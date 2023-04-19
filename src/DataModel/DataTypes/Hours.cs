@@ -19,10 +19,10 @@ namespace ESSP.DataModel
         public static Hours operator +(Hours a, Hours b) => new Hours(a.Value + b.Value);
         public static Hours operator -(Hours a, Hours b) => new Hours(a.Value - b.Value);
         public static bool operator <(Hours a, Hours b) => a.Value < b.Value;
-        public static bool operator >(Hours a, Hours b) => a.Value > b.Value; 
+        public static bool operator >(Hours a, Hours b) => a.Value > b.Value;
         public static bool operator <=(Hours a, Hours b) => a.Value <= b.Value;
-        public static bool operator >=(Hours a, Hours b) => a.Value >= b.Value; 
-        public static bool operator ==(Hours a, Hours b) => a.Value == b.Value; 
+        public static bool operator >=(Hours a, Hours b) => a.Value >= b.Value;
+        public static bool operator ==(Hours a, Hours b) => a.Value == b.Value;
         public static bool operator !=(Hours a, Hours b) => a.Value != b.Value;
         #endregion
 
@@ -38,9 +38,13 @@ namespace ESSP.DataModel
 
         public override bool Equals(object obj)
         {
-            return ((Hours)obj).Value == ((Hours)obj).Value; 
-        }
+            if (obj is Hours hour)
+            {
+                return this == hour;
+            }
 
+            return false;
+        }
         public Minutes ToMinutes()
         {
             return new Minutes(Value * 60);
@@ -58,7 +62,7 @@ namespace ESSP.DataModel
 
         public override string ToString()
         {
-            return $"{Value}h"; 
+            return $"{Value}h";
         }
 
 

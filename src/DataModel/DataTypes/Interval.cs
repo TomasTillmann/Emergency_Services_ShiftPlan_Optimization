@@ -29,25 +29,25 @@ namespace ESSP.DataModel
             Seconds start = Seconds.MaxValue;
             Seconds end = Seconds.MinValue;
 
-            foreach(Interval interval in intervals)
+            foreach (Interval interval in intervals)
             {
-                if(interval.Start < start)
+                if (interval.Start < start)
                 {
                     start = interval.Start;
                 }
 
-                if(interval.End > end)
+                if (interval.End > end)
                 {
                     end = interval.End;
                 }
             }
 
-            return GetByStartAndEnd(start, end); 
+            return GetByStartAndEnd(start, end);
         }
 
         public override string ToString()
         {
-            return $"INTERVAL: {{ {Start} : {End} }}"; 
+            return $"INTERVAL: {{ {Start} : {End} }}";
         }
     }
 }

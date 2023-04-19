@@ -39,7 +39,12 @@ namespace ESSP.DataModel
 
         public override bool Equals(object obj)
         {
-            return ((Minutes)obj).Value == ((Minutes)obj).Value; 
+            if (obj is Minutes minutes)
+            {
+                return this == minutes;
+            }
+
+            return false;
         }
 
         public Seconds ToSeconds()

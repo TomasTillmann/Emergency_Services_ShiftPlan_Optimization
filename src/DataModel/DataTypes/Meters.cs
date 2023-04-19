@@ -49,7 +49,12 @@ namespace ESSP.DataModel
 
         public override bool Equals(object obj)
         {
-            return ((Meters)obj).Value == ((Meters)obj).Value; 
+            if (obj is Meters hour)
+            {
+                return this == hour;
+            }
+
+            return false;
         }
 
         public override int GetHashCode()

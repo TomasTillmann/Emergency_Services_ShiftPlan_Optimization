@@ -26,10 +26,10 @@ namespace ESSP.DataModel
         public static Seconds operator +(Seconds a, Seconds b) => new Seconds(a.Value + b.Value);
         public static Seconds operator -(Seconds a, Seconds b) => new Seconds(a.Value - b.Value);
         public static bool operator <(Seconds a, Seconds b) => a.Value < b.Value;
-        public static bool operator >(Seconds a, Seconds b) => a.Value > b.Value; 
+        public static bool operator >(Seconds a, Seconds b) => a.Value > b.Value;
         public static bool operator <=(Seconds a, Seconds b) => a.Value <= b.Value;
-        public static bool operator >=(Seconds a, Seconds b) => a.Value >= b.Value; 
-        public static bool operator ==(Seconds a, Seconds b) => a.Value == b.Value; 
+        public static bool operator >=(Seconds a, Seconds b) => a.Value >= b.Value;
+        public static bool operator ==(Seconds a, Seconds b) => a.Value == b.Value;
         public static bool operator !=(Seconds a, Seconds b) => a.Value != b.Value;
 
         #endregion
@@ -46,7 +46,12 @@ namespace ESSP.DataModel
 
         public override bool Equals(object obj)
         {
-            return ((Seconds)obj).Value == ((Seconds)obj).Value; 
+            if (obj is Seconds seconds)
+            {
+                return this == seconds;
+            }
+
+            return false;
         }
 
         public override int GetHashCode()
@@ -56,7 +61,7 @@ namespace ESSP.DataModel
 
         public override string ToString()
         {
-            return $"{Value}s"; 
+            return $"{Value}s";
         }
     }
 

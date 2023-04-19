@@ -42,7 +42,12 @@ namespace ESSP.DataModel
 
         public override bool Equals(object obj)
         {
-            return ((MetersPerSecond)obj).Value == ((MetersPerSecond)obj).Value;
+            if (obj is MetersPerSecond metersPerSecond)
+            {
+                return this == metersPerSecond;
+            }
+
+            return false;
         }
 
         public override int GetHashCode()
