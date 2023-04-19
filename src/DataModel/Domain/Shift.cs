@@ -74,4 +74,19 @@ public class Shift : IIdentifiable
     {
         plannedIncidents.Add(currentIncident);
     }
+
+    /// <summary>
+    /// Returns incident which is / was handled in <paramref name="time"/>.
+    /// If no incidents were planned on this shift, returns <see langword="switch"/>.
+    /// </summary>
+    public PlannableIncident PlannedIncident(Seconds time)
+    {
+        if (PlannedIncidents.Count == 0)
+        {
+            return null;
+        }
+
+        // always has only one element
+        return PlannedIncidents.Where(inc => inc.WholeInterval.Contains(time)).First();
+    }
 }

@@ -45,6 +45,11 @@ namespace ESSP.DataModel
             return GetByStartAndEnd(start, end);
         }
 
+        public bool Contains(Seconds time)
+        {
+            return Start <= time && time <= End;
+        }
+
         public override string ToString()
         {
             return $"INTERVAL: {{ {Start} : {End} }}";

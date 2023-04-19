@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using DataModel.Interfaces;
 using ESSP.DataModel;
 
-namespace Simulation;
+namespace Simulating;
 
 class ShiftEvaluator
 {

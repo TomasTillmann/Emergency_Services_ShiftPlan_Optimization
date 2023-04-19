@@ -4,12 +4,21 @@ using System.Linq;
 using DataModel.Interfaces;
 using ESSP.DataModel;
 
-namespace Simulation;
+namespace Simulating;
 
-internal class Statistics
+public class Statistics
 {
     public IList<Incident> UnhandledIncidents { get; set; } = new List<Incident>();
     public IList<Incident> HandledIncidents { get; set; } = new List<Incident>();
+
+    public IList<Incident> AllIncidents { get; set; }
+
+    public double Threshold => AllIncidents.Count / HandledIncidents.Count;
+
+    public Statistics(IList<Incident> allIncidents)
+    {
+        AllIncidents = allIncidents;
+    }
 
     public void SetUnhandled(Incident incident)
     {
@@ -28,7 +37,7 @@ class State
     public Seconds StepDuration { get; set; }
 }
 
-class Simulation
+public class Simulation
 {
 
     public IList<Depot> Depots { get; }
@@ -49,9 +58,9 @@ class Simulation
         shiftEvaluator = new ShiftEvaluator(plannableIncidentFactory);
     }
 
-    public Statistics Run(IEnumerable<Incident> incidents, ShiftPlan shiftPlan)
+    public Statistics Run(IList<Incident> incidents, ShiftPlan shiftPlan)
     {
-        InitializeStatsStateAnd(shiftPlan);
+        Initialization(shiftPlan, incidents);
 
         foreach (Incident currentIncident in incidents)
         {
@@ -62,9 +71,9 @@ class Simulation
         return statistics;
     }
 
-    private void InitializeStatsStateAnd(ShiftPlan shiftPlan)
+    private void Initialization(ShiftPlan shiftPlan, IList<Incident> allIncidents)
     {
-        statistics = new Statistics();
+        statistics = new Statistics(allIncidents);
         state = new State();
         this.shiftPlan = shiftPlan;
     }
@@ -72,7 +81,6 @@ class Simulation
     private void UpdateSystem(Incident incident)
     {
         UpdateState(incident);
-        UpdateShiftPlan();
     }
 
     private void UpdateState(Incident incident)
@@ -81,21 +89,6 @@ class Simulation
 
         state.CurrentTime = incident.Occurence;
         state.StepDuration = state.CurrentTime - lastTime;
-    }
-
-    private void UpdateShiftPlan()
-    {
-
-
-
-        foreach (Depot depot in Depots)
-        {
-            foreach (Ambulance ambulance in depot.Ambulances)
-            {
-                Coordinate location = DistanceCalculator.GetNewLocation(ambulance, state.StepDuration, state.CurrentTime);
-                ambulance.Location = location;
-            }
-        }
     }
 
     private void Step(Incident currentIncident)
