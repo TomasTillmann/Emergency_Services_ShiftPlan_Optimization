@@ -16,7 +16,7 @@ public class Shift : IIdentifiable
 
     public Depot Depot { get; }
 
-    public Interval Work { get; internal set; }
+    public Interval Work { get; set; }
 
     public IReadOnlyList<PlannableIncident> PlannedIncidents => plannedIncidents;
 
@@ -38,7 +38,7 @@ public class Shift : IIdentifiable
             return true;
         }
 
-        return PlannedIncidents.Last().ToDepotDrive.End >= currentTime;
+        return PlannedIncidents.Last().ToDepotDrive.End <= currentTime;
     }
 
     public bool IsFree(Seconds currentTime)
@@ -77,9 +77,9 @@ public class Shift : IIdentifiable
 
     /// <summary>
     /// Returns incident which is / was handled in <paramref name="time"/>.
-    /// If no incidents were planned on this shift, returns <see langword="switch"/>.
+    /// If no incidents were planned on this shift, returns <see langword="null"/>.
     /// </summary>
-    public PlannableIncident PlannedIncident(Seconds time)
+    public PlannableIncident PlannedIncident(Seconds currentTime)
     {
         if (PlannedIncidents.Count == 0)
         {
@@ -87,6 +87,6 @@ public class Shift : IIdentifiable
         }
 
         // always has only one element
-        return PlannedIncidents.Where(inc => inc.WholeInterval.Contains(time)).First();
+        return PlannedIncidents.Where(inc => inc.WholeInterval.Contains(currentTime)).FirstOrDefault();
     }
 }

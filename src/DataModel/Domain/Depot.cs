@@ -13,6 +13,10 @@ public class Depot : ILocatable
     {
         Location = coordinate;
         Ambulances = ambulances;
-    }
 
+        foreach(Ambulance ambulance in Ambulances)
+        {
+            ambulance.Location = Location;
+        }
+    }
 }

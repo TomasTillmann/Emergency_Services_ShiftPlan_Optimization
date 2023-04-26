@@ -65,5 +65,7 @@ namespace ESSP.DataModel
     public static class MetersPerSecondExtensions
     {
         public static MetersPerSecond ToMetersPerSecond(this int value) => new MetersPerSecond(value);
+
+        public static MetersPerSecond ToKmPerHour(this int value) => new MetersPerSecond((int)(value / 3.6));
     }
 }

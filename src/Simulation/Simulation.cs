@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using DataModel.Interfaces;
 using ESSP.DataModel;
@@ -11,11 +12,11 @@ public class Statistics
     public IList<Incident> UnhandledIncidents { get; set; } = new List<Incident>();
     public IList<Incident> HandledIncidents { get; set; } = new List<Incident>();
 
-    public IList<Incident> AllIncidents { get; set; }
+    public IReadOnlyCollection<Incident> AllIncidents { get; set; }
 
     public double Threshold => AllIncidents.Count / HandledIncidents.Count;
 
-    public Statistics(IList<Incident> allIncidents)
+    public Statistics(IReadOnlyCollection<Incident> allIncidents)
     {
         AllIncidents = allIncidents;
     }
@@ -39,8 +40,7 @@ class State
 
 public class Simulation
 {
-
-    public IList<Depot> Depots { get; }
+    public IReadOnlyList<Depot> Depots { get; }
     public Seconds Time => state.CurrentTime;
     public IDistanceCalculator DistanceCalculator { get; }
 
@@ -50,15 +50,17 @@ public class Simulation
     private ShiftEvaluator shiftEvaluator;
     private PlannableIncident.Factory plannableIncidentFactory;
 
-    public Simulation(IList<Depot> depots, IList<Hospital> hospitals, IDistanceCalculator distanceCalculator)
+    private readonly TextWriter Logger = Console.Out; 
+
+    public Simulation(World world, IDistanceCalculator distanceCalculator)
     {
-        Depots = depots;
+        Depots = world.Depots;
         DistanceCalculator = distanceCalculator;
-        plannableIncidentFactory = new PlannableIncident.Factory(distanceCalculator, hospitals);
+        plannableIncidentFactory = new PlannableIncident.Factory(distanceCalculator, world.Hospitals);
         shiftEvaluator = new ShiftEvaluator(plannableIncidentFactory);
     }
 
-    public Statistics Run(IList<Incident> incidents, ShiftPlan shiftPlan)
+    public Statistics Run(IReadOnlyCollection<Incident> incidents, ShiftPlan shiftPlan)
     {
         Initialization(shiftPlan, incidents);
 
@@ -71,7 +73,7 @@ public class Simulation
         return statistics;
     }
 
-    private void Initialization(ShiftPlan shiftPlan, IList<Incident> allIncidents)
+    private void Initialization(ShiftPlan shiftPlan, IReadOnlyCollection<Incident> allIncidents)
     {
         statistics = new Statistics(allIncidents);
         state = new State();

@@ -7,7 +7,7 @@ namespace ESSP.DataModel;
 public partial class PlannableIncident
 {
     public Incident Incident { get; private set; }
-    public Hospital Hospital { get; private set; }
+    public Hospital NearestHospital { get; private set; }
     public Interval ToIncidentDrive { get; private set; }
     public Interval OnSceneDuration { get; private set; }
     public Interval ToHospitalDrive { get; private set; }
@@ -27,9 +27,9 @@ partial class PlannableIncident
     public class Factory
     {
         private IDistanceCalculator distanceCalculator;
-        private IList<Hospital> hospitals;
+        private IReadOnlyList<Hospital> hospitals;
 
-        public Factory(IDistanceCalculator distanceCalculator, IList<Hospital> hospitals)
+        public Factory(IDistanceCalculator distanceCalculator, IReadOnlyList<Hospital> hospitals)
         {
             this.distanceCalculator = distanceCalculator;
             this.hospitals = hospitals;
@@ -38,18 +38,18 @@ partial class PlannableIncident
         public PlannableIncident Get(Incident incident, Shift shift, Seconds currentTime)
         {
             PlannableIncident value = new(incident);
+            value.NearestHospital = distanceCalculator.GetNearestLocatable(incident, hospitals).First();
 
             value.ToIncidentDrive = GetToIncidentDrive(incident, shift, currentTime);
 
-            value.OnSceneDuration = Interval.GetByStartAndDuration(value.ToHospitalDrive.End, incident.OnSceneDuration);
+            value.OnSceneDuration = Interval.GetByStartAndDuration(value.ToIncidentDrive.End, incident.OnSceneDuration);
 
-            Hospital nearestHospital = distanceCalculator.GetNearestLocatable(incident, hospitals).First();
-            Seconds toHospitalTravelDuration = distanceCalculator.GetTravelDuration(incident, nearestHospital, value.OnSceneDuration.End);
+            Seconds toHospitalTravelDuration = distanceCalculator.GetTravelDuration(incident, value.NearestHospital, value.OnSceneDuration.End);
             value.ToHospitalDrive = Interval.GetByStartAndDuration(value.OnSceneDuration.End, toHospitalTravelDuration);
 
             value.InHospitalDelivery = Interval.GetByStartAndDuration(value.ToHospitalDrive.End, incident.InHospitalDelivery);
 
-            Seconds toDepotDriveDuration = distanceCalculator.GetTravelDuration(nearestHospital, shift.Depot, value.InHospitalDelivery.End);
+            Seconds toDepotDriveDuration = distanceCalculator.GetTravelDuration(value.NearestHospital, shift.Depot, value.InHospitalDelivery.End);
             value.ToDepotDrive = Interval.GetByStartAndDuration(value.InHospitalDelivery.End, toDepotDriveDuration);
 
             return value;
@@ -57,31 +57,48 @@ partial class PlannableIncident
 
         private Interval GetToIncidentDrive(Incident incident, Shift shift, Seconds currentTime)
         {
-            PlannableIncident value = new(incident);
+            Seconds startTimeToIncidentDrive = CalculateStartTimeToIncidentDrive(shift, currentTime);
+            Coordinate ambulanceLocation = CalculateAmbulanceStartingLocationToIncident(shift, currentTime);
 
-            Seconds reroutePenalty = 0.ToSeconds();
-            Coordinate ambulanceLocation = shift.Depot.Location;
+            Seconds toIncidentTravelDuration = distanceCalculator.GetTravelDuration(ambulanceLocation, incident.Location, startTimeToIncidentDrive);
 
-            // handling incident or driving to depot
-            if (!shift.IsInDepot(currentTime))
+            return Interval.GetByStartAndDuration(currentTime, startTimeToIncidentDrive + toIncidentTravelDuration);
+        }
+
+        private Seconds CalculateStartTimeToIncidentDrive(Shift shift, Seconds currentTime)
+        {
+            if (shift.IsInDepot(currentTime))
             {
-                PlannableIncident currentlyHandlingIncident = shift.PlannedIncident(currentTime);
-                Coordinate hospitalLocation = currentlyHandlingIncident.Hospital.Location;
-
-                ambulanceLocation = hospitalLocation;
-
-                // interrupting midway
-                if (currentlyHandlingIncident.ToDepotDrive.Contains(currentTime))
-                {
-                    reroutePenalty = shift.Ambulance.ReroutePenalty;
-                    Seconds durationDriving = currentTime - currentlyHandlingIncident.ToDepotDrive.Start;
-
-                    ambulanceLocation = distanceCalculator.GetNewLocation(hospitalLocation, shift.Depot.Location, durationDriving, currentTime);
-                }
+                return currentTime;
             }
 
-            Seconds toIncidentTravelDuration = distanceCalculator.GetTravelDuration(ambulanceLocation, incident.Location, currentTime + reroutePenalty);
-            value.ToIncidentDrive = Interval.GetByStartAndDuration(currentTime, reroutePenalty + toIncidentTravelDuration);
+            PlannableIncident currentlyHandlingIncident = shift.PlannedIncident(currentTime)!;
+
+            if (currentlyHandlingIncident.ToDepotDrive.Contains(currentTime))
+            {
+                return currentTime + shift.Ambulance.ReroutePenalty;
+            }
+
+            return currentlyHandlingIncident.InHospitalDelivery.End;
+        }
+
+        private Coordinate CalculateAmbulanceStartingLocationToIncident(Shift shift, Seconds currentTime)
+        {
+            if (shift.IsInDepot(currentTime))
+            {
+                return shift.Depot.Location;
+            }
+
+            PlannableIncident currentlyHandlingIncident = shift.PlannedIncident(currentTime)!;
+            Coordinate hospitalLocation = currentlyHandlingIncident.NearestHospital.Location;
+
+            if (currentlyHandlingIncident.ToDepotDrive.Contains(currentTime))
+            {
+                Seconds durationDriving = currentTime - currentlyHandlingIncident.ToDepotDrive.Start;
+                return distanceCalculator.GetNewLocation(hospitalLocation, shift.Depot.Location, durationDriving, currentTime);
+            }
+
+            return hospitalLocation;
         }
     }
 }
