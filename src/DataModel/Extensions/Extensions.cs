@@ -76,4 +76,22 @@ public static class Extensions
 
         return result;
     }
+
+    public static string Visualize<T>(this IEnumerable<T> enumerable)
+    {
+        const string separator = ", ";
+        string str = "";
+        foreach (T item in enumerable)
+        {
+            str += item?.ToString() + separator;
+        }
+
+        // remove the last separator
+        if(str.Length > 0)
+        {
+            str.Substring(0, str.Length - separator.Length);
+        }
+
+        return str;
+    }
 }

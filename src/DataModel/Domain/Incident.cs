@@ -28,6 +28,6 @@ public class Incident : ILocatable
 
     public override string ToString()
     {
-        return $"INCIDENT: {{ {Location}, OCCURENCE: {Occurence}, {Type} }}";
+        return $"Location: {Location}, Occurence: {Occurence}";
     }
 }

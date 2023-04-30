@@ -18,7 +18,7 @@ public interface IDistanceCalculator
 
 public class DistanceCalculator : IDistanceCalculator
 {
-    private static readonly MetersPerSecond speed = 100.ToKmPerHour(); 
+    public static MetersPerSecond Speed { get; } = 100.ToKmPerHour(); 
 
 
     public IEnumerable<T> GetNearestLocatable<T>(ILocatable locatable, IEnumerable<T> locatables) where T : ILocatable
@@ -28,17 +28,25 @@ public class DistanceCalculator : IDistanceCalculator
 
     public Coordinate GetNewLocation(Coordinate from, Coordinate to, Seconds duration, Seconds currentTime)
     {
-        // angle formula
+        Meters traveledDistance = DistanceCalculator.Speed * duration;
         Meters distance = GetDistance(from, to);
+
+        // crop it so it can't move behind the destination
+        if(traveledDistance > distance)
+        {
+            return to;
+        }
+        //
+
+        // angle formula
         double angle = Math.Atan2(to.Y.Value - from.Y.Value, to.X.Value - from.X.Value);
         //
 
-        // crop it so it can't move behind the destination
         return new Coordinate
-        (
-            Math.Max((int)(from.X.Value + distance.Value * Math.Cos(angle)), to.X.Value).ToMeters(),
-            Math.Max((int)(from.Y.Value + distance.Value * Math.Sin(angle)), to.Y.Value).ToMeters()
-        );
+        {
+            X = ((int)(from.X.Value + traveledDistance.Value * Math.Cos(angle))).ToMeters(),
+            Y = ((int)(from.Y.Value + traveledDistance.Value * Math.Sin(angle))).ToMeters()
+        };
     }
 
     public Seconds GetTravelDuration(ILocatable from, ILocatable to, Seconds currentTime)
@@ -48,7 +56,7 @@ public class DistanceCalculator : IDistanceCalculator
 
     public Seconds GetTravelDuration(Coordinate from, Coordinate to, Seconds currentTime)
     {
-        return GetDistance(from, to) / speed;
+        return GetDistance(from, to) / DistanceCalculator.Speed;
     }
 
 

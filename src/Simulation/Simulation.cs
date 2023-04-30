@@ -32,7 +32,7 @@ public class Statistics
     }
 }
 
-class State
+internal class State
 {
     public Seconds CurrentTime { get; set; } = 0.ToSeconds();
     public Seconds StepDuration { get; set; }
@@ -50,7 +50,7 @@ public class Simulation
     private ShiftEvaluator shiftEvaluator;
     private PlannableIncident.Factory plannableIncidentFactory;
 
-    private readonly TextWriter Logger = Console.Out; 
+    private readonly TextWriter Logger = new StreamWriter("Log.txt");
 
     public Simulation(World world, IDistanceCalculator distanceCalculator)
     {
@@ -60,6 +60,9 @@ public class Simulation
         shiftEvaluator = new ShiftEvaluator(plannableIncidentFactory);
     }
 
+    /// <summary>
+    /// Incidents need to be sorted by occurence.
+    /// </summary>
     public Statistics Run(IReadOnlyCollection<Incident> incidents, ShiftPlan shiftPlan)
     {
         Initialization(shiftPlan, incidents);

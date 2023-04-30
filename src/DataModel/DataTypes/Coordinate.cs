@@ -4,9 +4,9 @@ namespace ESSP.DataModel
 {
     public readonly struct Coordinate
     {
-        public Meters X { get; }
+        public Meters X { get; init; }
 
-        public Meters Y { get; }
+        public Meters Y { get; init; }
 
         public Coordinate(Meters x, Meters y)
         {
@@ -49,7 +49,7 @@ namespace ESSP.DataModel
 
         public override string ToString()
         {
-            return $"COORDINATE: {{ Lat: {X}, Long: {Y} }}";
+            return $"X: {X}, Y: {Y}";
         }
 
     }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using DataModel.Interfaces;
+using Model.Extensions;
 using Newtonsoft.Json;
 
 namespace ESSP.DataModel;
@@ -88,5 +89,10 @@ public class Shift : IIdentifiable
 
         // always has only one element
         return PlannedIncidents.Where(inc => inc.WholeInterval.Contains(currentTime)).FirstOrDefault();
+    }
+
+    public override string ToString()
+    {
+        return $"AmbulanceLoc: {Ambulance.Location}, WorkStart: {Work.Start}, WorkEnd: {Work.End}, Planned: {plannedIncidents.Select(inc => inc.Incident).Visualize()}"; 
     }
 }
