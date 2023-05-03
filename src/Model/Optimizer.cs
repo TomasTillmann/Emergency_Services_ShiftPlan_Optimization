@@ -19,10 +19,12 @@ public class Optimizer
 
     public void FindOptimal(ShiftPlan shiftPlan, List<Incidents> incidents)
     {
+        Statistics stats;
         shiftPlan = LargestShiftPlan(shiftPlan);
+
         foreach(Incidents incident in incidents)
         {
-            simulation.Run(incident.Value, shiftPlan);
+            stats = simulation.Run(incident.Value, shiftPlan);
         }
     }
 
