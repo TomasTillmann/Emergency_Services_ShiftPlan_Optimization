@@ -4,29 +4,33 @@ using System.IO;
 using System.Linq;
 using DataModel.Interfaces;
 using ESSP.DataModel;
+using Logging;
+using Microsoft.Extensions.Logging;
 
 namespace Simulating;
 
-public class Statistics
+public sealed class Statistics
 {
-    public IList<Incident> UnhandledIncidents { get; set; } = new List<Incident>();
-    public IList<Incident> HandledIncidents { get; set; } = new List<Incident>();
+    public IList<Incident> UnhandledIncidents { get; internal set; } = new List<Incident>();
+    public IList<Incident> HandledIncidents { get; internal set; } = new List<Incident>();
 
-    public IReadOnlyCollection<Incident> AllIncidents { get; set; }
+    public IReadOnlyCollection<Incident> AllIncidents { get; }
 
     public double Threshold => AllIncidents.Count / HandledIncidents.Count;
 
-    public Statistics(IReadOnlyCollection<Incident> allIncidents)
+    internal Statistics(IReadOnlyCollection<Incident> allIncidents)
     {
         AllIncidents = allIncidents;
     }
 
-    public void SetUnhandled(Incident incident)
+    private Statistics() { }
+
+    internal void SetUnhandled(Incident incident)
     {
         UnhandledIncidents.Add(incident);
     }
 
-    public void SetHandled(Incident incident)
+    internal void SetHandled(Incident incident)
     {
         HandledIncidents.Add(incident);
     }
@@ -38,7 +42,7 @@ class State
     public Seconds StepDuration { get; set; }
 }
 
-public class Simulation
+public sealed class Simulation
 {
     public IReadOnlyList<Depot> Depots { get; }
     public Seconds Time => state.CurrentTime;
@@ -50,7 +54,7 @@ public class Simulation
     private ShiftEvaluator shiftEvaluator;
     private PlannableIncident.Factory plannableIncidentFactory;
 
-    private readonly TextWriter Logger = Console.Out; 
+    private Logger Logger = Logger.Instance;
 
     public Simulation(World world, IDistanceCalculator distanceCalculator)
     {
@@ -68,6 +72,7 @@ public class Simulation
         {
             UpdateSystem(currentIncident);
             Step(currentIncident);
+            Logger.WriteLine(state.CurrentTime);
         }
 
         return statistics;
