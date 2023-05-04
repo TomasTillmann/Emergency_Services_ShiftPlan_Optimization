@@ -36,7 +36,7 @@ public sealed class Statistics
     }
 }
 
-internal class State
+internal class SimulationState
 {
     public Seconds CurrentTime { get; set; } = 0.ToSeconds();
     public Seconds StepDuration { get; set; }
@@ -48,7 +48,7 @@ public sealed class Simulation
     public Seconds Time => state.CurrentTime;
     public IDistanceCalculator DistanceCalculator { get; }
 
-    private State state;
+    private SimulationState state;
     private Statistics statistics;
     private ShiftPlan shiftPlan;
     private ShiftEvaluator shiftEvaluator;
@@ -86,7 +86,7 @@ public sealed class Simulation
     private void Initialization(ShiftPlan shiftPlan, IReadOnlyCollection<Incident> allIncidents)
     {
         statistics = new Statistics(allIncidents);
-        state = new State();
+        state = new SimulationState();
         this.shiftPlan = shiftPlan;
     }
 
@@ -109,7 +109,7 @@ public sealed class Simulation
         Logger.WriteLine($"Incident: {currentIncident}");
         Logger.WriteLine($"Shifts:\n{shiftPlan.Shifts.Visualize("\n")}");
 
-        List<Shift> handlingShifts = GetHandlingShifts(currentIncident);
+        List<Shift> handlingShifts = shiftEvaluator.GetHandlingShifts(shiftPlan.Shifts, currentIncident, state);
         if (handlingShifts.Count == 0)
         {
             Logger.WriteLine($"Unhandled");
@@ -117,37 +117,12 @@ public sealed class Simulation
             return;
         }
 
-        Shift bestShift = GetBestShift(handlingShifts, currentIncident);
+        Shift bestShift = shiftEvaluator.GetBestShift(handlingShifts, currentIncident, state);
 
         Logger.WriteLine($"Best shift:\n{bestShift}");
 
         bestShift.Plan(plannableIncidentFactory.Get(currentIncident, bestShift, state.CurrentTime));
 
         statistics.SetHandled(currentIncident);
-    }
-
-    private List<Shift> GetHandlingShifts(Incident currentIncident)
-    {
-        List<Shift> handlingShifts = new();
-        foreach (Shift shift in shiftPlan.Shifts)
-        {
-            if (shiftEvaluator.IsHandling(shift, currentIncident, state.CurrentTime))
-            {
-                handlingShifts.Add(shift);
-            }
-        }
-
-        return handlingShifts;
-    }
-
-    private Shift GetBestShift(List<Shift> handlingShifts, Incident currentIncident)
-    {
-        Shift bestShift = handlingShifts.First();
-        foreach (Shift shift in handlingShifts)
-        {
-            bestShift = shiftEvaluator.GetBetter(shift, bestShift, currentIncident, state.CurrentTime);
-        }
-
-        return bestShift;
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using DataModel.Interfaces;
 using ESSP.DataModel;
 
@@ -12,6 +13,20 @@ class ShiftEvaluator
     public ShiftEvaluator(PlannableIncident.Factory plannableIncidentFactory)
     {
         this.plannableIncidentFactory = plannableIncidentFactory;
+    }
+
+    public List<Shift> GetHandlingShifts(List<Shift> shifts, Incident currentIncident, SimulationState state)
+    {
+        List<Shift> handlingShifts = new();
+        foreach (Shift shift in shifts)
+        {
+            if (IsHandling(shift, currentIncident, state.CurrentTime))
+            {
+                handlingShifts.Add(shift);
+            }
+        }
+
+        return handlingShifts;
     }
 
     public bool IsHandling(Shift shift, Incident incident, Seconds currentTime)
@@ -31,6 +46,17 @@ class ShiftEvaluator
         }
 
         return true;
+    }
+
+    public Shift GetBestShift(List<Shift> shifts, Incident currentIncident, SimulationState state)
+    {
+        Shift bestShift = shifts.First();
+        foreach (Shift shift in shifts)
+        {
+            bestShift = GetBetter(shift, bestShift, currentIncident, state.CurrentTime);
+        }
+
+        return bestShift;
     }
 
     /// <summary>
