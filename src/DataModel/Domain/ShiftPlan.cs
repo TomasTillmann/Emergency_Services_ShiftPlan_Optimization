@@ -6,9 +6,9 @@ using System.Linq;
 namespace ESSP.DataModel;
 public class ShiftPlan
 {
-    public IList<Shift> Shifts { get; }
+    public List<Shift> Shifts { get; }
 
-    public ShiftPlan(IList<Shift> shifts)
+    public ShiftPlan(List<Shift> shifts)
     {
         Shifts = shifts;
     }

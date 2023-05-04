@@ -3,12 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using DataModel.Interfaces;
 using Model.Extensions;
-using Newtonsoft.Json;
 
 namespace ESSP.DataModel;
 public class Shift : IIdentifiable
 {
-    [JsonIgnore]
     private static uint IdGenerator = 1;
 
     public uint Id { get; }

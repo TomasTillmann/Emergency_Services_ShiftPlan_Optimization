@@ -1,21 +1,17 @@
 ﻿using DataModel.Interfaces;
-using Newtonsoft.Json;
 
 namespace ESSP.DataModel;
 public class Incident : ILocatable
 {
-    public Coordinate Location { get; }
+    public Coordinate Location { get; init; }
 
-    [JsonIgnore]
-    public Seconds Occurence { get; }
+    public Seconds Occurence { get; init; }
 
-    [JsonIgnore]
-    public Seconds OnSceneDuration { get; }
+    public Seconds OnSceneDuration { get; init; }
 
-    [JsonIgnore]
-    public Seconds InHospitalDelivery { get; }
+    public Seconds InHospitalDelivery { get; init; }
 
-    public IncidentType Type { get; }
+    public IncidentType Type { get; init; }
 
     public Incident(Coordinate coordinate, Seconds occurence, Seconds onSceneDuration, Seconds inHospitalDelivery, IncidentType type)
     {
