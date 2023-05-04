@@ -20,6 +20,18 @@ public partial class PlannableIncident
     {
         Incident = incident;
     }
+
+    public override string ToString()
+    {
+        return
+            $"{Incident}, " +
+            $"Hospital: {NearestHospital.Location}, " +
+            $"ToIncidentDrive: {ToIncidentDrive.Start}, " +
+            $"OnSceneDuration: {OnSceneDuration.Start}, ToHospitalDrive: {ToHospitalDrive.Start}, " +
+            $"InHospitalDelivery: {InHospitalDelivery.Start}, " +
+            $"ToDepotDrive: {ToDepotDrive.Start}, " +
+            $"InDepot: {ToDepotDrive.End}";
+    }
 }
 
 partial class PlannableIncident

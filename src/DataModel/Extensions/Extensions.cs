@@ -77,13 +77,14 @@ public static class Extensions
         return result;
     }
 
-    public static string Visualize<T>(this IEnumerable<T> enumerable)
+    public static string Visualize<T>(this IEnumerable<T> enumerable, string separator = ", ", int indent = 0)
     {
-        const string separator = ", ";
         string str = "";
+        string indentStr = new('\t', indent);
+
         foreach (T item in enumerable)
         {
-            str += item?.ToString() + separator;
+            str += indentStr + item?.ToString() + separator;
         }
 
         // remove the last separator

@@ -5,6 +5,7 @@ using System.Linq;
 using DataModel.Interfaces;
 using ESSP.DataModel;
 using Logging;
+using Model.Extensions;
 
 namespace Simulating;
 
@@ -15,7 +16,7 @@ public sealed class Statistics
 
     public IReadOnlyCollection<Incident> AllIncidents { get; }
 
-    public double Threshold => AllIncidents.Count / HandledIncidents.Count;
+    public double Threshold => (double)HandledIncidents.Count / AllIncidents.Count;
 
     internal Statistics(IReadOnlyCollection<Incident> allIncidents)
     {
@@ -74,8 +75,10 @@ public sealed class Simulation
         {
             UpdateSystem(currentIncident);
             Step(currentIncident);
-            Logger.WriteLine(state.CurrentTime);
+            Logger.WriteLine();
         }
+
+        Logger.WriteLine($"Threshold: {statistics.Threshold}");
 
         return statistics;
     }
@@ -102,14 +105,21 @@ public sealed class Simulation
 
     private void Step(Incident currentIncident)
     {
+        Logger.WriteLine($"Occurence: {state.CurrentTime}");
+        Logger.WriteLine($"Incident: {currentIncident}");
+        Logger.WriteLine($"Shifts:\n{shiftPlan.Shifts.Visualize("\n")}");
+
         List<Shift> handlingShifts = GetHandlingShifts(currentIncident);
         if (handlingShifts.Count == 0)
         {
+            Logger.WriteLine($"Unhandled");
             statistics.SetUnhandled(currentIncident);
             return;
         }
 
         Shift bestShift = GetBestShift(handlingShifts, currentIncident);
+
+        Logger.WriteLine($"Best shift:\n{bestShift}");
 
         bestShift.Plan(plannableIncidentFactory.Get(currentIncident, bestShift, state.CurrentTime));
 

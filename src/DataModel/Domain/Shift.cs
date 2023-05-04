@@ -93,6 +93,6 @@ public class Shift : IIdentifiable
 
     public override string ToString()
     {
-        return $"AmbulanceLoc: {Ambulance.Location}, WorkStart: {Work.Start}, WorkEnd: {Work.End}, Planned: {plannedIncidents.Select(inc => inc.Incident).Visualize()}"; 
+        return $"({Id}) AmbulanceLoc: {Ambulance.Location}, WorkStart: {Work.Start}, WorkEnd: {Work.End},\n\tPlanned:\n{plannedIncidents.Visualize("\n", 1)}"; 
     }
 }
