@@ -6,9 +6,9 @@ namespace ESSP.DataModel
 {
     public readonly struct IncidentType
     {
-        public string Name { get; }
-        public Seconds MaximumResponseTime { get; }
-        public HashSet<AmbulanceType> AllowedAmbulanceTypes { get; }
+        public string Name { get; init; }
+        public Seconds MaximumResponseTime { get; init; }
+        public HashSet<AmbulanceType> AllowedAmbulanceTypes { get; init; }
 
         public IncidentType(string name, Seconds maximumResponseTime, HashSet<AmbulanceType> allowedAmbulanceTypes)
         {

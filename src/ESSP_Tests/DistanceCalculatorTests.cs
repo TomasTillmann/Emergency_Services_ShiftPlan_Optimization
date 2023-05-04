@@ -24,14 +24,6 @@ namespace ESSP_Tests
         }
     }
 
-    public abstract class Tests
-    {
-        public string CollectionMessage<T>(IEnumerable<T> expected, IEnumerable<T> actual)
-        {
-            return string.Join("\n", expected.Visualize(), actual.Visualize());
-        }
-    }
-
     public class DistanceCalculatorTests : Tests
     {
         private DistanceCalculator distanceCalculator;

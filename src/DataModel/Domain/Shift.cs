@@ -21,10 +21,10 @@ public class Shift : IIdentifiable
 
     private List<PlannableIncident> plannedIncidents = new();
 
-    public Shift(Ambulance ambulance, Depot depot, Interval available)
+    public Shift(Ambulance ambulance, Depot depot, Interval work)
     {
         Ambulance = ambulance;
-        Work = available;
+        Work = work;
         Depot = depot;
 
         Id = IdGenerator++;
