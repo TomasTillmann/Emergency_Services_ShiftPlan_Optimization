@@ -74,7 +74,7 @@ partial class PlannableIncident
 
             Seconds toIncidentTravelDuration = distanceCalculator.GetTravelDuration(ambulanceLocation, incident.Location, startTimeToIncidentDrive);
 
-            return Interval.GetByStartAndDuration(currentTime, toIncidentTravelDuration);
+            return Interval.GetByStartAndDuration(startTimeToIncidentDrive, toIncidentTravelDuration);
         }
 
         private Seconds CalculateStartTimeToIncidentDrive(Shift shift, Seconds currentTime)
