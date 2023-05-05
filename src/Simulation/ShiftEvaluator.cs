@@ -31,7 +31,7 @@ class ShiftEvaluator
 
     public bool IsHandling(Shift shift, Incident incident, Seconds currentTime)
     {
-        PlannableIncident plannableIncident = plannableIncidentFactory.Get(incident, shift, currentTime);
+        PlannableIncident plannableIncident = plannableIncidentFactory.Get(incident, shift);
 
         // 1
         if (plannableIncident.ToIncidentDrive.Duration > incident.Type.MaximumResponseTime)
@@ -72,8 +72,8 @@ class ShiftEvaluator
         }
 
         // 2
-        PlannableIncident shift1PlannableIncident = plannableIncidentFactory.Get(incident, shift1, currentTime);
-        PlannableIncident shift2PlannableIncident = plannableIncidentFactory.Get(incident, shift2, currentTime);
+        PlannableIncident shift1PlannableIncident = plannableIncidentFactory.Get(incident, shift1);
+        PlannableIncident shift2PlannableIncident = plannableIncidentFactory.Get(incident, shift2);
 
         if (shift1PlannableIncident.ToIncidentDrive.End != shift2PlannableIncident.ToIncidentDrive.End)
         {

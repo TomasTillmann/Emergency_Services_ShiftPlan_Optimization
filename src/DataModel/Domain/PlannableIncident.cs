@@ -47,12 +47,12 @@ partial class PlannableIncident
             this.hospitals = hospitals;
         }
 
-        public PlannableIncident Get(Incident incident, Shift shift, Seconds currentTime)
+        public PlannableIncident Get(Incident incident, Shift shift)
         {
             PlannableIncident value = new(incident);
             value.NearestHospital = distanceCalculator.GetNearestLocatable(incident, hospitals).First();
 
-            value.ToIncidentDrive = GetToIncidentDrive(incident, shift, currentTime);
+            value.ToIncidentDrive = GetToIncidentDrive(incident, shift);
 
             value.OnSceneDuration = Interval.GetByStartAndDuration(value.ToIncidentDrive.End, incident.OnSceneDuration);
 
@@ -67,47 +67,47 @@ partial class PlannableIncident
             return value;
         }
 
-        private Interval GetToIncidentDrive(Incident incident, Shift shift, Seconds currentTime)
+        private Interval GetToIncidentDrive(Incident incident, Shift shift)
         {
-            Seconds startTimeToIncidentDrive = CalculateStartTimeToIncidentDrive(shift, currentTime);
-            Coordinate ambulanceLocation = CalculateAmbulanceStartingLocationToIncident(shift, currentTime);
+            Seconds startTimeToIncidentDrive = CalculateStartTimeToIncidentDrive(shift, incident.Occurence);
+            Coordinate ambulanceLocation = CalculateAmbulanceStartingLocationToIncident(shift, incident.Occurence);
 
             Seconds toIncidentTravelDuration = distanceCalculator.GetTravelDuration(ambulanceLocation, incident.Location, startTimeToIncidentDrive);
 
             return Interval.GetByStartAndDuration(startTimeToIncidentDrive, toIncidentTravelDuration);
         }
 
-        private Seconds CalculateStartTimeToIncidentDrive(Shift shift, Seconds currentTime)
+        private Seconds CalculateStartTimeToIncidentDrive(Shift shift, Seconds incidentOccurenceTime)
         {
-            if (shift.IsInDepot(currentTime))
+            if (shift.IsInDepot(incidentOccurenceTime))
             {
-                return currentTime;
+                return incidentOccurenceTime;
             }
 
-            PlannableIncident currentlyHandlingIncident = shift.PlannedIncident(currentTime)!;
+            PlannableIncident currentlyHandlingIncident = shift.PlannedIncident(incidentOccurenceTime)!;
 
-            if (currentlyHandlingIncident.ToDepotDrive.Contains(currentTime))
+            if (currentlyHandlingIncident.ToDepotDrive.Contains(incidentOccurenceTime))
             {
-                return currentTime + shift.Ambulance.ReroutePenalty;
+                return incidentOccurenceTime + shift.Ambulance.ReroutePenalty;
             }
 
             return currentlyHandlingIncident.InHospitalDelivery.End;
         }
 
-        private Coordinate CalculateAmbulanceStartingLocationToIncident(Shift shift, Seconds currentTime)
+        private Coordinate CalculateAmbulanceStartingLocationToIncident(Shift shift, Seconds incidentOccurenceTime)
         {
-            if (shift.IsInDepot(currentTime))
+            if (shift.IsInDepot(incidentOccurenceTime))
             {
                 return shift.Depot.Location;
             }
 
-            PlannableIncident currentlyHandlingIncident = shift.PlannedIncident(currentTime)!;
+            PlannableIncident currentlyHandlingIncident = shift.PlannedIncident(incidentOccurenceTime)!;
             Coordinate hospitalLocation = currentlyHandlingIncident.NearestHospital.Location;
 
-            if (currentlyHandlingIncident.ToDepotDrive.Contains(currentTime))
+            if (currentlyHandlingIncident.ToDepotDrive.Contains(incidentOccurenceTime))
             {
-                Seconds durationDriving = currentTime - currentlyHandlingIncident.ToDepotDrive.Start;
-                return distanceCalculator.GetNewLocation(hospitalLocation, shift.Depot.Location, durationDriving, currentTime);
+                Seconds durationDriving = incidentOccurenceTime - currentlyHandlingIncident.ToDepotDrive.Start;
+                return distanceCalculator.GetNewLocation(hospitalLocation, shift.Depot.Location, durationDriving, incidentOccurenceTime);
             }
 
             return hospitalLocation;

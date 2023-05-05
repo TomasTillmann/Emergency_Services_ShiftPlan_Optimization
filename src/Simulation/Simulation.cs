@@ -121,7 +121,7 @@ public sealed class Simulation
 
         Logger.WriteLine($"Best shift:\n{bestShift}");
 
-        bestShift.Plan(plannableIncidentFactory.Get(currentIncident, bestShift, state.CurrentTime));
+        bestShift.Plan(plannableIncidentFactory.Get(currentIncident, bestShift));
 
         statistics.SetHandled(currentIncident);
     }
