@@ -117,7 +117,7 @@ public sealed class Simulation
             return;
         }
 
-        Shift bestShift = shiftEvaluator.GetBestShift(handlingShifts, currentIncident, state);
+        Shift bestShift = shiftEvaluator.GetBestShift(handlingShifts, currentIncident);
 
         Logger.WriteLine($"Best shift:\n{bestShift}");
 

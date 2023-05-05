@@ -60,12 +60,15 @@ class ShiftEvaluator
         return true;
     }
 
-    public Shift GetBestShift(List<Shift> shifts, Incident currentIncident, SimulationState state)
+    /// <summary>
+    /// <paramref name="handlingShifts"/> needs to be handling shifts, otherwise undefined behaviour happens.
+    /// </summary>
+    public Shift GetBestShift(List<Shift> handlingShifts, Incident incident)
     {
-        Shift bestShift = shifts.First();
-        foreach (Shift shift in shifts)
+        Shift bestShift = handlingShifts.First();
+        foreach (Shift shift in handlingShifts)
         {
-            bestShift = GetBetter(shift, bestShift, currentIncident, state.CurrentTime);
+            bestShift = GetBetter(shift, bestShift, incident);
         }
 
         return bestShift;
@@ -75,12 +78,12 @@ class ShiftEvaluator
     /// Rreturns better shift out of the two based on defined conditions.
     /// If both shifts are equaly good, <paramref name="shift1"/> is returned.
     /// </summary>
-    public Shift GetBetter(Shift shift1, Shift shift2, Incident incident, Seconds currentTime)
+    public Shift GetBetter(Shift shift1, Shift shift2, Incident incident)
     {
         // 1
-        if (!shift1.IsFree(currentTime) || !shift2.IsFree(currentTime))
+        if (!shift1.IsFree(incident.Occurence) || !shift2.IsFree(incident.Occurence))
         {
-            return shift1.IsFree(currentTime) ? shift1 : shift2;
+            return shift1.IsFree(incident.Occurence) ? shift1 : shift2;
         }
 
         // 2
