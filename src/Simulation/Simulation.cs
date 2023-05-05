@@ -109,7 +109,7 @@ public sealed class Simulation
         Logger.WriteLine($"Incident: {currentIncident}");
         Logger.WriteLine($"Shifts:\n{shiftPlan.Shifts.Visualize("\n")}");
 
-        List<Shift> handlingShifts = shiftEvaluator.GetHandlingShifts(shiftPlan.Shifts, currentIncident, state);
+        List<Shift> handlingShifts = shiftEvaluator.GetHandlingShifts(shiftPlan.Shifts, currentIncident);
         if (handlingShifts.Count == 0)
         {
             Logger.WriteLine($"Unhandled");

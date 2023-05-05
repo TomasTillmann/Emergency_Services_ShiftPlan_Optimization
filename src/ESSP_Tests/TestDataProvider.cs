@@ -59,6 +59,27 @@ public class TestDataProvider
         return new Incidents(incidents, 0.8);
     }
 
+    public Incident GenerateIncident()
+    {
+        Random random = new(111);
+        TestDataProvider dataProvider = new();
+        List<AmbulanceType> ambTypes = dataProvider.GetAmbulanceTypes();
+        int start = random.Next(0, ambTypes.Count - 2);
+
+        return new Incident(
+            coordinate: new Coordinate { X = random.Next(0, 10_000).ToMeters(), Y = random.Next(0, 10_000).ToMeters() },
+            occurence: random.Next(0, 8.ToHours().ToSeconds().Value).ToSeconds(),
+            onSceneDuration: random.Next(30, 30.ToMinutes().ToSeconds().Value).ToSeconds(),
+            inHospitalDelivery: random.Next(5.ToMinutes().ToSeconds().Value, 20.ToMinutes().ToSeconds().Value).ToSeconds(),
+            type: new IncidentType
+            {
+                Name = $"IncidentTypeTest",
+                AllowedAmbulanceTypes = ambTypes.GetRange(start, ambTypes.Count - start).ToHashSet(),
+                MaximumResponseTime = random.Next(30.ToMinutes().ToSeconds().Value, 1.ToHours().ToSeconds().Value).ToSeconds(),
+            }
+        );
+    }
+
     public List<IncidentType> GetIncidentTypes()
     {
         return incidentTypes;

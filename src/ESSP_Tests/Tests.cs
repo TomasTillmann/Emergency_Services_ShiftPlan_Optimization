@@ -6,12 +6,11 @@ namespace ESSP_Tests
 {
     public abstract class Tests
     {
-        protected TestDataProvider dataProvider { get; } 
+        protected static TestDataProvider dataProvider { get; } = new();
         protected IDistanceCalculator distanceCalculator { get; }
 
         public Tests()
         {
-            dataProvider = new();
             distanceCalculator = dataProvider.GetDistanceCalculator();
         }
 

@@ -15,12 +15,12 @@ class ShiftEvaluator
         this.plannableIncidentFactory = plannableIncidentFactory;
     }
 
-    public List<Shift> GetHandlingShifts(List<Shift> shifts, Incident currentIncident, SimulationState state)
+    public List<Shift> GetHandlingShifts(List<Shift> shifts, Incident currentIncident)
     {
         List<Shift> handlingShifts = new();
         foreach (Shift shift in shifts)
         {
-            if (IsHandling(shift, currentIncident, state.CurrentTime))
+            if (IsHandling(shift, currentIncident))
             {
                 handlingShifts.Add(shift);
             }
@@ -29,7 +29,7 @@ class ShiftEvaluator
         return handlingShifts;
     }
 
-    public bool IsHandling(Shift shift, Incident incident, Seconds currentTime)
+    public bool IsHandling(Shift shift, Incident incident)
     {
         PlannableIncident plannableIncident = plannableIncidentFactory.Get(incident, shift);
 
@@ -40,7 +40,7 @@ class ShiftEvaluator
         }
 
         // 1, 2, 3, 4
-        if (plannableIncident.IncidentHandling.Duration > (shift.Work.End - currentTime))
+        if (plannableIncident.InHospitalDelivery.End > shift.Work.End)
         {
             return false;
         }

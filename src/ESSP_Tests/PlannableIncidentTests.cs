@@ -17,7 +17,7 @@ public abstract class PlannableIncidentTestsBase : Tests
     {
         for (int i = 0; i < 100; i++)
         {
-            yield return new TestCaseData(GetIncident());
+            yield return new TestCaseData(dataProvider.GenerateIncident());
         }
     }
 
@@ -26,7 +26,7 @@ public abstract class PlannableIncidentTestsBase : Tests
         List<Incident> incidents = new();
         for (int i = 0; i < 10; i++)
         {
-            incidents.Add(GetIncident());
+            incidents.Add(dataProvider.GenerateIncident());
         }
 
         foreach(Incident incident1 in incidents)
@@ -46,7 +46,7 @@ public abstract class PlannableIncidentTestsBase : Tests
 
         for (int i = 0; i < 10; i++)
         {
-            incidents.Add(GetIncident());
+            incidents.Add(dataProvider.GenerateIncident());
         }
 
         foreach (Incident incident in incidents)
@@ -56,7 +56,7 @@ public abstract class PlannableIncidentTestsBase : Tests
                 .Get(incident, shift);
 
             shift.Plan(plannableIncident);
-            Incident incidentInterruptingMidway = GetIncident();
+            Incident incidentInterruptingMidway = dataProvider.GenerateIncident();
             incidentInterruptingMidway.Occurence = ((plannableIncident.ToDepotDrive.Start.Value + plannableIncident.ToDepotDrive.End.Value) / 2).ToSeconds();
 
             Coordinate newAmbLocation = dataProvider.GetDistanceCalculator()
@@ -64,27 +64,6 @@ public abstract class PlannableIncidentTestsBase : Tests
 
             yield return new TestCaseData(incidentInterruptingMidway, shift, newAmbLocation);
         }
-    }
-
-    protected static Incident GetIncident()
-    {
-        Random random = new(111);
-        TestDataProvider dataProvider = new();
-        List<AmbulanceType> ambTypes = dataProvider.GetAmbulanceTypes();
-        int start = random.Next(0, ambTypes.Count - 2);
-
-        return new Incident(
-            coordinate: new Coordinate { X = random.Next(0, 10_000).ToMeters(), Y = random.Next(0, 10_000).ToMeters() },
-            occurence: random.Next(0, 8.ToHours().ToSeconds().Value).ToSeconds(),
-            onSceneDuration: random.Next(30, 30.ToMinutes().ToSeconds().Value).ToSeconds(),
-            inHospitalDelivery: random.Next(5.ToMinutes().ToSeconds().Value, 20.ToMinutes().ToSeconds().Value).ToSeconds(),
-            type: new IncidentType
-            {
-                Name = $"IncidentTypeTest",
-                AllowedAmbulanceTypes = ambTypes.GetRange(start, ambTypes.Count - start).ToHashSet(),
-                MaximumResponseTime = random.Next(30.ToMinutes().ToSeconds().Value, 1.ToHours().ToSeconds().Value).ToSeconds(),
-            }
-        );
     }
 }
 
@@ -175,12 +154,12 @@ public class PlannableIncidentTests : PlannableIncidentTestsBase
         TestDataProvider dataProvider = new();
         Shift shift = new(dataProvider.GetAmbulances().First(), dataProvider.GetDepots().First(), Interval.GetByStartAndDuration(300.ToSeconds(), 24.ToHours().ToSeconds()));
 
-        Incident incidentMidwayInterrupted = GetIncident();
+        Incident incidentMidwayInterrupted = dataProvider.GenerateIncident();
         PlannableIncident plannableIncidentMidwayInterrupted = new PlannableIncident.Factory(dataProvider.GetDistanceCalculator(), dataProvider.GetHospitals())
             .Get(incidentMidwayInterrupted, shift);
         shift.Plan(plannableIncidentMidwayInterrupted);
 
-        Incident incidentInterruptingMidway = GetIncident();
+        Incident incidentInterruptingMidway = dataProvider.GenerateIncident();
         incidentInterruptingMidway.Occurence = ((plannableIncidentMidwayInterrupted.ToDepotDrive.Start.Value + plannableIncidentMidwayInterrupted.ToDepotDrive.End.Value) / 2).ToSeconds();
 
 

@@ -24,7 +24,7 @@ public abstract class ShiftEvaluatorTestsBase : Tests
 public class ShiftEvaluatorTests : ShiftEvaluatorTestsBase
 {
     [TestCaseSource(nameof(HandlingShiftsTestSource))]
-    public void GetHandlingShiftTest(Incident incident)
+    public void IsHandlingTest(Incident incident)
     {
         //TODO: implement
     }
