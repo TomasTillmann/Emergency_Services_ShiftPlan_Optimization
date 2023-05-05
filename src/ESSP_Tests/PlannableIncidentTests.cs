@@ -10,14 +10,14 @@ public abstract class PlannableIncidentTestsBase : Tests
 
     public PlannableIncidentTestsBase()
     {
-        plannableIncidentFactory = new(distanceCalculator, dataProvider.GetHospitals());
+        plannableIncidentFactory = new(distanceCalculator, testDataProvider.GetHospitals());
     }
 
     protected static IEnumerable<TestCaseData> GetPlannableIncidentImmidiatelyAvailableTestSource()
     {
         for (int i = 0; i < 100; i++)
         {
-            yield return new TestCaseData(dataProvider.GenerateIncident());
+            yield return new TestCaseData(testDataProvider.GenerateIncident());
         }
     }
 
@@ -26,7 +26,7 @@ public abstract class PlannableIncidentTestsBase : Tests
         List<Incident> incidents = new();
         for (int i = 0; i < 10; i++)
         {
-            incidents.Add(dataProvider.GenerateIncident());
+            incidents.Add(testDataProvider.GenerateIncident());
         }
 
         foreach(Incident incident1 in incidents)
@@ -73,7 +73,7 @@ public class PlannableIncidentTests : PlannableIncidentTestsBase
     public void GetPlannableIncidentImmidiatelyAvailableTest(Incident incident)
     {
         Seconds timeOfIncidentOccurence = incident.Occurence; 
-        Shift shift = new(dataProvider.GetAmbulances().First(), dataProvider.GetDepots().First(), Interval.GetByStartAndDuration(300.ToSeconds(), 24.ToHours().ToSeconds()));
+        Shift shift = new(testDataProvider.GetAmbulances().First(), testDataProvider.GetDepots().First(), Interval.GetByStartAndDuration(300.ToSeconds(), 24.ToHours().ToSeconds()));
 
 
         PlannableIncident plannableIncident = plannableIncidentFactory.Get(incident, shift);
@@ -86,7 +86,7 @@ public class PlannableIncidentTests : PlannableIncidentTestsBase
         Assert.That(plannableIncident.OnSceneDuration.Duration,
             Is.EqualTo(incident.OnSceneDuration));
 
-        Hospital nearestHospital = distanceCalculator.GetNearestLocatable(incident, dataProvider.GetHospitals()).First();
+        Hospital nearestHospital = distanceCalculator.GetNearestLocatable(incident, testDataProvider.GetHospitals()).First();
         Assert.That(nearestHospital, Is.EqualTo(plannableIncident.NearestHospital));
 
         Seconds toHospitalDuration = distanceCalculator.GetTravelDuration(incident, nearestHospital, timeOfIncidentOccurence);
@@ -111,7 +111,7 @@ public class PlannableIncidentTests : PlannableIncidentTestsBase
     public void GetPlannableIncidentOnBusyShiftTest(Incident incident1, Incident incident2)
     {
         Seconds timeOfIncidentOccurence = incident1.Occurence; 
-        Shift shift = new(dataProvider.GetAmbulances().First(), dataProvider.GetDepots().First(), Interval.GetByStartAndDuration(timeOfIncidentOccurence, 24.ToHours().ToSeconds()));
+        Shift shift = new(testDataProvider.GetAmbulances().First(), testDataProvider.GetDepots().First(), Interval.GetByStartAndDuration(timeOfIncidentOccurence, 24.ToHours().ToSeconds()));
         shift.Plan(plannableIncidentFactory.Get(incident2, shift));
 
 
@@ -126,7 +126,7 @@ public class PlannableIncidentTests : PlannableIncidentTestsBase
         Assert.That(plannableIncident.OnSceneDuration.Duration,
             Is.EqualTo(incident1.OnSceneDuration));
 
-        Hospital nearestHospital = distanceCalculator.GetNearestLocatable(incident1, dataProvider.GetHospitals()).First();
+        Hospital nearestHospital = distanceCalculator.GetNearestLocatable(incident1, testDataProvider.GetHospitals()).First();
         Assert.That(nearestHospital, Is.EqualTo(plannableIncident.NearestHospital));
 
         Seconds toHospitalDuration = distanceCalculator.GetTravelDuration(incident1, nearestHospital, timeOfIncidentOccurence);

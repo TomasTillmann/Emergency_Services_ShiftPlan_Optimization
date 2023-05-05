@@ -6,12 +6,15 @@ namespace ESSP_Tests
 {
     public abstract class Tests
     {
-        protected static TestDataProvider dataProvider { get; } = new();
-        protected IDistanceCalculator distanceCalculator { get; }
+        protected static TestDataProvider testDataProvider { get; }
+        protected static IDistanceCalculator distanceCalculator { get; }
+        protected static PlannableIncident.Factory plannableIncidentFactory { get; }
 
-        public Tests()
+        static Tests()
         {
-            distanceCalculator = dataProvider.GetDistanceCalculator();
+            testDataProvider = new();
+            distanceCalculator = testDataProvider.GetDistanceCalculator();
+            plannableIncidentFactory = new(distanceCalculator, testDataProvider.GetHospitals());
         }
 
         public string CollectionMessage<T>(IEnumerable<T> expected, IEnumerable<T> actual)

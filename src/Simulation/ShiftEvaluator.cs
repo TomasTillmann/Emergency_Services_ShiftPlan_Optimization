@@ -33,14 +33,26 @@ class ShiftEvaluator
     {
         PlannableIncident plannableIncident = plannableIncidentFactory.Get(incident, shift);
 
+        return IsHandling(shift, plannableIncident);
+    }
+
+    public bool IsHandling(Shift shift, PlannableIncident plannableIncident)
+    {
         // 1
-        if (plannableIncident.ToIncidentDrive.Duration > incident.Type.MaximumResponseTime)
+        if (plannableIncident.ToIncidentDrive.Duration > plannableIncident.Incident.Type.MaximumResponseTime)
         {
             return false;
         }
 
         // 1, 2, 3, 4
         if (plannableIncident.InHospitalDelivery.End > shift.Work.End)
+        {
+            return false;
+        }
+
+        HashSet<AmbulanceType> allowedAmbulanceTypes = plannableIncident.Incident.Type.AllowedAmbulanceTypes;
+        // Open world principle.
+        if (allowedAmbulanceTypes.Count != 0 && !allowedAmbulanceTypes.Contains(shift.Ambulance.Type))
         {
             return false;
         }

@@ -7,12 +7,12 @@ namespace ESSP.DataModel;
 public partial class PlannableIncident
 {
     public Incident Incident { get; private set; }
-    public Hospital NearestHospital { get; private set; }
-    public Interval ToIncidentDrive { get; private set; }
-    public Interval OnSceneDuration { get; private set; }
-    public Interval ToHospitalDrive { get; private set; }
-    public Interval InHospitalDelivery { get; private set; }
-    public Interval ToDepotDrive { get; private set; }
+    public Hospital NearestHospital { get; set; }
+    public Interval ToIncidentDrive { get; set; }
+    public Interval OnSceneDuration { get; set; }
+    public Interval ToHospitalDrive { get; set; }
+    public Interval InHospitalDelivery { get; set; }
+    public Interval ToDepotDrive { get; set; }
     public Interval IncidentHandling => Interval.GetByStartAndEnd(ToIncidentDrive.Start, ToDepotDrive.Start);
     public Interval WholeInterval => Interval.GetByStartAndEnd(ToIncidentDrive.Start, ToDepotDrive.End);
 

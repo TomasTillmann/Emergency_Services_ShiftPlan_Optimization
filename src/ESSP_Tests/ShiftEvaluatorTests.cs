@@ -1,31 +1,88 @@
 ﻿using ESSP.DataModel;
+using Microsoft.VisualStudio.CodeCoverage;
+using Simulating;
 
 namespace ESSP_Tests;
 
-public abstract class ShiftEvaluatorTestsBase : Tests
+public class ShiftEvaluatorTests : Tests 
 {
-    public static IEnumerable<TestCaseData> HandlingShiftsTestSource()
+    [Test]
+    public void IsHandlingTestHandles()
     {
-        yield return new TestCaseData(new Incident(
-            coordinate: new Coordinate { X = 0.ToMeters(), Y = 0.ToMeters() },
-            occurence: 10.ToSeconds(),
-            onSceneDuration: 240.ToSeconds(),
-            inHospitalDelivery: 5.ToMinutes().ToSeconds(),
-            type: new IncidentType
-            {
-                Name = "I1",
-                AllowedAmbulanceTypes = new HashSet<AmbulanceType> { new AmbulanceType("A1", 300) },
-                MaximumResponseTime = 30.ToMinutes().ToSeconds(),
-            }
-        ));
-    }
-}
+        Shift shift = new(testDataProvider.GetAmbulances().First(), testDataProvider.GetDepots().Last(), Interval.GetByStartAndDuration(0.ToSeconds(), 8.ToHours().ToSeconds()));
 
-public class ShiftEvaluatorTests : ShiftEvaluatorTestsBase
-{
-    [TestCaseSource(nameof(HandlingShiftsTestSource))]
-    public void IsHandlingTest(Incident incident)
+        // Everything is satisfied.
+        Incident incident = testDataProvider.GenerateIncident();
+        incident.Occurence = 10.ToSeconds();
+        incident.Type = new IncidentType("sample", 10.ToHours().ToSeconds(), new HashSet<AmbulanceType> { shift.Ambulance.Type } );
+        PlannableIncident plannableIncident = plannableIncidentFactory.Get(incident, shift);
+        ShiftEvaluator shiftEvaluator = new(plannableIncidentFactory);
+
+
+        Assert.That(shiftEvaluator.IsHandling(shift, plannableIncident), Is.EqualTo(true));
+    }
+
+    [Test]
+    public void IsHandlingTestResponseTimeNotSatisfied()
     {
-        //TODO: implement
+        Shift shift = new(testDataProvider.GetAmbulances().First(), testDataProvider.GetDepots().Last(), Interval.GetByStartAndDuration(0.ToSeconds(), 8.ToHours().ToSeconds()));
+
+        // Not enought time to finish handling the incident. The shift ends sooner.
+        Incident incident = testDataProvider.GenerateIncident();
+        incident.Occurence = 10.ToSeconds();
+        incident.Location = shift.Ambulance.Location + new Coordinate(1000.ToMeters(), 1000.ToMeters());
+        incident.Type = new IncidentType("sample", 10.ToSeconds(), new HashSet<AmbulanceType> { shift.Ambulance.Type } );
+        PlannableIncident plannableIncident = plannableIncidentFactory.Get(incident, shift);
+        ShiftEvaluator shiftEvaluator = new(plannableIncidentFactory);
+
+
+        Assert.That(shiftEvaluator.IsHandling(shift, plannableIncident), Is.EqualTo(false));
+    }
+
+    [Test]
+    public void IsHandlingTestAmbulanceTypeNotSatisfied()
+    {
+        Shift shift = new(testDataProvider.GetAmbulances().First(), testDataProvider.GetDepots().Last(), Interval.GetByStartAndDuration(0.ToSeconds(), 8.ToHours().ToSeconds()));
+
+        // ambulance type not allowed
+        Incident incident = testDataProvider.GenerateIncident();
+        incident.Occurence = 10.ToSeconds();
+        incident.Type = new IncidentType("sample", 10.ToHours().ToSeconds(), new HashSet<AmbulanceType> { new AmbulanceType() });
+        PlannableIncident plannableIncident = plannableIncidentFactory.Get(incident, shift);
+        ShiftEvaluator shiftEvaluator = new(plannableIncidentFactory);
+
+
+        Assert.That(shiftEvaluator.IsHandling(shift, plannableIncident), Is.EqualTo(false));
+    }
+
+    public void IsHandlingTestAmbulanceTypesAllAllowed()
+    {
+        Shift shift = new(testDataProvider.GetAmbulances().First(), testDataProvider.GetDepots().Last(), Interval.GetByStartAndDuration(0.ToSeconds(), 8.ToHours().ToSeconds()));
+
+        // If no ambulance types are provided, all ambulance types are allowed - Open world.
+        Incident incident = testDataProvider.GenerateIncident();
+        incident.Occurence = 10.ToSeconds();
+        incident.Type = new IncidentType("sample", 10.ToHours().ToSeconds(), new HashSet<AmbulanceType> { });
+        PlannableIncident plannableIncident = plannableIncidentFactory.Get(incident, shift);
+        ShiftEvaluator shiftEvaluator = new(plannableIncidentFactory);
+
+
+        Assert.That(shiftEvaluator.IsHandling(shift, plannableIncident), Is.EqualTo(true));
+    }
+
+    [Test]
+    public void IsHandlingTestCantFinishIncidentTillEndOfShift()
+    {
+        Shift shift = new(testDataProvider.GetAmbulances().First(), testDataProvider.GetDepots().Last(), Interval.GetByStartAndDuration(0.ToSeconds(), 8.ToHours().ToSeconds()));
+
+        // can't finish till the end of shift 
+        Incident incident = testDataProvider.GenerateIncident();
+        incident.Occurence = (7.ToHours().ToMinutes() + 55.ToMinutes()).ToSeconds();
+        incident.Type = new IncidentType("sample", 10.ToHours().ToSeconds(), new HashSet<AmbulanceType> { shift.Ambulance.Type });
+        PlannableIncident plannableIncident = plannableIncidentFactory.Get(incident, shift);
+        ShiftEvaluator shiftEvaluator = new(plannableIncidentFactory);
+
+
+        Assert.That(shiftEvaluator.IsHandling(shift, plannableIncident), Is.EqualTo(false));
     }
 }
