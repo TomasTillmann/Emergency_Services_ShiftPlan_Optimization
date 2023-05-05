@@ -12,6 +12,7 @@ namespace Simulating;
 public sealed class Statistics
 {
     public IList<Incident> UnhandledIncidents { get; internal set; } = new List<Incident>();
+
     public IList<Incident> HandledIncidents { get; internal set; } = new List<Incident>();
 
     public IReadOnlyCollection<Incident> AllIncidents { get; }
@@ -64,10 +65,7 @@ public sealed class Simulation
         shiftEvaluator = new ShiftEvaluator(plannableIncidentFactory);
     }
 
-    /// <summary>
-    /// Incidents need to be sorted by occurence.
-    /// </summary>
-    public Statistics Run(IReadOnlyCollection<Incident> incidents, ShiftPlan shiftPlan)
+    public Statistics Run(List<Incident> incidents, ShiftPlan shiftPlan)
     {
         Initialization(shiftPlan, incidents);
 
@@ -78,13 +76,15 @@ public sealed class Simulation
             Logger.WriteLine();
         }
 
-        Logger.WriteLine($"Threshold: {statistics.Threshold}");
+        Logger.WriteLine($"Success rate: {statistics.Threshold * 100}%");
 
         return statistics;
     }
 
-    private void Initialization(ShiftPlan shiftPlan, IReadOnlyCollection<Incident> allIncidents)
+    private void Initialization(ShiftPlan shiftPlan, List<Incident> allIncidents)
     {
+        allIncidents.Sort((x, y) => x.Occurence.CompareTo(y.Occurence));
+
         statistics = new Statistics(allIncidents);
         state = new SimulationState();
         this.shiftPlan = shiftPlan;
@@ -105,7 +105,6 @@ public sealed class Simulation
 
     private void Step(Incident currentIncident)
     {
-        Logger.WriteLine($"Occurence: {state.CurrentTime}");
         Logger.WriteLine($"Incident: {currentIncident}");
         Logger.WriteLine($"Shifts:\n{shiftPlan.Shifts.Visualize("\n")}");
 

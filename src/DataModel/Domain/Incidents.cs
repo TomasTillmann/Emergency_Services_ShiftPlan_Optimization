@@ -10,13 +10,11 @@ public readonly struct Incidents
 {
     public double Threshold { get; }
 
-    private readonly List<Incident> _value;
-    public IReadOnlyList<Incident> Value => _value;
-
+    public List<Incident> Value { get; }
 
     public Incidents(List<Incident> incidents, double threshold)
     {
         Threshold = threshold;
-        _value = incidents;
+        Value = incidents;
     }
 }
