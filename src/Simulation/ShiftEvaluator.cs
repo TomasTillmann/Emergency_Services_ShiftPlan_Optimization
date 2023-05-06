@@ -68,7 +68,7 @@ class ShiftEvaluator
         Shift bestShift = handlingShifts.First();
         foreach (Shift shift in handlingShifts)
         {
-            bestShift = GetBetter(shift, bestShift, incident);
+            bestShift = GetBetter(bestShift, shift, incident);
         }
 
         return bestShift;

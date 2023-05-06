@@ -1,16 +1,23 @@
-﻿namespace Logging;
+﻿#define PRINT
+
+namespace Logging;
 
 public class Logger : IDisposable
 {
     public static readonly Logger Instance = new();
 
-    private TextWriter writer = new StreamWriter("Log.txt"); 
+    private TextWriter writer;
 
-    private Logger() { }
+    private Logger()
+    {
+#if PRINT
+        writer = new StreamWriter("Log.txt"); 
+#endif
+    }
 
     public void Write(object? message)
     {
-#if DEBUG
+#if PRINT
         writer.Write(message);
         writer.Flush();
 #endif
@@ -18,7 +25,7 @@ public class Logger : IDisposable
 
     public void WriteLine(object? message)
     {
-#if DEBUG
+#if PRINT
         writer.WriteLine(message);
         writer.Flush();
 #endif
@@ -26,7 +33,7 @@ public class Logger : IDisposable
 
     public void WriteLine()
     {
-#if DEBUG
+#if PRINT
         writer.WriteLine();
         writer.Flush();
 #endif
@@ -39,7 +46,9 @@ public class Logger : IDisposable
 
     public void Dispose()
     {
+#if PRINT
         writer.Flush();
         writer.Dispose();
+#endif
     }
 }

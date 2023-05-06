@@ -12,6 +12,6 @@ public readonly struct AmbulanceType
 
     public override string ToString()
     {
-        return $"AMBULANCE TYPE: {{ Name: {Name}, Cost: {Cost} }}"; 
+        return $"Name: {Name}"; 
     }
 }

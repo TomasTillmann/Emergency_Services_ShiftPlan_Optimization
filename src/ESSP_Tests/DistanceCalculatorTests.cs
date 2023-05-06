@@ -3,7 +3,7 @@ using ESSP.DataModel;
 
 namespace ESSP_Tests
 {
-    public static class Helpers
+    public static partial class Helpers
     {
         public static string Visualize<T>(this IEnumerable<T> enumerable)
         {
@@ -26,12 +26,23 @@ namespace ESSP_Tests
 
     public class DistanceCalculatorTests : Tests
     {
-        private DistanceCalculator distanceCalculator;
-        [SetUp]
-        public void Setup()
+        #region GetTravelDurationTestSource
+
+        public static IEnumerable<TestCaseData> GetTravelDurationTestSource()
         {
-            distanceCalculator = new();
+            ILocatable amb1 = new Ambulance(new AmbulanceType(), new Coordinate { X = 100.ToMeters(), Y = 100.ToMeters() }, 10.ToSeconds());
+            ILocatable h1 = new Hospital(new Coordinate { X = 120.ToMeters(), Y = 150.ToMeters() });
+            Seconds exp1 = ((int)(Math.Sqrt(20 * 20 + 50 * 50) / DistanceCalculator.Speed.Value)).ToSeconds();
+            yield return new TestCaseData(amb1, h1, exp1);
+
+            ILocatable amb2 = new Ambulance(new AmbulanceType(), new Coordinate { X = 10.ToMeters(), Y = 10.ToMeters() }, 10.ToSeconds());
+            ILocatable h2 = new Hospital(new Coordinate { X = 41441.ToMeters(), Y = 664.ToMeters() });
+            Seconds exp2 = ((int)(Math.Sqrt(Math.Pow(41441 - 10, 2) + Math.Pow(664 - 10, 2)) / DistanceCalculator.Speed.Value)).ToSeconds();
+
+            yield return new TestCaseData(amb2, h2, exp2);
         }
+
+        #endregion
 
         [Test]
         public void GetNearestLocatableTest()
@@ -51,15 +62,12 @@ namespace ESSP_Tests
                                   nearest.Select(locatable => locatable.Location)));
         }
 
-        [Test]
-        public void GetTravelDurationTest()
+        [TestCaseSource(nameof(GetTravelDurationTestSource))]
+        public void GetTravelDurationTest(ILocatable ambulance, ILocatable hospital, Seconds expected)
         {
-            ILocatable amb1 = new Ambulance(new AmbulanceType("aaa", 100), new Coordinate { X = 100.ToMeters(), Y = 100.ToMeters() }, 10.ToSeconds());
-            ILocatable h1 = new Hospital(new Coordinate { X = 120.ToMeters(), Y = 150.ToMeters() });
+            Seconds duration = distanceCalculator.GetTravelDuration(ambulance, hospital, 0.ToSeconds());
 
-            Seconds duration = distanceCalculator.GetTravelDuration(amb1, h1, 0.ToSeconds());
 
-            Seconds expected = ((int)(Math.Sqrt(20 * 20 + 50 * 50) / DistanceCalculator.Speed.Value)).ToSeconds();
             Assert.That(duration, Is.EqualTo(expected));
         }
 

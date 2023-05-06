@@ -67,7 +67,7 @@ public class TestDataProvider
         int start = random.Next(0, ambTypes.Count - 2);
 
         return new Incident(
-            coordinate: new Coordinate { X = random.Next(0, 10_000).ToMeters(), Y = random.Next(0, 10_000).ToMeters() },
+            location: new Coordinate { X = random.Next(0, 10_000).ToMeters(), Y = random.Next(0, 10_000).ToMeters() },
             occurence: random.Next(0, 8.ToHours().ToSeconds().Value).ToSeconds(),
             onSceneDuration: random.Next(30, 30.ToMinutes().ToSeconds().Value).ToSeconds(),
             inHospitalDelivery: random.Next(5.ToMinutes().ToSeconds().Value, 20.ToMinutes().ToSeconds().Value).ToSeconds(),

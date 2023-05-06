@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ESSP.DataModel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -94,5 +95,35 @@ public static class Extensions
         }
 
         return str;
+    }
+
+    public static T GetRandom<T>(this IList<T> collection, Random random = null)
+    {
+        random = random ?? new Random();
+        return collection[random.Next(0, collection.Count - 1)];
+    }
+
+    public static List<T> GetRangeRandom<T>(this List<T> collection, Random random = null, int minCount = 0, int maxCount = int.MaxValue)
+    {
+        if(collection.Count == 0)
+        {
+            return new List<T>();
+        }
+
+        random = random ?? new Random();
+        int start = random.Next(0, collection.Count - minCount);
+        int count = random.Next(minCount, Math.Min(collection.Count - start, maxCount));
+
+        return collection.GetRange(start, count);
+    }
+
+    public static void ModifyToLargest(this ShiftPlan shiftPlan, Constraints constraints)
+    {
+        Seconds largestDuration = constraints.AllowedShiftDurations.FindMaxSubset(_ => _).First();
+
+        foreach (Shift shift in shiftPlan.Shifts)
+        {
+            shift.Work = Interval.GetByStartAndDuration(0.ToSeconds(), largestDuration);
+        }
     }
 }

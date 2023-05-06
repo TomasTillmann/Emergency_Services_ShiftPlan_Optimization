@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace ESSP.DataModel;
 
-public readonly struct Incidents
+public class Incidents
 {
-    public double Threshold { get; }
+    public double Threshold { get; set; }
 
-    public List<Incident> Value { get; }
+    public List<Incident> Value { get; set; }
 
     public Incidents(List<Incident> incidents, double threshold)
     {

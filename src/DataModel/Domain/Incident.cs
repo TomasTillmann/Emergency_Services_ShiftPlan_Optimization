@@ -1,4 +1,5 @@
 ﻿using DataModel.Interfaces;
+using Model.Extensions;
 
 namespace ESSP.DataModel;
 public class Incident : ILocatable
@@ -13,9 +14,9 @@ public class Incident : ILocatable
 
     public IncidentType Type { get; set; }
 
-    public Incident(Coordinate coordinate, Seconds occurence, Seconds onSceneDuration, Seconds inHospitalDelivery, IncidentType type)
+    public Incident(Coordinate location, Seconds occurence, Seconds onSceneDuration, Seconds inHospitalDelivery, IncidentType type)
     {
-        Location = coordinate;
+        Location = location;
         Occurence = occurence;
         OnSceneDuration = onSceneDuration;
         InHospitalDelivery = inHospitalDelivery;
@@ -24,6 +25,6 @@ public class Incident : ILocatable
 
     public override string ToString()
     {
-        return $"Location: {Location}, Occurence: {Occurence}";
+        return $"Location: {Location}, Occurence: {Occurence}, AllowedAmbTypes: {Type.AllowedAmbulanceTypes.Visualize()}";
     }
 }

@@ -17,7 +17,7 @@ public sealed class Statistics
 
     public IReadOnlyCollection<Incident> AllIncidents { get; }
 
-    public double Threshold => (double)HandledIncidents.Count / AllIncidents.Count;
+    public double SuccessRate => (double)HandledIncidents.Count / AllIncidents.Count;
 
     internal Statistics(IReadOnlyCollection<Incident> allIncidents)
     {
@@ -69,14 +69,23 @@ public sealed class Simulation
     {
         Initialization(shiftPlan, incidents);
 
+        int incident = 1;
         foreach (Incident currentIncident in incidents)
         {
+            Console.WriteLine($"Incident: {incident++} / {incidents.Count}");
+
             UpdateSystem(currentIncident);
             Step(currentIncident);
+
+            Console.WriteLine($"Success rate: {statistics.SuccessRate * 100}%");
             Logger.WriteLine();
+            Console.WriteLine();
         }
 
-        Logger.WriteLine($"Success rate: {statistics.Threshold * 100}%");
+        Logger.WriteLine($"Success rate: {statistics.SuccessRate * 100}%");
+
+        Console.WriteLine();
+        Console.WriteLine($"Success rate: {statistics.SuccessRate * 100}%");
 
         return statistics;
     }
@@ -111,7 +120,8 @@ public sealed class Simulation
         List<Shift> handlingShifts = shiftEvaluator.GetHandlingShifts(shiftPlan.Shifts, currentIncident);
         if (handlingShifts.Count == 0)
         {
-            Logger.WriteLine($"Unhandled");
+            Logger.WriteLine("Unhandled");
+            Console.WriteLine("Unhandled");
             statistics.SetUnhandled(currentIncident);
             return;
         }
@@ -119,6 +129,7 @@ public sealed class Simulation
         Shift bestShift = shiftEvaluator.GetBestShift(handlingShifts, currentIncident);
 
         Logger.WriteLine($"Best shift:\n{bestShift}");
+        Console.WriteLine($"Best shift:\n{bestShift}");
 
         bestShift.Plan(plannableIncidentFactory.Get(currentIncident, bestShift));
 

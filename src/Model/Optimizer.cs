@@ -20,23 +20,11 @@ public class Optimizer
     public void FindOptimal(ShiftPlan shiftPlan, List<Incidents> incidents)
     {
         Statistics stats;
-        shiftPlan = LargestShiftPlan(shiftPlan);
+        shiftPlan.ModifyToLargest(Constraints);
 
         foreach(Incidents incident in incidents)
         {
             stats = simulation.Run(incident.Value, shiftPlan);
         }
-    }
-
-    private ShiftPlan LargestShiftPlan(ShiftPlan shiftPlan)
-    {
-        Seconds largestDuration = Constraints.AllowedShiftDurations.FindMaxSubset(_ => _).First();
-
-        foreach (Shift shift in shiftPlan.Shifts)
-        {
-            shift.Work = Interval.GetByStartAndDuration(0.ToSeconds(), largestDuration);
-        }
-
-        return shiftPlan;
     }
 }
