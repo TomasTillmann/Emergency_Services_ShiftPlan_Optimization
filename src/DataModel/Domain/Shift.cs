@@ -3,22 +3,24 @@ using System.Collections.Generic;
 using System.Linq;
 using DataModel.Interfaces;
 using Model.Extensions;
+using Newtonsoft.Json;
 
 namespace ESSP.DataModel;
 public class Shift : IIdentifiable
 {
     private static uint IdGenerator = 1;
 
-    public uint Id { get; }
+    public uint Id { get; init; }
 
-    public Ambulance Ambulance { get; }
+    public Ambulance Ambulance { get; init; }
 
-    public Depot Depot { get; }
+    public Depot Depot { get; init; }
 
     public Interval Work { get; set; }
 
     public IReadOnlyList<PlannableIncident> PlannedIncidents => plannedIncidents;
 
+    [JsonPropertyAttribute]
     private List<PlannableIncident> plannedIncidents = new();
 
     public Shift(Ambulance ambulance, Depot depot, Interval work)

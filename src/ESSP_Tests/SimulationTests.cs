@@ -25,8 +25,6 @@ namespace ESSP_Tests
         [Test]
         public void Test1()
         {
-            return;
-
             // TODO: Deserializing doesn't work as expected
             World world = DataSerializer.Deserialize<World>("test1/world.json");
             DistanceCalculator distanceCalculator = DataSerializer.Deserialize<DistanceCalculator>("test1/distanceCalculator2D.json");
@@ -39,8 +37,18 @@ namespace ESSP_Tests
             Statistics stats = simulation.Run(incidents.Value, shiftPlan);
 
 
-            Assert.That(shiftPlan.ToJson(), Is.EqualTo(File.ReadAllText(Path.Combine(DataSerializer.Path, "test1/shiftPlan_result.json"))));
-            Assert.That(stats.ToJson(), Is.EqualTo(File.ReadAllText(Path.Combine(DataSerializer.Path, "test1/stats_result.json"))));
+            ShiftPlan expectedShiftPlan = JsonConvert.DeserializeObject<ShiftPlan>(File.ReadAllText(Path.Combine(DataSerializer.Path, "test1/shiftPlan_result.json")));
+            for(int i = 0; i < shiftPlan.Shifts.Count; ++i)
+            {
+                CollectionAssert.AreEquivalent(shiftPlan.Shifts[i].PlannedIncidents.ToJson(), expectedShiftPlan.Shifts[i].PlannedIncidents.ToJson());
+                Assert.That(shiftPlan.Shifts[i].Work.ToJson(), Is.EqualTo(expectedShiftPlan.Shifts[i].Work.ToJson()));
+            }
+
+            Statistics expectedStats = JsonConvert.DeserializeObject<Statistics>(File.ReadAllText(Path.Combine(DataSerializer.Path, "test1/stats_result.json")));
+
+            Assert.That(stats.UnhandledIncidents.ToJson(), Is.EqualTo(expectedStats.UnhandledIncidents.ToJson()));
+            Assert.That(stats.HandledIncidents.ToJson(), Is.EqualTo(expectedStats.HandledIncidents.ToJson()));
+            Assert.That(stats.SuccessRate, Is.EqualTo(expectedStats.SuccessRate));
         }
     }
 }

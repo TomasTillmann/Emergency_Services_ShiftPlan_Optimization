@@ -1,8 +1,8 @@
 ﻿namespace ESSP.DataModel;
 public readonly struct AmbulanceType
 {
-    public string Name { get; }
-    public double Cost { get; }
+    public string Name { get; init; }
+    public double Cost { get; init; }
 
     public AmbulanceType(string name, double cost)
     {

@@ -11,7 +11,7 @@ namespace Client;
 
 class Program
 {
-#if false
+#if true
     static void Main(string[] args)
     {
         DataProvider dataProvider = new();

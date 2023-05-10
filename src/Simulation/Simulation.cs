@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using DataModel.Interfaces;
 using ESSP.DataModel;
 using Logging;
@@ -11,11 +9,11 @@ namespace Simulating;
 
 public sealed class Statistics
 {
-    public IList<Incident> UnhandledIncidents { get; internal set; } = new List<Incident>();
+    public IList<Incident> UnhandledIncidents { get; private init; } = new List<Incident>();
 
-    public IList<Incident> HandledIncidents { get; internal set; } = new List<Incident>();
+    public IList<Incident> HandledIncidents { get; private init; } = new List<Incident>();
 
-    public IReadOnlyCollection<Incident> AllIncidents { get; }
+    public IReadOnlyCollection<Incident> AllIncidents { get; init; }
 
     public double SuccessRate => (double)HandledIncidents.Count / AllIncidents.Count;
 

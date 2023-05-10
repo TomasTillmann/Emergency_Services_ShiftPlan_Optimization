@@ -4,7 +4,7 @@ using DataModel.Interfaces;
 namespace ESSP.DataModel;
 public class Hospital : ILocatable
 {
-    public Coordinate Location { get; }
+    public Coordinate Location { get; set; }
 
     public Hospital(Coordinate coordinate)
     {

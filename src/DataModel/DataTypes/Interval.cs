@@ -1,11 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace ESSP.DataModel
 {
     public readonly struct Interval
     {
-        public Seconds Start { get; }
-        public Seconds End { get; }
+        public Seconds Start { get; init; }
+
+        public Seconds End { get; init; }
+
         public Seconds Duration => End - Start;
 
         private Interval(Seconds start, Seconds end)
