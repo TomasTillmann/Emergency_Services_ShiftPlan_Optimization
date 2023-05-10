@@ -1,62 +1,11 @@
 ﻿using DataModel.Interfaces;
 using ESSP.DataModel;
 using Model.Extensions;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Reflection;
 
 namespace DataHandling;
-
-public static class DataSerializer
-{
-    private class PrivateResolver : DefaultContractResolver {
-        protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
-        {
-            var prop = base.CreateProperty(member, memberSerialization);
-            if (!prop.Writable) {
-                var property = member as PropertyInfo;
-                var hasPrivateSetter = property?.GetSetMethod(true) != null;
-                prop.Writable = hasPrivateSetter;
-            }
-
-            return prop;
-        }
-
-}
-    public static string Path { get; } = "D:/Playground/EmergencyServicesShiftPlanOptimization/src/Data/";
-
-    public static void Serialize<T>(T data, string file)
-    {
-        file = System.IO.Path.Combine(Path, file);
-        using StreamWriter writer = new(file);
-
-        writer.Write(JsonConvert.SerializeObject(data));
-    }
-
-    public static T Deserialize<T>(string file)
-    {
-        file = System.IO.Path.Combine(Path, file);
-
-        string data = File.ReadAllText(file);
-        return JsonConvert.DeserializeObject<T>(data, new JsonSerializerSettings
-        {
-            ContractResolver = new PrivateResolver(),
-            ConstructorHandling = ConstructorHandling.AllowNonPublicDefaultConstructor
-        });
-    }
-
-    //public static object Deserialize(string file)
-    //{
-    //    file = System.IO.Path.Combine(Path, file);
-
-    //    string data = File.ReadAllText(file);
-    //    return JsonConvert.DeserializeObject(data);
-    //}
-}
 
 public class DataProvider
 {
@@ -94,7 +43,7 @@ public class DataProvider
         GenerateWorld();
     }
 
-    public Incidents GetIncidents(int count, Hours duration)
+    public IncidentsSet GetIncidents(int count, Hours duration)
     {
         List<Incident> incidents = new();
         for(int i = 0; i < count; ++i)
@@ -114,7 +63,7 @@ public class DataProvider
 
         incidents.Sort((x, y) => x.Occurence.CompareTo(y.Occurence));
 
-        return new Incidents(incidents, 0.8);
+        return new IncidentsSet(incidents, 0.8);
     }
 
     public World GetWorld()
@@ -173,7 +122,7 @@ public class DataProvider
 
     private void GenerateWorld()
     {
-        world = new World(depots, hospitals);
+        world = new World(depots, hospitals, distanceCalculator);
     }
 
     private void GenerateHospitals()
@@ -213,7 +162,7 @@ public class DataProvider
         {
             for (Meters x = 10.ToMeters(); x < dimX; x += stepX)
             {
-                HashSet<Ambulance> selectedAmbulances = ambulances.GetRangeRandom(random, minCount: 20, maxCount: 80).ToHashSet();
+                HashSet<Ambulance> selectedAmbulances = ambulances.GetRangeRandom(random, minCount: 1, maxCount: 3).ToHashSet();
                 ambulances.RemoveAll(amb => selectedAmbulances.Contains(amb));
 
                 depots.Add(new Depot(new Coordinate(x, y), selectedAmbulances.ToList()));
@@ -223,19 +172,18 @@ public class DataProvider
 
     private void GenerateAmbulances()
     {
-#if false
-        ambulances = new List<Ambulance>();
+#if true
+        ambulances = new List<Ambulance>
         {
             new Ambulance(ambulanceTypes[0], new Coordinate(), 15.ToSeconds()),
             new Ambulance(ambulanceTypes[0], new Coordinate(), 15.ToSeconds()),
-            new Ambulance(ambulanceTypes[1], new Coordinate(), 15.ToSeconds()),
-            new Ambulance(ambulanceTypes[1], new Coordinate(), 15.ToSeconds()),
-            new Ambulance(ambulanceTypes[1], new Coordinate(), 30.ToSeconds()),
-            new Ambulance(ambulanceTypes[2], new Coordinate(), 50.ToSeconds()),
+            new Ambulance(ambulanceTypes[0], new Coordinate(), 15.ToSeconds()),
+            new Ambulance(ambulanceTypes[0], new Coordinate(), 15.ToSeconds()),
+            new Ambulance(ambulanceTypes[0], new Coordinate(), 30.ToSeconds()),
         };
 #endif
 
-#if true
+#if false
         ambulances = new List<Ambulance>();
         List<Seconds> reroutePenalties = new() { 15.ToSeconds(), 30.ToSeconds(), 70.ToSeconds() };
 
@@ -261,20 +209,28 @@ public class DataProvider
 
     public Constraints GetConstraints()
     {
+#if false
+        List<Seconds> allowedShiftStartingTimes = new();
+        for(Hours hour = 0.ToHours(); hour <= 20.ToHours(); ++hour)
+        {
+            allowedShiftStartingTimes.Add(hour.ToSeconds());
+        }
+#endif
+
         List<Seconds> allowedShiftStartingTimes = new()
         {
-            //TODO:
+            0.ToHours().ToSeconds(),
+            6.ToHours().ToSeconds(),
+            12.ToHours().ToSeconds(),
+            18.ToHours().ToSeconds()
         };
 
         List<Seconds> allowedShiftDurations = new()
         {
-            4.ToHours().ToSeconds(),
             6.ToHours().ToSeconds(),
             8.ToHours().ToSeconds(),
-            9.ToHours().ToSeconds(),
-            10.ToHours().ToSeconds(),
-            11.ToHours().ToSeconds(),
             12.ToHours().ToSeconds(),
+            24.ToHours().ToSeconds(),
         };
 
         return new Constraints(allowedShiftStartingTimes, allowedShiftDurations);

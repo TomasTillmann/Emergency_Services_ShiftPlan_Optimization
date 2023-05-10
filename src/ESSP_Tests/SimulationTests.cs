@@ -27,10 +27,10 @@ namespace ESSP_Tests
         {
             World world = DataSerializer.Deserialize<World>("test1/world.json");
             DistanceCalculator distanceCalculator = DataSerializer.Deserialize<DistanceCalculator>("test1/distanceCalculator2D.json");
-            Simulation simulation = new(world, distanceCalculator);
+            Simulation simulation = new(world);
 
             ShiftPlan shiftPlan = DataSerializer.Deserialize<ShiftPlan>("test1/shiftPlan.json");
-            Incidents incidents = DataSerializer.Deserialize<Incidents>("test1/incidents.json");
+            IncidentsSet incidents = DataSerializer.Deserialize<IncidentsSet>("test1/incidents.json");
 
 
             Statistics stats = simulation.Run(incidents.Value, shiftPlan);
@@ -55,10 +55,10 @@ namespace ESSP_Tests
         {
             World world = DataSerializer.Deserialize<World>("test2/world.json");
             DistanceCalculator distanceCalculator = DataSerializer.Deserialize<DistanceCalculator>("test2/distanceCalculator2D.json");
-            Simulation simulation = new(world, distanceCalculator);
+            Simulation simulation = new(world);
 
             ShiftPlan shiftPlan = DataSerializer.Deserialize<ShiftPlan>("test2/shiftPlan.json");
-            Incidents incidents = DataSerializer.Deserialize<Incidents>("test2/incidents.json");
+            IncidentsSet incidents = DataSerializer.Deserialize<IncidentsSet>("test2/incidents.json");
 
 
             Statistics stats = simulation.Run(incidents.Value, shiftPlan);

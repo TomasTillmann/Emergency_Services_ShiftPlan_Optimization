@@ -1,4 +1,5 @@
 ﻿using DataModel.Interfaces;
+using Model.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +16,11 @@ public class ShiftPlan
 
     public double GetCost()
     {
-        throw new NotImplementedException();
+        return Shifts.Select(shift => shift.Ambulance.Type.Cost * shift.Work.Duration.Value).Sum();
+    }
+
+    public override string ToString()
+    {
+        return Shifts.Visualize(separator: "\n", toString: shift => $"{shift.Work.Start}-{shift.Work.End}"); 
     }
 }

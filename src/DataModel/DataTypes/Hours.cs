@@ -17,6 +17,8 @@ namespace ESSP.DataModel
         #region Operators
 
         public static Hours operator +(Hours a, Hours b) => new Hours(a.Value + b.Value);
+        public static Hours operator ++(Hours a) => new Hours(a.Value + 1); 
+        public static Hours operator --(Hours a) => new Hours(a.Value - 1); 
         public static Hours operator -(Hours a, Hours b) => new Hours(a.Value - b.Value);
         public static bool operator <(Hours a, Hours b) => a.Value < b.Value;
         public static bool operator >(Hours a, Hours b) => a.Value > b.Value;
@@ -24,6 +26,7 @@ namespace ESSP.DataModel
         public static bool operator >=(Hours a, Hours b) => a.Value >= b.Value;
         public static bool operator ==(Hours a, Hours b) => a.Value == b.Value;
         public static bool operator !=(Hours a, Hours b) => a.Value != b.Value;
+
         #endregion
 
         public int CompareTo(Hours other)

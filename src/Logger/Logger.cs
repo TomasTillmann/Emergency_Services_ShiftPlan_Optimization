@@ -1,4 +1,4 @@
-﻿#define PRINT
+﻿//#define PRINT
 
 namespace Logging;
 
@@ -10,9 +10,7 @@ public class Logger : IDisposable
 
     private Logger()
     {
-#if PRINT
         writer = new StreamWriter("Log.txt"); 
-#endif
     }
 
     public void Write(object? message)
@@ -23,12 +21,24 @@ public class Logger : IDisposable
 #endif
     }
 
+    public void WriteForce(object? message)
+    {
+        writer.Write(message);
+        writer.Flush();
+    }
+
     public void WriteLine(object? message)
     {
 #if PRINT
         writer.WriteLine(message);
         writer.Flush();
 #endif
+    }
+
+    public void WriteLineForce(object? message)
+    {
+        writer.WriteLine(message);
+        writer.Flush();
     }
 
     public void WriteLine()
@@ -39,6 +49,12 @@ public class Logger : IDisposable
 #endif
     }
 
+    public void WriteLineForce()
+    {
+        writer.WriteLine();
+        writer.Flush();
+    }
+
     ~Logger()
     {
         Dispose();
@@ -46,9 +62,7 @@ public class Logger : IDisposable
 
     public void Dispose()
     {
-#if PRINT
         writer.Flush();
         writer.Dispose();
-#endif
     }
 }

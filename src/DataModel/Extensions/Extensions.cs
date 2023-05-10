@@ -78,14 +78,14 @@ public static class Extensions
         return result;
     }
 
-    public static string Visualize<T>(this IEnumerable<T> enumerable, string separator = ", ", int indent = 0)
+    public static string Visualize<T>(this IEnumerable<T> enumerable, string separator = ", ", int indent = 0, Func<T, string> toString = null)
     {
         string str = "";
         string indentStr = new('\t', indent);
 
         foreach (T item in enumerable)
         {
-            str += indentStr + item?.ToString() + separator;
+            str += indentStr + (toString is null ? item?.ToString() : toString(item)) + separator;
         }
 
         // remove the last separator
@@ -125,5 +125,16 @@ public static class Extensions
         {
             shift.Work = Interval.GetByStartAndDuration(0.ToSeconds(), largestDuration);
         }
+    }
+
+    public static ShiftPlan CopyTillShifts(this ShiftPlan shiftPlan)
+    {
+        List<Shift> shifts = new();
+        foreach(Shift shift in shiftPlan.Shifts)
+        {
+            shifts.Add(new Shift(shift.Ambulance, shift.Depot, shift.Work));
+        }
+
+        return new ShiftPlan(shifts);
     }
 }

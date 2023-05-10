@@ -91,6 +91,11 @@ public class Shift : IIdentifiable
         return PlannedIncidents.Where(inc => inc.WholeInterval.Contains(currentTime)).FirstOrDefault();
     }
 
+    public void ClearPlannedIncidents()
+    {
+        plannedIncidents.Clear();
+    }
+
     public override string ToString()
     {
         return $"({Id}) AmbulanceLoc: {Ambulance.Location}, WorkStart: {Work.Start}, WorkEnd: {Work.End}, AmbulanceType: {Ambulance.Type.Name}, Cost: {Ambulance.Type.Cost}\n\tPlanned:\n{plannedIncidents.Visualize("\n", 1)}"; 

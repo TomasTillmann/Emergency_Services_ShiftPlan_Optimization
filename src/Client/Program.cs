@@ -1,6 +1,7 @@
 ﻿using DataHandling;
 using DataModel.Interfaces;
 using ESSP.DataModel;
+using Logging;
 using Model.Extensions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -11,28 +12,22 @@ namespace Client;
 
 class Program
 {
-#if false
+#if true
     static void Main(string[] args)
     {
         DataProvider dataProvider = new();
-
-        List<Hospital> hospitals = dataProvider.GetHospitals();
-        List<Depot> depots = dataProvider.GetDepots();
-        IDistanceCalculator distanceCalculator = dataProvider.GetDistanceCalculator();
-
-        List<Incidents> incidents = new()
+        List<IncidentsSet> incidents = new()
         {
-            dataProvider.GetIncidents(100, 11.ToHours())
+            dataProvider.GetIncidents(10, 24.ToHours())
         };
 
-        Optimizer optimizer = new Optimizer(new World(depots, hospitals), distanceCalculator, dataProvider.GetConstraints());
-        ShiftPlan shiftPlan = dataProvider.GetShiftPlan();
-
-        optimizer.FindOptimal(shiftPlan, incidents);
+        IOptimizer optimizer = new ExhaustiveOptimizer(dataProvider.GetWorld(), dataProvider.GetConstraints());
+        ShiftPlan optimalShiftPlan = optimizer.FindOptimal(dataProvider.GetShiftPlan(), incidents);
+        Logger.Instance.WriteLineForce($"Optimal shift plan: {optimalShiftPlan}");
     }
 #endif
 
-#if true
+#if false
     static void Main(string[] args)
     {
         DataProvider dataProvider = new();

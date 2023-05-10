@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 
 namespace ESSP.DataModel;
 
-public class Incidents
+public class IncidentsSet
 {
     public double Threshold { get; set; }
 
     public List<Incident> Value { get; set; }
 
-    public Incidents(List<Incident> incidents, double threshold)
+    public IncidentsSet(List<Incident> incidents, double threshold)
     {
         Threshold = threshold;
         Value = incidents;

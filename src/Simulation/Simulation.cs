@@ -55,11 +55,11 @@ public sealed class Simulation
 
     private Logger Logger = Logger.Instance;
 
-    public Simulation(World world, IDistanceCalculator distanceCalculator)
+    public Simulation(World world)
     {
         Depots = world.Depots;
-        DistanceCalculator = distanceCalculator;
-        plannableIncidentFactory = new PlannableIncident.Factory(distanceCalculator, world.Hospitals);
+        DistanceCalculator = world.DistanceCalculator;
+        plannableIncidentFactory = new PlannableIncident.Factory(DistanceCalculator, world.Hospitals);
         shiftEvaluator = new ShiftEvaluator(plannableIncidentFactory);
     }
 
@@ -70,20 +70,20 @@ public sealed class Simulation
         int incident = 1;
         foreach (Incident currentIncident in incidents)
         {
-            Console.WriteLine($"Incident: {incident++} / {incidents.Count}");
+            //Console.WriteLine($"Incident: {incident++} / {incidents.Count}");
 
             UpdateSystem(currentIncident);
             Step(currentIncident);
 
-            Console.WriteLine($"Success rate: {statistics.SuccessRate * 100}%");
+            //Console.WriteLine($"Success rate: {statistics.SuccessRate * 100}%");
             Logger.WriteLine();
-            Console.WriteLine();
+            //Console.WriteLine();
         }
 
         Logger.WriteLine($"Success rate: {statistics.SuccessRate * 100}%");
 
-        Console.WriteLine();
-        Console.WriteLine($"Success rate: {statistics.SuccessRate * 100}%");
+        //Console.WriteLine();
+        //Console.WriteLine($"Success rate: {statistics.SuccessRate * 100}%");
 
         return statistics;
     }
@@ -95,6 +95,7 @@ public sealed class Simulation
         statistics = new Statistics(allIncidents);
         state = new SimulationState();
         this.shiftPlan = shiftPlan;
+        shiftPlan.Shifts.ForEach(shift => shift.ClearPlannedIncidents());
     }
 
     private void UpdateSystem(Incident incident)
@@ -119,7 +120,7 @@ public sealed class Simulation
         if (handlingShifts.Count == 0)
         {
             Logger.WriteLine("Unhandled");
-            Console.WriteLine("Unhandled");
+            //Console.WriteLine("Unhandled");
             statistics.SetUnhandled(currentIncident);
             return;
         }
@@ -127,7 +128,7 @@ public sealed class Simulation
         Shift bestShift = shiftEvaluator.GetBestShift(handlingShifts, currentIncident);
 
         Logger.WriteLine($"Best shift:\n{bestShift}");
-        Console.WriteLine($"Best shift:\n{bestShift}");
+        //Console.WriteLine($"Best shift:\n{bestShift}");
 
         bestShift.Plan(plannableIncidentFactory.Get(currentIncident, bestShift));
 

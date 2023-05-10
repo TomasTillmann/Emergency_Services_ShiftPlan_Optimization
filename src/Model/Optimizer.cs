@@ -1,30 +1,20 @@
-﻿using DataModel.Interfaces;
-using ESSP.DataModel;
-using Model.Extensions;
+﻿using ESSP.DataModel;
 using Simulating;
 
 namespace Optimizing;
 
-public class Optimizer
+public abstract class Optimizer : IOptimizer
 {
     public Constraints Constraints { get; }
 
-    private Simulation simulation;
+    protected Simulation simulation;
 
-    public Optimizer(World world, IDistanceCalculator distanceCalculator, Constraints constraints)
+    public Optimizer(World world, Constraints constraints)
     {
         Constraints = constraints;
-        simulation = new Simulation(world, distanceCalculator);
+        simulation = new Simulation(world);
     }
 
-    public void FindOptimal(ShiftPlan shiftPlan, List<Incidents> incidents)
-    {
-        Statistics stats;
-        shiftPlan.ModifyToLargest(Constraints);
-
-        foreach(Incidents incident in incidents)
-        {
-            stats = simulation.Run(incident.Value, shiftPlan);
-        }
-    }
+    public abstract ShiftPlan FindOptimal(ShiftPlan shiftPlan, List<IncidentsSet> incidentsSets);
 }
+

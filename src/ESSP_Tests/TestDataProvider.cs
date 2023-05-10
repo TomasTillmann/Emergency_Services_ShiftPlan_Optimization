@@ -36,7 +36,7 @@ public class TestDataProvider
         GenerateHospitals();
     }
 
-    public Incidents GetIncidents(int count, Hours duration)
+    public IncidentsSet GetIncidents(int count, Hours duration)
     {
         List<Incident> incidents = new();
         for (int i = 0; i < count; ++i)
@@ -56,7 +56,7 @@ public class TestDataProvider
 
         incidents.Sort((x, y) => x.Occurence.CompareTo(y.Occurence));
 
-        return new Incidents(incidents, 0.8);
+        return new IncidentsSet(incidents, 0.8);
     }
 
     public Incident GenerateIncident()
