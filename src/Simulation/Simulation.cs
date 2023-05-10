@@ -15,7 +15,7 @@ public sealed class Statistics
 
     public IReadOnlyCollection<Incident> AllIncidents { get; init; }
 
-    public double SuccessRate => (double)HandledIncidents.Count / AllIncidents.Count;
+    public double SuccessRate => 1 - (double)UnhandledIncidents.Count/AllIncidents.Count;
 
     internal Statistics(IReadOnlyCollection<Incident> allIncidents)
     {

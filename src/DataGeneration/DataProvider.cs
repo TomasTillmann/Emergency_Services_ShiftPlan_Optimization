@@ -239,7 +239,7 @@ public class DataProvider
         ambulances = new List<Ambulance>();
         List<Seconds> reroutePenalties = new() { 15.ToSeconds(), 30.ToSeconds(), 70.ToSeconds() };
 
-        for(int i = 0; i < 20; ++i)
+        for(int i = 0; i < 100; ++i)
         {
             ambulances.Add(new Ambulance(ambulanceTypes.GetRandom(random), new Coordinate(), reroutePenalties.GetRandom(random)));
         }

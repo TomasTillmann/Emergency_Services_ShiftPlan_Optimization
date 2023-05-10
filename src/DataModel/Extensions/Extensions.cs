@@ -105,7 +105,7 @@ public static class Extensions
 
     public static List<T> GetRangeRandom<T>(this List<T> collection, Random random = null, int minCount = 0, int maxCount = int.MaxValue)
     {
-        if(collection.Count == 0)
+        if(collection.Count == 0 || collection.Count - minCount < 0)
         {
             return new List<T>();
         }
