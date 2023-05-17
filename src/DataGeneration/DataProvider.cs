@@ -178,8 +178,6 @@ public class DataProvider
             new Ambulance(ambulanceTypes[0], new Coordinate(), 15.ToSeconds()),
             new Ambulance(ambulanceTypes[0], new Coordinate(), 15.ToSeconds()),
             new Ambulance(ambulanceTypes[0], new Coordinate(), 15.ToSeconds()),
-            //new Ambulance(ambulanceTypes[0], new Coordinate(), 15.ToSeconds()),
-            //new Ambulance(ambulanceTypes[0], new Coordinate(), 30.ToSeconds()),
         };
 #endif
 
@@ -220,8 +218,8 @@ public class DataProvider
         HashSet<Seconds> allowedShiftStartingTimes = new()
         {
             0.ToHours().ToSeconds(),
-            1.ToHours().ToSeconds(),
-            2.ToHours().ToSeconds(),
+            6.ToHours().ToSeconds(),
+            12.ToHours().ToSeconds(),
             18.ToHours().ToSeconds()
             //0.ToSeconds(),
             //1.ToSeconds(),

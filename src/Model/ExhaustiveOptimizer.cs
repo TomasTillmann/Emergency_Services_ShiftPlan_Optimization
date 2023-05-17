@@ -7,11 +7,19 @@ namespace Optimizing;
 
 public sealed class ExhaustiveOptimizer : Optimizer
 {
+    #region Stats
+
+    public int? SearchedShiftPlans { get; private set; } = null;
+
+    public int? SatisfyingShiftPlans { get; private set; } = null;
+
+    #endregion
+
     public ExhaustiveOptimizer(World world, Constraints constraints) : base(world, constraints)
     {
         if(constraints.AllowedShiftStartingTimes.Count() == 0 || constraints.AllowedShiftDurations.Count() == 0)
         {
-            throw new ArgumentException("Constraints need to be set");
+            throw new ArgumentException("Constraints need to be set.");
         }
     } 
 
@@ -24,7 +32,9 @@ public sealed class ExhaustiveOptimizer : Optimizer
     /// <returns></returns>
     public override IEnumerable<ShiftPlan> FindOptimal(ShiftPlan shiftPlan, List<IncidentsSet> incidentsSets)
     {
-        Logger.Instance.WriteLineForce(incidentsSets[0].Value.Visualize(separator: "\n"));
+        // reset stats
+        SearchedShiftPlans = 0;
+        //
 
         shiftPlan.Shifts.ForEach(shift => shift.Work = Interval.GetByStartAndDuration(Constraints.AllowedShiftStartingTimes.First(), Constraints.AllowedShiftDurations.First()));
 
@@ -35,9 +45,10 @@ public sealed class ExhaustiveOptimizer : Optimizer
             0.ToSeconds()
         };
 
-
         bool Succeeds(ShiftPlan shiftPlan)
         {
+            return true;
+
             foreach(IncidentsSet incidentsSet in incidentsSets)
             {
                 Statistics stats = simulation.Run(incidentsSet.Value, shiftPlan);
@@ -51,10 +62,18 @@ public sealed class ExhaustiveOptimizer : Optimizer
             return true;
         }
 
+        /// Traverses the state space. Adds all satisfying shifts to allShifts.
         void PopulateAllSuccessfulShiftPlansFrom(ShiftPlan shiftPlan, int currentShiftIndex = 0)
         {
             if(currentShiftIndex == shiftPlan.Shifts.Count)
             {
+                SearchedShiftPlans++;
+                // debugging, kolikrat jsem v listu by melo zhruba odpovidat slozitosti - progress bar takovy
+                //if(SearchedShiftPlans % 500 == 0)
+                //{
+                //    Logger.Instance.WriteLineForce(SearchedShiftPlans);
+                //}
+
                 if (Succeeds(shiftPlan))
                 {
                     allShiftPlans.Add(GetShiftPlanWithShallowCopiedShiftsFrom(shiftPlan));
@@ -79,8 +98,6 @@ public sealed class ExhaustiveOptimizer : Optimizer
 
                 foreach (Seconds startingTime in Constraints.AllowedShiftStartingTimes)
                 {
-                    //Logger.Instance.WriteLineForce($"Shift: {shift}, startingTime: {startingTime}, duration: {duration}");
-
                     Interval originalWork = shiftPlan.Shifts[currentShiftIndex].Work;
                     shiftPlan.Shifts[currentShiftIndex].Work = Interval.GetByStartAndDuration(startingTime, duration);
 
@@ -89,15 +106,15 @@ public sealed class ExhaustiveOptimizer : Optimizer
                     shiftPlan.Shifts[currentShiftIndex].Work = originalWork; 
                 }
             }
-
-            //Logger.Instance.WriteLineForce($"Finished for: {currentShiftIndex}");
         }
 
-        // traverse the state space
         PopulateAllSuccessfulShiftPlansFrom(shiftPlan);
 
-        Logger.Instance.WriteLineForce();
-        Logger.Instance.WriteLineForce(allShiftPlans.Visualize(separator: "\n"));
+        // update stats
+        SatisfyingShiftPlans = allShiftPlans.Count;
+        //
+
+        //Logger.Instance.WriteLineForce(allShiftPlans.Visualize("\n"));
 
         if(allShiftPlans.Count == 0)
         {
@@ -105,8 +122,6 @@ public sealed class ExhaustiveOptimizer : Optimizer
         }
 
         List<ShiftPlan> optimalShiftPlans = allShiftPlans.FindMinSubset(shiftPlan => shiftPlan.GetCost());
-        Logger.Instance.WriteLineForce("Optimal shift plans:\n" + optimalShiftPlans.Visualize(separator: "\n"));
-
         return optimalShiftPlans;
     }
 }
