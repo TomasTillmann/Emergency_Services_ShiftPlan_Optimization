@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using DataModel.Interfaces;
 using Model.Extensions;
@@ -73,6 +74,8 @@ public class Shift : IIdentifiable
 
     public void Plan(PlannableIncident currentIncident)
     {
+        Debug.Assert(Interval.GetByStartAndEnd(currentIncident.ToIncidentDrive.Start, currentIncident.ToDepotDrive.Start).IsSubsetOf(Work));
+
         plannedIncidents.Add(currentIncident);
     }
 

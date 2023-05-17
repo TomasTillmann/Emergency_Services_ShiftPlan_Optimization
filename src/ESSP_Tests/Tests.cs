@@ -10,11 +10,14 @@ namespace ESSP_Tests
         protected static IDistanceCalculator distanceCalculator { get; }
         protected static PlannableIncident.Factory plannableIncidentFactory { get; }
 
+        protected static World world { get; } 
+
         static Tests()
         {
             testDataProvider = new();
             distanceCalculator = testDataProvider.GetDistanceCalculator();
             plannableIncidentFactory = new(distanceCalculator, testDataProvider.GetHospitals());
+            world = new World(testDataProvider.GetDepots(), testDataProvider.GetHospitals(), testDataProvider.GetDistanceCalculator());
         }
 
         public string CollectionMessage<T>(IEnumerable<T> expected, IEnumerable<T> actual)

@@ -18,11 +18,11 @@ class Program
         DataProvider dataProvider = new();
         List<IncidentsSet> incidents = new()
         {
-            dataProvider.GetIncidents(10, 24.ToHours())
+            dataProvider.GetIncidents(1, 24.ToHours(), successRateThreshold: 1)
         };
 
         IOptimizer optimizer = new ExhaustiveOptimizer(dataProvider.GetWorld(), dataProvider.GetConstraints());
-        ShiftPlan optimalShiftPlan = optimizer.FindOptimal(dataProvider.GetShiftPlan(), incidents);
+        ShiftPlan optimalShiftPlan = optimizer.FindOptimal(dataProvider.GetShiftPlan(), incidents).FirstOrDefault();
         Logger.Instance.WriteLineForce($"Optimal shift plan: {optimalShiftPlan}");
     }
 #endif

@@ -21,6 +21,6 @@ public class ShiftPlan
 
     public override string ToString()
     {
-        return Shifts.Visualize(separator: "\n", toString: shift => $"{shift.Work.Start}-{shift.Work.End}"); 
+        return Shifts.Visualize(toString: shift => $"{shift.Work.Start}-{shift.Work.End}"); 
     }
 }

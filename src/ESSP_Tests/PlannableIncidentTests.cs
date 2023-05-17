@@ -196,4 +196,42 @@ public class PlannableIncidentTests : PlannableIncidentTestsBase
         Assert.That(Interval.GetByStartAndDuration(8983.ToSeconds(), toIncident.Duration + incidentInterruptingMidway.OnSceneDuration + toHospitalDuration + incidentInterruptingMidway.InHospitalDelivery),
             Is.EqualTo(plannableIncident.IncidentHandling));
     }
+
+    [Test]
+    public void GetPlannableIncidentWithCustomStartingTime()
+    {
+        Incident incident = testDataProvider.GetIncidents(1, 10.ToHours()).Value.First();
+        Shift shift = new(testDataProvider.GetAmbulances().First(), testDataProvider.GetDepots().First(), Interval.GetByStartAndDuration(incident.Occurence + 1.ToHours().ToSeconds(), 24.ToHours().ToSeconds()));
+
+
+        PlannableIncident plannableIncident = plannableIncidentFactory.Get(incident, shift);
+
+
+        Interval toIncident = Interval.GetByStartAndDuration(shift.Work.Start, distanceCalculator.GetTravelDuration(shift.Ambulance, incident, shift.Work.Start));
+        Assert.That(plannableIncident.ToIncidentDrive,
+            Is.EqualTo(toIncident));
+
+        Assert.That(plannableIncident.OnSceneDuration.Duration,
+            Is.EqualTo(incident.OnSceneDuration));
+
+        Hospital nearestHospital = distanceCalculator.GetNearestLocatable(incident, testDataProvider.GetHospitals()).First();
+        Assert.That(nearestHospital, Is.EqualTo(plannableIncident.NearestHospital));
+
+        Seconds toHospitalDuration = distanceCalculator.GetTravelDuration(incident, nearestHospital, shift.Work.Start);
+        Assert.That(plannableIncident.ToHospitalDrive.Duration,
+            Is.EqualTo(toHospitalDuration));
+
+        Assert.That(plannableIncident.InHospitalDelivery.Duration,
+            Is.EqualTo(incident.InHospitalDelivery));
+
+        Seconds toDepotDuration = distanceCalculator.GetTravelDuration(nearestHospital, shift.Depot, shift.Work.Start);
+        Assert.That(plannableIncident.ToDepotDrive.Duration,
+            Is.EqualTo(toDepotDuration));
+
+        Assert.That(Interval.GetByStartAndDuration(shift.Work.Start, toIncident.Duration + incident.OnSceneDuration + toHospitalDuration + incident.InHospitalDelivery + toDepotDuration),
+            Is.EqualTo(plannableIncident.WholeInterval));
+
+        Assert.That(Interval.GetByStartAndDuration(shift.Work.Start, toIncident.Duration + incident.OnSceneDuration + toHospitalDuration + incident.InHospitalDelivery),
+            Is.EqualTo(plannableIncident.IncidentHandling));
+    }
 }

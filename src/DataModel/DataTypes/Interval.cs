@@ -53,6 +53,11 @@ namespace ESSP.DataModel
             return Start <= time && time <= End;
         }
 
+        public bool IsSubsetOf(Interval interval)
+        {
+            return interval.Contains(Start) && interval.Contains(End);
+        }
+
         public override string ToString()
         {
             return $"INTERVAL: {{ {Start} : {End} }}";

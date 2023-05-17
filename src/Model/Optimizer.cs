@@ -15,6 +15,22 @@ public abstract class Optimizer : IOptimizer
         simulation = new Simulation(world);
     }
 
-    public abstract ShiftPlan FindOptimal(ShiftPlan shiftPlan, List<IncidentsSet> incidentsSets);
+    /// <summary>
+    /// Returns a new shift plan, with copied shifts.
+    /// </summary>
+    /// <param name="shiftPlan"></param>
+    /// <returns></returns>
+    public ShiftPlan GetShiftPlanWithShallowCopiedShiftsFrom(ShiftPlan shiftPlan)
+    {
+        List<Shift> shifts = new();
+        foreach(Shift shift in shiftPlan.Shifts)
+        {
+            shifts.Add(new Shift(shift.Ambulance, shift.Depot, shift.Work));
+        }
+
+        return new ShiftPlan(shifts);
+    }
+
+    public abstract IEnumerable<ShiftPlan> FindOptimal(ShiftPlan shiftPlan, List<IncidentsSet> incidentsSets);
 }
 

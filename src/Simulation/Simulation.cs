@@ -67,7 +67,7 @@ public sealed class Simulation
     {
         Initialization(shiftPlan, incidents);
 
-        int incident = 1;
+        //int incident = 1;
         foreach (Incident currentIncident in incidents)
         {
             //Console.WriteLine($"Incident: {incident++} / {incidents.Count}");
@@ -111,6 +111,7 @@ public sealed class Simulation
         state.StepDuration = state.CurrentTime - lastTime;
     }
 
+    //TODO: Refactor, so only one for loop is necessary to decide the best shift.
     private void Step(Incident currentIncident)
     {
         Logger.WriteLine($"Incident: {currentIncident}");

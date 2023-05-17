@@ -43,7 +43,7 @@ public class DataProvider
         GenerateWorld();
     }
 
-    public IncidentsSet GetIncidents(int count, Hours duration)
+    public IncidentsSet GetIncidents(int count, Hours duration, double successRateThreshold = 0.8)
     {
         List<Incident> incidents = new();
         for(int i = 0; i < count; ++i)
@@ -63,7 +63,7 @@ public class DataProvider
 
         incidents.Sort((x, y) => x.Occurence.CompareTo(y.Occurence));
 
-        return new IncidentsSet(incidents, 0.8);
+        return new IncidentsSet(incidents, successRateThreshold);
     }
 
     public World GetWorld()
@@ -116,7 +116,7 @@ public class DataProvider
             //new IncidentType("IncType4", 1.ToHours().ToSeconds(), ambulanceTypes.GetRangeRandom(random).ToHashSet()),
             //new IncidentType("IncType5", 1.ToHours().ToSeconds(), ambulanceTypes.GetRangeRandom(random).ToHashSet()),
             //new IncidentType("IncType6", 3.ToHours().ToSeconds(), ambulanceTypes.GetRangeRandom(random).ToHashSet()),
-            new IncidentType("IncType7", 10.ToHours().ToSeconds(), ambulanceTypes.GetRangeRandom(random, minCount: 1).ToHashSet()),
+            new IncidentType("IncType7", 1.ToHours().ToSeconds(), ambulanceTypes.GetRangeRandom(random, minCount: 1).ToHashSet()),
         };
     }
 
@@ -178,8 +178,8 @@ public class DataProvider
             new Ambulance(ambulanceTypes[0], new Coordinate(), 15.ToSeconds()),
             new Ambulance(ambulanceTypes[0], new Coordinate(), 15.ToSeconds()),
             new Ambulance(ambulanceTypes[0], new Coordinate(), 15.ToSeconds()),
-            new Ambulance(ambulanceTypes[0], new Coordinate(), 15.ToSeconds()),
-            new Ambulance(ambulanceTypes[0], new Coordinate(), 30.ToSeconds()),
+            //new Ambulance(ambulanceTypes[0], new Coordinate(), 15.ToSeconds()),
+            //new Ambulance(ambulanceTypes[0], new Coordinate(), 30.ToSeconds()),
         };
 #endif
 

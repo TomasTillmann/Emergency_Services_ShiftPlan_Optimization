@@ -5,13 +5,15 @@ namespace ESSP.DataModel;
 
 public class Constraints
 {
-    public IReadOnlyList<Seconds> AllowedShiftStartingTimes { get; }
+    public List<Seconds> AllowedShiftStartingTimes { get; set; } = new();
 
-    public IReadOnlyList<Seconds> AllowedShiftDurations { get; }
+    public List<Seconds> AllowedShiftDurations { get; set; } = new();
 
-    public Constraints(IReadOnlyList<Seconds> allowedShiftStartingTimes, IReadOnlyList<Seconds> allowedShiftDurations)
+    public Constraints(List<Seconds> allowedShiftStartingTimes, List<Seconds> allowedShiftDurations)
     {
         AllowedShiftStartingTimes = allowedShiftStartingTimes;
         AllowedShiftDurations = allowedShiftDurations;
     }
+
+    public Constraints() { }
 }

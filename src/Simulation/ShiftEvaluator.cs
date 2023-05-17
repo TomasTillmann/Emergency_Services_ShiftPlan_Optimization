@@ -39,7 +39,7 @@ class ShiftEvaluator
     public bool IsHandling(Shift shift, PlannableIncident plannableIncident)
     {
         // 1
-        if (plannableIncident.ToIncidentDrive.Duration > plannableIncident.Incident.Type.MaximumResponseTime)
+        if (plannableIncident.ToIncidentDrive.Start + plannableIncident.ToIncidentDrive.Duration > plannableIncident.Incident.Occurence + plannableIncident.Incident.Type.MaximumResponseTime)
         {
             return false;
         }

@@ -126,15 +126,4 @@ public static class Extensions
             shift.Work = Interval.GetByStartAndDuration(0.ToSeconds(), largestDuration);
         }
     }
-
-    public static ShiftPlan CopyTillShifts(this ShiftPlan shiftPlan)
-    {
-        List<Shift> shifts = new();
-        foreach(Shift shift in shiftPlan.Shifts)
-        {
-            shifts.Add(new Shift(shift.Ambulance, shift.Depot, shift.Work));
-        }
-
-        return new ShiftPlan(shifts);
-    }
 }
