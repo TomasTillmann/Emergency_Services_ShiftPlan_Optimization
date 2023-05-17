@@ -48,23 +48,18 @@ namespace ESSP_Tests
         }
 
         [Test]
-        public void MultipleShiftsOneIncidentTest()
+        public void MultipleShiftsSomeShiftsNotUsedOneIncidentTest()
         {
             IOptimizer optimizer = new ExhaustiveOptimizer(world, new Constraints
             {
                 AllowedShiftDurations = new HashSet<Seconds>
                 {
                     6.ToHours().ToSeconds(),
-                    8.ToHours().ToSeconds(),
-                    12.ToHours().ToSeconds(),
-                    24.ToHours().ToSeconds(),
                 },
                 AllowedShiftStartingTimes = new HashSet<Seconds>
                 {
                     0.ToHours().ToSeconds(),
                     6.ToHours().ToSeconds(),
-                    12.ToHours().ToSeconds(),
-                    18.ToHours().ToSeconds()
                 }
             });
 
@@ -74,10 +69,34 @@ namespace ESSP_Tests
             List<IncidentsSet> incidentsSet = new List<IncidentsSet> { testDataProvider.GetIncidents(1, 24.ToHours()) };
             incidentsSet[0].Value[0].Occurence = 10_000.ToSeconds();
 
-            IEnumerable<ShiftPlan> optimalShiftPlans = optimizer.FindOptimal(shiftPlan, incidentsSet);
+            List<ShiftPlan> optimalShiftPlans = optimizer.FindOptimal(shiftPlan, incidentsSet).ToList();
 
-            Assert.That(optimalShiftPlans.Count(), Is.EqualTo(1));
-            Assert.That(optimalShiftPlans.First().Shifts.First().Work, Is.EqualTo(Interval.GetByStartAndDuration(0.ToSeconds(), 21_600.ToSeconds())));
+            // Not three (0s-0s, 0s-0s, 0s-21600s), because, the third shift has ambulance type of higher cost
+            Assert.That(optimalShiftPlans.Count, Is.EqualTo(2));
+
+            Assert.That(optimalShiftPlans[0].Shifts.Select(shift => shift.Work).ToJson(),
+                Is.EqualTo(
+                    new List<Interval>
+                    {
+                        Interval.GetByStartAndDurationFromSeconds(0, 21_600),
+                        Interval.GetByStartAndDurationFromSeconds(0, 0),
+                        Interval.GetByStartAndDurationFromSeconds(0, 0),
+                    }
+                    .ToJson()
+                )
+            );
+
+            Assert.That(optimalShiftPlans[1].Shifts.Select(shift => shift.Work).ToJson(),
+                Is.EqualTo(
+                    new List<Interval>
+                    {
+                        Interval.GetByStartAndDurationFromSeconds(0, 0),
+                        Interval.GetByStartAndDurationFromSeconds(0, 21_600),
+                        Interval.GetByStartAndDurationFromSeconds(0, 0),
+                    }
+                    .ToJson()
+                )
+            );
         }
     }
 }

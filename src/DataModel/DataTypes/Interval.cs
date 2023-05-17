@@ -22,6 +22,11 @@ namespace ESSP.DataModel
             return new Interval(start, start + duration);
         }
 
+        public static Interval GetByStartAndDurationFromSeconds(int start, int duration)
+        {
+            return new Interval(start.ToSeconds(), (start + duration).ToSeconds());
+        }
+
         public static Interval GetByStartAndEnd(Seconds start, Seconds end)
         {
             return new Interval(start, end);

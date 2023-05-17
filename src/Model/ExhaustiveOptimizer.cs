@@ -90,7 +90,7 @@ public sealed class ExhaustiveOptimizer : Optimizer
                 }
             }
 
-            Logger.Instance.WriteLineForce($"Finished for: {currentShiftIndex}");
+            //Logger.Instance.WriteLineForce($"Finished for: {currentShiftIndex}");
         }
 
         // traverse the state space
@@ -104,8 +104,10 @@ public sealed class ExhaustiveOptimizer : Optimizer
             return Enumerable.Empty<ShiftPlan>(); 
         }
 
-        return allShiftPlans.FindMinSubset(shiftPlan => shiftPlan.GetCost());
-    }
+        List<ShiftPlan> optimalShiftPlans = allShiftPlans.FindMinSubset(shiftPlan => shiftPlan.GetCost());
+        Logger.Instance.WriteLineForce("Optimal shift plans:\n" + optimalShiftPlans.Visualize(separator: "\n"));
 
+        return optimalShiftPlans;
+    }
 }
 
