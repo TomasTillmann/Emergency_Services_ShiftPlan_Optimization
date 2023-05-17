@@ -2,8 +2,6 @@
 using Logging;
 using Model.Extensions;
 using Simulating;
-using System.Runtime.InteropServices;
-using System.Security.Cryptography.X509Certificates;
 
 namespace Optimizing;
 
@@ -29,28 +27,35 @@ public sealed class ExhaustiveOptimizer : Optimizer
         Logger.Instance.WriteLineForce(incidentsSets[0].Value.Visualize(separator: "\n"));
 
         shiftPlan.Shifts.ForEach(shift => shift.Work = Interval.GetByStartAndDuration(Constraints.AllowedShiftStartingTimes.First(), Constraints.AllowedShiftDurations.First()));
+
         List<ShiftPlan> allShiftPlans = new();
+
+        HashSet<Seconds> allowedDurations = new(Constraints.AllowedShiftDurations)
+        {
+            0.ToSeconds()
+        };
+
+
+        bool Succeeds(ShiftPlan shiftPlan)
+        {
+            foreach(IncidentsSet incidentsSet in incidentsSets)
+            {
+                Statistics stats = simulation.Run(incidentsSet.Value, shiftPlan);
+
+                if(stats.SuccessRate < incidentsSet.Threshold)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
 
         void PopulateAllSuccessfulShiftPlansFrom(ShiftPlan shiftPlan, int currentShiftIndex = 0)
         {
-            bool Succeeds(ShiftPlan shiftPlan)
-            {
-                foreach(IncidentsSet incidentsSet in incidentsSets)
-                {
-                    Statistics stats = simulation.Run(incidentsSet.Value, shiftPlan);
-
-                    if(stats.SuccessRate < incidentsSet.Threshold)
-                    {
-                        return false;
-                    }
-                }
-
-                return true;
-            }
-
             if(currentShiftIndex == shiftPlan.Shifts.Count)
             {
-                if (true || Succeeds(shiftPlan))
+                if (Succeeds(shiftPlan))
                 {
                     allShiftPlans.Add(GetShiftPlanWithShallowCopiedShiftsFrom(shiftPlan));
                 }
@@ -58,9 +63,21 @@ public sealed class ExhaustiveOptimizer : Optimizer
                 return;
             }
 
-            foreach (Seconds startingTime in Constraints.AllowedShiftStartingTimes)
+            foreach (Seconds duration in allowedDurations)
             {
-                foreach (Seconds duration in Constraints.AllowedShiftDurations)
+                if(duration == 0.ToSeconds())
+                {
+                    Interval originalWork = shiftPlan.Shifts[currentShiftIndex].Work;
+                    shiftPlan.Shifts[currentShiftIndex].Work = Interval.GetByStartAndDuration(0.ToSeconds(), 0.ToSeconds());
+
+                    PopulateAllSuccessfulShiftPlansFrom(shiftPlan, currentShiftIndex + 1);
+
+                    shiftPlan.Shifts[currentShiftIndex].Work = originalWork; 
+
+                    break;
+                }
+
+                foreach (Seconds startingTime in Constraints.AllowedShiftStartingTimes)
                 {
                     //Logger.Instance.WriteLineForce($"Shift: {shift}, startingTime: {startingTime}, duration: {duration}");
 
@@ -89,5 +106,6 @@ public sealed class ExhaustiveOptimizer : Optimizer
 
         return allShiftPlans.FindMinSubset(shiftPlan => shiftPlan.GetCost());
     }
+
 }
 
