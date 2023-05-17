@@ -9,7 +9,13 @@ namespace Optimizing;
 
 public sealed class ExhaustiveOptimizer : Optimizer
 {
-    public ExhaustiveOptimizer(World world, Constraints constraints) : base(world, constraints) { }
+    public ExhaustiveOptimizer(World world, Constraints constraints) : base(world, constraints)
+    {
+        if(constraints.AllowedShiftStartingTimes.Count() == 0 || constraints.AllowedShiftDurations.Count() == 0)
+        {
+            throw new ArgumentException("Constraints need to be set");
+        }
+    } 
 
     /// <summary>
     /// Tries brute force search for all possible combinations of starting times and shift durations on all shifts.
@@ -22,6 +28,7 @@ public sealed class ExhaustiveOptimizer : Optimizer
     {
         Logger.Instance.WriteLineForce(incidentsSets[0].Value.Visualize(separator: "\n"));
 
+        shiftPlan.Shifts.ForEach(shift => shift.Work = Interval.GetByStartAndDuration(Constraints.AllowedShiftStartingTimes.First(), Constraints.AllowedShiftDurations.First()));
         List<ShiftPlan> allShiftPlans = new();
 
         void PopulateAllSuccessfulShiftPlansFrom(ShiftPlan shiftPlan, int currentShiftIndex = 0)
@@ -43,22 +50,22 @@ public sealed class ExhaustiveOptimizer : Optimizer
 
             if(currentShiftIndex == shiftPlan.Shifts.Count)
             {
+                if (true || Succeeds(shiftPlan))
+                {
+                    allShiftPlans.Add(GetShiftPlanWithShallowCopiedShiftsFrom(shiftPlan));
+                }
+
                 return;
             }
 
-            foreach(Seconds startingTime in Constraints.AllowedShiftStartingTimes)
+            foreach (Seconds startingTime in Constraints.AllowedShiftStartingTimes)
             {
-                foreach(Seconds duration in Constraints.AllowedShiftDurations)
+                foreach (Seconds duration in Constraints.AllowedShiftDurations)
                 {
                     //Logger.Instance.WriteLineForce($"Shift: {shift}, startingTime: {startingTime}, duration: {duration}");
 
                     Interval originalWork = shiftPlan.Shifts[currentShiftIndex].Work;
                     shiftPlan.Shifts[currentShiftIndex].Work = Interval.GetByStartAndDuration(startingTime, duration);
-
-                    if (Succeeds(shiftPlan))
-                    {
-                        allShiftPlans.Add(GetShiftPlanWithShallowCopiedShiftsFrom(shiftPlan));
-                    }
 
                     PopulateAllSuccessfulShiftPlansFrom(shiftPlan, currentShiftIndex + 1);
 

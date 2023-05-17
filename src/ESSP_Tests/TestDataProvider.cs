@@ -181,12 +181,12 @@ public class TestDataProvider
 
     public Constraints GetConstraints()
     {
-        List<Seconds> allowedShiftStartingTimes = new()
+        HashSet<Seconds> allowedShiftStartingTimes = new()
         {
             //TODO:
         };
 
-        List<Seconds> allowedShiftDurations = new()
+        HashSet<Seconds> allowedShiftDurations = new()
         {
             4.ToHours().ToSeconds(),
             6.ToHours().ToSeconds(),

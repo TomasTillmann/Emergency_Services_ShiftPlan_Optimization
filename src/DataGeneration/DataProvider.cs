@@ -217,20 +217,25 @@ public class DataProvider
         }
 #endif
 
-        List<Seconds> allowedShiftStartingTimes = new()
+        HashSet<Seconds> allowedShiftStartingTimes = new()
         {
             0.ToHours().ToSeconds(),
-            6.ToHours().ToSeconds(),
-            12.ToHours().ToSeconds(),
+            1.ToHours().ToSeconds(),
+            2.ToHours().ToSeconds(),
             18.ToHours().ToSeconds()
+            //0.ToSeconds(),
+            //1.ToSeconds(),
+            //2.ToSeconds()
         };
 
-        List<Seconds> allowedShiftDurations = new()
+        HashSet<Seconds> allowedShiftDurations = new()
         {
             6.ToHours().ToSeconds(),
             8.ToHours().ToSeconds(),
             12.ToHours().ToSeconds(),
             24.ToHours().ToSeconds(),
+            //10.ToSeconds(),
+            //100.ToSeconds()
         };
 
         return new Constraints(allowedShiftStartingTimes, allowedShiftDurations);
