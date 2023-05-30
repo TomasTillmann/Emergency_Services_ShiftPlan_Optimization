@@ -54,7 +54,7 @@ class Program
     static void Main()
     {
         DataProvider dataProvider = new();
-        List<IncidentsSet> incidents = new()
+        List<SuccessRatedIncidents> incidents = new()
         {
             dataProvider.GetIncidents(5, 24.ToHours(), successRateThreshold: 1)
         };

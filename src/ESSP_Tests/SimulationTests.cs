@@ -30,7 +30,7 @@ namespace ESSP_Tests
             Simulation simulation = new(world);
 
             ShiftPlan shiftPlan = DataSerializer.Deserialize<ShiftPlan>("test1/shiftPlan.json");
-            IncidentsSet incidents = DataSerializer.Deserialize<IncidentsSet>("test1/incidents.json");
+            SuccessRatedIncidents incidents = DataSerializer.Deserialize<SuccessRatedIncidents>("test1/incidents.json");
 
 
             Statistics stats = simulation.Run(incidents.Value, shiftPlan);
@@ -58,7 +58,7 @@ namespace ESSP_Tests
             Simulation simulation = new(world);
 
             ShiftPlan shiftPlan = DataSerializer.Deserialize<ShiftPlan>("test2/shiftPlan.json");
-            IncidentsSet incidents = DataSerializer.Deserialize<IncidentsSet>("test2/incidents.json");
+            SuccessRatedIncidents incidents = DataSerializer.Deserialize<SuccessRatedIncidents>("test2/incidents.json");
 
 
             Statistics stats = simulation.Run(incidents.Value, shiftPlan);

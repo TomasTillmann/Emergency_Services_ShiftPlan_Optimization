@@ -31,6 +31,6 @@ public abstract class Optimizer : IOptimizer
         return new ShiftPlan(shifts);
     }
 
-    public abstract IEnumerable<ShiftPlan> FindOptimal(ShiftPlan shiftPlan, List<IncidentsSet> incidentsSets);
+    public abstract IEnumerable<ShiftPlan> FindOptimal(ShiftPlan shiftPlan, List<SuccessRatedIncidents> incidentsSets);
 }
 

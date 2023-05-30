@@ -4,6 +4,6 @@ namespace Optimizing;
 
 public interface IOptimizer
 {
-    public IEnumerable<ShiftPlan> FindOptimal(ShiftPlan shiftPlan, List<IncidentsSet> incidentsSets);
+    public IEnumerable<ShiftPlan> FindOptimal(ShiftPlan shiftPlan, List<SuccessRatedIncidents> incidentsSets);
 }
 

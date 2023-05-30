@@ -43,7 +43,7 @@ public class DataProvider
         GenerateWorld();
     }
 
-    public IncidentsSet GetIncidents(int count, Hours duration, double successRateThreshold = 0.8)
+    public SuccessRatedIncidents GetIncidents(int count, Hours duration, double successRateThreshold = 0.8)
     {
         List<Incident> incidents = new();
         for(int i = 0; i < count; ++i)
@@ -63,7 +63,7 @@ public class DataProvider
 
         incidents.Sort((x, y) => x.Occurence.CompareTo(y.Occurence));
 
-        return new IncidentsSet(incidents, successRateThreshold);
+        return new SuccessRatedIncidents(incidents, successRateThreshold);
     }
 
     public World GetWorld()
