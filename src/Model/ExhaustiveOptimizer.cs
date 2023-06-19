@@ -47,8 +47,6 @@ public sealed class ExhaustiveOptimizer : Optimizer
 
         bool Succeeds(ShiftPlan shiftPlan)
         {
-            return true;
-
             foreach(IncidentsSet incidentsSet in incidentsSets)
             {
                 Statistics stats = simulation.Run(incidentsSet.Value, shiftPlan);
