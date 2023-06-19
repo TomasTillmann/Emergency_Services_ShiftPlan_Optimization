@@ -1,20 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace ESSP.DataModel;
 
-public class IncidentsSet
+public class SuccessRatedIncidents
 {
-    public double Threshold { get; set; }
+    public double SuccessRate { get; set; }
 
     public List<Incident> Value { get; set; }
 
-    public IncidentsSet(List<Incident> incidents, double threshold)
+    public SuccessRatedIncidents(List<Incident> incidents, double successRate)
     {
-        Threshold = threshold;
+        SuccessRate = successRate;
         Value = incidents;
     }
 }

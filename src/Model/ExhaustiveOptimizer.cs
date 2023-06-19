@@ -28,9 +28,9 @@ public sealed class ExhaustiveOptimizer : Optimizer
     /// Keeps all shiftPlans in memory, to then globally assess which shift plan has the minimum cost and at the same time satisfies minimum threshold on all given historical incidents.
     /// </summary>
     /// <param name="shiftPlan">Shift plan structure, on which all possible shifts combinations are traversed.</param>
-    /// <param name="incidentsSets">Historical incidents.</param>
+    /// <param name="successRatedIncidents">Historical incidents.</param>
     /// <returns></returns>
-    public override IEnumerable<ShiftPlan> FindOptimal(ShiftPlan shiftPlan, List<IncidentsSet> incidentsSets)
+    public override IEnumerable<ShiftPlan> FindOptimal(ShiftPlan shiftPlan, List<SuccessRatedIncidents> successRatedIncidents)
     {
         // reset stats
         SearchedShiftPlans = 0;
@@ -47,11 +47,11 @@ public sealed class ExhaustiveOptimizer : Optimizer
 
         bool Succeeds(ShiftPlan shiftPlan)
         {
-            foreach(IncidentsSet incidentsSet in incidentsSets)
+            foreach(SuccessRatedIncidents successRatedIncident in successRatedIncidents)
             {
-                Statistics stats = simulation.Run(incidentsSet.Value, shiftPlan);
+                Statistics stats = simulation.Run(successRatedIncident.Value, shiftPlan);
 
-                if(stats.SuccessRate < incidentsSet.Threshold)
+                if(stats.SuccessRate < successRatedIncident.SuccessRate)
                 {
                     return false;
                 }

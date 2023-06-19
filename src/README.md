@@ -7,6 +7,7 @@
 	* $|S|$ udava hloubku stavoveho prostoru
 
 Celkem odvedene prace je:
+
 $$
 (a \times b + 1)^{|S|} * |I|
 $$

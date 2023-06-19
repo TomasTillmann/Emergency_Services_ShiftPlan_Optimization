@@ -38,7 +38,7 @@ namespace ESSP_Tests
             ShiftPlan shiftPlan = testDataProvider.GetShiftPlan();
             shiftPlan.Shifts = shiftPlan.Shifts.GetRange(0, 1);
 
-            List<IncidentsSet> incidentsSet = new List<IncidentsSet> { testDataProvider.GetIncidents(1, 24.ToHours()) };
+            List<SuccessRatedIncidents> incidentsSet = new List<SuccessRatedIncidents> { testDataProvider.GetIncidents(1, 24.ToHours()) };
             incidentsSet[0].Value[0].Occurence = 10_000.ToSeconds();
 
             IEnumerable<ShiftPlan> optimalShiftPlans = optimizer.FindOptimal(shiftPlan, incidentsSet);
@@ -66,7 +66,7 @@ namespace ESSP_Tests
             ShiftPlan shiftPlan = testDataProvider.GetShiftPlan();
             shiftPlan.Shifts = shiftPlan.Shifts.GetRange(0, 3);
 
-            List<IncidentsSet> incidentsSet = new List<IncidentsSet> { testDataProvider.GetIncidents(1, 24.ToHours()) };
+            List<SuccessRatedIncidents> incidentsSet = new List<SuccessRatedIncidents> { testDataProvider.GetIncidents(1, 24.ToHours()) };
             incidentsSet[0].Value[0].Occurence = 10_000.ToSeconds();
 
             List<ShiftPlan> optimalShiftPlans = optimizer.FindOptimal(shiftPlan, incidentsSet).ToList();
