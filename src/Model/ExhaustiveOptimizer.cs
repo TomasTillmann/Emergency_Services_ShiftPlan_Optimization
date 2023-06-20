@@ -30,12 +30,13 @@ public sealed class ExhaustiveOptimizer : Optimizer
     /// <param name="shiftPlan">Shift plan structure, on which all possible shifts combinations are traversed.</param>
     /// <param name="successRatedIncidents">Historical incidents.</param>
     /// <returns></returns>
-    public override IEnumerable<ShiftPlan> FindOptimal(ShiftPlan shiftPlan, List<SuccessRatedIncidents> successRatedIncidents)
+    public override IEnumerable<ShiftPlan> FindOptimal(List<SuccessRatedIncidents> successRatedIncidents)
     {
         // reset stats
         SearchedShiftPlans = 0;
         //
 
+        ShiftPlan shiftPlan = this.GetEmptyShiftPlan();
         shiftPlan.Shifts.ForEach(shift => shift.Work = Interval.GetByStartAndDuration(Constraints.AllowedShiftStartingTimes.First(), Constraints.AllowedShiftDurations.First()));
 
         List<ShiftPlan> allShiftPlans = new();
@@ -50,8 +51,9 @@ public sealed class ExhaustiveOptimizer : Optimizer
             foreach(SuccessRatedIncidents successRatedIncident in successRatedIncidents)
             {
                 Statistics stats = simulation.Run(successRatedIncident.Value, shiftPlan);
+                shiftPlan.Shifts.ForEach(shift => shift.ClearPlannedIncidents());
 
-                if(stats.SuccessRate < successRatedIncident.SuccessRate)
+                if (stats.SuccessRate < successRatedIncident.SuccessRate)
                 {
                     return false;
                 }
@@ -74,7 +76,7 @@ public sealed class ExhaustiveOptimizer : Optimizer
 
                 if (Succeeds(shiftPlan))
                 {
-                    allShiftPlans.Add(GetShiftPlanWithShallowCopiedShiftsFrom(shiftPlan));
+                    allShiftPlans.Add(shiftPlan.Clone());
                 }
 
                 return;
@@ -118,6 +120,9 @@ public sealed class ExhaustiveOptimizer : Optimizer
         {
             return Enumerable.Empty<ShiftPlan>(); 
         }
+
+        Console.WriteLine($"All Searched: {SearchedShiftPlans}");
+        Console.WriteLine($"Satisfying: {allShiftPlans.Count}");
 
         List<ShiftPlan> optimalShiftPlans = allShiftPlans.FindMinSubset(shiftPlan => shiftPlan.GetCost());
         return optimalShiftPlans;

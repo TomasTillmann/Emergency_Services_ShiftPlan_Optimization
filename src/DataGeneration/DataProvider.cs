@@ -11,9 +11,7 @@ public class DataProvider
 {
     private Meters dimX;
     private Meters dimY;
-    private Random random = new(42);
-
-    private List<Shift> shifts;
+    private Random random = new();
 
     private World world;
 
@@ -29,16 +27,15 @@ public class DataProvider
 
     private IDistanceCalculator distanceCalculator = new DistanceCalculator();
 
-    public DataProvider()
+    public DataProvider(int ambulancesCount)
     {
         dimX = 50_000.ToMeters();
         dimY = 50_000.ToMeters();
 
         GenerateAmbulanceTypes();
         GenerateIncidentTypes();
-        GenerateAmbulances();
+        GenerateAmbulances(ambulancesCount);
         GenerateDepots();
-        GenerateShifts();
         GenerateHospitals();
         GenerateWorld();
     }
@@ -79,11 +76,6 @@ public class DataProvider
     public List<Hospital> GetHospitals()
     {
         return hospitals;
-    }
-
-    public ShiftPlan GetShiftPlan()
-    {
-        return new ShiftPlan(shifts);
     }
 
     public List<Depot> GetDepots()
@@ -137,32 +129,19 @@ public class DataProvider
                 hospitals.Add(new Hospital(new Coordinate(x, y)));
     }
 
-    private void GenerateShifts()
-    {
-        shifts = new List<Shift>();
-
-        foreach(Depot depot in depots)
-        {
-            foreach(Ambulance ambulance in depot.Ambulances)
-            {
-                shifts.Add(new Shift(ambulance, depot, Interval.GetByStartAndDuration(0.ToSeconds(), 0.ToSeconds())));
-            }
-        }
-    }
-
     private void GenerateDepots()
     {
         depots = new List<Depot>();
         List<Ambulance> ambulances = new(this.ambulances);
 
-        Meters stepY = (dimY.Value / 3).ToMeters();
+        Meters stepY = (dimY.Value / 5).ToMeters();
         Meters stepX = (dimX.Value / 5).ToMeters();
 
         for (Meters y = 10.ToMeters(); y < dimY; y += stepY)
         {
             for (Meters x = 10.ToMeters(); x < dimX; x += stepX)
             {
-                HashSet<Ambulance> selectedAmbulances = ambulances.GetRangeRandom(random, minCount: 1, maxCount: 3).ToHashSet();
+                HashSet<Ambulance> selectedAmbulances = ambulances.GetRangeRandom(random, minCount: 5, maxCount: 20).ToHashSet();
                 ambulances.RemoveAll(amb => selectedAmbulances.Contains(amb));
 
                 depots.Add(new Depot(new Coordinate(x, y), selectedAmbulances.ToList()));
@@ -170,22 +149,25 @@ public class DataProvider
         }
     }
 
-    private void GenerateAmbulances()
+    private void GenerateAmbulances(int ambulancesCount)
     {
-#if true
+#if false
         ambulances = new List<Ambulance>
         {
+            new Ambulance(ambulanceTypes[0], new Coordinate(), 15.ToSeconds()),
+            new Ambulance(ambulanceTypes[0], new Coordinate(), 15.ToSeconds()),
             new Ambulance(ambulanceTypes[0], new Coordinate(), 15.ToSeconds()),
             new Ambulance(ambulanceTypes[0], new Coordinate(), 15.ToSeconds()),
             new Ambulance(ambulanceTypes[0], new Coordinate(), 15.ToSeconds()),
         };
 #endif
 
-#if false
+#if true
         ambulances = new List<Ambulance>();
-        List<Seconds> reroutePenalties = new() { 15.ToSeconds(), 30.ToSeconds(), 70.ToSeconds() };
+        //List<Seconds> reroutePenalties = new() { 15.ToSeconds(), 30.ToSeconds(), 70.ToSeconds() };
+        List<Seconds> reroutePenalties = new() { 500.ToSeconds() };
 
-        for(int i = 0; i < 100; ++i)
+        for(int i = 0; i < ambulancesCount; ++i)
         {
             ambulances.Add(new Ambulance(ambulanceTypes.GetRandom(random), new Coordinate(), reroutePenalties.GetRandom(random)));
         }
@@ -220,7 +202,7 @@ public class DataProvider
             0.ToHours().ToSeconds(),
             6.ToHours().ToSeconds(),
             12.ToHours().ToSeconds(),
-            18.ToHours().ToSeconds()
+            //18.ToHours().ToSeconds()
             //0.ToSeconds(),
             //1.ToSeconds(),
             //2.ToSeconds()
@@ -229,7 +211,7 @@ public class DataProvider
         HashSet<Seconds> allowedShiftDurations = new()
         {
             6.ToHours().ToSeconds(),
-            8.ToHours().ToSeconds(),
+            //8.ToHours().ToSeconds(),
             12.ToHours().ToSeconds(),
             24.ToHours().ToSeconds(),
             //10.ToSeconds(),

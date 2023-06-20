@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using DataModel.Interfaces;
 using ESSP.DataModel;
 using Logging;
@@ -32,6 +33,13 @@ public sealed class Statistics
     internal void SetHandled(Incident incident)
     {
         HandledIncidents.Add(incident);
+    }
+
+    public override string ToString()
+    {
+        return $"SuccessRate: {SuccessRate}\n" +
+            $"HandledIncidents: Count: {HandledIncidents.Count}, {HandledIncidents.Visualize("| ")}\n" +
+            $"UnhandledIncidents: Count: {UnhandledIncidents.Count}, {UnhandledIncidents.Visualize("| ")}\n";
     }
 }
 
@@ -95,7 +103,6 @@ public sealed class Simulation
         statistics = new Statistics(allIncidents);
         state = new SimulationState();
         this.shiftPlan = shiftPlan;
-        shiftPlan.Shifts.ForEach(shift => shift.ClearPlannedIncidents());
     }
 
     private void UpdateSystem(Incident incident)
@@ -111,25 +118,35 @@ public sealed class Simulation
         state.StepDuration = state.CurrentTime - lastTime;
     }
 
-    //TODO: Refactor, so only one for loop is necessary to decide the best shift.
     private void Step(Incident currentIncident)
     {
         Logger.WriteLine($"Incident: {currentIncident}");
         Logger.WriteLine($"Shifts:\n{shiftPlan.Shifts.Visualize("\n")}");
 
-        List<Shift> handlingShifts = shiftEvaluator.GetHandlingShifts(shiftPlan.Shifts, currentIncident);
-        if (handlingShifts.Count == 0)
+        Shift bestShift = null; 
+        foreach(Shift shift in shiftPlan.Shifts)
+        {
+            if (shiftEvaluator.IsHandling(shift, currentIncident))
+            {
+                if(bestShift is null)
+                {
+                    bestShift = shift;
+                    continue;
+                }
+
+                bestShift = shiftEvaluator.GetBetter(bestShift, shift, currentIncident); 
+            }
+        }
+
+        if (bestShift is null)
         {
             Logger.WriteLine("Unhandled");
-            //Console.WriteLine("Unhandled");
             statistics.SetUnhandled(currentIncident);
             return;
         }
 
-        Shift bestShift = shiftEvaluator.GetBestShift(handlingShifts, currentIncident);
 
         Logger.WriteLine($"Best shift:\n{bestShift}");
-        //Console.WriteLine($"Best shift:\n{bestShift}");
 
         bestShift.Plan(plannableIncidentFactory.Get(currentIncident, bestShift));
 

@@ -80,21 +80,20 @@ partial class PlannableIncident
 
         private Seconds CalculateStartTimeToIncidentDrive(Shift shift, Seconds incidentOccurenceTime)
         {
-            Seconds firstPossibleStartTime = Math.Max(incidentOccurenceTime.Value, shift.Work.Start.Value).ToSeconds();
 
-            if (shift.IsInDepot(firstPossibleStartTime))
+            if (shift.IsInDepot(incidentOccurenceTime))
             {
-                return firstPossibleStartTime;
+                return incidentOccurenceTime;
             }
 
-            PlannableIncident currentlyHandlingIncident = shift.PlannedIncident(firstPossibleStartTime)!;
+            PlannableIncident currentlyHandlingIncident = shift.PlannedIncidents.Last();
 
-            if (currentlyHandlingIncident.ToDepotDrive.Contains(firstPossibleStartTime))
+            if (currentlyHandlingIncident.ToDepotDrive.IsInInterval(incidentOccurenceTime))
             {
-                return firstPossibleStartTime + shift.Ambulance.ReroutePenalty;
+                return incidentOccurenceTime + shift.Ambulance.ReroutePenalty;
             }
 
-            return currentlyHandlingIncident.InHospitalDelivery.End;
+            return currentlyHandlingIncident.InHospitalDelivery.End + shift.Ambulance.ReroutePenalty;
         }
 
         private Coordinate CalculateAmbulanceStartingLocationToIncident(Shift shift, Seconds incidentOccurenceTime)
@@ -106,10 +105,10 @@ partial class PlannableIncident
                 return shift.Depot.Location;
             }
 
-            PlannableIncident currentlyHandlingIncident = shift.PlannedIncident(firstPossibleStartTime)!;
+            PlannableIncident currentlyHandlingIncident = shift.PlannedIncidents.Last();
             Coordinate hospitalLocation = currentlyHandlingIncident.NearestHospital.Location;
 
-            if (currentlyHandlingIncident.ToDepotDrive.Contains(firstPossibleStartTime))
+            if (currentlyHandlingIncident.ToDepotDrive.IsInInterval(firstPossibleStartTime))
             {
                 Seconds durationDriving = incidentOccurenceTime - currentlyHandlingIncident.ToDepotDrive.Start;
                 return distanceCalculator.GetNewLocation(hospitalLocation, shift.Depot.Location, durationDriving, firstPossibleStartTime);

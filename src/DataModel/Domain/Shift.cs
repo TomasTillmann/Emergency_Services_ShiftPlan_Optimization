@@ -80,8 +80,8 @@ public class Shift : IIdentifiable
     }
 
     /// <summary>
-    /// Returns incident which is / was handled in <paramref name="time"/>.
-    /// If no incidents were planned on this shift, returns <see langword="null"/>.
+    /// Returns incident which is / was handled in <paramref name="currentTime"/>.
+    /// If no incidents were planned on this shift at <paramref name="currentTime"/>, returns <see langword="null"/>.
     /// </summary>
     public PlannableIncident PlannedIncident(Seconds currentTime)
     {
@@ -91,7 +91,7 @@ public class Shift : IIdentifiable
         }
 
         // always has only one element
-        return PlannedIncidents.Where(inc => inc.WholeInterval.Contains(currentTime)).FirstOrDefault();
+        return PlannedIncidents.Where(inc => inc.WholeInterval.IsInInterval(currentTime)).FirstOrDefault();
     }
 
     public void ClearPlannedIncidents()

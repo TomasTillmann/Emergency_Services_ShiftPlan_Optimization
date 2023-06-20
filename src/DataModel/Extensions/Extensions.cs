@@ -1,4 +1,5 @@
 ﻿using ESSP.DataModel;
+using Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -124,6 +125,37 @@ public static class Extensions
         foreach (Shift shift in shiftPlan.Shifts)
         {
             shift.Work = Interval.GetByStartAndDuration(0.ToSeconds(), largestDuration);
+        }
+    }
+
+    public static void ShowGraph(this ShiftPlan shiftPlan, Seconds end)
+    {
+        foreach(var shift in shiftPlan.Shifts)
+        {
+            Logger.Instance.WriteForce($"{shift.Id}: ");
+
+            for(Seconds time = 0.ToSeconds(); time < end; time += (5 * 60).ToSeconds())
+            {
+                if(time.Value % 1.ToHours().ToSeconds().Value == 0)
+                {
+                    Logger.Instance.WriteForce($"{time.Value / (60 * 60)}");
+                }
+                else
+                {
+                    Logger.Instance.WriteForce(shift.Work.IsInInterval(time) ? "-" : " ");
+                }
+            }
+
+            Logger.Instance.WriteLineForce(Environment.NewLine);
+            Logger.Instance.WriteForce($"{shift.Id}: ");
+
+            for(Seconds time = 0.ToSeconds(); time < end; time += (5 * 60).ToSeconds())
+            {
+                Logger.Instance.WriteForce(shift.PlannedIncident(time) is not null ? "=" : " ");
+            }
+
+            Logger.Instance.WriteLineForce(Environment.NewLine);
+            Logger.Instance.WriteLineForce(Environment.NewLine);
         }
     }
 }

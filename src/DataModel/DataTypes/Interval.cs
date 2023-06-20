@@ -53,14 +53,14 @@ namespace ESSP.DataModel
             return GetByStartAndEnd(start, end);
         }
 
-        public bool Contains(Seconds time)
+        public bool IsInInterval(Seconds time)
         {
             return Start <= time && time <= End;
         }
 
         public bool IsSubsetOf(Interval interval)
         {
-            return interval.Contains(Start) && interval.Contains(End);
+            return interval.IsInInterval(Start) && interval.IsInInterval(End);
         }
 
         public override string ToString()
