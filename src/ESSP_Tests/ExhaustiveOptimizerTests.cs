@@ -41,7 +41,7 @@ namespace ESSP_Tests
             List<SuccessRatedIncidents> incidentsSet = new List<SuccessRatedIncidents> { testDataProvider.GetIncidents(1, 24.ToHours()) };
             incidentsSet[0].Value[0].Occurence = 10_000.ToSeconds();
 
-            IEnumerable<ShiftPlan> optimalShiftPlans = optimizer.FindOptimal(shiftPlan, incidentsSet);
+            IEnumerable<ShiftPlan> optimalShiftPlans = optimizer.FindOptimal(incidentsSet);
 
             Assert.That(optimalShiftPlans.Count(), Is.EqualTo(1));
             Assert.That(optimalShiftPlans.First().Shifts.First().Work, Is.EqualTo(Interval.GetByStartAndDuration(0.ToSeconds(), 21_600.ToSeconds())));
@@ -69,7 +69,7 @@ namespace ESSP_Tests
             List<SuccessRatedIncidents> incidentsSet = new List<SuccessRatedIncidents> { testDataProvider.GetIncidents(1, 24.ToHours()) };
             incidentsSet[0].Value[0].Occurence = 10_000.ToSeconds();
 
-            List<ShiftPlan> optimalShiftPlans = optimizer.FindOptimal(shiftPlan, incidentsSet).ToList();
+            List<ShiftPlan> optimalShiftPlans = optimizer.FindOptimal(incidentsSet).ToList();
 
             // Not three (0s-0s, 0s-0s, 0s-21600s), because, the third shift has ambulance type of higher cost
             Assert.That(optimalShiftPlans.Count, Is.EqualTo(2));

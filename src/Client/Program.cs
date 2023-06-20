@@ -117,10 +117,10 @@ class Program
     }
 #endif
 
-#if false
+#if true
     static void Main()
     {
-        DataProvider dataProvider = new(ambulancesCount: 40);
+        DataProvider dataProvider = new(ambulancesCount: 45);
         List<SuccessRatedIncidents> incidents = new()
         {
             dataProvider.GetIncidents(1000, 23.ToHours(), successRateThreshold: 1)
@@ -147,7 +147,7 @@ class Program
 #endif
 
     // BENCHMARK OF SIMULATION
-#if true
+#if false
     static void Main()
     {
         BenchmarkRunner.Run<SimulationBenchmark>();

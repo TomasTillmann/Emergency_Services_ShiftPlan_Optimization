@@ -11,7 +11,7 @@ public class DataProvider
 {
     private Meters dimX;
     private Meters dimY;
-    private Random random = new();
+    private Random random = new(42);
 
     private World world;
 
