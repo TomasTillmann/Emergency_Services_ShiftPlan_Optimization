@@ -118,7 +118,7 @@ public class PlannableIncidentTests : PlannableIncidentTestsBase
         PlannableIncident plannableIncident = plannableIncidentFactory.Get(incident1, shift);
 
 
-        Seconds startingTimeOfDrive = shift.PlannedIncident(timeOfIncidentOccurence).ToDepotDrive.Start;
+        Seconds startingTimeOfDrive = shift.PlannedIncident(timeOfIncidentOccurence).ToDepotDrive.Start + shift.Ambulance.ReroutePenalty;
         Interval toIncident = Interval.GetByStartAndDuration(startingTimeOfDrive, distanceCalculator.GetTravelDuration(shift.PlannedIncident(timeOfIncidentOccurence).NearestHospital, incident1, timeOfIncidentOccurence));
         Assert.That(plannableIncident.ToIncidentDrive,
             Is.EqualTo(toIncident));
