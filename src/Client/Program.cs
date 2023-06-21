@@ -53,33 +53,56 @@ class Program
     }
 #endif
 
-#if false
+#if true
     static void Main()
     {
-        DataProvider dataProvider = new();
+        DataProvider dataProvider = new(30);
         List<SuccessRatedIncidents> incidents = new()
         {
-            dataProvider.GetIncidents(5, 24.ToHours(), successRateThreshold: 1)
+            dataProvider.GetIncidents(50, 23.ToHours(), successRateThreshold: 0.9)
         };
 
-        ExhaustiveOptimizer optimizer = new ExhaustiveOptimizer(dataProvider.GetWorld(), dataProvider.GetConstraints());
+        //List<SuccessRatedIncidents> incidents = new()
+        //{
+        //    new SuccessRatedIncidents(new List<Incident>
+        //    {
+        //        new Incident(Coordinate.FromMeters(10_000, 10_000), 60000.ToSeconds(), 3600.ToSeconds(), 200.ToSeconds(), IncidentType.Default),
+        //        new Incident(Coordinate.FromMeters(30_000, 10_000), 1000.ToSeconds(), 3600.ToSeconds(), 200.ToSeconds(), IncidentType.Default)
+        //    }, 1)
+        //};
 
-        Console.WriteLine(incidents.Visualize(separator: "\n"));
+        IOptimizer optimizer = new TabuSearchOptimizer
+        (
+            world: dataProvider.GetWorld(),
+            constraints: dataProvider.GetConstraints(),
+            iterations: 200,
+            maxTabuSize: 50,
+            simulationDuration: 24.ToHours().ToSeconds(),
+            initialDurationPenalty: 10
+        );
+
+        //Console.WriteLine(incidents.Visualize(separator: "\n"));
         Stopwatch sw = Stopwatch.StartNew();
 
-        IEnumerable<ShiftPlan> optimalShiftPlans = optimizer.FindOptimal(incidents);
+        IEnumerable<ShiftPlan> optimals = optimizer.FindOptimal(incidents);
 
-        Console.WriteLine("Celkem zabralo: " + (sw.ElapsedMilliseconds / 1000d) + "s");
-        Console.WriteLine("Celkem prohledano: " + optimizer.SearchedShiftPlans);
-        Console.WriteLine("Celkem splnujicich: " + optimizer.SatisfyingShiftPlans);
-        Console.WriteLine("Nejvic optimalni: \n" + optimalShiftPlans.Visualize(separator: "\n"));
+        Logger.Instance.WriteLineForce($"Optimizing took: {sw.ElapsedMilliseconds}ms.");
+
+        Simulation simulation = new(dataProvider.GetWorld());
+        foreach(var optimal in optimals)
+        {
+            Statistics stats = simulation.Run(incidents.First().Value, optimal);
+            optimal.ShowGraph(24.ToHours().ToSeconds());
+            Logger.Instance.WriteLineForce(stats);
+            Logger.Instance.WriteLineForce();
+        }
     }
 #endif
 
 #if false
     static void Main()
     {
-        DataProvider dataProvider = new();
+        DataProvider dataProvider = new(3);
         List<SuccessRatedIncidents> incidents = new()
         {
             dataProvider.GetIncidents(5, 24.ToHours(), successRateThreshold: 1)
@@ -117,13 +140,13 @@ class Program
     }
 #endif
 
-#if true
+#if false
     static void Main()
     {
-        DataProvider dataProvider = new(ambulancesCount: 45);
+        DataProvider dataProvider = new(ambulancesCount: 100);
         List<SuccessRatedIncidents> incidents = new()
         {
-            dataProvider.GetIncidents(1000, 23.ToHours(), successRateThreshold: 1)
+            dataProvider.GetIncidents(2000, 23.ToHours(), successRateThreshold: 1)
         };
 
         Simulation simulation = new(dataProvider.GetWorld());
@@ -132,7 +155,9 @@ class Program
             dataProvider.GetConstraints().AllowedShiftStartingTimes.Min(),
             dataProvider.GetConstraints().AllowedShiftDurations.Max());
 
+        Stopwatch sw = Stopwatch.StartNew();
         Statistics stats = simulation.Run(incidents.First().Value, maximalShiftPlan);
+        Logger.Instance.WriteLineForce($"Simulation took: {sw.ElapsedMilliseconds}ms");
 
         maximalShiftPlan.ShowGraph(24.ToHours().ToSeconds());
 
@@ -163,10 +188,10 @@ public class SimulationBenchmark
     DataProvider dataProvider;
     Simulation simulation;
 
-    [Params(50)]
+    [Params(100)]
     public int ambulancesCount = 10;
 
-    [Params(1000)]
+    [Params(2000)]
     public int incidentsCount = 10;
 
     List<Incident> incidents;

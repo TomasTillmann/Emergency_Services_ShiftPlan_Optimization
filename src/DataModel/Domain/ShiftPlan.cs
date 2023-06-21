@@ -30,7 +30,7 @@ public class ShiftPlan
         return new ShiftPlan(shifts); 
     }
 
-    public double GetCost()
+    public int GetCost()
     {
         return Shifts.Select(shift => shift.Ambulance.Type.Cost * shift.Work.Duration.Value).Sum();
     }

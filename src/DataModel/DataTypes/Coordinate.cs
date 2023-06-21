@@ -14,6 +14,11 @@ namespace ESSP.DataModel
             Y = y;
         }
 
+        public static Coordinate FromMeters(int x, int y)
+        {
+            return new Coordinate(x.ToMeters(), y.ToMeters());
+        }
+
         #region Operators
 
         public static Coordinate operator -(Coordinate c1, Coordinate c2) => new Coordinate(c1.X - c2.X, c1.Y - c2.Y);

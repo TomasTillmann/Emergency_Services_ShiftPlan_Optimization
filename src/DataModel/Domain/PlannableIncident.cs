@@ -70,39 +70,21 @@ partial class PlannableIncident
 
         private Interval GetToIncidentDrive(Incident incident, Shift shift)
         {
-            Seconds startTimeToIncidentDrive = CalculateStartTimeToIncidentDrive(shift, incident.Occurence);
-            Coordinate ambulanceLocation = CalculateAmbulanceStartingLocationToIncident(shift, incident.Occurence);
+            CalculateStartTimeAndAmbulanceStartingLocation(shift, incident.Occurence, out Seconds startTimeToIncidentDrive, out Coordinate ambulanceLocation);
 
             Seconds toIncidentTravelDuration = distanceCalculator.GetTravelDuration(ambulanceLocation, incident.Location, startTimeToIncidentDrive);
 
             return Interval.GetByStartAndDuration(startTimeToIncidentDrive, toIncidentTravelDuration);
         }
 
-        private Seconds CalculateStartTimeToIncidentDrive(Shift shift, Seconds incidentOccurenceTime)
-        {
-
-            if (shift.IsInDepot(incidentOccurenceTime))
-            {
-                return incidentOccurenceTime;
-            }
-
-            PlannableIncident currentlyHandlingIncident = shift.PlannedIncidents.Last();
-
-            if (currentlyHandlingIncident.ToDepotDrive.IsInInterval(incidentOccurenceTime))
-            {
-                return incidentOccurenceTime + shift.Ambulance.ReroutePenalty;
-            }
-
-            return currentlyHandlingIncident.InHospitalDelivery.End + shift.Ambulance.ReroutePenalty;
-        }
-
-        private Coordinate CalculateAmbulanceStartingLocationToIncident(Shift shift, Seconds incidentOccurenceTime)
+        private void CalculateStartTimeAndAmbulanceStartingLocation(Shift shift, Seconds incidentOccurenceTime, out Seconds startTime, out Coordinate ambulanceLocation)
         {
             Seconds firstPossibleStartTime = Math.Max(incidentOccurenceTime.Value, shift.Work.Start.Value).ToSeconds();
-
             if (shift.IsInDepot(firstPossibleStartTime))
             {
-                return shift.Depot.Location;
+                startTime = firstPossibleStartTime;
+                ambulanceLocation = shift.Depot.Location;
+                return;
             }
 
             PlannableIncident currentlyHandlingIncident = shift.PlannedIncidents.Last();
@@ -110,11 +92,16 @@ partial class PlannableIncident
 
             if (currentlyHandlingIncident.ToDepotDrive.IsInInterval(firstPossibleStartTime))
             {
+                startTime = firstPossibleStartTime + shift.Ambulance.ReroutePenalty;
+
                 Seconds durationDriving = incidentOccurenceTime - currentlyHandlingIncident.ToDepotDrive.Start;
-                return distanceCalculator.GetNewLocation(hospitalLocation, shift.Depot.Location, durationDriving, firstPossibleStartTime);
+                ambulanceLocation = distanceCalculator.GetNewLocation(hospitalLocation, shift.Depot.Location, durationDriving, firstPossibleStartTime);
+
+                return;
             }
 
-            return hospitalLocation;
+            startTime = currentlyHandlingIncident.InHospitalDelivery.End + shift.Ambulance.ReroutePenalty;
+            ambulanceLocation = hospitalLocation;
         }
     }
 }

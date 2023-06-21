@@ -1,5 +1,7 @@
 ﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
+using System.Numerics;
 
 namespace ESSP.DataModel
 {
@@ -10,6 +12,8 @@ namespace ESSP.DataModel
         public Seconds End { get; init; }
 
         public Seconds Duration => End - Start;
+
+        public static Interval Empty = new Interval(0.ToSeconds(), 0.ToSeconds());
 
         private Interval(Seconds start, Seconds end)
         {
@@ -66,6 +70,24 @@ namespace ESSP.DataModel
         public override string ToString()
         {
             return $"INTERVAL: {{ {Start} : {End} }}";
+        }
+
+        public static bool operator ==(Interval i1, Interval i2) => i1.Start == i2.Start && i1.End == i2.End;
+        public static bool operator !=(Interval i1, Interval i2) => i1.Start != i2.Start || i1.End != i2.End;
+
+        public override bool Equals(object obj)
+        {
+            if(obj is Interval interval)
+            {
+                return this == interval;
+            }
+
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Start.GetHashCode(), End.GetHashCode());
         }
     }
 }

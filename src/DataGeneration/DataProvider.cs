@@ -141,7 +141,7 @@ public class DataProvider
         {
             for (Meters x = 10.ToMeters(); x < dimX; x += stepX)
             {
-                HashSet<Ambulance> selectedAmbulances = ambulances.GetRangeRandom(random, minCount: 5, maxCount: 20).ToHashSet();
+                HashSet<Ambulance> selectedAmbulances = ambulances.GetRangeRandom(random, minCount: 1, maxCount: 20).ToHashSet();
                 ambulances.RemoveAll(amb => selectedAmbulances.Contains(amb));
 
                 depots.Add(new Depot(new Coordinate(x, y), selectedAmbulances.ToList()));
@@ -211,9 +211,9 @@ public class DataProvider
         HashSet<Seconds> allowedShiftDurations = new()
         {
             6.ToHours().ToSeconds(),
-            //8.ToHours().ToSeconds(),
+            8.ToHours().ToSeconds(),
             12.ToHours().ToSeconds(),
-            24.ToHours().ToSeconds(),
+            //24.ToHours().ToSeconds(),
             //10.ToSeconds(),
             //100.ToSeconds()
         };

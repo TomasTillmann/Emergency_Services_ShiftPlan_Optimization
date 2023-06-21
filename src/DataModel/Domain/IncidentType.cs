@@ -10,6 +10,8 @@ namespace ESSP.DataModel
         public Seconds MaximumResponseTime { get; init; }
         public HashSet<AmbulanceType> AllowedAmbulanceTypes { get; init; }
 
+        public static IncidentType Default = new IncidentType("Default", 1.ToHours().ToSeconds(), new HashSet<AmbulanceType>());
+
         public IncidentType(string name, Seconds maximumResponseTime, HashSet<AmbulanceType> allowedAmbulanceTypes)
         {
             Name=name;

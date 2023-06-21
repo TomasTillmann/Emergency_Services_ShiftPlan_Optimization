@@ -67,6 +67,7 @@ public sealed class Simulation
     {
         Depots = world.Depots;
         DistanceCalculator = world.DistanceCalculator;
+
         plannableIncidentFactory = new PlannableIncident.Factory(DistanceCalculator, world.Hospitals);
         shiftEvaluator = new ShiftEvaluator(plannableIncidentFactory);
     }
@@ -84,11 +85,11 @@ public sealed class Simulation
             Step(currentIncident);
 
             //Console.WriteLine($"Success rate: {statistics.SuccessRate * 100}%");
-            Logger.WriteLine();
+            //Logger.WriteLine();
             //Console.WriteLine();
         }
 
-        Logger.WriteLine($"Success rate: {statistics.SuccessRate * 100}%");
+        //Logger.WriteLine($"Success rate: {statistics.SuccessRate * 100}%");
 
         //Console.WriteLine();
         //Console.WriteLine($"Success rate: {statistics.SuccessRate * 100}%");
@@ -120,8 +121,8 @@ public sealed class Simulation
 
     private void Step(Incident currentIncident)
     {
-        Logger.WriteLine($"Incident: {currentIncident}");
-        Logger.WriteLine($"Shifts:\n{shiftPlan.Shifts.Visualize("\n")}");
+        //Logger.WriteLine($"Incident: {currentIncident}");
+        //Logger.WriteLine($"Shifts:\n{shiftPlan.Shifts.Visualize("\n")}");
 
         Shift bestShift = null; 
         foreach(Shift shift in shiftPlan.Shifts)
@@ -140,13 +141,13 @@ public sealed class Simulation
 
         if (bestShift is null)
         {
-            Logger.WriteLine("Unhandled");
+            //Logger.WriteLine("Unhandled");
             statistics.SetUnhandled(currentIncident);
             return;
         }
 
 
-        Logger.WriteLine($"Best shift:\n{bestShift}");
+        //Logger.WriteLine($"Best shift:\n{bestShift}");
 
         bestShift.Plan(plannableIncidentFactory.Get(currentIncident, bestShift));
 

@@ -15,13 +15,7 @@ public sealed class ExhaustiveOptimizer : Optimizer
 
     #endregion
 
-    public ExhaustiveOptimizer(World world, Constraints constraints) : base(world, constraints)
-    {
-        if(constraints.AllowedShiftStartingTimes.Count() == 0 || constraints.AllowedShiftDurations.Count() == 0)
-        {
-            throw new ArgumentException("Constraints need to be set.");
-        }
-    } 
+    public ExhaustiveOptimizer(World world, Constraints constraints) : base(world, constraints) { }
 
     /// <summary>
     /// Tries brute force search for all possible combinations of starting times and shift durations on all shifts.

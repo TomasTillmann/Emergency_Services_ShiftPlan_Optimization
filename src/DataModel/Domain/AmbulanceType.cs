@@ -2,9 +2,9 @@
 public readonly struct AmbulanceType
 {
     public string Name { get; init; }
-    public double Cost { get; init; }
+    public int Cost { get; init; }
 
-    public AmbulanceType(string name, double cost)
+    public AmbulanceType(string name, int cost)
     {
         Name = name;
         Cost = cost;

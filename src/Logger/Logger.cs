@@ -5,12 +5,18 @@ namespace Logging;
 public class Logger : IDisposable
 {
     public static readonly Logger Instance = new();
+    public static readonly string LogDivider = new string('#', 50);
 
     private TextWriter writer;
 
     private Logger()
     {
-        writer = new StreamWriter("Log.txt"); 
+        writer = new StreamWriter("Log.txt", append: true);
+
+        writer.WriteLine();
+        writer.WriteLine(LogDivider);
+        writer.WriteLine();
+        writer.Flush();
     }
 
     public void Write(object? message)

@@ -64,16 +64,47 @@ Kod neni tak dulezity. Dulezity je hlavne ten text.
 Prvni napsat ten kod a pohrat si s temi metodami atd ... az pak spise zacit psat. Pomuze mi to i pri tom co dat do te faze teorie a jak to cele uvest.
 Nemuzu delat uvod do neceho co jeste nevim jak bude probihat.
 
-# TODO
-* Benchmarkuj simulaci
-* nejaky chytrejsi optimizer
-* zrefaktorovat starting time a starting location do jedne metody - maji vicemene stejny kod a nedodrzuji open closed princip
+# Napady co udelat
+## Zoptimalizovat simulaci, musi byt fakt mega rychla
+* a zatim je spise pomalejsi
+100 sanitek a 2000 incidentu -> 20 sekund ... to je nejak moc
+50 sanitek a 200 incidentu -> 6 sekund podle benchmark, ale to mi prijde hodne, ze to bude mene, ale i tak ...
 
-## Optimalizace
-* Spocitej si nejakou mapu, kde budes mit ke kazdemu bodu / ctverecku v  prostoru, kde je nejblizsi nemocnice
-	* tedka v kazdem kroku simulace prochazim vsechny nemocnice abych nasel tu nejblizsi
-* Zrefaktoruj step v simulaci at se shifts prochazi pouze jednou ne dvakrat
-	* ted to delam dvakrat, muzu to delat jen jednou
-* Cachuj si nejak ty PlannableIncidenty, vytvarim je jak v GetHandling, tak v GetBetter
-	* a prave v nich se furt prochazi i ty nemocnice
+1. Distance matrik pro nejblizsi nemocnici z nejake zdiskretizovane mapy?
+1. cahovani plannable incidentu?
 
+## Stochastic search nepotrebuju
+Protoze eval function mam na ruce.
+
+## Prohledavni pres sousedy 
+1. Hill climb
+1. Tabu search
+	* jak zvolit velikost tabulky?
+		* odpovida stavum kam se nevratim v _velikost tabulky_ krocich, takze asi odvodit nejak z poctu shiftu??
+			* podivat se na velikost tabulky u reseni jinych problemu - sudoku napr.
+	* muzu zacit s nevalidnim resenim?
+	* jak udelat damping, at nevracim jen nekonecno?
+		* jak zachytit, ze i kdyz shift plan neni validni, tak ma pomerne slusny success rate napr., takze bude lepsi nez, skoro tak dobry jako validni, nez nejaky co ma success rate o dost nizsi?
+1. Simulated annealing
+	* jak zvolit T? Mozna jako mean random 200 shiftPlanu? Bude ale hodne natahovat int.MaxValue, takze mozna median? 
+
+Ve vsech pripadech je ale treba nejaky zpusob ziskani sousedu. To jsou shiftPlany, ktere jsou v nejakem smyslu podobne a musi byt validni.
+
+## Co je soused
+1. Stejny pocet shiftu
+1. Prumerna celkova delka pres intervaly je stejna
+1. stejny pocet shiftu se stejnymi delkami
+	* permutovat shifty, neco jako v TSP jak ziskas sousedy
+1. Brat v potaz prostor, ne jenom cas / delky intervalu
+
+Samotny swapping atd nestaci. Je treba intervaly jeste nejak zkracovat.
+
+
+### Zkracovani
+1. Zkratim nejaky shift co nejmene to jde
+	* bud zmenim starting time nebo end time, na nejblizsi nizsi dovoleny interval length
+	* celkovy pocet je 2 * #shift
+		* buz zkratim zleva nebo zprava, pro vybranou shiftu
+
+## Evolucni
+1. Geneticke
