@@ -16,13 +16,13 @@ namespace Client;
 
 class Program
 {
-#if true
+#if false
     static void Main()
     {
-        DataProvider dataProvider = new(30);
+        DataProvider dataProvider = new(50);
         List<SuccessRatedIncidents> incidents = new()
         {
-            dataProvider.GetIncidents(150, 23.ToHours(), successRateThreshold: 1)
+            dataProvider.GetIncidents(400, 23.ToHours(), successRateThreshold: 1)
         };
 
         //List<SuccessRatedIncidents> incidents = new()
@@ -101,13 +101,13 @@ class Program
     }
 #endif
 
-#if false
+#if true
     static void Main()
     {
-        DataProvider dataProvider = new(ambulancesCount: 100);
+        DataProvider dataProvider = new(ambulancesCount: 1000);
         List<SuccessRatedIncidents> incidents = new()
         {
-            dataProvider.GetIncidents(2000, 23.ToHours(), successRateThreshold: 1)
+            dataProvider.GetIncidents(3000, 23.ToHours(), successRateThreshold: 1)
         };
 
         Simulation simulation = new(dataProvider.GetWorld());
@@ -116,19 +116,27 @@ class Program
             dataProvider.GetConstraints().AllowedShiftStartingTimes.Min(),
             dataProvider.GetConstraints().AllowedShiftDurations.Max());
 
-        Stopwatch sw = Stopwatch.StartNew();
-        Statistics stats = simulation.Run(incidents.First().Value, maximalShiftPlan);
-        Logger.Instance.WriteLineForce($"Simulation took: {sw.ElapsedMilliseconds}ms");
-
-        maximalShiftPlan.ShowGraph(24.ToHours().ToSeconds());
-
-        Logger.Instance.WriteLineForce();
-        Logger.Instance.WriteLineForce(stats);
-
-        foreach(var incident in incidents.First().Value)
+        Stopwatch sw = new(); 
+        for(int i = 0; i < 50; i++)
         {
-            Logger.Instance.WriteLineForce($"occurence: {incident.Occurence} | {incident.Occurence.Value / 60 / 60}");
+            sw.Start();
+            simulation.Run(incidents.First().Value, maximalShiftPlan);
+            Logger.Instance.WriteLineForce($"{sw.ElapsedMilliseconds}ms");
+            sw.Restart();
         }
+
+
+        //Logger.Instance.WriteLineForce($"Simulation took: {sw.ElapsedMilliseconds}ms");
+
+        //maximalShiftPlan.ShowGraph(24.ToHours().ToSeconds());
+
+        //Logger.Instance.WriteLineForce();
+        //Logger.Instance.WriteLineForce(stats);
+
+        //foreach(var incident in incidents.First().Value)
+        //{
+        //    Logger.Instance.WriteLineForce($"occurence: {incident.Occurence} | {incident.Occurence.Value / 60 / 60}");
+        //}
     }
 #endif
 
