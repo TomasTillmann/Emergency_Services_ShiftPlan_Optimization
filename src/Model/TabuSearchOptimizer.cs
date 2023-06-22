@@ -3,7 +3,10 @@ using Logging;
 using Model.Extensions;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -75,13 +78,35 @@ public sealed class TabuSearchOptimizer : Optimizer
         }
     }
 
+    private class Move
+    {
+        public int ShiftIndex { get; }
+        public MoveType Type { get; }
+
+        public Move(int shiftIndex, MoveType type)
+        {
+            ShiftIndex = shiftIndex;
+            Type = type;
+        }
+    }
+
+    private enum MoveType
+    {
+        Shorter,
+        Longer,
+        Earlier,
+        Later,
+    }
+
     #region Params
     public readonly int Iterations;
     public readonly int MaxTabuSize;
     #endregion
 
     private Seconds MaxDuration;
+    private Seconds MinDuration;
     private Seconds EarliestStartingTime;
+    private Seconds LatestStartingTime;
 
     private List<Seconds> AllowedDurationsSorted;
     private List<Seconds> AllowedStartingTimesSorted;
@@ -100,17 +125,23 @@ public sealed class TabuSearchOptimizer : Optimizer
     /// <param name="initialDurationPenalty"></param>
     public TabuSearchOptimizer(World world, Constraints constraints, int iterations, int maxTabuSize) : base(world, constraints)
     {
-        this.Iterations = iterations;
-        this.MaxTabuSize = maxTabuSize;
+        Iterations = iterations;
+        MaxTabuSize = maxTabuSize;
 
         AllowedDurationsSorted = Constraints.AllowedShiftDurations.OrderBy(d => d.Value).ToList();
+
+        // empty interval - ambulance not in use at all
+        AllowedDurationsSorted.Add(0.ToSeconds());
+
+        MinDuration = AllowedDurationsSorted.First();
         MaxDuration = AllowedDurationsSorted.Last();
+
+        AllowedStartingTimesSorted = Constraints.AllowedShiftStartingTimes.OrderBy(startingTime => startingTime.Value).ToList();
+        EarliestStartingTime = AllowedStartingTimesSorted.First();
+        LatestStartingTime = AllowedStartingTimesSorted.Last();
 
         ShiftPlan maximalShiftPlan = ShiftPlanTabu.GetAllShiftHavingSameDuration(world.Depots, MaxDuration).Value;
         this.maxShiftPlanCost = maximalShiftPlan.GetCost();
-
-        AllowedStartingTimesSorted = Constraints.AllowedShiftStartingTimes.OrderBy(startingTime => startingTime.Value).ToList();
-        EarliestStartingTime = Constraints.AllowedShiftStartingTimes.First();
     }
 
     public override IEnumerable<ShiftPlan> FindOptimal(List<SuccessRatedIncidents> incidentsSets)
@@ -126,48 +157,60 @@ public sealed class TabuSearchOptimizer : Optimizer
         ShiftPlanTabu globalBest = initShiftPlan;
         int globalBestFitness = Fitness(globalBest);
 
-        ShiftPlanTabu? bestCandidate = initShiftPlan;
-        int? bestCandidateFitness = Fitness(bestCandidate);
+        ShiftPlanTabu bestCandidate = initShiftPlan;
+        int? bestCandidateFitness = globalBestFitness;
 
-        LinkedList<ShiftPlanTabu> tabu = new();
-        tabu.AddLast(initShiftPlan);
+        ShiftPlanTabu candidate;
+        Move? bestMove;
 
+        LinkedList<Move> tabu = new();
+        // TODO: Init tabu?
+
+        Stopwatch sw = new Stopwatch();
         for(int i = 0; i < Iterations; i++)
         {
-            List<ShiftPlanTabu> neighbourHood = GetNeighborhood(bestCandidate);
+            sw.Start();
+            List<Move> neighbourHoodMoves = GetNeighborhoodMoves(bestCandidate);
 
-            bestCandidate = null;
+            bestMove = null;
             bestCandidateFitness = null;
-            foreach (ShiftPlanTabu candidate in neighbourHood)
+
+            foreach (Move move in neighbourHoodMoves)
             {
+                candidate = ModifyMakeMove(bestCandidate, move);
+
                 int candidateFitness = Fitness(candidate);
 
-                if (tabu.Contains(candidate))
+                if (tabu.Contains(move))
                 {
                     // aspiration criterion
                     if(candidateFitness < globalBestFitness)
                     {
-                        if(bestCandidate is null || candidateFitness < bestCandidateFitness)
+                        if(bestCandidateFitness is null || candidateFitness < bestCandidateFitness)
                         {
-                            bestCandidate = candidate;
+                            bestMove = move; 
                             bestCandidateFitness = candidateFitness;
                         }
                     }
                 }
                 else
                 {
-                    if(bestCandidate is null || candidateFitness < bestCandidateFitness)
+                    if(bestCandidateFitness is null || candidateFitness < bestCandidateFitness)
                     {
-                        bestCandidate = candidate;
+                        bestMove = move; 
                         bestCandidateFitness = candidateFitness;
                     }
                 }
+
+                ModifyUnmakeMove(bestCandidate, move);
             }
 
-            if(bestCandidate is null || bestCandidateFitness is null)
+            if(bestMove is null || bestCandidateFitness is null)
             {
                 throw new ArgumentException("All neighbours were tabu and none of them also satisfied aspiration criterion. Perhaps you set tabu size too high?");
             }
+
+            bestCandidate = ModifyMakeMove(bestCandidate.Clone(), bestMove);
 
             if (bestCandidateFitness < globalBestFitness)
             {
@@ -175,12 +218,13 @@ public sealed class TabuSearchOptimizer : Optimizer
                 globalBestFitness = bestCandidateFitness.Value;
             }
 
-            tabu.AddLast(bestCandidate);
+            tabu.AddLast(bestMove);
             if (tabu.Count > MaxTabuSize)
             {
                 tabu.RemoveFirst();
             }
 
+            Logger.Instance.WriteLineForce($"One step took: {sw.ElapsedMilliseconds}ms"); sw.Restart();
             Logger.Instance.WriteLineForce($"Global best: {globalBestFitness} ({globalBest.Value})");
             Logger.Instance.WriteLineForce($"Best candidate: {bestCandidateFitness} ({bestCandidate.Value})");
             Logger.Instance.WriteLineForce();
@@ -204,105 +248,194 @@ public sealed class TabuSearchOptimizer : Optimizer
         return eval;
     } 
 
-    private List<ShiftPlanTabu> GetNeighborhood(ShiftPlanTabu shiftPlanTabu)
+    private ShiftPlanTabu ModifyMakeMove(ShiftPlanTabu shiftPlanTabu, Move move)
     {
-        List<ShiftPlanTabu> neighborhood = new();
-        Shift shift;
-        ShiftPlanTabu neighbour;
+        Shift shift = shiftPlanTabu.Value.Shifts[move.ShiftIndex];
 
-        for (int i = 0; i < shiftPlanTabu.Value.Shifts.Count; i++)
+        switch (move.Type)
         {
-            // Making shorter
-            neighbour = shiftPlanTabu.Clone();
-            shift = neighbour.Value.Shifts[i];
-            if (shift.Work != Interval.Empty)
+            case MoveType.Shorter:
             {
-                Seconds? duration = GetClosestAllowedDurationInDirection(shift.Work.Duration, left: true);
-                if(duration is null)
-                {
-                    shift.Work = Interval.Empty;
-                }
-                else
-                {
-                    shift.Work = Interval.GetByStartAndDuration(shift.Work.Start, duration.Value);
-                }
-
-                neighborhood.Add(neighbour);
-            }
-
-            // Making longer
-            neighbour = shiftPlanTabu.Clone();
-            shift = neighbour.Value.Shifts[i];
-            if (shift.Work.Duration != MaxDuration)
-            {
-                Seconds duration = GetClosestAllowedDurationInDirection(shift.Work.Duration, left: false)!.Value;
+                Seconds duration = GetShorter(shift.Work.Duration); 
                 shift.Work = Interval.GetByStartAndDuration(shift.Work.Start, duration);
 
-                neighborhood.Add(neighbour);
+                break;
             }
 
-            // Moving right 
-            neighbour = shiftPlanTabu.Clone();
-            shift = neighbour.Value.Shifts[i];
-            if (shift.Work != Interval.Empty)
+            case MoveType.Longer:
             {
-                Seconds? startingTime = GetClosestAllowedStartingTimeInDirection(shift.Work.Start, left: false);
-                if (startingTime is not null)
+                Seconds duration = GetLonger(shift.Work.Duration);
+                shift.Work = Interval.GetByStartAndDuration(shift.Work.Start, duration);
+
+                break;
+            }
+            case MoveType.Later:
+            {
+
+                Seconds startingTime = GetLater(shift.Work.Start);
+                shift.Work = Interval.GetByStartAndDuration(startingTime, shift.Work.Duration);
+
+                break;
+            }
+            case MoveType.Earlier:
+            {
+                Seconds startingTime = GetEarlier(shift.Work.Start); 
+                shift.Work = Interval.GetByStartAndDuration(startingTime, shift.Work.Duration);
+
+                break;
+            }
+
+            default:
+            {
+                throw new ArgumentException("Missing case!");
+            }
+        }
+
+        return shiftPlanTabu;
+    }
+
+    private ShiftPlanTabu ModifyUnmakeMove(ShiftPlanTabu shiftPlanTabu, Move move)
+    {
+        switch (move.Type)
+        {
+            case MoveType.Shorter:
+            {
+                ModifyMakeMove(shiftPlanTabu, new Move(move.ShiftIndex, MoveType.Longer));
+                break;
+            }
+
+            case MoveType.Longer:
+            {
+                ModifyMakeMove(shiftPlanTabu, new Move(move.ShiftIndex, MoveType.Shorter));
+                break;
+            }
+
+            case MoveType.Earlier:
+            {
+                ModifyMakeMove(shiftPlanTabu, new Move(move.ShiftIndex, MoveType.Later));
+                break;
+            }
+
+            case MoveType.Later:
+            {
+                ModifyMakeMove(shiftPlanTabu, new Move(move.ShiftIndex, MoveType.Earlier));
+                break;
+            }
+        }
+
+        return shiftPlanTabu;
+    }
+
+    private List<Move> GetNeighborhoodMoves(ShiftPlanTabu shiftPlanTabu)
+    {
+        List<Move> moves = new();
+
+        for (int shiftIndex = 0; shiftIndex < shiftPlanTabu.Value.Shifts.Count; shiftIndex++)
+        {
+            Interval shiftWork = shiftPlanTabu.Value.Shifts[shiftIndex].Work;
+
+            Move? move;
+            if(TryGenerateMove(shiftWork, shiftIndex, MoveType.Shorter, out move))
+            {
+                moves.Add(move);
+            }
+
+            if(TryGenerateMove(shiftWork, shiftIndex, MoveType.Longer, out move))
+            {
+                moves.Add(move);
+            }
+
+            if(TryGenerateMove(shiftWork, shiftIndex, MoveType.Later, out move))
+            {
+                moves.Add(move);
+            }
+
+            if(TryGenerateMove(shiftWork, shiftIndex, MoveType.Earlier, out move))
+            {
+                moves.Add(move);
+            }
+        }
+
+        return moves;
+    }
+
+    private bool TryGenerateMove(Interval work, int shiftIndex, MoveType type, [NotNullWhen(true)] out Move? move)
+    {
+        move = null;
+        switch (type)
+        {
+            case MoveType.Shorter:
+            {
+                if (work.Duration != MinDuration)
                 {
-                    shift.Work = Interval.GetByStartAndDuration(startingTime.Value, shift.Work.Duration);
+                    move = new Move(shiftIndex, MoveType.Shorter);
+                    return true;
                 }
 
-                neighborhood.Add(neighbour);
+                return false;
             }
 
-            // Moving left 
-            neighbour = shiftPlanTabu.Clone();
-            shift = neighbour.Value.Shifts[i];
-            if (shift.Work != Interval.Empty)
+            case MoveType.Longer:
             {
-                Seconds? startingTime = GetClosestAllowedStartingTimeInDirection(shift.Work.Start, left: true);
-                if(startingTime is not null)
+                if (work.Duration != MaxDuration)
                 {
-                    shift.Work = Interval.GetByStartAndDuration(startingTime.Value, shift.Work.Duration);
-                    neighborhood.Add(neighbour);
+                    move = new Move(shiftIndex, MoveType.Longer);
+                    return true;
                 }
+
+                return false;
             }
-        }
 
-        return neighborhood;
-    }
-
-    private Seconds? GetClosestAllowedDurationInDirection(Seconds duration, bool left)
-    {
-        return GetClosestFromListInDirection(duration, AllowedDurationsSorted, left);
-    }
-
-    private Seconds? GetClosestAllowedStartingTimeInDirection(Seconds duration, bool left)
-    {
-        return GetClosestFromListInDirection(duration, AllowedStartingTimesSorted, left);
-    }
-
-    private Seconds? GetClosestFromListInDirection(Seconds duration, List<Seconds> list, bool left)
-    {
-        int index = list.IndexOf(duration);
-
-        if (left)
-        {
-            if(index == 0)
+            case MoveType.Earlier:
             {
-                return null;
+                if (work.Start != EarliestStartingTime)
+                {
+                    move = new Move(shiftIndex, MoveType.Earlier);
+                    return true;
+                }
+
+                return false;
             }
 
-            return list[index - 1];
-        }
-        else
-        {
-            if(index == list.Count - 1)
+            case MoveType.Later:
             {
-                return null;
+                if (work.Start != LatestStartingTime)
+                {
+                    move = new Move(shiftIndex, MoveType.Later);
+                    return true;
+                }
+
+                return false;
             }
 
-            return list[index + 1];
+            default:
+            {
+                throw new ArgumentException("Missing case statement!");
+            }
         }
+    }
+
+    private Seconds GetShorter(Seconds duration)
+    {
+        int index = AllowedDurationsSorted.IndexOf(duration);
+        return AllowedDurationsSorted[index-1];
+    }
+
+    private Seconds GetLonger(Seconds duration)
+    {
+        int index = AllowedDurationsSorted.IndexOf(duration);
+        return AllowedDurationsSorted[index+1];
+    }
+
+    private Seconds GetEarlier(Seconds startTime)
+    {
+        int index = AllowedStartingTimesSorted.IndexOf(startTime);
+        return AllowedStartingTimesSorted[index-1];
+    }
+
+    private Seconds GetLater(Seconds startTime)
+    {
+        int index = AllowedStartingTimesSorted.IndexOf(startTime);
+        return AllowedStartingTimesSorted[index+1];
     }
 }
