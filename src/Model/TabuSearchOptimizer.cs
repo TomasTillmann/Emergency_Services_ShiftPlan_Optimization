@@ -13,46 +13,36 @@ public sealed class TabuSearchOptimizer : Optimizer
 {
     private class ShiftPlanTabu
     {
-        public int ShiftsOfInitialDurationCount { get; private set; } = 0;
         public ShiftPlan Value;
 
-        private Seconds initialDuration;
-
-        private ShiftPlanTabu(ShiftPlan shiftPlan, Seconds initialDuration)
+        private ShiftPlanTabu(ShiftPlan shiftPlan)
         {
             Value = shiftPlan;
-            this.initialDuration = initialDuration;
-            ShiftsOfInitialDurationCount = Value.Shifts.Count;
         }
 
-        public static ShiftPlanTabu GetInitial(IReadOnlyList<Depot> depots, Seconds initialDuration)
+        public static ShiftPlanTabu GetAllShiftHavingSameDuration(IReadOnlyList<Depot> depots, Seconds duration)
         {
-            return new ShiftPlanTabu(ShiftPlan.ConstructFrom(depots, 0.ToSeconds(), initialDuration), initialDuration);
+            return new ShiftPlanTabu(ShiftPlan.ConstructFrom(depots, 0.ToSeconds(), duration));
         }
-
-        public void SetShiftsWork(int index, Interval work)
+        public static ShiftPlanTabu GetRandom(IReadOnlyList<Depot> depots, List<Seconds> allowedStartingTimes, List<Seconds> allowedShiftDurations, Random? random = null)
         {
-            if(work.Duration != initialDuration)
+            ShiftPlan shiftPlanDefault = ShiftPlan.ConstructEmpty(depots);
+            foreach(Shift shift in shiftPlanDefault.Shifts)
             {
-                ShiftsOfInitialDurationCount--;
+                shift.Work = Interval.GetByStartAndDuration(allowedStartingTimes.GetRandom(random), allowedShiftDurations.GetRandom(random));
             }
 
-            if(work.Duration == initialDuration)
-            {
-                ShiftsOfInitialDurationCount++;
-            }
-
-            Value.Shifts[index].Work = work;
+            return new ShiftPlanTabu(shiftPlanDefault); 
         }
 
         internal ShiftPlanTabu Clone()
         {
-            return new ShiftPlanTabu(Value.Clone(), initialDuration);
+            return new ShiftPlanTabu(Value.Clone());
         }
 
         public override string ToString()
         {
-            return Value.ToString();
+            return Value.Shifts.Select(shift => (shift.Work.Start.Value / 60/ 60, shift.Work.End.Value / 60/ 60)).Visualize(",");
         }
 
         public static bool operator ==(ShiftPlanTabu s1, ShiftPlanTabu s2)
@@ -88,8 +78,6 @@ public sealed class TabuSearchOptimizer : Optimizer
     #region Params
     public readonly int Iterations;
     public readonly int MaxTabuSize;
-    public readonly int InitialDurationPenalty;
-    public readonly Seconds SimulationDuration;
     #endregion
 
     private Seconds MaxDuration;
@@ -97,6 +85,8 @@ public sealed class TabuSearchOptimizer : Optimizer
 
     private List<Seconds> AllowedDurationsSorted;
     private List<Seconds> AllowedStartingTimesSorted;
+
+    private readonly int maxShiftPlanCost;
 
     /// <summary>
     /// 
@@ -108,47 +98,39 @@ public sealed class TabuSearchOptimizer : Optimizer
     /// otherwise could happen, that all neighbours are tabu and for all aspiration criterion is not satisfied, leading to no allowed moves.</param>
     /// <param name="simulationDuration"></param>
     /// <param name="initialDurationPenalty"></param>
-    public TabuSearchOptimizer(World world, Constraints constraints, int iterations, int maxTabuSize, Seconds simulationDuration, int initialDurationPenalty) : base(world, constraints)
+    public TabuSearchOptimizer(World world, Constraints constraints, int iterations, int maxTabuSize) : base(world, constraints)
     {
         this.Iterations = iterations;
         this.MaxTabuSize = maxTabuSize;
-        this.SimulationDuration = simulationDuration;
-        this.InitialDurationPenalty = initialDurationPenalty;
 
-        MaxDuration = simulationDuration; 
-        EarliestStartingTime = Constraints.AllowedShiftStartingTimes.Min();
+        AllowedDurationsSorted = Constraints.AllowedShiftDurations.OrderBy(d => d.Value).ToList();
+        MaxDuration = AllowedDurationsSorted.Last();
 
-        AllowedDurationsSorted = new List<Seconds>(Constraints.AllowedShiftDurations)
-        {
-            simulationDuration
-        };
-        AllowedDurationsSorted.Sort((d1,d2) => d1.Value.CompareTo(d2.Value));
+        ShiftPlan maximalShiftPlan = ShiftPlanTabu.GetAllShiftHavingSameDuration(world.Depots, MaxDuration).Value;
+        this.maxShiftPlanCost = maximalShiftPlan.GetCost();
 
         AllowedStartingTimesSorted = Constraints.AllowedShiftStartingTimes.OrderBy(startingTime => startingTime.Value).ToList();
+        EarliestStartingTime = Constraints.AllowedShiftStartingTimes.First();
     }
 
     public override IEnumerable<ShiftPlan> FindOptimal(List<SuccessRatedIncidents> incidentsSets)
     {
         int Fitness(ShiftPlanTabu shiftPlanTabu)
         {
-            return this.Fitness(shiftPlanTabu, incidentsSets);
+            return this.Fitness(shiftPlanTabu.Value, incidentsSets);
         }
 
-        ShiftPlanTabu maxShiftPlan = ShiftPlanTabu.GetInitial(world.Depots, SimulationDuration);
+        ShiftPlanTabu initShiftPlan
+            = ShiftPlanTabu.GetRandom(world.Depots, Constraints.AllowedShiftStartingTimes.ToList(), Constraints.AllowedShiftDurations.ToList());
 
-        if(!IsValid(maxShiftPlan.Value, incidentsSets))
-        {
-            return Enumerable.Empty<ShiftPlan>();
-        }
-
-        ShiftPlanTabu globalBest = maxShiftPlan;
+        ShiftPlanTabu globalBest = initShiftPlan;
         int globalBestFitness = Fitness(globalBest);
 
-        ShiftPlanTabu? bestCandidate = maxShiftPlan;
+        ShiftPlanTabu? bestCandidate = initShiftPlan;
         int? bestCandidateFitness = Fitness(bestCandidate);
 
         LinkedList<ShiftPlanTabu> tabu = new();
-        tabu.AddLast(maxShiftPlan);
+        tabu.AddLast(initShiftPlan);
 
         for(int i = 0; i < Iterations; i++)
         {
@@ -187,9 +169,6 @@ public sealed class TabuSearchOptimizer : Optimizer
                 throw new ArgumentException("All neighbours were tabu and none of them also satisfied aspiration criterion. Perhaps you set tabu size too high?");
             }
 
-            Logger.Instance.WriteLineForce($"Best candidate: {bestCandidate}");
-            Logger.Instance.WriteLineForce($"Tabu: {tabu.Visualize("|")}");
-
             if (bestCandidateFitness < globalBestFitness)
             {
                 globalBest = bestCandidate;
@@ -202,48 +181,50 @@ public sealed class TabuSearchOptimizer : Optimizer
                 tabu.RemoveFirst();
             }
 
-            Logger.Instance.WriteLineForce($"Global best: {Fitness(globalBest)} | {globalBest.Value}");
-            Logger.Instance.WriteLineForce($"Best candidate: {Fitness(bestCandidate)} | {bestCandidate.Value}");
+            Logger.Instance.WriteLineForce($"Global best: {globalBestFitness} ({globalBest.Value})");
+            Logger.Instance.WriteLineForce($"Best candidate: {bestCandidateFitness} ({bestCandidate.Value})");
             Logger.Instance.WriteLineForce();
         }
 
         return new List<ShiftPlan> { globalBest.Value };
     }
 
-    private int Fitness(ShiftPlanTabu shiftPlan, List<SuccessRatedIncidents> successRatedIncidents)
+    internal int Fitness(ShiftPlan shiftPlan, List<SuccessRatedIncidents> successRatedIncidents)
     {
-        int eval = base.Fitness(shiftPlan.Value, successRatedIncidents, out double meanSuccessRate);
+        int eval = base.Fitness(shiftPlan, successRatedIncidents, out double meanSuccessRate);
+
+        // damping, to better navigate
         if(eval == int.MaxValue)
         {
-            //return (int)(shiftPlan.Value.GetCost() * (1 - meanSuccessRate));
-            return int.MaxValue;
+            //int cost = shiftPlan.GetCost();
+            return maxShiftPlanCost + (int)((1 - meanSuccessRate) * 100);
+            //return int.MaxValue;
         }
 
-        //return eval + this.InitialDurationPenalty * shiftPlan.ShiftsOfInitialDurationCount; 
-        return eval + this.InitialDurationPenalty;
+        return eval;
     } 
 
     private List<ShiftPlanTabu> GetNeighborhood(ShiftPlanTabu shiftPlanTabu)
     {
         List<ShiftPlanTabu> neighborhood = new();
-        Shift readonlyShift;
+        Shift shift;
         ShiftPlanTabu neighbour;
 
         for (int i = 0; i < shiftPlanTabu.Value.Shifts.Count; i++)
         {
             // Making shorter
             neighbour = shiftPlanTabu.Clone();
-            readonlyShift = neighbour.Value.Shifts[i];
-            if (readonlyShift.Work != Interval.Empty)
+            shift = neighbour.Value.Shifts[i];
+            if (shift.Work != Interval.Empty)
             {
-                Seconds? duration = GetClosestAllowedDurationInDirection(readonlyShift.Work.Duration, left: true);
+                Seconds? duration = GetClosestAllowedDurationInDirection(shift.Work.Duration, left: true);
                 if(duration is null)
                 {
-                    neighbour.SetShiftsWork(i, Interval.Empty);
+                    shift.Work = Interval.Empty;
                 }
                 else
                 {
-                    neighbour.SetShiftsWork(i, Interval.GetByStartAndDuration(readonlyShift.Work.Start, duration.Value));
+                    shift.Work = Interval.GetByStartAndDuration(shift.Work.Start, duration.Value);
                 }
 
                 neighborhood.Add(neighbour);
@@ -251,39 +232,38 @@ public sealed class TabuSearchOptimizer : Optimizer
 
             // Making longer
             neighbour = shiftPlanTabu.Clone();
-            readonlyShift = neighbour.Value.Shifts[i];
-            if (readonlyShift.Work.Duration != MaxDuration)
+            shift = neighbour.Value.Shifts[i];
+            if (shift.Work.Duration != MaxDuration)
             {
-                Seconds duration = GetClosestAllowedDurationInDirection(readonlyShift.Work.Duration, left: false)!.Value;
-                neighbour.SetShiftsWork(i, Interval.GetByStartAndDuration(readonlyShift.Work.Start, duration));
+                Seconds duration = GetClosestAllowedDurationInDirection(shift.Work.Duration, left: false)!.Value;
+                shift.Work = Interval.GetByStartAndDuration(shift.Work.Start, duration);
 
                 neighborhood.Add(neighbour);
             }
 
             // Moving right 
             neighbour = shiftPlanTabu.Clone();
-            readonlyShift = neighbour.Value.Shifts[i];
-            if (readonlyShift.Work != Interval.Empty)
+            shift = neighbour.Value.Shifts[i];
+            if (shift.Work != Interval.Empty)
             {
-                Seconds? startingTime = GetClosestAllowedStartingTimeInDirection(readonlyShift.Work.Start, left: false);
+                Seconds? startingTime = GetClosestAllowedStartingTimeInDirection(shift.Work.Start, left: false);
                 if (startingTime is not null)
                 {
-                    neighbour.SetShiftsWork(i, Interval.GetByStartAndDuration(startingTime.Value, readonlyShift.Work.Duration));
+                    shift.Work = Interval.GetByStartAndDuration(startingTime.Value, shift.Work.Duration);
                 }
 
                 neighborhood.Add(neighbour);
             }
 
-
             // Moving left 
             neighbour = shiftPlanTabu.Clone();
-            readonlyShift = neighbour.Value.Shifts[i];
-            if (readonlyShift.Work != Interval.Empty)
+            shift = neighbour.Value.Shifts[i];
+            if (shift.Work != Interval.Empty)
             {
-                Seconds? startingTime = GetClosestAllowedStartingTimeInDirection(readonlyShift.Work.Start, left: true);
+                Seconds? startingTime = GetClosestAllowedStartingTimeInDirection(shift.Work.Start, left: true);
                 if(startingTime is not null)
                 {
-                    neighbour.SetShiftsWork(i, Interval.GetByStartAndDuration(startingTime.Value, readonlyShift.Work.Duration));
+                    shift.Work = Interval.GetByStartAndDuration(startingTime.Value, shift.Work.Duration);
                     neighborhood.Add(neighbour);
                 }
             }

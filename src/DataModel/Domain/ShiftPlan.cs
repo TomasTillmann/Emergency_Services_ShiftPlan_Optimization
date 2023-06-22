@@ -17,13 +17,24 @@ public class ShiftPlan
 
     public static ShiftPlan ConstructFrom(IReadOnlyList<Depot> depots, Seconds allShiftsStartingTime, Seconds allShiftsDuration)
     {
+        ShiftPlan defaultShiftPlan = ConstructEmpty(depots);
+        foreach(Shift shift in defaultShiftPlan.Shifts)
+        {
+            shift.Work = Interval.GetByStartAndDuration(allShiftsStartingTime, allShiftsDuration);
+        }
+
+        return defaultShiftPlan;
+    }
+
+    public static ShiftPlan ConstructEmpty(IReadOnlyList<Depot> depots)
+    {
         List<Shift> shifts = new();
 
         foreach (Depot depot in depots)
         {
             foreach (Ambulance ambulance in depot.Ambulances)
             {
-                shifts.Add(new Shift(ambulance, depot, Interval.GetByStartAndDuration(allShiftsStartingTime, allShiftsDuration)));
+                shifts.Add(new Shift(ambulance, depot, Interval.Empty));
             }
         }
 

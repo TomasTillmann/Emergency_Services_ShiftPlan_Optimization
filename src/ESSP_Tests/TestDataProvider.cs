@@ -183,17 +183,15 @@ public class TestDataProvider
     {
         HashSet<Seconds> allowedShiftStartingTimes = new()
         {
-            //TODO:
+            0.ToSeconds(),
+            6.ToHours().ToSeconds(),
+            12.ToHours().ToSeconds()
         };
 
         HashSet<Seconds> allowedShiftDurations = new()
         {
-            4.ToHours().ToSeconds(),
             6.ToHours().ToSeconds(),
             8.ToHours().ToSeconds(),
-            9.ToHours().ToSeconds(),
-            10.ToHours().ToSeconds(),
-            11.ToHours().ToSeconds(),
             12.ToHours().ToSeconds(),
         };
 
