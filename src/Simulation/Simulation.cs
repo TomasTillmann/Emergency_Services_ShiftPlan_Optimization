@@ -10,11 +10,9 @@ namespace Simulating;
 
 public sealed class Statistics
 {
-    public IList<Incident> UnhandledIncidents { get; private init; } = new List<Incident>();
+    public IList<Incident> UnhandledIncidents { get; private set; } = new List<Incident>();
 
-    public IList<Incident> HandledIncidents { get; private init; } = new List<Incident>();
-
-    public IReadOnlyCollection<Incident> AllIncidents { get; init; }
+    public IReadOnlyCollection<Incident> AllIncidents { get; private set; }
 
     public double SuccessRate => 1 - (double)UnhandledIncidents.Count/AllIncidents.Count;
 
@@ -23,107 +21,86 @@ public sealed class Statistics
         AllIncidents = allIncidents;
     }
 
-    private Statistics() { }
+    internal Statistics()
+    {
+        AllIncidents = new List<Incident>();
+    }
 
     internal void SetUnhandled(Incident incident)
     {
         UnhandledIncidents.Add(incident);
     }
 
-    internal void SetHandled(Incident incident)
+    internal void Reset(IReadOnlyCollection<Incident> allIncidents)
     {
-        HandledIncidents.Add(incident);
+        UnhandledIncidents.Clear();
+        AllIncidents = allIncidents;
     }
 
     public override string ToString()
     {
         return $"SuccessRate: {SuccessRate}\n" +
-            $"HandledIncidents: Count: {HandledIncidents.Count}, {HandledIncidents.Visualize("| ")}\n" +
+            $"AllIncidents: Count: {AllIncidents.Count}, {AllIncidents.Visualize("| ")}\n" +
             $"UnhandledIncidents: Count: {UnhandledIncidents.Count}, {UnhandledIncidents.Visualize("| ")}\n";
     }
-}
-
-internal class SimulationState
-{
-    public Seconds CurrentTime { get; set; } = 0.ToSeconds();
-    public Seconds StepDuration { get; set; }
 }
 
 public sealed class Simulation
 {
     public IReadOnlyList<Depot> Depots { get; }
-    public Seconds Time => state.CurrentTime;
     public IDistanceCalculator DistanceCalculator { get; }
+    public Seconds CurrentTime { get; private set; } = 0.ToSeconds();
 
-    private SimulationState state;
     private Statistics statistics;
     private ShiftPlan shiftPlan;
     private ShiftEvaluator shiftEvaluator;
     private PlannableIncident.Factory plannableIncidentFactory;
 
-    private Logger Logger = Logger.Instance;
-
     public Simulation(World world)
     {
         Depots = world.Depots;
         DistanceCalculator = world.DistanceCalculator;
+        statistics = new Statistics();
 
         plannableIncidentFactory = new PlannableIncident.Factory(DistanceCalculator, world.Hospitals);
         shiftEvaluator = new ShiftEvaluator(plannableIncidentFactory);
     }
 
-    public Statistics Run(List<Incident> incidents, ShiftPlan shiftPlan)
+    /// <summary>
+    /// Runs the simulation for given <paramref name="shiftPlan"/> on given <paramref name="incidents"/>.
+    /// Returns statistics, including success rate of given <paramref name="shiftPlan"/>.
+    /// </summary>
+    /// <param name="incidents">Have to be sorted in ascending order by occurence. It is not sorted nor checked internally for faster performance.</param>
+    /// <param name="shiftPlan"></param>
+    /// <returns></returns>
+    public Statistics Run(IReadOnlyList<Incident> incidents, ShiftPlan shiftPlan)
     {
         Initialization(shiftPlan, incidents);
 
-        //int incident = 1;
         foreach (Incident currentIncident in incidents)
         {
-            //Console.WriteLine($"Incident: {incident++} / {incidents.Count}");
-
             UpdateSystem(currentIncident);
             Step(currentIncident);
-
-            //Console.WriteLine($"Success rate: {statistics.SuccessRate * 100}%");
-            //Logger.WriteLine();
-            //Console.WriteLine();
         }
-
-        //Logger.WriteLine($"Success rate: {statistics.SuccessRate * 100}%");
-
-        //Console.WriteLine();
-        //Console.WriteLine($"Success rate: {statistics.SuccessRate * 100}%");
 
         return statistics;
     }
 
-    private void Initialization(ShiftPlan shiftPlan, List<Incident> allIncidents)
+    private void Initialization(ShiftPlan shiftPlan, IReadOnlyList<Incident> allIncidents)
     {
-        allIncidents.Sort((x, y) => x.Occurence.CompareTo(y.Occurence));
+        statistics.Reset(allIncidents);
+        CurrentTime = 0.ToSeconds();
 
-        statistics = new Statistics(allIncidents);
-        state = new SimulationState();
         this.shiftPlan = shiftPlan;
     }
 
     private void UpdateSystem(Incident incident)
     {
-        UpdateState(incident);
-    }
-
-    private void UpdateState(Incident incident)
-    {
-        Seconds lastTime = state.CurrentTime;
-
-        state.CurrentTime = incident.Occurence;
-        state.StepDuration = state.CurrentTime - lastTime;
+        CurrentTime = incident.Occurence;
     }
 
     private void Step(Incident currentIncident)
     {
-        //Logger.WriteLine($"Incident: {currentIncident}");
-        //Logger.WriteLine($"Shifts:\n{shiftPlan.Shifts.Visualize("\n")}");
-
         Shift bestShift = null; 
         foreach(Shift shift in shiftPlan.Shifts)
         {
@@ -141,16 +118,10 @@ public sealed class Simulation
 
         if (bestShift is null)
         {
-            //Logger.WriteLine("Unhandled");
             statistics.SetUnhandled(currentIncident);
             return;
         }
 
-
-        //Logger.WriteLine($"Best shift:\n{bestShift}");
-
         bestShift.Plan(plannableIncidentFactory.Get(currentIncident, bestShift));
-
-        statistics.SetHandled(currentIncident);
     }
 }

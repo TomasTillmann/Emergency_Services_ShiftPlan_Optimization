@@ -21,7 +21,6 @@ public class Shift : IIdentifiable
 
     public IReadOnlyList<PlannableIncident> PlannedIncidents => plannedIncidents;
 
-    [JsonPropertyAttribute]
     private List<PlannableIncident> plannedIncidents = new();
 
     public Shift(Ambulance ambulance, Depot depot, Interval work)
@@ -69,7 +68,7 @@ public class Shift : IIdentifiable
             return 0.ToSeconds();
         }
 
-        return PlannedIncidents.Select(inc => inc.IncidentHandling.Duration.Value).Sum().ToSeconds();
+        return PlannedIncidents.Sum(inc => inc.IncidentHandling.Duration.Value).ToSeconds();
     }
 
     public void Plan(PlannableIncident currentIncident)

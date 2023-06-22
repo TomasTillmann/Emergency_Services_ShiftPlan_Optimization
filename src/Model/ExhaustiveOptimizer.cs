@@ -26,6 +26,8 @@ public sealed class ExhaustiveOptimizer : Optimizer
     /// <returns></returns>
     public override IEnumerable<ShiftPlan> FindOptimal(List<SuccessRatedIncidents> successRatedIncidents)
     {
+        successRatedIncidents.ForEach(incidents => incidents.Value.Sort((x, y) => x.Occurence.CompareTo(y.Occurence)));
+
         // reset stats
         SearchedShiftPlans = 0;
         //

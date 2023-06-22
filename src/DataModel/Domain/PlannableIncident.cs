@@ -53,7 +53,7 @@ partial class PlannableIncident
             PlannableIncident value = new(incident);
             value.NearestHospital = distanceCalculator.GetNearestLocatable(incident, hospitals).First();
 
-            value.ToIncidentDrive = GetToIncidentDrive(incident, shift);
+            value.ToIncidentDrive = GetToIncidentDrive(incident.Occurence, incident.Location, shift);
 
             value.OnSceneDuration = Interval.GetByStartAndDuration(value.ToIncidentDrive.End, incident.OnSceneDuration);
 
@@ -68,11 +68,11 @@ partial class PlannableIncident
             return value;
         }
 
-        private Interval GetToIncidentDrive(Incident incident, Shift shift)
+        private Interval GetToIncidentDrive(Seconds incidentOccurence, Coordinate incidentLocation, Shift shift)
         {
-            CalculateStartTimeAndAmbulanceStartingLocation(shift, incident.Occurence, out Seconds startTimeToIncidentDrive, out Coordinate ambulanceLocation);
+            CalculateStartTimeAndAmbulanceStartingLocation(shift, incidentOccurence, out Seconds startTimeToIncidentDrive, out Coordinate ambulanceLocation);
 
-            Seconds toIncidentTravelDuration = distanceCalculator.GetTravelDuration(ambulanceLocation, incident.Location, startTimeToIncidentDrive);
+            Seconds toIncidentTravelDuration = distanceCalculator.GetTravelDuration(ambulanceLocation, incidentLocation, startTimeToIncidentDrive);
 
             return Interval.GetByStartAndDuration(startTimeToIncidentDrive, toIncidentTravelDuration);
         }

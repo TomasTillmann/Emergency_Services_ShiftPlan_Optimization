@@ -15,20 +15,6 @@ class ShiftEvaluator
         this.plannableIncidentFactory = plannableIncidentFactory;
     }
 
-    public List<Shift> GetHandlingShifts(List<Shift> shifts, Incident currentIncident)
-    {
-        List<Shift> handlingShifts = new();
-        foreach (Shift shift in shifts)
-        {
-            if (IsHandling(shift, currentIncident))
-            {
-                handlingShifts.Add(shift);
-            }
-        }
-
-        return handlingShifts;
-    }
-
     public bool IsHandling(Shift shift, Incident incident)
     {
         PlannableIncident plannableIncident = plannableIncidentFactory.Get(incident, shift);
@@ -61,29 +47,16 @@ class ShiftEvaluator
     }
 
     /// <summary>
-    /// <paramref name="handlingShifts"/> needs to be handling shifts, otherwise undefined behaviour happens.
-    /// </summary>
-    public Shift GetBestShift(List<Shift> handlingShifts, Incident incident)
-    {
-        Shift bestShift = handlingShifts.First();
-        foreach (Shift shift in handlingShifts)
-        {
-            bestShift = GetBetter(bestShift, shift, incident);
-        }
-
-        return bestShift;
-    }
-
-    /// <summary>
     /// Rreturns better shift out of the two based on defined conditions.
     /// If both shifts are equaly good, <paramref name="shift1"/> is returned.
     /// </summary>
     public Shift GetBetter(Shift shift1, Shift shift2, Incident incident)
     {
         // 1
-        if (!shift1.IsFree(incident.Occurence) || !shift2.IsFree(incident.Occurence))
+        bool isShift1Free = shift1.IsFree(incident.Occurence);
+        if (!isShift1Free || !shift2.IsFree(incident.Occurence))
         {
-            return shift1.IsFree(incident.Occurence) ? shift1 : shift2;
+            return isShift1Free ? shift1 : shift2;
         }
 
         // 2
@@ -96,9 +69,11 @@ class ShiftEvaluator
         }
 
         // 3
-        if (shift1.TimeActive() != shift2.TimeActive())
+        Seconds shift1TimeActive = shift1.TimeActive();
+        Seconds shift2TimeActive = shift2.TimeActive();
+        if (shift1TimeActive != shift2TimeActive)
         {
-            return shift1.TimeActive() < shift2.TimeActive() ? shift1 : shift2;
+            return shift1TimeActive < shift2TimeActive ? shift1 : shift2;
         }
 
         // 4
