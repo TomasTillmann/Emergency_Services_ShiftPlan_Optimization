@@ -78,13 +78,17 @@ Protoze eval function mam na ruce.
 
 ## Prohledavni pres sousedy 
 1. Hill climb
+	* prilis stupidni, nebudu delat
+
 1. Tabu search
 	* jak zvolit velikost tabulky?
 		* odpovida stavum kam se nevratim v _velikost tabulky_ krocich, takze asi odvodit nejak z poctu shiftu??
 			* podivat se na velikost tabulky u reseni jinych problemu - sudoku napr.
 	* muzu zacit s nevalidnim resenim?
+		* muzu!
 	* jak udelat damping, at nevracim jen nekonecno?
 		* jak zachytit, ze i kdyz shift plan neni validni, tak ma pomerne slusny success rate napr., takze bude lepsi nez, skoro tak dobry jako validni, nez nejaky co ma success rate o dost nizsi?
+
 1. Simulated annealing
 	* jak zvolit T? Mozna jako mean random 200 shiftPlanu? Bude ale hodne natahovat int.MaxValue, takze mozna median? 
 

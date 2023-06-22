@@ -56,10 +56,10 @@ class Program
 #if true
     static void Main()
     {
-        DataProvider dataProvider = new(5);
+        DataProvider dataProvider = new(30);
         List<SuccessRatedIncidents> incidents = new()
         {
-            dataProvider.GetIncidents(20, 23.ToHours(), successRateThreshold: 0.9)
+            dataProvider.GetIncidents(150, 23.ToHours(), successRateThreshold: 1)
         };
 
         //List<SuccessRatedIncidents> incidents = new()
@@ -75,7 +75,7 @@ class Program
         (
             world: dataProvider.GetWorld(),
             constraints: dataProvider.GetConstraints(),
-            iterations: 200,
+            iterations: 50,
             maxTabuSize: 20
         );
 
