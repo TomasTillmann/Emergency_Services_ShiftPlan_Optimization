@@ -16,13 +16,13 @@ namespace Client;
 
 class Program
 {
-#if false
+#if true
     static void Main()
     {
-        DataProvider dataProvider = new(50);
+        DataProvider dataProvider = new(30);
         List<SuccessRatedIncidents> incidents = new()
         {
-            dataProvider.GetIncidents(400, 23.ToHours(), successRateThreshold: 1)
+            dataProvider.GetIncidents(100, 23.ToHours(), successRateThreshold: 1)
         };
 
         //List<SuccessRatedIncidents> incidents = new()
@@ -101,7 +101,7 @@ class Program
     }
 #endif
 
-#if true
+#if false
     static void Main()
     {
         DataProvider dataProvider = new(ambulancesCount: 1000);
