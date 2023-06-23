@@ -118,9 +118,10 @@ public static class Extensions
         return collection.GetRange(start, count);
     }
 
-    public static List<T> GetRandomSamples<T>(this IEnumerable<T> collection, int count)
+    public static List<T> GetRandomSamples<T>(this IEnumerable<T> collection, int count, Random random = null)
     {
-        return collection.OrderBy(arg => Guid.NewGuid()).Take(count).ToList();
+        random = random ?? new Random();
+        return collection.OrderBy(x => random.Next()).Take(count).ToList();
     }
 
     public static void ModifyToLargest(this ShiftPlan shiftPlan, Domain constraints)

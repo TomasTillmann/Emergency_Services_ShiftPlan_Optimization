@@ -38,10 +38,17 @@ Ale podle me to je metrika proste.
 ### S jakou pravdepodobnosti nahodne reseni splnuje?
 
 - v zavislotni na poctu incidentu, poctu sanitek
+- S hodne malou
+
+* napr. pustil jsem pro 30 sanitek a 3 incidenty s 16 moznymi intervaly bez typu sanitek. Udelalt jsem 10_000 random samplu. Ani jeden nesplnoval ...
 
 ### Jak dobri jsou sousede nejakeho splnujiciho reseni?
 
-1. Jak moc se meni Fitness po provedeni vsechno moves?
+1. Jak moc se meni Fitness po provedeni jednoho moves?
+
+   - zalezi jak moc je incidentu, pokud sanitky tak tak obslouzi vsechny incidenty, sousedi jsou stejne nebo hure ohodnoceni. Stejne ohodnocenych je pomalo.
+   - Vetsinou ve stylu Earlier / Later, a to jeste na prazdem intervalu. Samozrejme pokud vytizene, zadny prazdny neni.
+
 1. Jak rychle klesa fitness v zavislosti na poctu provedenych canonical moves?
 
 # POSTREHY

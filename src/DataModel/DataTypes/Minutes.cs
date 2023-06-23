@@ -61,6 +61,8 @@ namespace ESSP.DataModel
         {
             return $"{Value}min"; 
         }
+
+        public static implicit operator Seconds(Minutes m) => new Seconds(m.Value * 60);
     }
 
     public static class MinutesExtensions

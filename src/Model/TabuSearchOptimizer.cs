@@ -93,6 +93,7 @@ public sealed class TabuSearchOptimizer : MetaheuristicOptimizer
     public readonly int Iterations;
     public readonly int TabuSize;
     public readonly int NeighboursLimit;
+    public readonly Random Random;
     #endregion
 
     private readonly int maxShiftPlanCost;
@@ -105,8 +106,10 @@ public sealed class TabuSearchOptimizer : MetaheuristicOptimizer
     /// <param name="seed">Seed used for random sample of neighbours list.</param>
     /// <param name="neighboursLimit">If count of neighbours is exceeded, uniformly random sample of this size will be taken as representants of all neighbours.
     /// The more the shifts, the more the neighbours. Running hundreads of simulations in one iteration can be too expensive. This helps this issue.</param>
-    public TabuSearchOptimizer(World world, Domain constraints, int iterations, int tabuSize, int neighboursLimit = int.MaxValue) : base(world, constraints)
+    /// <param name="seed">Initial <see cref="ShiftPlan"/> is selected randomly. When limiting neighbours to search by <paramref name="neighboursLimit"/>, neighbours to search are selected at random.</param>
+    public TabuSearchOptimizer(World world, Domain constraints, int iterations, int tabuSize, int neighboursLimit = int.MaxValue, int? seed = null) : base(world, constraints)
     {
+        Random = seed is null ? new Random() : new Random(seed.Value);
         Iterations = iterations;
         TabuSize = tabuSize;
         NeighboursLimit = neighboursLimit;
@@ -123,7 +126,7 @@ public sealed class TabuSearchOptimizer : MetaheuristicOptimizer
         }
 
         ShiftPlanTabu initShiftPlan
-            = ShiftPlanTabu.GetRandom(world.Depots, Constraints.AllowedShiftStartingTimes.ToList(), Constraints.AllowedShiftDurations.ToList());
+            = ShiftPlanTabu.GetRandom(world.Depots, Constraints.AllowedShiftStartingTimes.ToList(), Constraints.AllowedShiftDurations.ToList(), Random);
 
         ShiftPlanTabu globalBest = initShiftPlan;
         int globalBestFitness = Fitness(globalBest);
@@ -144,7 +147,7 @@ public sealed class TabuSearchOptimizer : MetaheuristicOptimizer
             List<Move> neighbourHoodMoves = GetNeighborhoodMoves(bestCandidate).ToList();
             if (neighbourHoodMoves.Count > NeighboursLimit)
             {
-                neighbourHoodMoves = neighbourHoodMoves.GetRandomSamples(NeighboursLimit);
+                neighbourHoodMoves = neighbourHoodMoves.GetRandomSamples(NeighboursLimit, Random);
             }
 
             bestMove = null;

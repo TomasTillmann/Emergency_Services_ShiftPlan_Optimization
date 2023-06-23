@@ -1,5 +1,6 @@
 ﻿//#define RunTabuSearch
-#define Statistics
+//#define HowDoNeighboursLook
+#define HowDoesRandomSampleLook
 
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
@@ -65,13 +66,13 @@ class Program
     }
 #endif
 
-#if Statistics
+#if HowDoNeighboursLook
     static void Main()
     {
-        DataProvider dataProvider = new(20);
+        DataProvider dataProvider = new(30);
         List<SuccessRatedIncidents> incidents = new()
         {
-            dataProvider.GetIncidents(80, 23.ToHours(), successRateThreshold: 1)
+            dataProvider.GetIncidents(200, 22.ToHours().ToSeconds() + 30.ToMinutes().ToSeconds(), successRateThreshold: 1)
         };
 
         //List<SuccessRatedIncidents> incidents = new()
@@ -87,9 +88,10 @@ class Program
         (
             world: dataProvider.GetWorld(),
             constraints: dataProvider.GetDomain(),
-            iterations: 50,
+            iterations: 80,
             tabuSize: 20,
-            neighboursLimit: 30
+            neighboursLimit: 20,
+            seed: 42
         );
 
         //Console.WriteLine(incidents.Visualize(separator: "\n"));
@@ -107,16 +109,69 @@ class Program
 
         ShiftsTravel traveler = new(dataProvider.GetDomain());
 
+        optimal.ClearAllPlannedIncidents();
         Logger.Instance.WriteLineForce($"Optimal: {optimizer.Fitness(optimal, incidents)}");
         IEnumerable<Move> moves = traveler.GetNeighborhoodMoves(optimal);
+        List<(int Fitness, Move Move)> fitnesses = new();
+
         foreach(Move move in moves)
         {
             ShiftPlan neighbor = traveler.ModifyMakeMove(optimal, move);
 
             int fitness = optimizer.Fitness(neighbor, incidents);
-            Logger.Instance.WriteLineForce($"Neighbor: {fitness}");
+            fitnesses.Add((fitness, move));
 
             traveler.ModifyUnmakeMove(optimal, move);
+        }
+
+        fitnesses.Sort((a,b) => a.Fitness.CompareTo(b.Fitness));
+        foreach(var fitness in fitnesses)
+        {
+            Logger.Instance.WriteLineForce($"Neighbor: {fitness.Fitness} | {fitness.Move}");
+        }
+    }
+#endif
+
+#if HowDoesRandomSampleLook
+    static void Main()
+    {
+        DataProvider dataProvider = new(30);
+        List<SuccessRatedIncidents> incidents = new()
+        {
+            dataProvider.GetIncidents(3, 22.ToHours().ToSeconds() + 30.ToMinutes().ToSeconds(), successRateThreshold: 1)
+        };
+
+        IOptimizer optimizer = new TabuSearchOptimizer
+        (
+            world: dataProvider.GetWorld(),
+            constraints: dataProvider.GetDomain(),
+            iterations: 80,
+            tabuSize: 20,
+            neighboursLimit: 20,
+            seed: 42
+        );
+
+        Random random = new(10);
+        List<(int Fitness, ShiftPlan Random)> fitnesses = new();
+
+        for(int i = 0; i < 50000; i++)
+        {
+            ShiftPlan randomSample = ShiftPlan.ConstructEmpty(dataProvider.GetDepots());
+            foreach(Shift shift in randomSample.Shifts)
+            {
+                shift.Work
+                    = Interval.GetByStartAndDuration(dataProvider.GetDomain().AllowedShiftStartingTimes.ToList().GetRandomElement(random),
+                    dataProvider.GetDomain().AllowedShiftDurations.ToList().GetRandomElement(random));
+            }
+
+            int fitness = optimizer.Fitness(randomSample, incidents);
+            fitnesses.Add((fitness, randomSample));
+        }
+
+        fitnesses.Sort((a,b) => a.Fitness.CompareTo(b.Fitness));
+        foreach(var fitness in fitnesses)
+        {
+            Logger.Instance.WriteLineForce($"Random sample: {fitness.Fitness} | {fitness.Random}");
         }
     }
 #endif

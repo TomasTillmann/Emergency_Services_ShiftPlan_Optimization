@@ -21,10 +21,11 @@ public class ShiftsTravel
 
     public ShiftsTravel(Domain constraints)
     {
-        AllowedDurationsSorted = constraints.AllowedShiftDurations.OrderBy(d => d.Value).ToList();
-
-        // empty interval - ambulance not in use at all
-        AllowedDurationsSorted.Add(0.ToSeconds());
+        AllowedDurationsSorted = new List<Seconds>(constraints.AllowedShiftDurations)
+        {
+            0.ToSeconds()
+        };
+        AllowedDurationsSorted.Sort((d1, d2) => d1.CompareTo(d2));
 
         MinDuration = AllowedDurationsSorted.First();
         MaxDuration = AllowedDurationsSorted.Last();
