@@ -182,7 +182,7 @@ public sealed class TabuSearchOptimizer : Optimizer
         {
             sw.Start();
             List<Move> neighbourHoodMoves = GetNeighborhoodMoves(bestCandidate).ToList();
-            if(neighbourHoodMoves.Count > NeighboursLimit)
+            if (neighbourHoodMoves.Count > NeighboursLimit)
             {
                 neighbourHoodMoves = neighbourHoodMoves.GetRandomSamples(NeighboursLimit);
             }
@@ -349,29 +349,24 @@ public sealed class TabuSearchOptimizer : Optimizer
             Move? move;
             if(TryGenerateMove(shiftWork, shiftIndex, MoveType.Shorter, out move))
             {
-                //moves.Add(move);
                 yield return move;
             }
 
             if(TryGenerateMove(shiftWork, shiftIndex, MoveType.Longer, out move))
             {
-                //moves.Add(move);
                 yield return move;
             }
 
             if(TryGenerateMove(shiftWork, shiftIndex, MoveType.Later, out move))
             {
-                //moves.Add(move);
                 yield return move;
             }
 
             if(TryGenerateMove(shiftWork, shiftIndex, MoveType.Earlier, out move))
             {
-                //moves.Add(move);
                 yield return move;
             }
         }
-        //return moves;
     }
 
     private bool TryGenerateMove(Interval work, int shiftIndex, MoveType type, [NotNullWhen(true)] out Move? move)

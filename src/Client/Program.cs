@@ -19,10 +19,10 @@ class Program
 #if true
     static void Main()
     {
-        DataProvider dataProvider = new(50);
+        DataProvider dataProvider = new(100);
         List<SuccessRatedIncidents> incidents = new()
         {
-            dataProvider.GetIncidents(200, 23.ToHours(), successRateThreshold: 1)
+            dataProvider.GetIncidents(450, 23.ToHours(), successRateThreshold: 1)
         };
 
         //List<SuccessRatedIncidents> incidents = new()
