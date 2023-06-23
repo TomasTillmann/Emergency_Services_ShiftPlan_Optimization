@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -32,7 +33,7 @@ public sealed class TabuSearchOptimizer : Optimizer
             ShiftPlan shiftPlanDefault = ShiftPlan.ConstructEmpty(depots);
             foreach(Shift shift in shiftPlanDefault.Shifts)
             {
-                shift.Work = Interval.GetByStartAndDuration(allowedStartingTimes.GetRandom(random), allowedShiftDurations.GetRandom(random));
+                shift.Work = Interval.GetByStartAndDuration(allowedStartingTimes.GetRandomElement(random), allowedShiftDurations.GetRandomElement(random));
             }
 
             return new ShiftPlanTabu(shiftPlanDefault); 
@@ -88,6 +89,11 @@ public sealed class TabuSearchOptimizer : Optimizer
             ShiftIndex = shiftIndex;
             Type = type;
         }
+
+        public override string ToString()
+        {
+            return $"({Type}, {ShiftIndex})"; 
+        }
     }
 
     private enum MoveType
@@ -100,7 +106,9 @@ public sealed class TabuSearchOptimizer : Optimizer
 
     #region Params
     public readonly int Iterations;
-    public readonly int MaxTabuSize;
+    public readonly int TabuSize;
+    public readonly int NeighboursLimit;
+    public readonly Random Random;
     #endregion
 
     private Seconds MaxDuration;
@@ -119,14 +127,17 @@ public sealed class TabuSearchOptimizer : Optimizer
     /// <param name="world"></param>
     /// <param name="constraints"></param>
     /// <param name="iterations"></param>
-    /// <param name="maxTabuSize">Shoudl be less or equal to minimal number of possible neighbours (or some mean at least, to minimize the change),
-    /// otherwise could happen, that all neighbours are tabu and for all aspiration criterion is not satisfied, leading to no allowed moves.</param>
-    /// <param name="simulationDuration"></param>
-    /// <param name="initialDurationPenalty"></param>
-    public TabuSearchOptimizer(World world, Constraints constraints, int iterations, int maxTabuSize) : base(world, constraints)
+    /// <param name="tabuSize">If set too high, it could happen, that all neighbours are tabu (and aspiration criterion is not satisfied either).
+    /// <see cref="Exception"/> will be thrown.</param>
+    /// <param name="seed">Seed used for random sample of neighbours list.</param>
+    /// <param name="neighboursLimit">If count of neighbours is exceeded, uniformly random sample of this size will be taken as representants of all neighbours.
+    /// The more the shifts, the more the neighbours. Running hundreads of simulations in one iteration can be too expensive. This helps this issue.</param>
+    public TabuSearchOptimizer(World world, Constraints constraints, int iterations, int tabuSize, int? seed = null, int neighboursLimit = int.MaxValue) : base(world, constraints)
     {
         Iterations = iterations;
-        MaxTabuSize = maxTabuSize;
+        TabuSize = tabuSize;
+        NeighboursLimit = neighboursLimit;
+        Random = seed is null ? new Random() : new Random(seed.Value);
 
         AllowedDurationsSorted = Constraints.AllowedShiftDurations.OrderBy(d => d.Value).ToList();
 
@@ -170,7 +181,11 @@ public sealed class TabuSearchOptimizer : Optimizer
         for(int i = 0; i < Iterations; i++)
         {
             sw.Start();
-            List<Move> neighbourHoodMoves = GetNeighborhoodMoves(bestCandidate);
+            List<Move> neighbourHoodMoves = GetNeighborhoodMoves(bestCandidate).ToList();
+            if(neighbourHoodMoves.Count > NeighboursLimit)
+            {
+                neighbourHoodMoves = neighbourHoodMoves.GetRandomSamples(NeighboursLimit);
+            }
 
             bestMove = null;
             bestCandidateFitness = null;
@@ -219,7 +234,7 @@ public sealed class TabuSearchOptimizer : Optimizer
             }
 
             tabu.AddLast(bestMove);
-            if (tabu.Count > MaxTabuSize)
+            if (tabu.Count > TabuSize)
             {
                 tabu.RemoveFirst();
             }
@@ -240,7 +255,6 @@ public sealed class TabuSearchOptimizer : Optimizer
         // damping, to better navigate
         if(eval == int.MaxValue)
         {
-            //int cost = shiftPlan.GetCost();
             return maxShiftPlanCost + (int)((1 - meanSuccessRate) * 100);
             //return int.MaxValue;
         }
@@ -326,10 +340,8 @@ public sealed class TabuSearchOptimizer : Optimizer
         return shiftPlanTabu;
     }
 
-    private List<Move> GetNeighborhoodMoves(ShiftPlanTabu shiftPlanTabu)
+    private IEnumerable<Move> GetNeighborhoodMoves(ShiftPlanTabu shiftPlanTabu)
     {
-        List<Move> moves = new();
-
         for (int shiftIndex = 0; shiftIndex < shiftPlanTabu.Value.Shifts.Count; shiftIndex++)
         {
             Interval shiftWork = shiftPlanTabu.Value.Shifts[shiftIndex].Work;
@@ -337,26 +349,29 @@ public sealed class TabuSearchOptimizer : Optimizer
             Move? move;
             if(TryGenerateMove(shiftWork, shiftIndex, MoveType.Shorter, out move))
             {
-                moves.Add(move);
+                //moves.Add(move);
+                yield return move;
             }
 
             if(TryGenerateMove(shiftWork, shiftIndex, MoveType.Longer, out move))
             {
-                moves.Add(move);
+                //moves.Add(move);
+                yield return move;
             }
 
             if(TryGenerateMove(shiftWork, shiftIndex, MoveType.Later, out move))
             {
-                moves.Add(move);
+                //moves.Add(move);
+                yield return move;
             }
 
             if(TryGenerateMove(shiftWork, shiftIndex, MoveType.Earlier, out move))
             {
-                moves.Add(move);
+                //moves.Add(move);
+                yield return move;
             }
         }
-
-        return moves;
+        //return moves;
     }
 
     private bool TryGenerateMove(Interval work, int shiftIndex, MoveType type, [NotNullWhen(true)] out Move? move)

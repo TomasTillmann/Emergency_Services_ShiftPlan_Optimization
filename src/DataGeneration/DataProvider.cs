@@ -108,7 +108,7 @@ public class DataProvider
             //new IncidentType("IncType4", 1.ToHours().ToSeconds(), ambulanceTypes.GetRangeRandom(random).ToHashSet()),
             //new IncidentType("IncType5", 1.ToHours().ToSeconds(), ambulanceTypes.GetRangeRandom(random).ToHashSet()),
             //new IncidentType("IncType6", 3.ToHours().ToSeconds(), ambulanceTypes.GetRangeRandom(random).ToHashSet()),
-            new IncidentType("IncType7", 1.ToHours().ToSeconds(), ambulanceTypes.GetRangeRandom(random, minCount: 1).ToHashSet()),
+            new IncidentType("IncType7", 1.ToHours().ToSeconds(), ambulanceTypes.GetRandomRange(random, minCount: 1).ToHashSet()),
         };
     }
 
@@ -141,7 +141,7 @@ public class DataProvider
         {
             for (Meters x = 10.ToMeters(); x < dimX; x += stepX)
             {
-                HashSet<Ambulance> selectedAmbulances = ambulances.GetRangeRandom(random, minCount: 1, maxCount: 20).ToHashSet();
+                HashSet<Ambulance> selectedAmbulances = ambulances.GetRandomRange(random, minCount: 1, maxCount: 20).ToHashSet();
                 ambulances.RemoveAll(amb => selectedAmbulances.Contains(amb));
 
                 depots.Add(new Depot(new Coordinate(x, y), selectedAmbulances.ToList()));
@@ -169,7 +169,7 @@ public class DataProvider
 
         for(int i = 0; i < ambulancesCount; ++i)
         {
-            ambulances.Add(new Ambulance(ambulanceTypes.GetRandom(random), new Coordinate(), reroutePenalties.GetRandom(random)));
+            ambulances.Add(new Ambulance(ambulanceTypes.GetRandomElement(random), new Coordinate(), reroutePenalties.GetRandomElement(random)));
         }
 #endif
     }
