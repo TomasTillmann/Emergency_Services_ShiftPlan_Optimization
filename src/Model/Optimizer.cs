@@ -6,12 +6,12 @@ namespace Optimizing;
 
 public abstract class Optimizer : IOptimizer
 {
-    public Constraints Constraints { get; }
+    public Domain Constraints { get; }
 
     protected Simulation simulation;
     protected World world;
 
-    public Optimizer(World world, Constraints constraints)
+    public Optimizer(World world, Domain constraints)
     {
         if (constraints.AllowedShiftStartingTimes.Count() == 0 || constraints.AllowedShiftDurations.Count() == 0)
         {
@@ -23,7 +23,12 @@ public abstract class Optimizer : IOptimizer
         simulation = new Simulation(world);
     }
 
-    protected virtual int Fitness(ShiftPlan shiftPlan, List<SuccessRatedIncidents> successRatedIncidents, out double meanSuccessRate)
+    public virtual int Fitness(ShiftPlan shiftPlan, List<SuccessRatedIncidents> successRatedIncidents)
+    {
+        return Fitness(shiftPlan, successRatedIncidents, out _);
+    }
+
+    public virtual int Fitness(ShiftPlan shiftPlan, List<SuccessRatedIncidents> successRatedIncidents, out double meanSuccessRate)
     {
         if(!IsValid(shiftPlan, successRatedIncidents, out meanSuccessRate))
         {
@@ -33,12 +38,12 @@ public abstract class Optimizer : IOptimizer
         return shiftPlan.GetCost();
     }
 
-    protected bool IsValid(ShiftPlan shiftPlan, List<SuccessRatedIncidents> successRatedIncidents)
+    public bool IsValid(ShiftPlan shiftPlan, List<SuccessRatedIncidents> successRatedIncidents)
     {
         return IsValid(shiftPlan, successRatedIncidents, out _);
     }
 
-    protected bool IsValid(ShiftPlan shiftPlan, List<SuccessRatedIncidents> successRatedIncidents, out double meanSuccessRate)
+    public bool IsValid(ShiftPlan shiftPlan, List<SuccessRatedIncidents> successRatedIncidents, out double meanSuccessRate)
     {
         double successRateSum = 0;
         bool isValid = true;

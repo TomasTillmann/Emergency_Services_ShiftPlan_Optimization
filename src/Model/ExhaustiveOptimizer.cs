@@ -15,7 +15,7 @@ public sealed class ExhaustiveOptimizer : Optimizer
 
     #endregion
 
-    public ExhaustiveOptimizer(World world, Constraints constraints) : base(world, constraints) { }
+    public ExhaustiveOptimizer(World world, Domain constraints) : base(world, constraints) { }
 
     /// <summary>
     /// Tries brute force search for all possible combinations of starting times and shift durations on all shifts.
@@ -72,7 +72,7 @@ public sealed class ExhaustiveOptimizer : Optimizer
 
                 if (Succeeds(shiftPlan))
                 {
-                    allShiftPlans.Add(shiftPlan.Clone());
+                    allShiftPlans.Add(shiftPlan.Copy());
                 }
 
                 return;

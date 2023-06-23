@@ -1,18 +1,33 @@
 ﻿using DataModel.Interfaces;
 using Model.Extensions;
+using Optimizing;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace ESSP.DataModel;
 
-public class ShiftPlan
+public class ShiftPlan : IShifts
 {
     public List<Shift> Shifts { get; set; }
+
+    public int Count => Shifts.Count; 
+    public Shift this[int index] { get => Shifts[index]; set => Shifts[index] = value; }
 
     public ShiftPlan(List<Shift> shifts)
     {
         Shifts = shifts;
+    }
+
+    public static ShiftPlan ConstructRandom(IReadOnlyList<Depot> depots, List<Seconds> allowedStartingTimes, List<Seconds> allowedShiftDurations, Random? random = null)
+    {
+        ShiftPlan shiftPlanDefault = ConstructEmpty(depots);
+        foreach (Shift shift in shiftPlanDefault.Shifts)
+        {
+            shift.Work = Interval.GetByStartAndDuration(allowedStartingTimes.GetRandomElement(random), allowedShiftDurations.GetRandomElement(random));
+        }
+
+        return shiftPlanDefault;
     }
 
     public static ShiftPlan ConstructFrom(IReadOnlyList<Depot> depots, Seconds allShiftsStartingTime, Seconds allShiftsDuration)
@@ -46,7 +61,12 @@ public class ShiftPlan
         return Shifts.Select(shift => shift.Ambulance.Type.Cost * shift.Work.Duration.Value).Sum();
     }
 
-    public ShiftPlan Clone()
+    public void ClearAllPlannedIncidents()
+    {
+        Shifts.ForEach(shift => shift.ClearPlannedIncidents());
+    }
+
+    public ShiftPlan Copy()
     {
         return new ShiftPlan(Shifts.Select(shift => new Shift(shift.Ambulance, shift.Depot, shift.Work)).ToList());
     }
