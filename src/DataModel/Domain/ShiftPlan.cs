@@ -1,14 +1,18 @@
 ﻿using DataModel.Interfaces;
 using Model.Extensions;
+using Optimizing;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace ESSP.DataModel;
 
-public class ShiftPlan
+public class ShiftPlan : IShifts
 {
     public List<Shift> Shifts { get; set; }
+
+    public int Count => Shifts.Count; 
+    public Shift this[int index] { get => Shifts[index]; set => Shifts[index] = value; }
 
     public ShiftPlan(List<Shift> shifts)
     {

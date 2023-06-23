@@ -4,7 +4,6 @@ using Model.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -13,11 +12,14 @@ using System.Threading.Tasks;
 
 namespace Optimizing;
 
-public sealed class TabuSearchOptimizer : Optimizer
+public sealed class TabuSearchOptimizer : MetaheuristicOptimizer
 {
-    private class ShiftPlanTabu
+    private class ShiftPlanTabu : IShifts
     {
         public ShiftPlan Value;
+
+        public int Count => Value.Shifts.Count; 
+        public Shift this[int index] { get => Value.Shifts[index]; set => Value.Shifts[index] = value; }
 
         private ShiftPlanTabu(ShiftPlan shiftPlan)
         {
@@ -79,51 +81,14 @@ public sealed class TabuSearchOptimizer : Optimizer
         }
     }
 
-    private class Move
-    {
-        public int ShiftIndex { get; }
-        public MoveType Type { get; }
-
-        public Move(int shiftIndex, MoveType type)
-        {
-            ShiftIndex = shiftIndex;
-            Type = type;
-        }
-
-        public override string ToString()
-        {
-            return $"({Type}, {ShiftIndex})"; 
-        }
-    }
-
-    private enum MoveType
-    {
-        Shorter,
-        Longer,
-        Earlier,
-        Later,
-    }
-
     #region Params
     public readonly int Iterations;
     public readonly int TabuSize;
     public readonly int NeighboursLimit;
-    public readonly Random Random;
     #endregion
-
-    private Seconds MaxDuration;
-    private Seconds MinDuration;
-    private Seconds EarliestStartingTime;
-    private Seconds LatestStartingTime;
-
-    private List<Seconds> AllowedDurationsSorted;
-    private List<Seconds> AllowedStartingTimesSorted;
 
     private readonly int maxShiftPlanCost;
 
-    /// <summary>
-    /// 
-    /// </summary>
     /// <param name="world"></param>
     /// <param name="constraints"></param>
     /// <param name="iterations"></param>
@@ -132,24 +97,11 @@ public sealed class TabuSearchOptimizer : Optimizer
     /// <param name="seed">Seed used for random sample of neighbours list.</param>
     /// <param name="neighboursLimit">If count of neighbours is exceeded, uniformly random sample of this size will be taken as representants of all neighbours.
     /// The more the shifts, the more the neighbours. Running hundreads of simulations in one iteration can be too expensive. This helps this issue.</param>
-    public TabuSearchOptimizer(World world, Constraints constraints, int iterations, int tabuSize, int? seed = null, int neighboursLimit = int.MaxValue) : base(world, constraints)
+    public TabuSearchOptimizer(World world, Constraints constraints, int iterations, int tabuSize, int neighboursLimit = int.MaxValue) : base(world, constraints)
     {
         Iterations = iterations;
         TabuSize = tabuSize;
         NeighboursLimit = neighboursLimit;
-        Random = seed is null ? new Random() : new Random(seed.Value);
-
-        AllowedDurationsSorted = Constraints.AllowedShiftDurations.OrderBy(d => d.Value).ToList();
-
-        // empty interval - ambulance not in use at all
-        AllowedDurationsSorted.Add(0.ToSeconds());
-
-        MinDuration = AllowedDurationsSorted.First();
-        MaxDuration = AllowedDurationsSorted.Last();
-
-        AllowedStartingTimesSorted = Constraints.AllowedShiftStartingTimes.OrderBy(startingTime => startingTime.Value).ToList();
-        EarliestStartingTime = AllowedStartingTimesSorted.First();
-        LatestStartingTime = AllowedStartingTimesSorted.Last();
 
         ShiftPlan maximalShiftPlan = ShiftPlanTabu.GetAllShiftHavingSameDuration(world.Depots, MaxDuration).Value;
         this.maxShiftPlanCost = maximalShiftPlan.GetCost();
@@ -261,191 +213,4 @@ public sealed class TabuSearchOptimizer : Optimizer
 
         return eval;
     } 
-
-    private ShiftPlanTabu ModifyMakeMove(ShiftPlanTabu shiftPlanTabu, Move move)
-    {
-        Shift shift = shiftPlanTabu.Value.Shifts[move.ShiftIndex];
-
-        switch (move.Type)
-        {
-            case MoveType.Shorter:
-            {
-                Seconds duration = GetShorter(shift.Work.Duration); 
-                shift.Work = Interval.GetByStartAndDuration(shift.Work.Start, duration);
-
-                break;
-            }
-
-            case MoveType.Longer:
-            {
-                Seconds duration = GetLonger(shift.Work.Duration);
-                shift.Work = Interval.GetByStartAndDuration(shift.Work.Start, duration);
-
-                break;
-            }
-            case MoveType.Later:
-            {
-
-                Seconds startingTime = GetLater(shift.Work.Start);
-                shift.Work = Interval.GetByStartAndDuration(startingTime, shift.Work.Duration);
-
-                break;
-            }
-            case MoveType.Earlier:
-            {
-                Seconds startingTime = GetEarlier(shift.Work.Start); 
-                shift.Work = Interval.GetByStartAndDuration(startingTime, shift.Work.Duration);
-
-                break;
-            }
-
-            default:
-            {
-                throw new ArgumentException("Missing case!");
-            }
-        }
-
-        return shiftPlanTabu;
-    }
-
-    private ShiftPlanTabu ModifyUnmakeMove(ShiftPlanTabu shiftPlanTabu, Move move)
-    {
-        switch (move.Type)
-        {
-            case MoveType.Shorter:
-            {
-                ModifyMakeMove(shiftPlanTabu, new Move(move.ShiftIndex, MoveType.Longer));
-                break;
-            }
-
-            case MoveType.Longer:
-            {
-                ModifyMakeMove(shiftPlanTabu, new Move(move.ShiftIndex, MoveType.Shorter));
-                break;
-            }
-
-            case MoveType.Earlier:
-            {
-                ModifyMakeMove(shiftPlanTabu, new Move(move.ShiftIndex, MoveType.Later));
-                break;
-            }
-
-            case MoveType.Later:
-            {
-                ModifyMakeMove(shiftPlanTabu, new Move(move.ShiftIndex, MoveType.Earlier));
-                break;
-            }
-        }
-
-        return shiftPlanTabu;
-    }
-
-    private IEnumerable<Move> GetNeighborhoodMoves(ShiftPlanTabu shiftPlanTabu)
-    {
-        for (int shiftIndex = 0; shiftIndex < shiftPlanTabu.Value.Shifts.Count; shiftIndex++)
-        {
-            Interval shiftWork = shiftPlanTabu.Value.Shifts[shiftIndex].Work;
-
-            Move? move;
-            if(TryGenerateMove(shiftWork, shiftIndex, MoveType.Shorter, out move))
-            {
-                yield return move;
-            }
-
-            if(TryGenerateMove(shiftWork, shiftIndex, MoveType.Longer, out move))
-            {
-                yield return move;
-            }
-
-            if(TryGenerateMove(shiftWork, shiftIndex, MoveType.Later, out move))
-            {
-                yield return move;
-            }
-
-            if(TryGenerateMove(shiftWork, shiftIndex, MoveType.Earlier, out move))
-            {
-                yield return move;
-            }
-        }
-    }
-
-    private bool TryGenerateMove(Interval work, int shiftIndex, MoveType type, [NotNullWhen(true)] out Move? move)
-    {
-        move = null;
-        switch (type)
-        {
-            case MoveType.Shorter:
-            {
-                if (work.Duration != MinDuration)
-                {
-                    move = new Move(shiftIndex, MoveType.Shorter);
-                    return true;
-                }
-
-                return false;
-            }
-
-            case MoveType.Longer:
-            {
-                if (work.Duration != MaxDuration)
-                {
-                    move = new Move(shiftIndex, MoveType.Longer);
-                    return true;
-                }
-
-                return false;
-            }
-
-            case MoveType.Earlier:
-            {
-                if (work.Start != EarliestStartingTime)
-                {
-                    move = new Move(shiftIndex, MoveType.Earlier);
-                    return true;
-                }
-
-                return false;
-            }
-
-            case MoveType.Later:
-            {
-                if (work.Start != LatestStartingTime)
-                {
-                    move = new Move(shiftIndex, MoveType.Later);
-                    return true;
-                }
-
-                return false;
-            }
-
-            default:
-            {
-                throw new ArgumentException("Missing case statement!");
-            }
-        }
-    }
-
-    private Seconds GetShorter(Seconds duration)
-    {
-        int index = AllowedDurationsSorted.IndexOf(duration);
-        return AllowedDurationsSorted[index-1];
-    }
-
-    private Seconds GetLonger(Seconds duration)
-    {
-        int index = AllowedDurationsSorted.IndexOf(duration);
-        return AllowedDurationsSorted[index+1];
-    }
-
-    private Seconds GetEarlier(Seconds startTime)
-    {
-        int index = AllowedStartingTimesSorted.IndexOf(startTime);
-        return AllowedStartingTimesSorted[index-1];
-    }
-
-    private Seconds GetLater(Seconds startTime)
-    {
-        int index = AllowedStartingTimesSorted.IndexOf(startTime);
-        return AllowedStartingTimesSorted[index+1];
-    }
 }
