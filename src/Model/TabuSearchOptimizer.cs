@@ -103,8 +103,8 @@ public sealed class TabuSearchOptimizer : MetaheuristicOptimizer
         TabuSize = tabuSize;
         NeighboursLimit = neighboursLimit;
 
-        ShiftPlan maximalShiftPlan = ShiftPlanTabu.GetAllShiftHavingSameDuration(world.Depots, MaxDuration).Value;
-        this.maxShiftPlanCost = maximalShiftPlan.GetCost();
+        ShiftPlan maximalShiftPlan = ShiftPlanTabu.GetAllShiftHavingSameDuration(world.Depots, constraints.AllowedShiftDurations.Max()).Value;
+        maxShiftPlanCost = maximalShiftPlan.GetCost();
     }
 
     public override IEnumerable<ShiftPlan> FindOptimal(List<SuccessRatedIncidents> incidentsSets)
