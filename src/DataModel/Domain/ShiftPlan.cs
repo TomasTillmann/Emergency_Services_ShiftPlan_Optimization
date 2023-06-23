@@ -50,7 +50,12 @@ public class ShiftPlan : IShifts
         return Shifts.Select(shift => shift.Ambulance.Type.Cost * shift.Work.Duration.Value).Sum();
     }
 
-    public ShiftPlan Clone()
+    public void ClearAllPlannedIncidents()
+    {
+        Shifts.ForEach(shift => shift.ClearPlannedIncidents());
+    }
+
+    public ShiftPlan Copy()
     {
         return new ShiftPlan(Shifts.Select(shift => new Shift(shift.Ambulance, shift.Depot, shift.Work)).ToList());
     }

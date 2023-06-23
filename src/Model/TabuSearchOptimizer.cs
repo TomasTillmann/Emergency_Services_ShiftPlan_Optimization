@@ -40,10 +40,18 @@ public sealed class TabuSearchOptimizer : MetaheuristicOptimizer
 
             return new ShiftPlanTabu(shiftPlanDefault); 
         }
-
-        internal ShiftPlanTabu Clone()
+        public void ClearAllPlannedIncidents()
         {
-            return new ShiftPlanTabu(Value.Clone());
+            Value.Shifts.ForEach(shift => shift.ClearPlannedIncidents());
+        }
+
+        internal ShiftPlanTabu Copy()
+        {
+            return new ShiftPlanTabu(Value.Copy());
+        }
+        public int GetCost()
+        {
+            return Value.GetCost();
         }
 
         public override string ToString()
@@ -97,7 +105,7 @@ public sealed class TabuSearchOptimizer : MetaheuristicOptimizer
     /// <param name="seed">Seed used for random sample of neighbours list.</param>
     /// <param name="neighboursLimit">If count of neighbours is exceeded, uniformly random sample of this size will be taken as representants of all neighbours.
     /// The more the shifts, the more the neighbours. Running hundreads of simulations in one iteration can be too expensive. This helps this issue.</param>
-    public TabuSearchOptimizer(World world, Constraints constraints, int iterations, int tabuSize, int neighboursLimit = int.MaxValue) : base(world, constraints)
+    public TabuSearchOptimizer(World world, Domain constraints, int iterations, int tabuSize, int neighboursLimit = int.MaxValue) : base(world, constraints)
     {
         Iterations = iterations;
         TabuSize = tabuSize;
@@ -177,7 +185,7 @@ public sealed class TabuSearchOptimizer : MetaheuristicOptimizer
                 throw new ArgumentException("All neighbours were tabu and none of them also satisfied aspiration criterion. Perhaps you set tabu size too high?");
             }
 
-            bestCandidate = ModifyMakeMove(bestCandidate.Clone(), bestMove);
+            bestCandidate = ModifyMakeMove(bestCandidate.Copy(), bestMove);
 
             if (bestCandidateFitness < globalBestFitness)
             {
@@ -200,7 +208,7 @@ public sealed class TabuSearchOptimizer : MetaheuristicOptimizer
         return new List<ShiftPlan> { globalBest.Value };
     }
 
-    internal int Fitness(ShiftPlan shiftPlan, List<SuccessRatedIncidents> successRatedIncidents)
+    public override int Fitness(ShiftPlan shiftPlan, List<SuccessRatedIncidents> successRatedIncidents)
     {
         int eval = base.Fitness(shiftPlan, successRatedIncidents, out double meanSuccessRate);
 

@@ -123,7 +123,7 @@ public static class Extensions
         return collection.OrderBy(arg => Guid.NewGuid()).Take(count).ToList();
     }
 
-    public static void ModifyToLargest(this ShiftPlan shiftPlan, Constraints constraints)
+    public static void ModifyToLargest(this ShiftPlan shiftPlan, Domain constraints)
     {
         Seconds largestDuration = constraints.AllowedShiftDurations.FindMaxSubset(_ => _).First();
 
@@ -135,9 +135,10 @@ public static class Extensions
 
     public static void ShowGraph(this ShiftPlan shiftPlan, Seconds end)
     {
+        int index = 1;
         foreach(var shift in shiftPlan.Shifts)
         {
-            Logger.Instance.WriteForce($"{shift.Id}: ");
+            Logger.Instance.WriteForce($"{index++}: ");
 
             for(Seconds time = 0.ToSeconds(); time < end; time += (5 * 60).ToSeconds())
             {

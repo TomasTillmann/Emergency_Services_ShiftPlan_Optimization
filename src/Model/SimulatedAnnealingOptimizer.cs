@@ -10,7 +10,7 @@ namespace Optimization;
 
 public class SimulatedAnnealingOptimizer : MetaheuristicOptimizer
 {
-    public SimulatedAnnealingOptimizer(World world, Constraints constraints) : base(world, constraints)
+    public SimulatedAnnealingOptimizer(World world, Domain constraints) : base(world, constraints)
     {
     }
 

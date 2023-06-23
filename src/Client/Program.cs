@@ -11,6 +11,7 @@ using Logging;
 using Model.Extensions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Optimization;
 using Optimizing;
 using Simulating;
 using System.Diagnostics;
@@ -85,7 +86,7 @@ class Program
         IOptimizer optimizer = new TabuSearchOptimizer
         (
             world: dataProvider.GetWorld(),
-            constraints: dataProvider.GetConstraints(),
+            constraints: dataProvider.GetDomain(),
             iterations: 50,
             tabuSize: 20,
             neighboursLimit: 30
@@ -103,6 +104,20 @@ class Program
         optimal.ShowGraph(24.ToHours().ToSeconds());
         Logger.Instance.WriteLineForce(stats);
         Logger.Instance.WriteLineForce();
+
+        ShiftsTravel traveler = new(dataProvider.GetDomain());
+
+        Logger.Instance.WriteLineForce($"Optimal: {optimizer.Fitness(optimal, incidents)}");
+        IEnumerable<Move> moves = traveler.GetNeighborhoodMoves(optimal);
+        foreach(Move move in moves)
+        {
+            ShiftPlan neighbor = traveler.ModifyMakeMove(optimal, move);
+
+            int fitness = optimizer.Fitness(neighbor, incidents);
+            Logger.Instance.WriteLineForce($"Neighbor: {fitness}");
+
+            traveler.ModifyUnmakeMove(optimal, move);
+        }
     }
 #endif
 
@@ -140,8 +155,8 @@ public class SimulationBenchmark
         simulation = new(dataProvider.GetWorld());
 
         shiftPlan = ShiftPlan.ConstructFrom(dataProvider.GetDepots(),
-            dataProvider.GetConstraints().AllowedShiftStartingTimes.Min(),
-            dataProvider.GetConstraints().AllowedShiftDurations.Max());
+            dataProvider.GetDomain().AllowedShiftStartingTimes.Min(),
+            dataProvider.GetDomain().AllowedShiftDurations.Max());
 
         incidents = dataProvider.GetIncidents(incidentsCount, 23.ToHours(), 1).Value;
     }

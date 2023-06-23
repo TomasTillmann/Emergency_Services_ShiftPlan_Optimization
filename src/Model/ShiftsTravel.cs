@@ -19,7 +19,7 @@ public class ShiftsTravel
     protected List<Seconds> AllowedDurationsSorted;
     protected List<Seconds> AllowedStartingTimesSorted;
 
-    public ShiftsTravel(Constraints constraints)
+    public ShiftsTravel(Domain constraints)
     {
         AllowedDurationsSorted = constraints.AllowedShiftDurations.OrderBy(d => d.Value).ToList();
 

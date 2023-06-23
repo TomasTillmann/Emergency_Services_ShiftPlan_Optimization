@@ -187,7 +187,7 @@ public class DataProvider
         };
     }
 
-    public Constraints GetConstraints()
+    public Domain GetDomain()
     {
 #if false
         List<Seconds> allowedShiftStartingTimes = new();
@@ -218,6 +218,6 @@ public class DataProvider
             //100.ToSeconds()
         };
 
-        return new Constraints(allowedShiftStartingTimes, allowedShiftDurations);
+        return new Domain(allowedShiftStartingTimes, allowedShiftDurations);
     }
 }

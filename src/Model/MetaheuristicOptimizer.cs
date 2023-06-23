@@ -9,7 +9,7 @@ public abstract class MetaheuristicOptimizer : Optimizer
 
     private ShiftsTravel shiftTravel;
 
-    protected MetaheuristicOptimizer(World world, Constraints constraints) : base(world, constraints)
+    protected MetaheuristicOptimizer(World world, Domain constraints) : base(world, constraints)
     {
         shiftTravel = new ShiftsTravel(constraints);
     }
