@@ -21,7 +21,7 @@ public sealed class TabuSearchOptimizer : MetaheuristicOptimizer
         public int Count => Value.Shifts.Count; 
         public Shift this[int index] { get => Value.Shifts[index]; set => Value.Shifts[index] = value; }
 
-        private ShiftPlanTabu(ShiftPlan shiftPlan)
+        public ShiftPlanTabu(ShiftPlan shiftPlan)
         {
             Value = shiftPlan;
         }
@@ -30,16 +30,7 @@ public sealed class TabuSearchOptimizer : MetaheuristicOptimizer
         {
             return new ShiftPlanTabu(ShiftPlan.ConstructFrom(depots, 0.ToSeconds(), duration));
         }
-        public static ShiftPlanTabu GetRandom(IReadOnlyList<Depot> depots, List<Seconds> allowedStartingTimes, List<Seconds> allowedShiftDurations, Random? random = null)
-        {
-            ShiftPlan shiftPlanDefault = ShiftPlan.ConstructEmpty(depots);
-            foreach(Shift shift in shiftPlanDefault.Shifts)
-            {
-                shift.Work = Interval.GetByStartAndDuration(allowedStartingTimes.GetRandomElement(random), allowedShiftDurations.GetRandomElement(random));
-            }
 
-            return new ShiftPlanTabu(shiftPlanDefault); 
-        }
         public void ClearAllPlannedIncidents()
         {
             Value.Shifts.ForEach(shift => shift.ClearPlannedIncidents());
@@ -126,7 +117,8 @@ public sealed class TabuSearchOptimizer : MetaheuristicOptimizer
         }
 
         ShiftPlanTabu initShiftPlan
-            = ShiftPlanTabu.GetRandom(world.Depots, Constraints.AllowedShiftStartingTimes.ToList(), Constraints.AllowedShiftDurations.ToList(), Random);
+            = new ShiftPlanTabu(ShiftPlan.ConstructRandom(world.Depots, Constraints.AllowedShiftStartingTimes.ToList(),
+            Constraints.AllowedShiftDurations.ToList(), Random));
 
         ShiftPlanTabu globalBest = initShiftPlan;
         int globalBestFitness = Fitness(globalBest);

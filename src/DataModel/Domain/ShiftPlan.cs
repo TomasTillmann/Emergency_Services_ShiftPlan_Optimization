@@ -19,6 +19,17 @@ public class ShiftPlan : IShifts
         Shifts = shifts;
     }
 
+    public static ShiftPlan ConstructRandom(IReadOnlyList<Depot> depots, List<Seconds> allowedStartingTimes, List<Seconds> allowedShiftDurations, Random? random = null)
+    {
+        ShiftPlan shiftPlanDefault = ConstructEmpty(depots);
+        foreach (Shift shift in shiftPlanDefault.Shifts)
+        {
+            shift.Work = Interval.GetByStartAndDuration(allowedStartingTimes.GetRandomElement(random), allowedShiftDurations.GetRandomElement(random));
+        }
+
+        return shiftPlanDefault;
+    }
+
     public static ShiftPlan ConstructFrom(IReadOnlyList<Depot> depots, Seconds allShiftsStartingTime, Seconds allShiftsDuration)
     {
         ShiftPlan defaultShiftPlan = ConstructEmpty(depots);

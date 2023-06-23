@@ -1,6 +1,7 @@
 ﻿//#define RunTabuSearch
+#define RunSimulatedAnnealing
 //#define HowDoNeighboursLook
-#define HowDoesRandomSampleLook
+//#define HowDoesRandomSampleLook
 
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
@@ -46,6 +47,53 @@ class Program
             iterations: 50,
             tabuSize: 20,
             neighboursLimit: 30
+        );
+
+        //Console.WriteLine(incidents.Visualize(separator: "\n"));
+        Stopwatch sw = Stopwatch.StartNew();
+
+        IEnumerable<ShiftPlan> optimals = optimizer.FindOptimal(incidents);
+
+        Logger.Instance.WriteLineForce($"Optimizing took: {sw.ElapsedMilliseconds}ms.");
+
+        Simulation simulation = new(dataProvider.GetWorld());
+        foreach(var optimal in optimals)
+        {
+            Statistics stats = simulation.Run(incidents.First().Value, optimal);
+            optimal.ShowGraph(24.ToHours().ToSeconds());
+            Logger.Instance.WriteLineForce(stats);
+            Logger.Instance.WriteLineForce();
+        }
+    }
+#endif
+
+#if RunSimulatedAnnealing
+    static void Main()
+    {
+        DataProvider dataProvider = new(50);
+        List<SuccessRatedIncidents> incidents = new()
+        {
+            dataProvider.GetIncidents(200, 22.ToHours().ToSeconds() + 30.ToMinutes().ToSeconds(), successRateThreshold: 1)
+        };
+
+        //List<SuccessRatedIncidents> incidents = new()
+        //{
+        //    new SuccessRatedIncidents(new List<Incident>
+        //    {
+        //        new Incident(Coordinate.FromMeters(10_000, 10_000), 60000.ToSeconds(), 3600.ToSeconds(), 200.ToSeconds(), IncidentType.Default),
+        //        new Incident(Coordinate.FromMeters(30_000, 10_000), 1000.ToSeconds(), 3600.ToSeconds(), 200.ToSeconds(), IncidentType.Default)
+        //    }, 1)
+        //};
+
+        IOptimizer optimizer = new SimulatedAnnealingOptimizer
+        (
+            world: dataProvider.GetWorld(),
+            constraints: dataProvider.GetDomain(),
+            lowestTemperature: 5,
+            highestTemperature: 100,
+            temperatureReductionFactor: 0.9,
+            neighbourLimit: 30,
+            new Random(42)
         );
 
         //Console.WriteLine(incidents.Visualize(separator: "\n"));
@@ -176,7 +224,7 @@ class Program
     }
 #endif
 
-// BENCHMARK OF SIMULATION
+    // BENCHMARK OF SIMULATION
 #if false
     static void Main()
     {

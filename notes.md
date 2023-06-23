@@ -51,6 +51,10 @@ Ale podle me to je metrika proste.
 
 1. Jak rychle klesa fitness v zavislosti na poctu provedenych canonical moves?
 
+### Jak rychle jsem od nahodneho reseni schopen najit validni shiftPlan?
+
+### Jaka je prumerna velikost lokalniho minima?
+
 # POSTREHY
 
 ## Nelze v polynomialnim case rict, zda je reseni optimalni, jen ze se jedna o reseni.
@@ -60,3 +64,17 @@ Ale podle me to je metrika proste.
   - jedine odvijet od velikosti prohledaneho podprostoru, ten bude vzdy polynomialni, takze hrozne maly.
     - cili je dulezite jakym zpusobem prohledavas
     - najit vztah mezi shiftPlans
+
+## Popis problem
+
+- Combinatorial optimization problem, with no constraints.
+- Nejsme schopni nijak overit zda se jedna o optimalni reseni.
+
+# A comparative study of Meta-heuristic Algorithms for solving QAP
+
+## Plot
+
+- Osa x bude konkretni vstup - (#sanitek, #incdentu), pripadne #depotu atd ...
+- Osa y bude nejvic optimalni reseni
+- Osa y bude execution time pro nalezeni toho reseni
+- na jednom grafu se budou prekryvat, at to jde hezky videt
