@@ -98,13 +98,13 @@ public static class Extensions
         return str;
     }
 
-    public static T GetRandom<T>(this IList<T> collection, Random random = null)
+    public static T GetRandomElement<T>(this List<T> collection, Random random = null)
     {
         random = random ?? new Random();
         return collection[random.Next(0, collection.Count - 1)];
     }
 
-    public static List<T> GetRangeRandom<T>(this List<T> collection, Random random = null, int minCount = 0, int maxCount = int.MaxValue)
+    public static List<T> GetRandomRange<T>(this List<T> collection, Random random = null, int minCount = 0, int maxCount = int.MaxValue)
     {
         if(collection.Count == 0 || collection.Count - minCount < 0)
         {
@@ -118,7 +118,13 @@ public static class Extensions
         return collection.GetRange(start, count);
     }
 
-    public static void ModifyToLargest(this ShiftPlan shiftPlan, Constraints constraints)
+    public static List<T> GetRandomSamples<T>(this IEnumerable<T> collection, int count, Random random = null)
+    {
+        random = random ?? new Random();
+        return collection.OrderBy(x => random.Next()).Take(count).ToList();
+    }
+
+    public static void ModifyToLargest(this ShiftPlan shiftPlan, Domain constraints)
     {
         Seconds largestDuration = constraints.AllowedShiftDurations.FindMaxSubset(_ => _).First();
 
@@ -130,9 +136,10 @@ public static class Extensions
 
     public static void ShowGraph(this ShiftPlan shiftPlan, Seconds end)
     {
+        int index = 1;
         foreach(var shift in shiftPlan.Shifts)
         {
-            Logger.Instance.WriteForce($"{shift.Id}: ");
+            Logger.Instance.WriteForce($"{index++}: ");
 
             for(Seconds time = 0.ToSeconds(); time < end; time += (5 * 60).ToSeconds())
             {

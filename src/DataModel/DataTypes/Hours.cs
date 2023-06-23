@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Numerics;
+using System.Runtime.CompilerServices;
 
 namespace ESSP.DataModel
 {
@@ -68,7 +70,7 @@ namespace ESSP.DataModel
             return $"{Value}h";
         }
 
-
+        public static implicit operator Seconds(Hours h) => new Seconds(h.Value * 60 * 60);
     }
 
     public static class HoursExtension

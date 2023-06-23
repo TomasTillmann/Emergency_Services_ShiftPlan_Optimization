@@ -1,4 +1,9 @@
-﻿using BenchmarkDotNet.Attributes;
+﻿//#define RunTabuSearch
+#define RunSimulatedAnnealing
+//#define HowDoNeighboursLook
+//#define HowDoesRandomSampleLook
+
+using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 using DataHandling;
@@ -8,6 +13,7 @@ using Logging;
 using Model.Extensions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Optimization;
 using Optimizing;
 using Simulating;
 using System.Diagnostics;
@@ -16,13 +22,13 @@ namespace Client;
 
 class Program
 {
-#if true
+#if RunTabuSearch
     static void Main()
     {
-        DataProvider dataProvider = new(30);
+        DataProvider dataProvider = new(20);
         List<SuccessRatedIncidents> incidents = new()
         {
-            dataProvider.GetIncidents(100, 23.ToHours(), successRateThreshold: 1)
+            dataProvider.GetIncidents(80, 23.ToHours(), successRateThreshold: 1)
         };
 
         //List<SuccessRatedIncidents> incidents = new()
@@ -39,7 +45,8 @@ class Program
             world: dataProvider.GetWorld(),
             constraints: dataProvider.GetConstraints(),
             iterations: 50,
-            maxTabuSize: 20
+            tabuSize: 20,
+            neighboursLimit: 30
         );
 
         //Console.WriteLine(incidents.Visualize(separator: "\n"));
@@ -60,83 +67,160 @@ class Program
     }
 #endif
 
-#if false
+#if RunSimulatedAnnealing
     static void Main()
     {
-        DataProvider dataProvider = new(3);
+        DataProvider dataProvider = new(50);
         List<SuccessRatedIncidents> incidents = new()
         {
-            dataProvider.GetIncidents(5, 24.ToHours(), successRateThreshold: 1)
+            dataProvider.GetIncidents(200, 22.ToHours().ToSeconds() + 30.ToMinutes().ToSeconds(), successRateThreshold: 1)
         };
 
+        //List<SuccessRatedIncidents> incidents = new()
+        //{
+        //    new SuccessRatedIncidents(new List<Incident>
+        //    {
+        //        new Incident(Coordinate.FromMeters(10_000, 10_000), 60000.ToSeconds(), 3600.ToSeconds(), 200.ToSeconds(), IncidentType.Default),
+        //        new Incident(Coordinate.FromMeters(30_000, 10_000), 1000.ToSeconds(), 3600.ToSeconds(), 200.ToSeconds(), IncidentType.Default)
+        //    }, 1)
+        //};
+
+        IOptimizer optimizer = new SimulatedAnnealingOptimizer
+        (
+            world: dataProvider.GetWorld(),
+            constraints: dataProvider.GetDomain(),
+            lowestTemperature: 5,
+            highestTemperature: 100,
+            temperatureReductionFactor: 0.9,
+            neighbourLimit: 30,
+            new Random(42)
+        );
+
+        //Console.WriteLine(incidents.Visualize(separator: "\n"));
+        Stopwatch sw = Stopwatch.StartNew();
+
+        IEnumerable<ShiftPlan> optimals = optimizer.FindOptimal(incidents);
+
+        Logger.Instance.WriteLineForce($"Optimizing took: {sw.ElapsedMilliseconds}ms.");
+
         Simulation simulation = new(dataProvider.GetWorld());
-
-        ShiftPlan maximalShiftPlan = ShiftPlan.ConstructFrom(dataProvider.GetDepots(),
-            dataProvider.GetConstraints().AllowedShiftStartingTimes.Min(),
-            dataProvider.GetConstraints().AllowedShiftDurations.Max());
-        SuccessRatedIncidents successRatedIncidents = dataProvider.GetIncidents(7, 24.ToHours(), 1);
-
-        ExhaustiveOptimizer optimizer = new ExhaustiveOptimizer(dataProvider.GetWorld(), dataProvider.GetConstraints());
-        var optimals = optimizer.FindOptimal(new List<SuccessRatedIncidents> { successRatedIncidents });
-
-        simulation.Run(successRatedIncidents.Value, maximalShiftPlan);
-
-        foreach(var incident in successRatedIncidents.Value)
-        {
-            Logger.Instance.WriteLineForce($"occurence: {incident.Occurence} | {incident.Occurence.Value / 60 / 60}");
-        }
-
-        maximalShiftPlan.ShowGraph(24.ToHours().ToSeconds());
-
-        Logger.Instance.WriteLineForce();
-        Logger.Instance.WriteLineForce();
-
         foreach(var optimal in optimals)
         {
-            simulation.Run(successRatedIncidents.Value, optimal);
+            Statistics stats = simulation.Run(incidents.First().Value, optimal);
             optimal.ShowGraph(24.ToHours().ToSeconds());
-            Logger.Instance.WriteLineForce();
+            Logger.Instance.WriteLineForce(stats);
             Logger.Instance.WriteLineForce();
         }
     }
 #endif
 
-#if false
+#if HowDoNeighboursLook
     static void Main()
     {
-        DataProvider dataProvider = new(ambulancesCount: 1000);
+        DataProvider dataProvider = new(30);
         List<SuccessRatedIncidents> incidents = new()
         {
-            dataProvider.GetIncidents(3000, 23.ToHours(), successRateThreshold: 1)
+            dataProvider.GetIncidents(200, 22.ToHours().ToSeconds() + 30.ToMinutes().ToSeconds(), successRateThreshold: 1)
         };
 
+        //List<SuccessRatedIncidents> incidents = new()
+        //{
+        //    new SuccessRatedIncidents(new List<Incident>
+        //    {
+        //        new Incident(Coordinate.FromMeters(10_000, 10_000), 60000.ToSeconds(), 3600.ToSeconds(), 200.ToSeconds(), IncidentType.Default),
+        //        new Incident(Coordinate.FromMeters(30_000, 10_000), 1000.ToSeconds(), 3600.ToSeconds(), 200.ToSeconds(), IncidentType.Default)
+        //    }, 1)
+        //};
+
+        IOptimizer optimizer = new TabuSearchOptimizer
+        (
+            world: dataProvider.GetWorld(),
+            constraints: dataProvider.GetDomain(),
+            iterations: 80,
+            tabuSize: 20,
+            neighboursLimit: 20,
+            seed: 42
+        );
+
+        //Console.WriteLine(incidents.Visualize(separator: "\n"));
+        Stopwatch sw = Stopwatch.StartNew();
+
+        ShiftPlan optimal = optimizer.FindOptimal(incidents).First();
+
+        Logger.Instance.WriteLineForce($"Optimizing took: {sw.ElapsedMilliseconds}ms.");
+
         Simulation simulation = new(dataProvider.GetWorld());
+        Statistics stats = simulation.Run(incidents.First().Value, optimal);
+        optimal.ShowGraph(24.ToHours().ToSeconds());
+        Logger.Instance.WriteLineForce(stats);
+        Logger.Instance.WriteLineForce();
 
-        ShiftPlan maximalShiftPlan = ShiftPlan.ConstructFrom(dataProvider.GetDepots(),
-            dataProvider.GetConstraints().AllowedShiftStartingTimes.Min(),
-            dataProvider.GetConstraints().AllowedShiftDurations.Max());
+        ShiftsTravel traveler = new(dataProvider.GetDomain());
 
-        Stopwatch sw = new(); 
-        for(int i = 0; i < 50; i++)
+        optimal.ClearAllPlannedIncidents();
+        Logger.Instance.WriteLineForce($"Optimal: {optimizer.Fitness(optimal, incidents)}");
+        IEnumerable<Move> moves = traveler.GetNeighborhoodMoves(optimal);
+        List<(int Fitness, Move Move)> fitnesses = new();
+
+        foreach(Move move in moves)
         {
-            sw.Start();
-            simulation.Run(incidents.First().Value, maximalShiftPlan);
-            Logger.Instance.WriteLineForce($"{sw.ElapsedMilliseconds}ms");
-            sw.Restart();
+            ShiftPlan neighbor = traveler.ModifyMakeMove(optimal, move);
+
+            int fitness = optimizer.Fitness(neighbor, incidents);
+            fitnesses.Add((fitness, move));
+
+            traveler.ModifyUnmakeMove(optimal, move);
         }
 
+        fitnesses.Sort((a,b) => a.Fitness.CompareTo(b.Fitness));
+        foreach(var fitness in fitnesses)
+        {
+            Logger.Instance.WriteLineForce($"Neighbor: {fitness.Fitness} | {fitness.Move}");
+        }
+    }
+#endif
 
-        //Logger.Instance.WriteLineForce($"Simulation took: {sw.ElapsedMilliseconds}ms");
+#if HowDoesRandomSampleLook
+    static void Main()
+    {
+        DataProvider dataProvider = new(30);
+        List<SuccessRatedIncidents> incidents = new()
+        {
+            dataProvider.GetIncidents(3, 22.ToHours().ToSeconds() + 30.ToMinutes().ToSeconds(), successRateThreshold: 1)
+        };
 
-        //maximalShiftPlan.ShowGraph(24.ToHours().ToSeconds());
+        IOptimizer optimizer = new TabuSearchOptimizer
+        (
+            world: dataProvider.GetWorld(),
+            constraints: dataProvider.GetDomain(),
+            iterations: 80,
+            tabuSize: 20,
+            neighboursLimit: 20,
+            seed: 42
+        );
 
-        //Logger.Instance.WriteLineForce();
-        //Logger.Instance.WriteLineForce(stats);
+        Random random = new(10);
+        List<(int Fitness, ShiftPlan Random)> fitnesses = new();
 
-        //foreach(var incident in incidents.First().Value)
-        //{
-        //    Logger.Instance.WriteLineForce($"occurence: {incident.Occurence} | {incident.Occurence.Value / 60 / 60}");
-        //}
+        for(int i = 0; i < 50000; i++)
+        {
+            ShiftPlan randomSample = ShiftPlan.ConstructEmpty(dataProvider.GetDepots());
+            foreach(Shift shift in randomSample.Shifts)
+            {
+                shift.Work
+                    = Interval.GetByStartAndDuration(dataProvider.GetDomain().AllowedShiftStartingTimes.ToList().GetRandomElement(random),
+                    dataProvider.GetDomain().AllowedShiftDurations.ToList().GetRandomElement(random));
+            }
+
+            int fitness = optimizer.Fitness(randomSample, incidents);
+            fitnesses.Add((fitness, randomSample));
+        }
+
+        fitnesses.Sort((a,b) => a.Fitness.CompareTo(b.Fitness));
+        foreach(var fitness in fitnesses)
+        {
+            Logger.Instance.WriteLineForce($"Random sample: {fitness.Fitness} | {fitness.Random}");
+        }
     }
 #endif
 
@@ -174,8 +258,8 @@ public class SimulationBenchmark
         simulation = new(dataProvider.GetWorld());
 
         shiftPlan = ShiftPlan.ConstructFrom(dataProvider.GetDepots(),
-            dataProvider.GetConstraints().AllowedShiftStartingTimes.Min(),
-            dataProvider.GetConstraints().AllowedShiftDurations.Max());
+            dataProvider.GetDomain().AllowedShiftStartingTimes.Min(),
+            dataProvider.GetDomain().AllowedShiftDurations.Max());
 
         incidents = dataProvider.GetIncidents(incidentsCount, 23.ToHours(), 1).Value;
     }

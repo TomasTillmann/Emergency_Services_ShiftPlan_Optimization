@@ -17,7 +17,7 @@ namespace ESSP_Tests
         [Test]
         public void OneShiftOneIncidentTest()
         {
-            IOptimizer optimizer = new ExhaustiveOptimizer(world, new Constraints
+            IOptimizer optimizer = new ExhaustiveOptimizer(world, new Domain
             {
                 AllowedShiftDurations = new HashSet<Seconds>
                 {
@@ -50,7 +50,7 @@ namespace ESSP_Tests
         [Test]
         public void MultipleShiftsSomeShiftsNotUsedOneIncidentTest()
         {
-            IOptimizer optimizer = new ExhaustiveOptimizer(world, new Constraints
+            IOptimizer optimizer = new ExhaustiveOptimizer(world, new Domain
             {
                 AllowedShiftDurations = new HashSet<Seconds>
                 {

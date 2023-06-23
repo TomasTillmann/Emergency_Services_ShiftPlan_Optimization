@@ -179,7 +179,7 @@ public class TestDataProvider
         };
     }
 
-    public Constraints GetConstraints()
+    public Domain GetConstraints()
     {
         HashSet<Seconds> allowedShiftStartingTimes = new()
         {
@@ -195,6 +195,6 @@ public class TestDataProvider
             12.ToHours().ToSeconds(),
         };
 
-        return new Constraints(allowedShiftStartingTimes, allowedShiftDurations);
+        return new Domain(allowedShiftStartingTimes, allowedShiftDurations);
     }
 }
