@@ -13,8 +13,6 @@
 
 ## Zavedu metriku _Moves_.
 
-### Definice
-
 Mejme $s1 \in S$ a $s2 \in S$. Metrika _Moves_ $m: m(s1, s2)$ je pocet _moves_, ktery je treba provest, abychom se z
 $s1$ dostali do $s2$ (nebo naopak), aniz bychom provadeli _moves_, ktere se navzajem neguji (napr. (Shorter, 2), ..., (Longer, 2)).
 
@@ -38,6 +36,28 @@ Jeste je treba dokazat ze aspon jedna takova cesta vzdy existuje.
 Pak ze vsechny takove cesty maji stejnou velikost. Neni totiz prave jedna.
 
 Ale podle me to je metrika proste.
+
+### K cemu se mi hodi metrika?
+
+Hodne se mi hodi. Muzu podle toho volit pocet iterations v local search algoritmech.
+
+Napriklad: Mam 3 mozne intervaly pro kazdou sanitku, tech je treba 5. Muze byt libovolne $k$ a $n$.
+Jsem schopny najit nejvetsi moznou vzdalenost v tomto prostoru.
+
+Aby byli od sebe shift plans co nejvzdalenejsi pod touto metrikou, musim udelat co nejvice kanonickych tahu abych se z jednoho dostal na druhy.
+
+Jelikoz kazdy tah ovnlivni prave jeden interval, tak abych nasel nejvzdalenejsi shift plan, tak mi staci najit dva od sebe nejvzdalenejsi intervaly.
+Pak uz jenom jednomu shift priradim vsude ten jeden interval a druhemu ten druhy.
+
+Najit dva nejvzdalenejsi intervaly je ez, proste vezmu jeden interval co nejvice na "kraji", cili nemuzu jit napr. uz nijak doleva ani zkratit (0s-0s).
+A pak najdu ktery je co nejvice vpravo a nejde zvetsit (napr. 12h-12h). Operace posun doleva - doprava a zkratit-zdlouzit jsou navzajem negace, cili proto zvollim takhle.
+
+Pak tyhle intervaly nasazim kazde sanitce. Vzdalenost pak je suma pres pocet tahu pro kazdou sanitku (lepe to nejde).
+
+Oznacme tento maximalni pocet tahu $m$. Pokud zvolime iterations = $m$, tak vime, ze mame sanci na globalni minimum narazit. Je dosazitelne.
+Cim vyssi iterations, tim mene perfektni muzu volit cestu, cili tim vice cest existuje, cili tim vetsi sance je ze globalni minimum najdu.
+
+Muzeme tak dat spodni mez na pocet iterations, ktera nam garantuje pro kazdy zacinajici shift plan, ze globalni minimum je v dosahu.
 
 ## Prozkoumat vice ten prostor
 
@@ -77,7 +97,32 @@ class Input {
 
 ```
 
-###
+## Nebehat simulaci vzdy na vsech incidents sets
+
+Muzu zkusit vybrat jen par reprezentantu nahodne pro kazdy simulation run. Udelat z toho tak trochu dynamic constraint optimization problem.
+
+Mohlo by vest vice k obecnejsim resenim a ne hard tailored pro danou incidents mnozinu.
+Taky by to mohlo byt rycheljsi, zvlaste pokud incidents set je pocetnejsi.
+
+## Mit nejakou heuristiku fitness
+
+Cili nepobezim celou simulaci az do konce napriklad.
+
+Jakmile napriklad success rate prilis nizky, tak prerusim a vratim.
+
+Nebo pokud duration shiftPlan je mensi nez pozadavana minimalni hranice, viz nize, tak vratim nejake vysoke $n$.
+
+# Annealing
+
+- ruzne varianty, napr. vyberu uplne nahodne, ne souseda.
+- dam pryc tu konstantu, viz str. 63 v mravencich. - jenom metropolis distribution.
+
+# TS
+
+- pry je jedna z nejlepsich metaheuristik
+- da se jeste vylepsit, drzet si nejake elitni reseni a pak se k nim vracet, neco jako seznam vsech reseni co byli global best. Kdy se k nim ale vratit? Treba co $k$ prohledat jedno z elitnich reseni?
+- misto toho, aby sis primo drzel to resni, muzes si pamatovat tah ktery k nemu vedl nebo tak.
+- doporucuje Glover & Laguna 1997
 
 # POSTREHY
 
@@ -91,7 +136,7 @@ class Input {
 
 ## Popis problem
 
-- Combinatorial optimization problem, with no constraints.
+- Static Combinatorial optimization problem, with one constraint - musi projit simulaci, (asi neni constraint actually vubec).
 - Intractable
   - dokazu tak, ze corresponding indecisive problem je NP tezky, viz kniha o mravencich
 - Nejsme schopni nijak overit zda se jedna o optimalni reseni.
@@ -118,3 +163,43 @@ class Input {
   - muzu dokazat kontradikci
 
 * seshora
+
+# ACO
+
+- je constructive, takze muze byt zajimave porovnat s local search based
+- vrcholy budou vsechny mozne intervaly
+- $n$-partitni graf
+- $n$ je pocet sanitek
+- hrany vzdy z $n$ partity do $n+1$ z kazdeho do kazdeho
+- stav mravence - cesta - pak reprezentuje prirazeni intervalu v $k$ vrstve do $k$ shifty
+- constraints nejsou
+  - neni nic jako maximalne jedna 12 hodinva smena, nebo ze maximalne musi mit shift plan v souctu nejake $n$ ...
+  - dalo by se udelat lehce tak, ze mravenec si totiz pamatuju cestu, tak by v $N$ nemel jako dostupne sousedy vsechny z dalsi vrstvy ale jen ty co splnuji constraints
+    - pokud by neslo, tak treba vyberes ten infeasible, ktery je nejmensi zlo, pak ale taky musis ohodnotit spravne feronomama, jakoze slepa ulicka vicemene
+
+## Co bude heruistika na hrane?
+
+- pridam ten shift, ktery za co nejlevnejsi cenu co nejvice fitness
+  - muze byt pomale
+- budu preferovat pridani vzdy tech levnejsich intervalu
+
+## Jak updatovat feronomy?
+
+- mel bych hodnotit hrany
+- zalezi na poradi, napriklad na rozdil knap sack problem reseny ACO
+  - tam je jedno v jakem poradi pridam jednotlive items
+  - tady me to zajima, protoze to prirazuje ke konkretni sanitce
+    - cili mi nejde jen o to jake intervaly vyberu, ale ke komu je priradim
+    - a kdyz nejake sanitace priradim nejaky interval tak to muze ovlivnit jaky bych chtel priradit jine sanitce, coz vystihuje feronomovani cesty mnohem lepe nez vrcholy jen
+
+## Co pak udelat kdyz dojdu do posledni partity $n$?
+
+- jednoduse ukoncim tuto iteraci solution construction, cili zastavim toho mravence
+
+## Kdy simulaci zastavit? Kdy zastavit mravence?
+
+- simulaci zastavim kdy chci - pocet interations, po dlouhem poctu iterations jsme na jednom miste atd ...
+- mravence zastavim jakmile dojde do posledni vrsty, nasel totiz jedno reseni
+  - muze byt ale mega spatne, napr. plan je nevalidni
+  - ale jelikoz nemam zadne constraints, tak vsechna reseni jsou feasible
+  - splnit tu simulaci neni constraint!!! jenom bude mit hodne spatne hodnoceni!!!

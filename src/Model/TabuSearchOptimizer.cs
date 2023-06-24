@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Optimizing;
 
-public sealed class TabuSearchOptimizer : MetaheuristicOptimizer
+public sealed class TabuSearchOptimizer : LocalSearchOptimizer
 {
     private class ShiftPlanTabu : IShifts
     {

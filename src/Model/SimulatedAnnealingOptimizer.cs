@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Optimization;
 
-public class SimulatedAnnealingOptimizer : MetaheuristicOptimizer
+public class SimulatedAnnealingOptimizer : LocalSearchOptimizer
 {
     #region Parameters
     public readonly double LowestTemperature;
