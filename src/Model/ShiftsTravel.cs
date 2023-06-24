@@ -21,12 +21,7 @@ public class ShiftsTravel
 
     public ShiftsTravel(Domain constraints)
     {
-        AllowedDurationsSorted = new List<Seconds>(constraints.AllowedShiftDurations)
-        {
-            0.ToSeconds()
-        };
-        AllowedDurationsSorted.Sort((d1, d2) => d1.CompareTo(d2));
-
+        AllowedDurationsSorted = constraints.AllowedShiftDurations.OrderBy(duration => duration.Value).ToList();
         MinDuration = AllowedDurationsSorted.First();
         MaxDuration = AllowedDurationsSorted.Last();
 

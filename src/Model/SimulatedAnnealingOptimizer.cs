@@ -23,8 +23,6 @@ public class SimulatedAnnealingOptimizer : LocalSearchOptimizer
 
     public readonly Random Random;
 
-    private readonly int maxShiftPlanCost;
-
     public SimulatedAnnealingOptimizer(World world, Domain constraints, double lowestTemperature, double highestTemperature, double temperatureReductionFactor, int neighbourLimit, Random? random = null) : base(world, constraints)
     {
         Random = random ?? new Random();
@@ -32,21 +30,17 @@ public class SimulatedAnnealingOptimizer : LocalSearchOptimizer
         HighestTemperature = highestTemperature;
         TemperatureReductionFactor = temperatureReductionFactor;
         NeighboursLimit = neighbourLimit;
-
-        ShiftPlan maximalShiftPlan = ShiftPlan.ConstructFrom(world.Depots, 0.ToSeconds(), constraints.AllowedShiftDurations.Max());
-        maxShiftPlanCost = maximalShiftPlan.GetCost();
-
     }
 
     public override IEnumerable<ShiftPlan> FindOptimal(List<SuccessRatedIncidents> incidentsSets)
     {
         int Fitness(ShiftPlan shiftPlan)
         {
-            return this.Fitness(shiftPlan, incidentsSets);
+            return DampedFitness(shiftPlan, incidentsSets);
         }
 
         ShiftPlan initShiftPlan
-            = ShiftPlan.ConstructRandom(world.Depots, Constraints.AllowedShiftStartingTimes.ToList(),
+            = ShiftPlan.ConstructRandom(World.Depots, Constraints.AllowedShiftStartingTimes.ToList(),
             Constraints.AllowedShiftDurations.ToList(), Random);
 
         ShiftPlan globalBest = initShiftPlan;
@@ -108,19 +102,6 @@ public class SimulatedAnnealingOptimizer : LocalSearchOptimizer
         }
 
         return new List<ShiftPlan> { globalBest };
-    }
-    public override int Fitness(ShiftPlan shiftPlan, List<SuccessRatedIncidents> successRatedIncidents)
-    {
-        int eval = base.Fitness(shiftPlan, successRatedIncidents, out double meanSuccessRate);
-
-        // damping, to better navigate
-        if (eval == int.MaxValue)
-        {
-            return maxShiftPlanCost + (int)((1 - meanSuccessRate) * 100);
-            //return int.MaxValue;
-        }
-
-        return eval;
     }
 
     public bool Accept(double difference, double temperature)

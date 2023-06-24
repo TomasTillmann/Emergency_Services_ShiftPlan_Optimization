@@ -180,21 +180,68 @@ Nebo pokud duration shiftPlan je mensi nez pozadavana minimalni hranice, viz niz
 ## Co bude heruistika na hrane?
 
 - pridam ten shift, ktery za co nejlevnejsi cenu co nejvice fitness
+
   - muze byt pomale
+
 - budu preferovat pridani vzdy tech levnejsich intervalu
+
+* budu se snazit pridavat intervaly ktere zaplnuji casove diry doposud vytvoreneho shift planu
+
+* budu mit minimalni hranici jak dlouho musi shiftPlan trvat a maximalni hranici a budu se snazit nacpat do tohohle pasma
+
+  - minimalni hranice bude spodni mez delky shiftPlan
+  - maximalni by mohl byt treba lehce nadsazena expected cost? Takze nejaky parametr nebo -
+    - pustim local search nejaky, jen na par iteraci, podivam se kolik stoji nalezeny shift plan, mozna udelam par samplu - branch & bound? - a tohle zvolim jako horni mez
+    - stejne local search potrebujes spustit na init feronomu
+
+* kombinace - levnejsi, vyplnit diru, idealni pasmo
 
 ## Jak updatovat feronomy?
 
 - mel bych hodnotit hrany
-- zalezi na poradi, napriklad na rozdil knap sack problem reseny ACO
-  - tam je jedno v jakem poradi pridam jednotlive items
-  - tady me to zajima, protoze to prirazuje ke konkretni sanitce
-    - cili mi nejde jen o to jake intervaly vyberu, ale ke komu je priradim
-    - a kdyz nejake sanitace priradim nejaky interval tak to muze ovlivnit jaky bych chtel priradit jine sanitce, coz vystihuje feronomovani cesty mnohem lepe nez vrcholy jen
+  - hodnocenim hrany rikam, jak dobre je po shiftu x vybrat shift y
+  - to by mohlo resit zavislosti shiftu navzajem mezi sebou
+  - tim vice ma hrana feronomomu, tim vicekrat dobre reseni obsahuje tuto dvojici shiftu
+    - jenze me nezajimaji konkretni dvojice, ale celkovy vztah, ktery nevim jetli se prenasi nejak
+
+* dava ale i smysl hodnotit vrcholy, mozna dokonce vetsi
+
+  - tim rikam, jak dulezity je dany shift
+  - cim vice ma feronomu, tim ve vice dobrych reseni je
+
+* update udelam pak naraz, na kvalite daneho reseni
+
+* nebudu updatovat jak tam poleze
+
+  - to se jmenuje tzvn. Ant cycle
+
+* str. 87 ACO - vzorecek
+  - evaporuju
+  - pak nastavim podle reseni
+  - 1 / successRate
+
+## Jak na zacatku incializiovat feronomy a proc?
+
+- hodi se na zacatku inicializovat feronomy na neco jako expected hodnotu, kterou prvni mravenci ohodnoti svoje reseni
+- Proc?
+  - kdyz moc mala, treba = 0, tak mravenci jsou hodne rychle biased na prvni cesty, ktere ale byli vybrany random
+  - pokud moc vyskoa, nekolik iteraci se ztrati, protoze nez prolezani mravencu prebije init ohodnoceni, ktere pomalu vyprchava, tak to muze trvat par iteraci
+  * v TSP: #mravencu / NNH result
+
+## Jak si mravenec vybere kam pujde?
+
+    - str. 85, ACO, vzorecek
+        * beres v potaz feronomy a heuristiku
+    - musis vhonde zvolit alfa a beta
+    - stejne tak musis vhodne zvolit init feronoms
+
+## Co reprezentuji feronomy?
+
+- cim vyssi, tim vic je zadouci po zvolenem shift planu x pouzit shift plan y, pro hranu (x,y)
 
 ## Co pak udelat kdyz dojdu do posledni partity $n$?
 
-- jednoduse ukoncim tuto iteraci solution construction, cili zastavim toho mravence
+- jednoduse ukoncim tuto iteraci solution construction, cili zastavim toho mravence.
 
 ## Kdy simulaci zastavit? Kdy zastavit mravence?
 
@@ -203,3 +250,16 @@ Nebo pokud duration shiftPlan je mensi nez pozadavana minimalni hranice, viz niz
   - muze byt ale mega spatne, napr. plan je nevalidni
   - ale jelikoz nemam zadne constraints, tak vsechna reseni jsou feasible
   - splnit tu simulaci neni constraint!!! jenom bude mit hodne spatne hodnoceni!!!
+
+# Generovani dat
+
+- nechci to asi udelat uplne uniforme, napriklad v noci, by se melo dit mene incidentu
+- a pak ani uniforme prostorove, napriklad dopoledne / rano by se melo dit vice incidentu na cesto do skoly / prace
+
+  - stejne pak odpoledne
+  - a behem dne jsou lidi v prace tak uz normalne uniforme
+
+- distance funkce by mela byt predpocitana na nejake zdiskretizovane ctverecky - distance matrix pak
+  - tu si pak muzes kdo chce vyplnit jak chce, treba realnymi daty
+  - a menit jeji velikost
+  - zmenenim velikost zmenis prostor, kde se muzou dit incidenty
