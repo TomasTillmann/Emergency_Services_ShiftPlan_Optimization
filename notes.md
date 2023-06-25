@@ -251,6 +251,11 @@ Nebo pokud duration shiftPlan je mensi nez pozadavana minimalni hranice, viz niz
   - ale jelikoz nemam zadne constraints, tak vsechna reseni jsou feasible
   - splnit tu simulaci neni constraint!!! jenom bude mit hodne spatne hodnoceni!!!
 
+# Graf jak rychle local search konverguje k dobrym resenim
+
+- na ose x iterations
+- na ose y globalBestFitness
+
 # Generovani dat
 
 - nechci to asi udelat uplne uniforme, napriklad v noci, by se melo dit mene incidentu

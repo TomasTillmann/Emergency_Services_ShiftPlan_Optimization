@@ -213,7 +213,7 @@ public class DataProvider
         {
             0.ToHours(),
             4.ToHours(),
-            6.ToHours(),
+            //6.ToHours(),
             8.ToHours(),
             //12.ToHours(),
             //24.ToHours().ToSeconds(),

@@ -191,7 +191,6 @@ public sealed class TabuSearchOptimizer : LocalSearchOptimizer
 
             Logger.Instance.WriteLineForce($"One step took: {sw.ElapsedMilliseconds}ms"); sw.Restart();
             Logger.Instance.WriteLineForce($"Global best: {globalBestFitness} ({globalBest.Value})");
-            Logger.Instance.WriteLineForce($"Best candidate: {bestCandidateFitness} ({bestCandidate.Value})");
             Logger.Instance.WriteLineForce();
         }
 

@@ -8,6 +8,7 @@ public abstract class MetaheuristicOptimizer : Optimizer
 
     protected MetaheuristicOptimizer(World world, Domain constraints) : base(world, constraints)
     {
+        // TODO: Doesnt take into acount ambulance type
         ShiftPlan maximalShiftPlan = ShiftPlan.ConstructFrom(world.Depots, 0.ToSeconds(), constraints.AllowedShiftDurations.Max());
         MaxShiftPlanCost = maximalShiftPlan.GetCost();
     }

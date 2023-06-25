@@ -5,6 +5,7 @@ using Optimizing;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
@@ -50,15 +51,21 @@ public class Ant
 
     public float CoverageGain(Interval interval)
     {
-        int upperBound = Math.Min(CoveragePerHour.Length, interval.Duration.Value);
-        int gain = 0;
-
-        for (int i = interval.Start.Value; i < upperBound; i++)
+        if(interval.Duration == 0.ToSeconds())
         {
-            gain += 1 / CoveragePerHour[i];
+            return 0f;
         }
 
-        return gain;
+        int startHour = interval.Start.Value / 60 / 60;
+        int endHour = Math.Min(CoveragePerHour.Length, startHour + interval.Duration.Value / 60 / 60);
+
+        float coverageSum = 0;
+        for (int i = startHour; i < endHour; i++)
+        {
+            coverageSum += 1f / CoveragePerHour[i];
+        }
+
+        return coverageSum / (endHour - startHour); 
     }
 
     public void AddToCoverage(Interval interval)
@@ -141,13 +148,16 @@ public class AntColonizationOptimizer : MetaheuristicOptimizer
     public readonly int Permutations;
     public readonly float InitialPheromone;
     public readonly float PheromoneEvaporationRate;
-    public readonly int Alpha;
-    public readonly int Beta;
+    public readonly float Alpha;
+    public readonly float Beta;
     public readonly Hours SimulationDuration;
     public readonly int EstimatedMinimalShiftPlanDuration;
     public readonly int EstimatedMaximalShiftPlanDuration;
     public readonly Random Random;
     #endregion
+
+    public int EstimatedMaxFitness { get; private set; } 
+    public int EstimatedMinFitness { get; private set; }
 
     protected ComponentGraph Graph { get; private set; } = null!;
 
@@ -157,7 +167,7 @@ public class AntColonizationOptimizer : MetaheuristicOptimizer
 
     private int[] permutationsTempIndeces;
 
-    public AntColonizationOptimizer(World world, Domain constraints, int iterations, int permutations, float initialPheromone, float pheromoneEvaporationRate, int alpha, int beta, Hours simulationDuration, Seconds estimatedMinimalShiftPlanDuration, Seconds estimatedMaximalShiftPlanDuration, Random? random = null) : base(world, constraints)
+    public AntColonizationOptimizer(World world, Domain constraints, int iterations, int permutations, float initialPheromone, float pheromoneEvaporationRate, float alpha, float beta, Hours simulationDuration, Seconds estimatedMinimalShiftPlanDuration, Seconds estimatedMaximalShiftPlanDuration, Random? random = null) : base(world, constraints)
     {
         if(estimatedMaximalShiftPlanDuration < estimatedMinimalShiftPlanDuration)
         {
@@ -168,6 +178,7 @@ public class AntColonizationOptimizer : MetaheuristicOptimizer
         {
             throw new ArgumentException("Pheromone has to be between 0 and 1.");
         }
+
 
         Iterations = iterations;
         Permutations = permutations;
@@ -185,6 +196,12 @@ public class AntColonizationOptimizer : MetaheuristicOptimizer
         InitIntervals();
         InitPreferShorterIntervals();
         InitGraph();
+        InitEstimatedMinMaxFintess(Graph.Partitions);
+
+        if(Permutations > Graph.Partitions)
+        {
+            throw new ArgumentException("Permutations have to be less than or equal to number of shifts.");
+        }
     }
 
     private void InitIntervals()
@@ -198,16 +215,6 @@ public class AntColonizationOptimizer : MetaheuristicOptimizer
             }
         }
 
-        intervals.Sort((i1, i2) =>
-        {
-            int res = i1.Duration.Value.CompareTo(i2.Duration.Value);
-            if (res == 0)
-            {
-                return i1.Start.Value.CompareTo(i2.Start.Value);
-            }
-
-            return res;
-        });
         Intervals = intervals.ToArray();
     }
 
@@ -231,6 +238,14 @@ public class AntColonizationOptimizer : MetaheuristicOptimizer
                 Graph[partition, interval] = new Component(InitialPheromone);
             }
         }
+    }
+
+    public void InitEstimatedMinMaxFintess(int shiftCount)
+    {
+        EstimatedMinFitness = Intervals.Min(interval => interval.Duration.Value) * shiftCount;
+
+        // +100 is specifically chosen because this is the fitness function
+        EstimatedMaxFitness = MaxShiftPlanCost + 100; 
     }
 
     public override IEnumerable<ShiftPlan> FindOptimal(List<SuccessRatedIncidents> incidentsSets)
@@ -272,22 +287,27 @@ public class AntColonizationOptimizer : MetaheuristicOptimizer
 
                 for(int i = 0; i < neighbours.Length; i++)
                 {
-                    neighbourEvals[i] = HeuristicPheromonesCombined(ant, neighbours[i]);
+                    double heuristic = Math.Pow(Heuristic(ant, neighbours[i]), Alpha);
+                    double pheromones = Math.Pow(Pheromones(ant, neighbours[i]), Beta);
+                    Logger.Instance.WriteLineForce($"ph read: {pheromones}, on component: {Graph[neighbours[i]].Pheromones}");
+                    neighbourEvals[i] = heuristic * pheromones;
+
                     totalEval += neighbourEvals[i];
                 }
-
-                //Logger.Instance.WriteLineForce("neighbours:");
-                //Logger.Instance.WriteLineForce(neighbours.Select(i => Graph[i]).Visualize("| "));
-                //Logger.Instance.WriteLineForce(neighbours.Select(i => Intervals[i.J]).Visualize("| "));
-                //Logger.Instance.WriteLineForce("neighbours evals:");
-                //Logger.Instance.WriteLineForce(neighbourEvals.Visualize("| "));
 
                 for(int i = 0; i < neighbours.Length; i++)
                 {
                     neighbourEvals[i] = neighbourEvals[i] / totalEval;
                 }
 
+                Logger.Instance.WriteLineForce(neighbours.Select(i => Intervals[i.J]).Visualize(" | "));
+                Logger.Instance.WriteLineForce(neighbourEvals.Visualize(" | "));
+
+
+                //int randomIndex = Random.Next(0, neighbours.Length);
+                //Index randomNeighbour = neighbours[randomIndex]; 
                 Index randomNeighbour = distribution.BasedOn(neighbourEvals).Sample(neighbours);
+
                 //Logger.Instance.WriteLineForce($"Selected: {randomNeighbour}");
 
                 ant.Location = randomNeighbour;
@@ -331,28 +351,27 @@ public class AntColonizationOptimizer : MetaheuristicOptimizer
         return shiftPlan;
     }
 
-    public double HeuristicPheromonesCombined(Ant ant, Index component)
-    {
-        return Math.Pow(Heuristic(ant, component), Alpha) * Math.Pow(Pheromones(ant, component), Beta);
-    }
-
     public float Heuristic(Ant ant, Index component)
     {
         const float epsilon = 0.001f;
 
-        //float coverageGain = ant.CoverageGain(Intervals[component.J]) + epsilon; 
+        float coverageGain = 1f * (ant.CoverageGain(Intervals[component.J]) + epsilon);
 
-        float minimalCost = PreferShorterIntervalsCosts[component.J] + epsilon;
+        float minimalCost = 0.5f * (PreferShorterIntervalsCosts[component.J] + epsilon);
 
-        //float inZone = Math.Abs((EstimatedMaximalShiftPlanDuration + EstimatedMinimalShiftPlanDuration) / 2f - ant.Duration.Value)
-        //    / (EstimatedMaximalShiftPlanDuration - EstimatedMinimalShiftPlanDuration) / 2f;
-        //inZone += epsilon;
+        float inZone = Math.Abs((EstimatedMaximalShiftPlanDuration + EstimatedMinimalShiftPlanDuration) / 2f - ant.Duration.Value)
+            / (EstimatedMaximalShiftPlanDuration - EstimatedMinimalShiftPlanDuration) / 2f;
+        inZone = 1f * (inZone + epsilon);
 
-        //return (coverageGain + minimalCost + inZone) / 3;
+        float res = (coverageGain + minimalCost + inZone) / 3;
 
-        //return (coverageGain + minimalCost) / 2;
+        //float res = (coverageGain + minimalCost) / 2;
 
-        return minimalCost;
+        //float res = coverageGain;
+
+        //float res = (float)Random.NextDouble(); 
+
+        return res;
     }
 
     public float Pheromones(Ant ant, Index component)
@@ -369,7 +388,7 @@ public class AntColonizationOptimizer : MetaheuristicOptimizer
                 Component component = Graph[ants[i].VisitedLocations[j]];
 
                 component.Pheromones = (1 - PheromoneEvaporationRate) * component.Pheromones;
-                component.Pheromones += 1f / ants[i].Fitness; 
+                component.Pheromones += 1 - (ants[i].Fitness / (float)(EstimatedMaxFitness - EstimatedMinFitness)); 
             }
         }
     }
