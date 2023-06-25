@@ -155,8 +155,8 @@ class Program
             (
                 world: dataProvider.GetWorld(),
                 constraints: dataProvider.GetDomain(),
-                iterations: 10,
-                tabuSize: 5,
+                iterations: 50,
+                tabuSize: 50,
                 random: random
             )
         );

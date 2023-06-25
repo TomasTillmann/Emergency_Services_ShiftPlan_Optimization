@@ -1,4 +1,6 @@
-﻿using ESSP.DataModel;
+﻿//#define Log
+
+using ESSP.DataModel;
 using Logging;
 using Model.Extensions;
 using Optimizing;
@@ -297,25 +299,37 @@ public class AntColonizationOptimizer : MetaheuristicOptimizer
 
             for (int antIndex = 0; antIndex < ants.Length; antIndex++)
             {
+#if Log
                 Logger.Instance.WriteLineForce($"Partition: {partition}");
+#endif
 
                 Ant ant = ants[antIndex];
+#if Log
                 Logger.Instance.WriteLineForce($"{ant.VisitedLocations.Select(index => Intervals[index.J]).Visualize(" | ")}");
+#endif
                 totalEval = 0;
 
                 for(int i = 0; i < neighbours.Length; i++)
                 {
                     double heuristic = Math.Pow(Heuristic(ant, neighbours[i]), Alpha);
+#if Log
                     Logger.Instance.WriteLineForce($"heur {heuristic}, interval: {Intervals[neighbours[i].J]}");
+#endif
 
                     double pheromones = Math.Pow(Pheromones(ant, neighbours[i]), Beta);
+#if Log
                     Logger.Instance.WriteLineForce($"ph: {pheromones}, interval: {Intervals[neighbours[i].J]}");
+#endif
 
                     neighbourEvals[i] = heuristic * pheromones;
+#if Log
                     Logger.Instance.WriteLineForce($"eval: {neighbourEvals[i]}, interval: {Intervals[neighbours[i].J]}");
+#endif
 
                     totalEval += neighbourEvals[i];
+#if Log
                     Logger.Instance.WriteLineForce();
+#endif
                 }
 
                 for(int i = 0; i < neighbours.Length; i++)
@@ -323,21 +337,23 @@ public class AntColonizationOptimizer : MetaheuristicOptimizer
                     neighbourEvals[i] = neighbourEvals[i] / totalEval;
                 }
 
-
-
                 //int randomIndex = Random.Next(0, neighbours.Length);
                 //Index randomNeighbour = neighbours[randomIndex]; 
                 Index randomNeighbour = distribution.BasedOn(neighbourEvals).Sample(neighbours);
 
-                //Logger.Instance.WriteLineForce($"Selected: {randomNeighbour}");
+#if Log
+                Logger.Instance.WriteLineForce($"Selected: {randomNeighbour}");
+#endif
 
                 ant.Location = randomNeighbour;
                 ant.AddToCoverage(Intervals[randomNeighbour.J]);
                 ant.Duration += Intervals[randomNeighbour.J].Duration;
                 ant.VisitedLocations[partition + 1] = randomNeighbour;
-                Logger.Instance.WriteLineForce();
 
+#if Log
                 Logger.Instance.WriteLineForce($"{ant.VisitedLocations.Select(index => Intervals[index.J]).Visualize(" | ")}");
+                Logger.Instance.WriteLineForce();
+#endif
             }
         }
     }
