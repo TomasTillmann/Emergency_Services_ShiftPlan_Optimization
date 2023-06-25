@@ -202,7 +202,7 @@ public class DataProvider
             0.ToHours(),
             6.ToHours(),
             12.ToHours(),
-            18.ToHours(),
+            //18.ToHours(),
             //18.ToHours().ToSeconds()
             //0.ToSeconds(),
             //1.ToSeconds(),
@@ -215,7 +215,7 @@ public class DataProvider
             4.ToHours(),
             6.ToHours(),
             8.ToHours(),
-            12.ToHours(),
+            //12.ToHours(),
             //24.ToHours().ToSeconds(),
             //10.ToSeconds(),
             //100.ToSeconds()

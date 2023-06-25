@@ -118,11 +118,11 @@ class Program
 #if RunACO
     static void Main()
     {
-        const int ambulancesCount = 100;
+        const int ambulancesCount = 50;
         DataProvider dataProvider = new(ambulancesCount);
         List<SuccessRatedIncidents> incidents = new()
         {
-            dataProvider.GetIncidents(500, 22.ToHours().ToSeconds() + 30.ToMinutes().ToSeconds(), successRateThreshold: 1)
+            dataProvider.GetIncidents(100, 22.ToHours().ToSeconds() + 30.ToMinutes().ToSeconds(), successRateThreshold: 1)
         };
 
         //List<SuccessRatedIncidents> incidents = new()
@@ -138,10 +138,11 @@ class Program
         (
             world: dataProvider.GetWorld(),
             constraints: dataProvider.GetDomain(),
-            iterations: 500,
+            iterations: 100,
+            permutations: 10,
             initialPheromone: 0.3f,
-            pheromoneEvaporationRate: 0.1f,
-            alpha: 1,
+            pheromoneEvaporationRate: 0.2f,
+            alpha: 2,
             beta: 2,
             simulationDuration: 24.ToHours(),
             estimatedMinimalShiftPlanDuration: incidents.First().Value.Sum(inc => inc.OnSceneDuration.Value + inc.InHospitalDelivery.Value).ToSeconds(),
