@@ -119,11 +119,13 @@ class Program
 #if RunACO
     static void Main()
     {
-        const int ambulancesCount = 30;
+        const int ambulancesCount = 5;
         DataProvider dataProvider = new(ambulancesCount);
+        Random random = new(42);
+
         List<SuccessRatedIncidents> incidents = new()
         {
-            dataProvider.GetIncidents(80, 22.ToHours().ToSeconds() + 30.ToMinutes().ToSeconds(), successRateThreshold: 1)
+            dataProvider.GetIncidents(15, 22.ToHours().ToSeconds() + 30.ToMinutes().ToSeconds(), successRateThreshold: 1)
         };
 
         //List<SuccessRatedIncidents> incidents = new()
@@ -139,15 +141,24 @@ class Program
         (
             world: dataProvider.GetWorld(),
             constraints: dataProvider.GetDomain(),
-            iterations: 200, 
-            permutations: 10,
-            initialPheromone: 0.3f,
-            pheromoneEvaporationRate: 0.5f,
+            iterations: 10, 
+            permutations: 0,
+            initialPheromone: 0.1f,
+            pheromoneEvaporationRate: 0.2f,
             alpha: 1,
-            beta: 1f,
+            beta: 0.9f,
             simulationDuration: 24.ToHours(),
             estimatedMinimalShiftPlanDuration: incidents.First().Value.Sum(inc => inc.OnSceneDuration.Value + inc.InHospitalDelivery.Value).ToSeconds(),
-            estimatedMaximalShiftPlanDuration: (12.ToHours().ToSeconds().Value * ambulancesCount).ToSeconds()
+            estimatedMaximalShiftPlanDuration: (12.ToHours().ToSeconds().Value * ambulancesCount).ToSeconds(),
+            random: random,
+            localSearchOptimizer: new TabuSearchOptimizer
+            (
+                world: dataProvider.GetWorld(),
+                constraints: dataProvider.GetDomain(),
+                iterations: 10,
+                tabuSize: 5,
+                random: random
+            )
         );
 
         //Console.WriteLine(incidents.Visualize(separator: "\n"));

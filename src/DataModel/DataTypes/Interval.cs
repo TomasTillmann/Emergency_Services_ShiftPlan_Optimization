@@ -69,7 +69,7 @@ namespace ESSP.DataModel
 
         public override string ToString()
         {
-            return $"INTERVAL: {{ {Start} : {End} }}";
+            return $"({Start} : {End})";
         }
 
         public static bool operator ==(Interval i1, Interval i2) => i1.Start == i2.Start && i1.End == i2.End;

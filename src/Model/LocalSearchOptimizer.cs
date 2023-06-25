@@ -13,6 +13,8 @@ public abstract class LocalSearchOptimizer : MetaheuristicOptimizer
         shiftTravel = new ShiftsTravel(constraints);
     }
 
+    public abstract IEnumerable<ShiftPlan> FindOptimalFrom(ShiftPlan initShiftPlan, List<SuccessRatedIncidents> incidentsSets);
+
     protected TShifts ModifyMakeMove<TShifts>(TShifts movable, Move move) where TShifts : IShifts
     {
         return shiftTravel.ModifyMakeMove(movable, move);

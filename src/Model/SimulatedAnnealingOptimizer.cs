@@ -34,25 +34,30 @@ public class SimulatedAnnealingOptimizer : LocalSearchOptimizer
 
     public override IEnumerable<ShiftPlan> FindOptimal(List<SuccessRatedIncidents> incidentsSets)
     {
+        ShiftPlan initShiftPlan
+            = ShiftPlan.ConstructRandom(World.Depots, Constraints.AllowedShiftStartingTimes.ToList(),
+            Constraints.AllowedShiftDurations.ToList(), Random);
+
+        return FindOptimalFrom(initShiftPlan, incidentsSets);
+    }
+
+    public override IEnumerable<ShiftPlan> FindOptimalFrom(ShiftPlan startShiftPlan, List<SuccessRatedIncidents> incidentsSets)
+    {
         int Fitness(ShiftPlan shiftPlan)
         {
             return DampedFitness(shiftPlan, incidentsSets);
         }
 
-        ShiftPlan initShiftPlan
-            = ShiftPlan.ConstructRandom(World.Depots, Constraints.AllowedShiftStartingTimes.ToList(),
-            Constraints.AllowedShiftDurations.ToList(), Random);
-
-        ShiftPlan globalBest = initShiftPlan;
+        ShiftPlan globalBest = startShiftPlan;
         int globalBestFitness = Fitness(globalBest);
 
         Move? currentBestMove = null;
-        ShiftPlan currentBest = initShiftPlan;
+        ShiftPlan currentBest = startShiftPlan;
         int currentBestFitness = globalBestFitness;
 
 
         Stopwatch sw = new Stopwatch();
-        for(double currentTemperature = HighestTemperature; currentTemperature > LowestTemperature; currentTemperature *= TemperatureReductionFactor)
+        for (double currentTemperature = HighestTemperature; currentTemperature > LowestTemperature; currentTemperature *= TemperatureReductionFactor)
         {
             sw.Start();
 
@@ -67,27 +72,27 @@ public class SimulatedAnnealingOptimizer : LocalSearchOptimizer
                 ModifyMakeMove(currentBest, move);
                 int neighbourFitness = Fitness(currentBest);
 
-                if(neighbourFitness < currentBestFitness)
+                if (neighbourFitness < currentBestFitness)
                 {
-                    currentBestMove = move; 
+                    currentBestMove = move;
                     currentBestFitness = neighbourFitness;
 
-                    if(currentBestFitness < globalBestFitness)
+                    if (currentBestFitness < globalBestFitness)
                     {
                         globalBest = currentBest.Copy();
                         globalBestFitness = currentBestFitness;
                     }
                 }
-                else if(Accept(currentBestFitness - neighbourFitness, currentTemperature))
+                else if (Accept(currentBestFitness - neighbourFitness, currentTemperature))
                 {
-                    currentBestMove = move; 
+                    currentBestMove = move;
                     currentBestFitness = neighbourFitness;
                 }
 
                 ModifyUnmakeMove(currentBest, move);
             }
 
-            if(currentBestMove is null || currentBest is null)
+            if (currentBestMove is null || currentBest is null)
             {
                 throw new ArgumentException("All neighbours either have worse fitness and even none was accepted, leading to no move being selected.");
             }
