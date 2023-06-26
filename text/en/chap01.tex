@@ -174,15 +174,32 @@ resembles the functioning of a shift plan in the real world, not exploiting the
 bigger picture but only deciding on local informatio, not exploiting the bigger
 picture but only deciding based on local information.
 
-The accuracy and quality of the success rate obtained from the simulation
-depend significantly on the calculated durations for ambulance response time,
-incident handling at the scene, patient transfer to the hospital, handling of
-the incident at the hospital and finally the estimated time required to return
-to depot. While these durations may vary in the real world, introducing
-stochastic factors to simulate their variability could bring marginal
-improvements to the success rate estimation. However, considering the need to
-run the simulation multiple times, it is more important to ensure that the
-simulation efficiently captures real-life scenarios. Introducing additional
-stochastic elements may also introduce unnecessary unpredictability to the
-simulation. Therefore, for the sake of efficiency and reliability, the
-simulation does not employ such stochastic factors.
+The accuracy and quality of the success rate obtained from the simulation are
+heavily influenced by the calculated durations for various stages of incident
+handling, including ambulance response time, incident handling at the scene,
+patient transfer to the hospital, handling of the incident at the hospital, and
+the estimated time required to return to the depot. To accurately calculate
+these durations, a reliable distance calculator is essential.
+
+One approach to achieve this is by discretizing the area of interest and
+precalculating the distances for all pairs of locations, storing them in a
+distance matrix. When a distance request is made, the distance calculator
+simply retrieves the precalculated distance for the requested locations. The
+time required can then be calculated using the velocity of the ambulance.
+However, it is important to note that this approach does not consider factors
+such as traffic or the type of route taken. A more advanced approach involves
+precalculating the estimated duration, which also eliminates the need for the
+ambulance's velocity information.
+
+Another factor to account for which might negatively influence the quality of
+yielded success rate is that the variability of durations in real-life
+scenarios vary. Factors such as traffic conditions, road closures, and
+unexpected events can cause variations in ambulance response times, incident
+handling durations, and patient transfer times. While these durations may vary
+in the real world, introducing stochastic factors to simulate their variability
+could lead to minor improvements in estimating the success rate. Despite that,
+given the necessity of running the simulation multiple times, it is more
+crucial to ensure that the simulation effectively captures real-life scenarios.
+Introducing additional stochastic elements may also introduce unnecessary
+unpredictability to the simulation. Therefore, for the sake of efficiency and
+reliability, the simulation does not incorporate such stochastic factors.
