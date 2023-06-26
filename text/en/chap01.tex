@@ -209,9 +209,8 @@ stochastic factors.
 
 \section{Problem formalization}
 As the problem above is described, it is clear we have to find the most optimal
-shift plan $s_o$ from set of all possible shift plans $S^T$, where $T$ is a set
-of allowed time intervals, against given incident sets $I$. Most optimal means
-it has to be valid,
+shift plan $s_o$ from set of all possible shift plans $S$, against given
+incident sets $I$. Most optimal means it has to be valid,
 
 \[
     \text{successRate}(s_o, I) \geq
@@ -224,18 +223,32 @@ and has the least possible cost over all valid shift plans $S_v$,
     \forall s_v \in S_v: \text{cost}(s_o) \leq \text{cost}(s_v),
 \]
 
-defined,
+where set $S_v$ of all valid shift plans is defined,
 
 \[
-    S_v = \{ s_v \in S^I | \text{successRate}(s_v, I) \geq \text{givenSuccessRate}(I) \}.
+    S_v = \{ s_v \in S \mid \text{successRate}(s_v, I) \geq \text{givenSuccessRate}(I) \}.
 \]
+
+There are two important considerations to note. First, this definition of an
+optimal shift plan allows for the existence of multiple solutions that achieve
+optimality. Therefore, we can refer to the set of all these optimal solutions
+as $S_o$. Second, according to this definition, if no valid shift plans exist,
+there is no well-defined optimum. While this may initially seem peculiar, it is
+important to emphasize that in our problem formulation, we assume that it is
+highly unlikely that such situation will occur, and they are not relevant to
+our primary focus and it will only make proposed solutions unclear.
+
+However, for the sake of consistency, we will provide a definition for the
+optimum even in the unlikely event of no valid shift plans. It is worth noting,
+though, that the subsequent proposed solutions will not consider this
+particular case.
 
 If there doesn't exist any shift plan in $S^I$ which satisfies given success
 rate, the most optimal is then the shift plan with the highest success rate and
 at the same time having the least cost. Let denote
 
 \[
-    S_r = \{s_r \in S^I | \text{successRate}(s_r, I) \geq \text{successRate}(s, I), \forall s \in S^I\}
+    S_r = \{s_r \in S \mid \text{successRate}(s_r, I) \geq \text{successRate}(s, I), \forall s \in S^T\}
 \]
 
 as a set of all shift plans with the highest success rate. The optimal $s_o \in
@@ -245,37 +258,50 @@ as a set of all shift plans with the highest success rate. The optimal $s_o \in
     \forall s_r \in S_r: \text{cost}(s_o, I) \leq \text{cost}(s_r, I).
 \]
 
-Note, that this definition of optimal shift plan allows for multiple optimal
-solutions. We can therefore denote set of all these optimal solutions as $S_o$.
+\newpage
 
 \section{Exhaustive solution}
 
-The most straightforward algorithm for finding the most optimal solution is to
-exhaustively enumerate over all possible shift plans by brute force, holding
-some global best shift plan so far and updating it in each iteration against
-current shift plan. After going through every possible shift plan we can then
-be certain that we have found the most optimal one.
-
-\newpage
+The most straightforward algorithms for finding the most optimal solution is to
+employ a brute force approach by exhaustively enumerating all possible shift
+plans. The algorithm initializes a global best shift plan at random or as first
+one in the list and updates it in each iteration, comparing it to the current
+shift plan being evaluated. By iterating through every possible shift plan, we
+can ensure that we have identified the most optimal solution.
 
 \begin{algorithmic}
     \STATE \textbf{Algorithm} ExhaustiveSolution
-    \STATE \textbf{Input:} $S^T$, givenSuccessRate($I^T$)
+    \STATE \textbf{Input:} $I$, givenSuccessRate($I$)
     \STATE \textbf{Output:} $s_o$
 
-    \STATE bestSoFar = $s_0 \in S^T$
+    \STATE $s_o \leftarrow s_0 \in S^T$
 
-    \FOR{$i \in \{ 1, 2, ..., |S^T| \}$}
-    \IF{$$}
-    \STATE Perform some operation
-    \ELSE
-    \STATE Perform a different operation
+    \FOR{$i \in \{ 1, 2, \ldots, |S^T| \}$}
+    \IF{$\text{successRate}(s_i, I) \geq \text{givenSuccessRate}(I) \: \text{\AND} \text{cost}(s_i, I) \leq \text{cost}(s_o, I)$}
+    \STATE $s_o \leftarrow s_i$
     \ENDIF
     \ENDFOR
 
-    \WHILE{condition is met}
-    \STATE Do something
-    \ENDWHILE
-
-    \STATE \textbf{Return} final result
+    \STATE \textbf{Return} $s_o$
 \end{algorithmic}
+
+Although the brute force algorithm provides a correct solution, it suffers from
+a significant drawback of being very slow. The runtime of this algorithm is
+exponential, as the size of the set $S$ grows exponentially. Specifically, we
+have:
+
+\[
+    |S| = |T|^{|A|},
+\]
+
+where $S$ represents the set of all allowed time intervals and $A$ represents
+the set of all ambulances. Since the exhaustive algorithm needs to iterate
+through all possible shift plans, the time complexity is:
+
+\[
+    \Theta(|S|).
+\]
+
+While it is reassuring to have a correct solution, the exponential runtime is
+undesirable. We need to explore alternative approaches to improve the
+efficiency of finding the optimal solution.
