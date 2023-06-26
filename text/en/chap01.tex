@@ -206,3 +206,76 @@ real-life scenarios. Introducing additional stochastic elements may also
 introduce unnecessary unpredictability to the simulation. Therefore, for the
 sake of efficiency and reliability, the simulation does not incorporate such
 stochastic factors.
+
+\section{Problem formalization}
+As the problem above is described, it is clear we have to find the most optimal
+shift plan $s_o$ from set of all possible shift plans $S^T$, where $T$ is a set
+of allowed time intervals, against given incident sets $I$. Most optimal means
+it has to be valid,
+
+\[
+    \text{successRate}(s_o, I) \geq
+    \text{givenSuccessRate}(I),
+\]
+
+and has the least possible cost over all valid shift plans $S_v$,
+
+\[
+    \forall s_v \in S_v: \text{cost}(s_o) \leq \text{cost}(s_v),
+\]
+
+defined,
+
+\[
+    S_v = \{ s_v \in S^I | \text{successRate}(s_v, I) \geq \text{givenSuccessRate}(I) \}.
+\]
+
+If there doesn't exist any shift plan in $S^I$ which satisfies given success
+rate, the most optimal is then the shift plan with the highest success rate and
+at the same time having the least cost. Let denote
+
+\[
+    S_r = \{s_r \in S^I | \text{successRate}(s_r, I) \geq \text{successRate}(s, I), \forall s \in S^I\}
+\]
+
+as a set of all shift plans with the highest success rate. The optimal $s_o \in
+    S_r$ is now defined as:
+
+\[
+    \forall s_r \in S_r: \text{cost}(s_o, I) \leq \text{cost}(s_r, I).
+\]
+
+Note, that this definition of optimal shift plan allows for multiple optimal
+solutions. We can therefore denote set of all these optimal solutions as $S_o$.
+
+\section{Exhaustive solution}
+
+The most straightforward algorithm for finding the most optimal solution is to
+exhaustively enumerate over all possible shift plans by brute force, holding
+some global best shift plan so far and updating it in each iteration against
+current shift plan. After going through every possible shift plan we can then
+be certain that we have found the most optimal one.
+
+\newpage
+
+\begin{algorithmic}
+    \STATE \textbf{Algorithm} ExhaustiveSolution
+    \STATE \textbf{Input:} $S^T$, givenSuccessRate($I^T$)
+    \STATE \textbf{Output:} $s_o$
+
+    \STATE bestSoFar = $s_0 \in S^T$
+
+    \FOR{$i \in \{ 1, 2, ..., |S^T| \}$}
+    \IF{$$}
+    \STATE Perform some operation
+    \ELSE
+    \STATE Perform a different operation
+    \ENDIF
+    \ENDFOR
+
+    \WHILE{condition is met}
+    \STATE Do something
+    \ENDWHILE
+
+    \STATE \textbf{Return} final result
+\end{algorithmic}
