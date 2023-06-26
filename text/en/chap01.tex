@@ -1,4 +1,4 @@
-\setlength{\parindent}{0pt}
+\setlength{\parindent}{0pt} \usepackage{parskip}
 
 \chapter{Introduction}
 
@@ -28,10 +28,11 @@ ambulances may be suitable for handling such incidents.
 
 Ultimately, our primary concern is determining whether a given ambulance can
 effectively respond to a particular incident, based on the mapping between
-ambulance types and incident requirements. Throughout the day, only one shift
-can be assigned to each ambulance, and there may be instances where no shift is
-assigned, rendering the ambulance unavailable for the day and unable to
-participate in incident response.
+ambulance types and incident requirements, hence such abstraction is sufficient
+for our purposes. Throughout the day, only one shift can be assigned to each
+ambulance, and there may be instances where no shift is assigned, rendering the
+ambulance unavailable for the day and unable to participate in incident
+response.
 
 A shift plan incurs a cost, which we aim to minimize. This cost is determined
 by the duration of the shift and the associated cost of the ambulance type.
@@ -65,5 +66,32 @@ approach offers greater flexibility, allowing us to experiment with different
 distributions and simulate various scenarios, including unexpected or extreme
 situations.
 
-Finaly having all this information at our display, we can focus on how to
-evaluate performance of shift plan against a set of incidents sets.
+Finally, with all this information at our disposal, we can now shift our focus
+towards evaluating the performance of the shift plan against a set of incident
+sets. In order to measure performance, we will assess the ratio of successfully
+handled incidents to the total number of incidents in the set. A higher number
+of handled incidents and lower costs indicate a better shift plan. While this
+approach is reasonable, we will take a slightly different route in this thesis.
+Since this thesis is associated with the Computer-Aided Dispatch System
+Organization Logis Solutions s. r. o. (Logis), which employs advanced solutions
+for existing EMS, Logis has the advantage of having historical incident data
+sets available. This leads us to examine the success rates achieved by each
+incident set on a given day. As the proposed solutions in this thesis may be
+utilized in the production software developed by Logis for their EMS clients,
+it would be ideal to generate a shift plan that maintains or surpasses the
+success rates indicated by the historical data, while concurrently reducing
+costs. Therefore, the success rate will be provided for each incident set, and
+our optimization will solely focus on minimizing the cost.
+
+Introducing the concept of success rate provides a useful framework for
+considering a shift plan as either valid or invalid. A shift plan is deemed
+valid if it can meet the given success rate, indicating its ability to satisfy
+the incident requirements. Conversely, a shift plan is considered invalid if it
+fails to meet the specified success rate. It is worth noting that there may be
+scenarios where no shift plan can handle the incidents to meet the desired
+success rate, resulting in all shift plans being invalid. However, this
+particular case is not our primary concern, as the success rates derived from
+historical data are based on shift plans employed on previous days, which were
+not necessarily designed using highly sophisticated methods. Therefore, the
+probability of encountering such a situation in high-quality historical data is
+very low.
