@@ -3,6 +3,7 @@
 \chapter{Introduction}
 
 \section{Problem definition}
+
 One of the primary challenges faced by emergency medical service providers
 (EMS) revolves around determining the optimal availability schedule for their
 ambulances at specific depots. The primary objective is to maximize the number
@@ -96,3 +97,92 @@ not necessarily designed using highly sophisticated methods. Therefore, the
 probability of encountering such a situation in high-quality historical data is
 very low. Nonetheless, even in such scenario the proposed solutions will
 prioritize maximizing the success rate to the greatest extent possible.
+
+\section{Evaluating success rate of a shift plan}
+
+Our primary objective is to ensure that the evaluation of the shift plan
+closely reflects real-world conditions. It is essential that the success rate
+of a shift plan, as determined by a given incident set and specific ambulances,
+closely aligns with its real-world performance. To achieve this, we will employ
+evaluation strategies that mirror those used in actual ambulance dispatching.
+
+The most direct and flexible approach is to develop a simulation that emulates
+the real-world dispatching of ambulances to incidents based on the shift plan.
+This simulation will also incorporate the handling of incidents at the
+occurrence location, as well as the travel to the hospital and return to the
+depot. In reality, ambulance dispatching decisions are guided by a set of
+rules. While these rules can become quite complex, often requiring approval
+from a dispatcher, we can devise our own rules that closely approximate
+real-world dispatching practices. By doing so, we can ensure that the
+probabilities of dispatching in the simulation closely mirror those in the real
+world and are easier to work with and simulate. Leveraging Logis's extensive
+expertise as one of the top CAD dispatchers in the market, Logis has derived
+the following abstracted rules. If multiple ambulances satisfy a given rule,
+the selection process will follow the subsequent rules in the specified order.
+
+\begin{enumerate}[(1)]
+    \item Rule of Availability: Give priority to ambulances that are free, either
+          stationed at the depot or returning from a hospital after completing an
+          incident.
+    \item Rule of Promptness: Prioritize the ambulance with the earliest estimated
+          arrival time to the incident scene.
+    \item Rule of Workload Distribution: Favor ambulances with the least overall active
+          time, ensuring a fair distribution of workload among all available ambulances.
+    \item Rule of Cost: If multiple ambulances can handle an incident equally well,
+          choose the one with the lowest operating cost.
+    \item If still more than one ambulance satisfies all the above rules, just choose one
+          at random. In real life, this will be dispatcher's choice.
+\end{enumerate}
+
+In addition to the previously mentioned rules, before selecting the best
+ambulance for an incident, we must ensure that the ambulance satisfies a set of
+conditions. These conditions determine whether a particular ambulance is
+capable of handling the incident. The conditions are as follows:
+
+\begin{enumerate}[(1)]
+    \item Time for Response: The ambulance must have sufficient time to travel from its
+          current location to the incident within the maximum response time specified for
+          the incident type.
+    \item Duration at Incident: The ambulance must have enough time available to remain
+          at the incident location for the expected duration, which is also determined by
+          the incident type.
+    \item Travel to Hospital: Sufficient time must be available for the ambulance to
+          travel from the incident location to the nearest hospital.
+    \item Patient Delivery: The ambulance must have enough time to transport the patient
+          to the hospital, considering the specific duration required based on the
+          incident type.
+\end{enumerate}
+
+It is crucial to ensure that the assigned ambulance can complete all the
+necessary tasks outlined above within the allocated shift interval. By
+verifying these conditions, we can determine the suitability of an ambulance
+for a given incident, ensuring that it has the required time to carry out its
+responsibilities effectively.
+
+It can happen, that no ambulances can handle given incident based on above
+conditions. In such a case, the incident is declared as unhandled, and the
+success rate ration must be updated appropriately. This incident is therefore
+ignored and no action is done.
+
+Once the best ambulance is selected, the incident is assigned to that
+ambulance, and the ambulance proceeds with handling the incident.
+
+In the simulation, all incidents from the incidents set are processed
+sequentially, one by one, and the best ambulance is selected solely based on
+the above rules and conditions. Evaluating the incidents one by one closely
+resembles the functioning of a shift plan in the real world, not exploiting the
+bigger picture but only deciding on local informatio, not exploiting the bigger
+picture but only deciding based on local information.
+
+The accuracy and quality of the success rate obtained from the simulation
+depend significantly on the calculated durations for ambulance response time,
+incident handling at the scene, patient transfer to the hospital, handling of
+the incident at the hospital and finally the estimated time required to return
+to depot. While these durations may vary in the real world, introducing
+stochastic factors to simulate their variability could bring marginal
+improvements to the success rate estimation. However, considering the need to
+run the simulation multiple times, it is more important to ensure that the
+simulation efficiently captures real-life scenarios. Introducing additional
+stochastic elements may also introduce unnecessary unpredictability to the
+simulation. Therefore, for the sake of efficiency and reliability, the
+simulation does not employ such stochastic factors.
