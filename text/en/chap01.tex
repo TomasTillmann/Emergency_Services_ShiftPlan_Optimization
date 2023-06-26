@@ -1,7 +1,69 @@
-\chapter{Title of the first chapter}
+\setlength{\parindent}{0pt}
 
-An~example citation: \cite{Andel07}
+\chapter{Introduction}
 
-\section{Title of the first subchapter of the first chapter}
+\section{Problem definition}
+One of the primary challenges faced by emergency medical service providers
+(EMS) revolves around determining the optimal availability schedule for their
+ambulances at specific depots. The primary objective is to maximize the number
+of successfully handled incidents while minimizing the operational costs
+associated with the ambulances. This allocation of ambulances and their
+availability is commonly referred to as a shift plan.
 
-\section{Title of the second subchapter of the first chapter}
+A shift plan entails assigning shifts and ambulances for a given time interval,
+typically a single day. It serves as a representation of when ambulances are
+available throughout the day.
+
+Each shift represents a time interval during which an ambulance crew operates
+the vehicle, rendering it available for emergency response. Ambulance crews may
+possess specialized skills or equipment, such as the inclusion of a doctor or
+experienced personnel. Similarly, different ambulances can vary in size or
+possess advanced medical tools. To capture these distinctions, each ambulance
+is assigned a specific type.
+
+Ambulance types provide an abstraction of these varying scenarios and specify
+the incidents they are equipped to handle. For instance, certain incidents may
+require specific tools or a larger ambulance. Consequently, only select
+ambulances may be suitable for handling such incidents.
+
+Ultimately, our primary concern is determining whether a given ambulance can
+effectively respond to a particular incident, based on the mapping between
+ambulance types and incident requirements. Throughout the day, only one shift
+can be assigned to each ambulance, and there may be instances where no shift is
+assigned, rendering the ambulance unavailable for the day and unable to
+participate in incident response.
+
+A shift plan incurs a cost, which we aim to minimize. This cost is determined
+by the duration of the shift and the associated cost of the ambulance type.
+
+In evaluating the performance of a shift plan, we measure its effectiveness in
+handling a set of incidents. This set represents the spatial and temporal
+distribution of incidents that occur within a day. We can obtain such incident
+sets through two main approaches.
+
+The first approach involves leveraging historical data, which document the
+occurrence of incidents in a given area over months or years. By uniformly
+sampling a representative subset of this data, we can test the generated shift
+plan's performance. This approach assumes that past incident patterns will
+persist in the future. Historical data provide the most reliable means of
+simulating incident occurrences accurately.
+
+The second approach involves defining a distribution that generates incidents
+based on prior knowledge. For instance, we may observe that incidents primarily
+occur during early mornings, around lunchtime, or at transportation hubs due to
+commuting patterns. Conversely, we may notice a lower incidence rate during
+nighttime compared to the daytime.
+
+While the first approach more accurately depicts the occurrence of incidents in
+the area of interest, obtaining such historical data can be challenging and
+time-consuming. Moreover, these data often remain confidential, making it
+difficult to access them, especially from other EMS organizations.
+
+Therefore, for the purposes of this thesis, we will adopt the second approach,
+generating representative incident sets using a predefined distribution. This
+approach offers greater flexibility, allowing us to experiment with different
+distributions and simulate various scenarios, including unexpected or extreme
+situations.
+
+Finaly having all this information at our display, we can focus on how to
+evaluate performance of shift plan against a set of incidents sets.
