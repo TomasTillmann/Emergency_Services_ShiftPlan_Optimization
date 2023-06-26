@@ -25,15 +25,15 @@ is assigned a specific type.
 Ambulance types provide an abstraction of these varying scenarios and specify
 the incidents they are equipped to handle. For instance, certain incidents may
 require specific tools or a larger ambulance. Consequently, only select
-ambulances may be suitable for handling such incidents.
-
-Ultimately, our primary concern is determining whether a given ambulance can
+ambulances may be suitable for handling such incidents. Ultimately, our primary
+concern int this regard is determining whether a given ambulance can
 effectively respond to a particular incident, based on the mapping between
-ambulance types and incident requirements, hence such abstraction is sufficient
-for our purposes. Throughout the day, only one shift can be assigned to each
-ambulance, and there may be instances where no shift is assigned, rendering the
-ambulance unavailable for the day and unable to participate in incident
-response.
+ambulance types and incident types. Hence such abstraction is sufficient for
+our purposes.
+
+Throughout the day, only one shift can be assigned to each ambulance, and there
+may be instances where no shift is assigned, rendering the ambulance
+unavailable for the day and unable to participate in incident response.
 
 A shift plan incurs a cost, which we aim to minimize. This cost is determined
 by the duration of the shift and the associated cost of the ambulance type.
@@ -59,7 +59,7 @@ nighttime compared to the daytime.
 While the first approach more accurately depicts the occurrence of incidents in
 the area of interest, obtaining such historical data can be challenging and
 time-consuming. Moreover, these data often remain confidential, making it
-difficult to access them, especially from other EMS organizations.
+difficult to access them, for example from other EMS organizations.
 
 Therefore, for the purposes of this thesis, we will adopt the second approach,
 generating representative incident sets using a predefined distribution. This
@@ -171,8 +171,7 @@ In the simulation, all incidents from the incidents set are processed
 sequentially, one by one, and the best ambulance is selected solely based on
 the above rules and conditions. Evaluating the incidents one by one closely
 resembles the functioning of a shift plan in the real world, not exploiting the
-bigger picture but only deciding on local informatio, not exploiting the bigger
-picture but only deciding based on local information.
+bigger picture but only deciding on local information.
 
 The accuracy and quality of the success rate obtained from the simulation are
 heavily influenced by the calculated durations for various stages of incident
@@ -187,19 +186,23 @@ distance matrix. When a distance request is made, the distance calculator
 simply retrieves the precalculated distance for the requested locations. The
 time required can then be calculated using the velocity of the ambulance.
 However, it is important to note that this approach does not consider factors
-such as traffic or the type of route taken. A more advanced approach involves
-precalculating the estimated duration, which also eliminates the need for the
-ambulance's velocity information.
+such as traffic or the type of route taken. A more appropriate approach might
+be to precalculate not the estimated distance but the estimated duration, which
+also eliminates the need for the ambulance's velocity information. To obtain
+reasonable precalculated duration, Here or Google map services might be great
+candidates. These durations can also be recalculated to better incorporate
+these factors, such as traffic condition or road closure etc ...
 
 Another factor to account for which might negatively influence the quality of
 yielded success rate is that the variability of durations in real-life
 scenarios vary. Factors such as traffic conditions, road closures, and
 unexpected events can cause variations in ambulance response times, incident
-handling durations, and patient transfer times. While these durations may vary
-in the real world, introducing stochastic factors to simulate their variability
-could lead to minor improvements in estimating the success rate. Despite that,
-given the necessity of running the simulation multiple times, it is more
-crucial to ensure that the simulation effectively captures real-life scenarios.
-Introducing additional stochastic elements may also introduce unnecessary
-unpredictability to the simulation. Therefore, for the sake of efficiency and
-reliability, the simulation does not incorporate such stochastic factors.
+handling durations, and patient transfer times. Therefore, because these
+durations may vary in the real world, introducing stochastic factors to
+simulate their variability could lead to improvements in estimating the success
+rate. Despite that, given the necessity of running the simulation multiple
+times, it is more crucial to ensure that the simulation effectively captures
+real-life scenarios. Introducing additional stochastic elements may also
+introduce unnecessary unpredictability to the simulation. Therefore, for the
+sake of efficiency and reliability, the simulation does not incorporate such
+stochastic factors.
