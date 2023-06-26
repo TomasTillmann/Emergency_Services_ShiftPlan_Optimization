@@ -141,12 +141,12 @@ class Program
         (
             world: dataProvider.GetWorld(),
             constraints: dataProvider.GetDomain(),
-            iterations: 10, 
+            iterations: 60, 
             permutations: 0,
             initialPheromone: 0.1f,
-            pheromoneEvaporationRate: 0.2f,
+            pheromoneEvaporationRate: 0.1f,
             alpha: 1,
-            beta: 0.9f,
+            beta: 0.3f,
             simulationDuration: 24.ToHours(),
             estimatedMinimalShiftPlanDuration: incidents.First().Value.Sum(inc => inc.OnSceneDuration.Value + inc.InHospitalDelivery.Value).ToSeconds(),
             estimatedMaximalShiftPlanDuration: (12.ToHours().ToSeconds().Value * ambulancesCount).ToSeconds(),
@@ -157,6 +157,7 @@ class Program
                 constraints: dataProvider.GetDomain(),
                 iterations: 50,
                 tabuSize: 50,
+                neighboursLimit: 20,
                 random: random
             )
         );

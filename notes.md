@@ -251,6 +251,25 @@ Nebo pokud duration shiftPlan je mensi nez pozadavana minimalni hranice, viz niz
   - ale jelikoz nemam zadne constraints, tak vsechna reseni jsou feasible
   - splnit tu simulaci neni constraint!!! jenom bude mit hodne spatne hodnoceni!!!
 
+## Jak se vyhnout stagnaci?
+
+- MMAS - udava spodni hranici na feronomy, tim je garantova vzdy nejaka minimalne explorace - nenastane 0 0 0 0 0 1 0 0 0 0 0 distribuce
+  - taky reinicializuje feronome trails, cimz zase zvysuje exploration
+
+## Co je blbe doposud
+
+- feromony jsou nejake nizke furt, mnohem vetsi vahu ma stale heuristika, coz je blbe, protoze se nijak nevyuziva past experience
+- duvod vypada ze je to, ze narazit nahodou na alespon validni je hodne mala, cili se mravenci neustale jen pohybuji v prostoru nevalidnich reseni
+- mozna zkusit neco jak v prvnich k iteracich dat local search na nejlepsiho mravence na hodne iteraci a pak uz jen zlehka nebo vubec
+  - tim bych mel pro kazdeho mravence alespon jedno nejake rozumnejsi reseni, nez jenom ta co ziskavam naslepo pres heuristiku
+  - pak by i feronomy byli silnejsi (stejn bych mel zmenit tu funkci at je lepsi)
+  - nevyhoda muze byt ze se stucknu na nejakych lokalnich optimech
+
+## Ostatni
+
+- zminit ze se jedna i o model based, ne jako samlple based
+- cili ze se vytvari nejaky pravdepodobnostni model, ktery se snazi popsat kde se v prostoru nachazi dobra reseni
+
 # Graf jak rychle local search konverguje k dobrym resenim
 
 - na ose x iterations
