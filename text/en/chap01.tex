@@ -1,8 +1,8 @@
 \setlength{\parindent}{0pt}
 
-\chapter{Introduction}
+\chapter{Problem introduction}
 
-\section{Problem definition}
+\section{Domain description}
 
 One of the primary challenges faced by emergency medical service providers
 (EMS) revolves around determining the optimal availability schedule for their
@@ -98,7 +98,9 @@ probability of encountering such a situation in high-quality historical data is
 very low. Nonetheless, even in such scenario the proposed solutions will
 prioritize maximizing the success rate to the greatest extent possible.
 
-\section{Evaluating success rate of a shift plan}
+\newpage
+
+\section{Evaluating shift plan using simulation}
 
 Our primary objective is to ensure that the evaluation of the shift plan
 closely reflects real-world conditions. It is essential that the success rate
@@ -171,7 +173,47 @@ In the simulation, all incidents from the incidents set are processed
 sequentially, one by one, and the best ambulance is selected solely based on
 the above rules and conditions. Evaluating the incidents one by one closely
 resembles the functioning of a shift plan in the real world, not exploiting the
-bigger picture but only deciding on local information.
+bigger picture but only deciding on local information. Here is a sample
+pseudocode to better understand the simulation algorithm.
+
+\begin{algorithm}
+    \caption{Simulation}
+    \label{alg:Simulation}
+    \begin{algorithmic}[1]
+        \STATE \textbf{Input:} $s$, $I$
+        \STATE \textbf{Output:} successRate($s, I$)
+
+        \STATE currentTime $\leftarrow$ 0
+        \STATE unhandledsCount $\leftarrow$ 0
+
+        \STATE sortedIncidents $\leftarrow$ sortByOccurence($I$)
+
+        \FOR{incident \textbf{in} sortedIncidents}
+        \STATE handlingShifts $\leftarrow$ getHandlingShifts($s$, incident)
+        \label{func:getHandlingShifts}
+        \IF{size(handingShifts) == 0}
+        \STATE unhandledsCount $\leftarrow$ unhandledsCount + 1
+        \STATE \textbf{continue}
+        \ENDIF
+        \STATE bestShift $\leftarrow$ getBestShift(handlingShifts, incident)
+        \STATE planIncident(bestShift, incident)
+        \ENDFOR
+
+        \STATE \textbf{Return} $(|I| - \text{unhandledsCount}) / |I|$
+    \end{algorithmic}
+\end{algorithm}
+
+In the simulation, the function \texttt{getHandlingShifts} evaluates whether a
+shift is capable of handling a specific incident based on the conditions
+outlined above. The function \texttt{getBestShift} is then used to identify the
+best shift among the available options, taking into account the rules outlined
+above. Finally, the function \texttt{planIncident} is responsible for assigning
+the incident to the best shift found. This process simulates the dispatch of
+incidents to shifts.
+
+In subsequent iterations, the functions \texttt{getHandlingShifts} and
+\texttt{getBestShift} will consider the fact that the shift already has the
+incident planned and use this information to make it's decisions.
 
 The accuracy and quality of the success rate obtained from the simulation are
 heavily influenced by the calculated durations for various stages of incident
@@ -269,21 +311,24 @@ one in the list and updates it in each iteration, comparing it to the current
 shift plan being evaluated. By iterating through every possible shift plan, we
 can ensure that we have identified the most optimal solution.
 
-\begin{algorithmic}
-    \STATE \textbf{Algorithm} ExhaustiveSolution
-    \STATE \textbf{Input:} $I$, givenSuccessRate($I$)
-    \STATE \textbf{Output:} $s_o$
+\begin{algorithm}
+    \caption{Exhaustive}
+    \label{alg:name}
+    \begin{algorithmic}[1]
+        \STATE \textbf{Input:} $I$, givenSuccessRate($I$)
+        \STATE \textbf{Output:} $s_o$
 
-    \STATE $s_o \leftarrow s_0 \in S^T$
+        \STATE $s_o \leftarrow s_0 \in S$
 
-    \FOR{$i \in \{ 1, 2, \ldots, |S^T| \}$}
-    \IF{$\text{successRate}(s_i, I) \geq \text{givenSuccessRate}(I) \: \text{\AND} \text{cost}(s_i, I) \leq \text{cost}(s_o, I)$}
-    \STATE $s_o \leftarrow s_i$
-    \ENDIF
-    \ENDFOR
+        \FOR{$i \in \{ 1, 2, \ldots, |S| \}$}
+        \IF{$\text{successRate}(s_i, I) \geq \text{givenSuccessRate}(I) \: \text{\AND} \text{cost}(s_i, I) \leq \text{cost}(s_o, I)$}
+        \STATE $s_o \leftarrow s_i$
+        \ENDIF
+        \ENDFOR
 
-    \STATE \textbf{Return} $s_o$
-\end{algorithmic}
+        \STATE \textbf{Return} $s_o$
+    \end{algorithmic}
+\end{algorithm}
 
 Although the brute force algorithm provides a correct solution, it suffers from
 a significant drawback of being very slow. The runtime of this algorithm is
