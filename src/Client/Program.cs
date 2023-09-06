@@ -45,7 +45,7 @@ class Program
         IOptimizer optimizer = new TabuSearchOptimizer
         (
             world: dataProvider.GetWorld(),
-            constraints: dataProvider.GetConstraints(),
+            constraints: dataProvider.GetDomain(),
             iterations: 50,
             tabuSize: 20,
             neighboursLimit: 30
@@ -142,7 +142,7 @@ class Program
             world: dataProvider.GetWorld(),
             constraints: dataProvider.GetDomain(),
             iterations: 60, 
-            permutations: 0,
+            permutations: 10,
             initialPheromone: 0.1f,
             pheromoneEvaporationRate: 0.1f,
             alpha: 1,
