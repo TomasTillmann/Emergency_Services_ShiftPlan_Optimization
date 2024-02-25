@@ -56,7 +56,7 @@ class Program
 
         Logger.Instance.WriteLineForce($"Optimizing took: {sw.ElapsedMilliseconds}ms.");
 
-        Simulation simulation = new(dataProvider.GetWorld());
+        Simulating simulation = new(dataProvider.GetWorld());
         foreach(var optimal in optimals)
         {
             Statistics stats = simulation.Run(incidents.First().Value, optimal);
@@ -149,7 +149,7 @@ class Program
 
         Logger.Instance.WriteLineForce($"Optimizing took: {sw.ElapsedMilliseconds}ms.");
 
-        Simulation simulation = new(dataProvider.GetWorld());
+        Simulating simulation = new(dataProvider.GetWorld());
         Statistics stats = simulation.Run(incidents.First().Value, optimal);
         optimal.ShowGraph(24.ToHours().ToSeconds());
         Logger.Instance.WriteLineForce(stats);

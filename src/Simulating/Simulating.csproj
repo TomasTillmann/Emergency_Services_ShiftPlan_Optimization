@@ -3,6 +3,7 @@
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <TargetFramework>net7.0</TargetFramework>
+    <RootNamespace>Simulation</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

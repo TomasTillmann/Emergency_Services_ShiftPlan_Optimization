@@ -30,7 +30,7 @@ public abstract class Optimizer : IOptimizer
 
     public virtual int Fitness(ShiftPlan shiftPlan, List<SuccessRatedIncidents> successRatedIncidents, out double meanSuccessRate)
     {
-        if(!IsValid(shiftPlan, successRatedIncidents, out meanSuccessRate))
+        if (!IsValid(shiftPlan, successRatedIncidents, out meanSuccessRate))
         {
             return int.MaxValue;
         }

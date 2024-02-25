@@ -7,7 +7,7 @@ namespace Optimizing;
 public abstract class LocalSearchOptimizer : MetaheuristicOptimizer
 {
 
-    private ShiftsTravel shiftTravel;
+    private readonly ShiftsTravel shiftTravel;
 
     protected LocalSearchOptimizer(World world, Domain constraints) : base(world, constraints)
     {

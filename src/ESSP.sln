@@ -5,7 +5,7 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataModel", "DataModel\DataModel.csproj", "{0DD0994B-56F1-4E3B-9C7E-9F11CD3AE96F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Simulation", "Simulation\Simulation.csproj", "{B0328413-7857-4E6E-9EF6-D4EBEBC8283E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Simulating", "Simulating\Simulating.csproj", "{B0328413-7857-4E6E-9EF6-D4EBEBC8283E}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Client", "Client\Client.csproj", "{612DBCB6-8189-4FE7-A762-3CE3AC433C95}"
 EndProject

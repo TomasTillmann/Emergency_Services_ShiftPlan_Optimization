@@ -4,46 +4,8 @@ using System.Linq;
 using DataModel.Interfaces;
 using ESSP.DataModel;
 using Logging;
-using Model.Extensions;
 
 namespace Simulating;
-
-public sealed class Statistics
-{
-    public IList<Incident> UnhandledIncidents { get; private set; } = new List<Incident>();
-
-    public IReadOnlyCollection<Incident> AllIncidents { get; private set; }
-
-    public double SuccessRate => 1 - (double)UnhandledIncidents.Count/AllIncidents.Count;
-
-    internal Statistics(IReadOnlyCollection<Incident> allIncidents)
-    {
-        AllIncidents = allIncidents;
-    }
-
-    internal Statistics()
-    {
-        AllIncidents = new List<Incident>();
-    }
-
-    internal void SetUnhandled(Incident incident)
-    {
-        UnhandledIncidents.Add(incident);
-    }
-
-    internal void Reset(IReadOnlyCollection<Incident> allIncidents)
-    {
-        UnhandledIncidents.Clear();
-        AllIncidents = allIncidents;
-    }
-
-    public override string ToString()
-    {
-        return $"SuccessRate: {SuccessRate}\n" +
-            $"AllIncidents: Count: {AllIncidents.Count}, {AllIncidents.Visualize("| ")}\n" +
-            $"UnhandledIncidents: Count: {UnhandledIncidents.Count}, {UnhandledIncidents.Visualize("| ")}\n";
-    }
-}
 
 public sealed class Simulation
 {
@@ -51,10 +13,11 @@ public sealed class Simulation
     public IDistanceCalculator DistanceCalculator { get; }
     public Seconds CurrentTime { get; private set; } = 0.ToSeconds();
 
-    private Statistics statistics;
+    private readonly Statistics statistics;
+    private readonly ShiftEvaluator shiftEvaluator;
+    private readonly PlannableIncident.Factory plannableIncidentFactory;
+    
     private ShiftPlan shiftPlan;
-    private ShiftEvaluator shiftEvaluator;
-    private PlannableIncident.Factory plannableIncidentFactory;
 
     public Simulation(World world)
     {

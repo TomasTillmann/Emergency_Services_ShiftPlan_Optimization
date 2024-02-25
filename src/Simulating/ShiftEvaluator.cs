@@ -37,6 +37,7 @@ class ShiftEvaluator
         }
 
         HashSet<AmbulanceType> allowedAmbulanceTypes = plannableIncident.Incident.Type.AllowedAmbulanceTypes;
+        
         // Open world principle.
         if (allowedAmbulanceTypes.Count != 0 && !allowedAmbulanceTypes.Contains(shift.Ambulance.Type))
         {

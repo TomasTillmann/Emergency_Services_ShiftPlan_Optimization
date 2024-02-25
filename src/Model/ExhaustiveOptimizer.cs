@@ -58,13 +58,13 @@ public sealed class ExhaustiveOptimizer : Optimizer
             return true;
         }
 
-        /// Traverses the state space. Adds all satisfying shifts to allShifts.
+        // Traverses the state space. Adds all satisfying shifts to allShifts.
         void PopulateAllSuccessfulShiftPlansFrom(ShiftPlan shiftPlan, int currentShiftIndex = 0)
         {
             if(currentShiftIndex == shiftPlan.Shifts.Count)
             {
                 SearchedShiftPlans++;
-                // debugging, kolikrat jsem v listu by melo zhruba odpovidat slozitosti - progress bar takovy
+                // progress bar 
                 //if(SearchedShiftPlans % 500 == 0)
                 //{
                 //    Logger.Instance.WriteLineForce(SearchedShiftPlans);
@@ -108,7 +108,6 @@ public sealed class ExhaustiveOptimizer : Optimizer
 
         // update stats
         SatisfyingShiftPlans = allShiftPlans.Count;
-        //
 
         //Logger.Instance.WriteLineForce(allShiftPlans.Visualize("\n"));
 

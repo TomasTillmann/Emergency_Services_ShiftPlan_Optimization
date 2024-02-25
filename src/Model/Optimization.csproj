@@ -8,7 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DataModel\DataModel.csproj" />
-    <ProjectReference Include="..\Simulation\Simulation.csproj" />
+    <ProjectReference Include="..\Simulating\Simulating.csproj" />
   </ItemGroup>
 
     <ItemGroup>
