@@ -7,9 +7,9 @@ namespace Optimizing;
 public abstract class Optimizer : IOptimizer
 {
     public Domain Constraints { get; }
+    public World World { get; }
 
-    protected Simulation simulation;
-    protected World world;
+    protected Simulation Simulation;
 
     public Optimizer(World world, Domain constraints)
     {
@@ -19,8 +19,8 @@ public abstract class Optimizer : IOptimizer
         }
 
         Constraints = constraints;
-        this.world = world;
-        simulation = new Simulation(world);
+        this.World = world;
+        Simulation = new Simulation(world);
     }
 
     public virtual int Fitness(ShiftPlan shiftPlan, List<SuccessRatedIncidents> successRatedIncidents)
@@ -50,7 +50,7 @@ public abstract class Optimizer : IOptimizer
 
         foreach(SuccessRatedIncidents successRatedIncident in successRatedIncidents)
         {
-            Statistics stats = simulation.Run(successRatedIncident.Value, shiftPlan);
+            Statistics stats = Simulation.Run(successRatedIncident.Value, shiftPlan);
             shiftPlan.Shifts.ForEach(shift => shift.ClearPlannedIncidents());
 
             if (stats.SuccessRate < successRatedIncident.SuccessRate)
@@ -68,7 +68,7 @@ public abstract class Optimizer : IOptimizer
 
     protected ShiftPlan GetEmptyShiftPlan()
     {
-        return ShiftPlan.ConstructFrom(simulation.Depots, 0.ToSeconds(), 0.ToSeconds());
+        return ShiftPlan.ConstructFrom(Simulation.Depots, 0.ToSeconds(), 0.ToSeconds());
     }
 }
 

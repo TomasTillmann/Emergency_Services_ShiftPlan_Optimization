@@ -211,10 +211,11 @@ public class DataProvider
 
         HashSet<Seconds> allowedShiftDurations = new()
         {
+            0.ToHours(),
             4.ToHours(),
             6.ToHours(),
             8.ToHours(),
-            12.ToHours(),
+            //12.ToHours(),
             //24.ToHours().ToSeconds(),
             //10.ToSeconds(),
             //100.ToSeconds()

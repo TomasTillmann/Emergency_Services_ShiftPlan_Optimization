@@ -46,7 +46,7 @@ public sealed class ExhaustiveOptimizer : Optimizer
         {
             foreach(SuccessRatedIncidents successRatedIncident in successRatedIncidents)
             {
-                Statistics stats = simulation.Run(successRatedIncident.Value, shiftPlan);
+                Statistics stats = Simulation.Run(successRatedIncident.Value, shiftPlan);
                 shiftPlan.Shifts.ForEach(shift => shift.ClearPlannedIncidents());
 
                 if (stats.SuccessRate < successRatedIncident.SuccessRate)

@@ -6,6 +6,30 @@
 # vscode garbage
 .vscode
 
+# tex garbage
+/text/cs/
+/text/tex/
+/text/img/
+/text/README
+/text/README.en
+/text/en/Makefile
+/text/VERSION
+/text/en/*.mpdata
+/text/en/*.xmpdata
+/text/en/*.xmpi
+/text/en/*lot
+/text/en/*.aux
+/text/en/*.mpi
+/text/en/*.bib
+/text/en/*.bbl
+/text/en/*.blg
+/text/en/*.fdb_latexmk
+/text/en/*.fls
+/text/en/*.lof
+/text/en/*.out
+/text/en/*.gz
+/text/en/*.toc
+
 # User-specific files
 *.rsuser
 *.suo

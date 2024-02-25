@@ -23,8 +23,6 @@ public class SimulatedAnnealingOptimizer : LocalSearchOptimizer
 
     public readonly Random Random;
 
-    private readonly int maxShiftPlanCost;
-
     public SimulatedAnnealingOptimizer(World world, Domain constraints, double lowestTemperature, double highestTemperature, double temperatureReductionFactor, int neighbourLimit, Random? random = null) : base(world, constraints)
     {
         Random = random ?? new Random();
@@ -32,33 +30,34 @@ public class SimulatedAnnealingOptimizer : LocalSearchOptimizer
         HighestTemperature = highestTemperature;
         TemperatureReductionFactor = temperatureReductionFactor;
         NeighboursLimit = neighbourLimit;
-
-        ShiftPlan maximalShiftPlan = ShiftPlan.ConstructFrom(world.Depots, 0.ToSeconds(), constraints.AllowedShiftDurations.Max());
-        maxShiftPlanCost = maximalShiftPlan.GetCost();
-
     }
 
     public override IEnumerable<ShiftPlan> FindOptimal(List<SuccessRatedIncidents> incidentsSets)
     {
-        int Fitness(ShiftPlan shiftPlan)
-        {
-            return this.Fitness(shiftPlan, incidentsSets);
-        }
-
         ShiftPlan initShiftPlan
-            = ShiftPlan.ConstructRandom(world.Depots, Constraints.AllowedShiftStartingTimes.ToList(),
+            = ShiftPlan.ConstructRandom(World.Depots, Constraints.AllowedShiftStartingTimes.ToList(),
             Constraints.AllowedShiftDurations.ToList(), Random);
 
-        ShiftPlan globalBest = initShiftPlan;
+        return FindOptimalFrom(initShiftPlan, incidentsSets);
+    }
+
+    public override IEnumerable<ShiftPlan> FindOptimalFrom(ShiftPlan startShiftPlan, List<SuccessRatedIncidents> incidentsSets)
+    {
+        int Fitness(ShiftPlan shiftPlan)
+        {
+            return DampedFitness(shiftPlan, incidentsSets);
+        }
+
+        ShiftPlan globalBest = startShiftPlan;
         int globalBestFitness = Fitness(globalBest);
 
         Move? currentBestMove = null;
-        ShiftPlan currentBest = initShiftPlan;
+        ShiftPlan currentBest = startShiftPlan;
         int currentBestFitness = globalBestFitness;
 
 
         Stopwatch sw = new Stopwatch();
-        for(double currentTemperature = HighestTemperature; currentTemperature > LowestTemperature; currentTemperature *= TemperatureReductionFactor)
+        for (double currentTemperature = HighestTemperature; currentTemperature > LowestTemperature; currentTemperature *= TemperatureReductionFactor)
         {
             sw.Start();
 
@@ -73,27 +72,27 @@ public class SimulatedAnnealingOptimizer : LocalSearchOptimizer
                 ModifyMakeMove(currentBest, move);
                 int neighbourFitness = Fitness(currentBest);
 
-                if(neighbourFitness < currentBestFitness)
+                if (neighbourFitness < currentBestFitness)
                 {
-                    currentBestMove = move; 
+                    currentBestMove = move;
                     currentBestFitness = neighbourFitness;
 
-                    if(currentBestFitness < globalBestFitness)
+                    if (currentBestFitness < globalBestFitness)
                     {
                         globalBest = currentBest.Copy();
                         globalBestFitness = currentBestFitness;
                     }
                 }
-                else if(Accept(currentBestFitness - neighbourFitness, currentTemperature))
+                else if (Accept(currentBestFitness - neighbourFitness, currentTemperature))
                 {
-                    currentBestMove = move; 
+                    currentBestMove = move;
                     currentBestFitness = neighbourFitness;
                 }
 
                 ModifyUnmakeMove(currentBest, move);
             }
 
-            if(currentBestMove is null || currentBest is null)
+            if (currentBestMove is null || currentBest is null)
             {
                 throw new ArgumentException("All neighbours either have worse fitness and even none was accepted, leading to no move being selected.");
             }
@@ -108,19 +107,6 @@ public class SimulatedAnnealingOptimizer : LocalSearchOptimizer
         }
 
         return new List<ShiftPlan> { globalBest };
-    }
-    public override int Fitness(ShiftPlan shiftPlan, List<SuccessRatedIncidents> successRatedIncidents)
-    {
-        int eval = base.Fitness(shiftPlan, successRatedIncidents, out double meanSuccessRate);
-
-        // damping, to better navigate
-        if (eval == int.MaxValue)
-        {
-            return maxShiftPlanCost + (int)((1 - meanSuccessRate) * 100);
-            //return int.MaxValue;
-        }
-
-        return eval;
     }
 
     public bool Accept(double difference, double temperature)

@@ -87,8 +87,6 @@ public sealed class TabuSearchOptimizer : LocalSearchOptimizer
     public readonly Random Random;
     #endregion
 
-    private readonly int maxShiftPlanCost;
-
     /// <param name="world"></param>
     /// <param name="constraints"></param>
     /// <param name="iterations"></param>
@@ -98,27 +96,31 @@ public sealed class TabuSearchOptimizer : LocalSearchOptimizer
     /// <param name="neighboursLimit">If count of neighbours is exceeded, uniformly random sample of this size will be taken as representants of all neighbours.
     /// The more the shifts, the more the neighbours. Running hundreads of simulations in one iteration can be too expensive. This helps this issue.</param>
     /// <param name="seed">Initial <see cref="ShiftPlan"/> is selected randomly. When limiting neighbours to search by <paramref name="neighboursLimit"/>, neighbours to search are selected at random.</param>
-    public TabuSearchOptimizer(World world, Domain constraints, int iterations, int tabuSize, int neighboursLimit = int.MaxValue, int? seed = null) : base(world, constraints)
+    public TabuSearchOptimizer(World world, Domain constraints, int iterations, int tabuSize, int neighboursLimit = int.MaxValue, Random? random = null) : base(world, constraints)
     {
-        Random = seed is null ? new Random() : new Random(seed.Value);
+        Random = random ?? new Random(); 
         Iterations = iterations;
         TabuSize = tabuSize;
         NeighboursLimit = neighboursLimit;
-
-        ShiftPlan maximalShiftPlan = ShiftPlanTabu.GetAllShiftHavingSameDuration(world.Depots, constraints.AllowedShiftDurations.Max()).Value;
-        maxShiftPlanCost = maximalShiftPlan.GetCost();
     }
 
     public override IEnumerable<ShiftPlan> FindOptimal(List<SuccessRatedIncidents> incidentsSets)
     {
+        ShiftPlan initShiftPlan
+            = ShiftPlan.ConstructRandom(World.Depots, Constraints.AllowedShiftStartingTimes.ToList(),
+            Constraints.AllowedShiftDurations.ToList(), Random);
+
+        return FindOptimalFrom(initShiftPlan, incidentsSets);
+    }
+
+    public override IEnumerable<ShiftPlan> FindOptimalFrom(ShiftPlan startShiftPlan, List<SuccessRatedIncidents> incidentsSets)
+    {
         int Fitness(ShiftPlanTabu shiftPlanTabu)
         {
-            return this.Fitness(shiftPlanTabu.Value, incidentsSets);
+            return DampedFitness(shiftPlanTabu.Value, incidentsSets);
         }
 
-        ShiftPlanTabu initShiftPlan
-            = new ShiftPlanTabu(ShiftPlan.ConstructRandom(world.Depots, Constraints.AllowedShiftStartingTimes.ToList(),
-            Constraints.AllowedShiftDurations.ToList(), Random));
+        ShiftPlanTabu initShiftPlan = new (startShiftPlan);
 
         ShiftPlanTabu globalBest = initShiftPlan;
         int globalBestFitness = Fitness(globalBest);
@@ -133,7 +135,7 @@ public sealed class TabuSearchOptimizer : LocalSearchOptimizer
         // TODO: Init tabu?
 
         Stopwatch sw = new Stopwatch();
-        for(int i = 0; i < Iterations; i++)
+        for (int i = 0; i < Iterations; i++)
         {
             sw.Start();
             List<Move> neighbourHoodMoves = GetNeighborhoodMoves(bestCandidate).ToList();
@@ -154,20 +156,20 @@ public sealed class TabuSearchOptimizer : LocalSearchOptimizer
                 if (tabu.Contains(move))
                 {
                     // aspiration criterion
-                    if(candidateFitness < globalBestFitness)
+                    if (candidateFitness < globalBestFitness)
                     {
-                        if(bestCandidateFitness is null || candidateFitness < bestCandidateFitness)
+                        if (bestCandidateFitness is null || candidateFitness < bestCandidateFitness)
                         {
-                            bestMove = move; 
+                            bestMove = move;
                             bestCandidateFitness = candidateFitness;
                         }
                     }
                 }
                 else
                 {
-                    if(bestCandidateFitness is null || candidateFitness < bestCandidateFitness)
+                    if (bestCandidateFitness is null || candidateFitness < bestCandidateFitness)
                     {
-                        bestMove = move; 
+                        bestMove = move;
                         bestCandidateFitness = candidateFitness;
                     }
                 }
@@ -175,7 +177,7 @@ public sealed class TabuSearchOptimizer : LocalSearchOptimizer
                 ModifyUnmakeMove(bestCandidate, move);
             }
 
-            if(bestMove is null || bestCandidateFitness is null)
+            if (bestMove is null || bestCandidateFitness is null)
             {
                 throw new ArgumentException("All neighbours were tabu and none of them also satisfied aspiration criterion. Perhaps you set tabu size too high?");
             }
@@ -196,24 +198,9 @@ public sealed class TabuSearchOptimizer : LocalSearchOptimizer
 
             Logger.Instance.WriteLineForce($"One step took: {sw.ElapsedMilliseconds}ms"); sw.Restart();
             Logger.Instance.WriteLineForce($"Global best: {globalBestFitness} ({globalBest.Value})");
-            Logger.Instance.WriteLineForce($"Best candidate: {bestCandidateFitness} ({bestCandidate.Value})");
             Logger.Instance.WriteLineForce();
         }
 
         return new List<ShiftPlan> { globalBest.Value };
     }
-
-    public override int Fitness(ShiftPlan shiftPlan, List<SuccessRatedIncidents> successRatedIncidents)
-    {
-        int eval = base.Fitness(shiftPlan, successRatedIncidents, out double meanSuccessRate);
-
-        // damping, to better navigate
-        if(eval == int.MaxValue)
-        {
-            return maxShiftPlanCost + (int)((1 - meanSuccessRate) * 100);
-            //return int.MaxValue;
-        }
-
-        return eval;
-    } 
 }

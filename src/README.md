@@ -1,34 +1,3 @@
-# Poznamky
-## Casova slozitost Exhaustive Optimizeru
-* $a$ je pocet startingTimes, $b$ je pocet allowedDurations, $S$ je mnozina shiftu a $I$ je mnozina uplne vsech incidentu pres vsechny incidentsSets.
-* Pocet prohledanych ShiftPlanu je $(a \times b + 1)^{|S|}$
-	* $a$ a $b$ udavaji vetvici faktor, protoze uvnitr jedne hladiny zkousim vsechny moznosti starting times a durations
-	* +1, protoze shift jeste muze byt nepouzity (0s-0s)
-	* $|S|$ udava hloubku stavoveho prostoru
-
-Celkem odvedene prace je:
-
-$$
-(a \times b + 1)^{|S|} * |I|
-$$
-
-* Pro kazdy jeden shiftPlan musim spusti simulaci, ta je linearni vuci $|I|$
-
-# V reci COP
-Minimalizujeme cost function $cost(ShiftPlan) -> double$.
-
-Constrainty jsou:
-1. simulace musi na shiftPlane projit: $simulation(ShiftPlan) -> bool = true$
-
-ShiftPlan neni nic jineho nez $n$ intervalu - $S$, ktere musi zacinat a trvat podle $t_a$ a $t_d$.
-
-Preformulovane:
-$min(cost(S))$
-
-
-Constraints:
-1. $simulation(S) = true$
-
 # Osnova
 Osnova
 Introduction
@@ -112,3 +81,5 @@ Samotny swapping atd nestaci. Je treba intervaly jeste nejak zkracovat.
 
 ## Evolucni
 1. Geneticke
+
+
