@@ -15,15 +15,41 @@ namespace Optimization;
 public class SimulatedAnnealingOptimizer : LocalSearchOptimizer
 {
     #region Parameters
-    public readonly double LowestTemperature;
-    public readonly double HighestTemperature;
-    public readonly double TemperatureReductionFactor;
-    public readonly int NeighboursLimit;
+   
+    public double LowestTemperature { get; set; }
+    public double HighestTemperature { get; set; }
+    public double TemperatureReductionFactor { get; set; }
+    public int NeighboursLimit { get; set; }
+    
     #endregion
+    
+    public int CurrStep { get; protected set; }
+    
+    public ShiftPlan StartShiftPlan { get; set; }
+    public ShiftPlan OptimalShiftPlan { get; protected set; }
 
     public readonly Random Random;
 
-    public SimulatedAnnealingOptimizer(World world, Domain constraints, double lowestTemperature, double highestTemperature, double temperatureReductionFactor, int neighbourLimit, Random? random = null) : base(world, constraints)
+    private List<SuccessRatedIncidents> _incidentsSets;
+    private ShiftPlan _globalBest;
+    private int _globalBestFitness;
+    private Move? _currentBestMove;
+    private ShiftPlan _currentBest;
+    private int _currentBestFitness;
+    private double _currentTemperature;
+    
+    #region InternalState
+    
+    public ShiftPlan GlobalBest => _globalBest;
+    public int GlobalBestFitness => _globalBestFitness;
+    public Move? CurrentBestMove => _currentBestMove;
+    public ShiftPlan CurrentBest => _currentBest;
+    public int CurrentBestFitness => _currentBestFitness;
+    public double CurrentTemperature => _currentTemperature;
+    
+    #endregion
+
+    public SimulatedAnnealingOptimizer(World world, Domain constraints, double lowestTemperature = 0.1, double highestTemperature = 50, double temperatureReductionFactor = 0.2, int neighbourLimit = int.MaxValue, Random? random = null) : base(world, constraints)
     {
         Random = random ?? new Random();
         LowestTemperature = lowestTemperature;
@@ -34,82 +60,96 @@ public class SimulatedAnnealingOptimizer : LocalSearchOptimizer
 
     public override IEnumerable<ShiftPlan> FindOptimal(List<SuccessRatedIncidents> incidentsSets)
     {
-        ShiftPlan initShiftPlan
+        StartShiftPlan
             = ShiftPlan.ConstructRandom(World.Depots, Constraints.AllowedShiftStartingTimes.ToList(),
-            Constraints.AllowedShiftDurations.ToList(), Random);
-
-        return FindOptimalFrom(initShiftPlan, incidentsSets);
+                Constraints.AllowedShiftDurations.ToList(), Random);
+        
+        StepThroughInit(incidentsSets);
+        (this as IStepOptimizer).Run();
+        return new List<ShiftPlan> { OptimalShiftPlan };
+    }
+    
+    public override IEnumerable<ShiftPlan> FindOptimalFrom(ShiftPlan startShiftPlan, List<SuccessRatedIncidents> incidentsSets)
+    {
+        StartShiftPlan = startShiftPlan;
+        StepThroughInit(incidentsSets);
+        (this as IStepOptimizer).Run();
+        return new List<ShiftPlan> { OptimalShiftPlan };
     }
 
-    public override IEnumerable<ShiftPlan> FindOptimalFrom(ShiftPlan startShiftPlan, List<SuccessRatedIncidents> incidentsSets)
+    public void StepThroughInit(List<SuccessRatedIncidents> incidentsSets)
+    {
+        if (StartShiftPlan is null)
+        {
+            throw new InvalidOperationException($"Must set {nameof(StartShiftPlan)} before initializing.");
+        }
+        
+        _incidentsSets = incidentsSets;
+
+        _globalBest = StartShiftPlan; 
+        _globalBestFitness = Fitness(_globalBest, incidentsSets);
+
+        _currentBestMove = null;
+        _currentBest = StartShiftPlan; 
+        _currentBestFitness = _globalBestFitness;
+        _currentTemperature = HighestTemperature;
+    }
+
+    public void Step()
     {
         int Fitness(ShiftPlan shiftPlan)
         {
-            return DampedFitness(shiftPlan, incidentsSets);
+            return DampedFitness(shiftPlan, _incidentsSets);
         }
-
-        ShiftPlan globalBest = startShiftPlan;
-        int globalBestFitness = Fitness(globalBest);
-
-        Move? currentBestMove = null;
-        ShiftPlan currentBest = startShiftPlan;
-        int currentBestFitness = globalBestFitness;
-
-
-        Stopwatch sw = new Stopwatch();
-        for (double currentTemperature = HighestTemperature; currentTemperature > LowestTemperature; currentTemperature *= TemperatureReductionFactor)
+        
+        List<Move> moves = GetNeighborhoodMoves(_currentBest).ToList();
+        if (moves.Count > NeighboursLimit)
         {
-            sw.Start();
-
-            List<Move> moves = GetNeighborhoodMoves(currentBest).ToList();
-            if (moves.Count > NeighboursLimit)
-            {
-                moves = moves.GetRandomSamples(NeighboursLimit, Random);
-            }
-
-            foreach (Move move in moves)
-            {
-                ModifyMakeMove(currentBest, move);
-                int neighbourFitness = Fitness(currentBest);
-
-                if (neighbourFitness < currentBestFitness)
-                {
-                    currentBestMove = move;
-                    currentBestFitness = neighbourFitness;
-
-                    if (currentBestFitness < globalBestFitness)
-                    {
-                        globalBest = currentBest.Copy();
-                        globalBestFitness = currentBestFitness;
-                    }
-                }
-                else if (Accept(currentBestFitness - neighbourFitness, currentTemperature))
-                {
-                    currentBestMove = move;
-                    currentBestFitness = neighbourFitness;
-                }
-
-                ModifyUnmakeMove(currentBest, move);
-            }
-
-            if (currentBestMove is null || currentBest is null)
-            {
-                throw new ArgumentException("All neighbours either have worse fitness and even none was accepted, leading to no move being selected.");
-            }
-
-            currentBest = ModifyMakeMove(currentBest.Copy(), currentBestMove);
-
-            Logger.Instance.WriteLineForce($"Temperature: {currentTemperature} / {LowestTemperature}");
-            Logger.Instance.WriteLineForce($"One step took: {sw.ElapsedMilliseconds}ms"); sw.Reset();
-            Logger.Instance.WriteLineForce($"Global best: {globalBestFitness} ({globalBest})");
-            Logger.Instance.WriteLineForce($"Current best: {currentBestFitness} ({currentBest})");
-            Logger.Instance.WriteLineForce();
+            moves = moves.GetRandomSamples(NeighboursLimit, Random);
         }
 
-        return new List<ShiftPlan> { globalBest };
+        foreach (Move move in moves)
+        {
+            ModifyMakeMove(_currentBest, move);
+            int neighbourFitness = Fitness(_currentBest);
+
+            if (neighbourFitness < _currentBestFitness)
+            {
+                _currentBestMove = move;
+                _currentBestFitness = neighbourFitness;
+
+                if (_currentBestFitness < _globalBestFitness)
+                {
+                    _globalBest = _currentBest.Copy();
+                    _globalBestFitness = _currentBestFitness;
+                }
+            }
+            else if (Accept(_currentBestFitness - neighbourFitness, _currentTemperature))
+            {
+                _currentBestMove = move;
+                _currentBestFitness = neighbourFitness;
+            }
+
+            ModifyUnmakeMove(_currentBest, move);
+        }
+
+        if (_currentBestMove is null || _currentBest is null)
+        {
+            throw new ArgumentException("All neighbours either have worse fitness and even none was accepted, leading to no move being selected.");
+        }
+
+        _currentBest = ModifyMakeMove(_currentBest.Copy(), _currentBestMove);
+        
+        _currentTemperature *= TemperatureReductionFactor;
+        CurrStep++;
     }
 
-    public bool Accept(double difference, double temperature)
+    public bool IsFinished()
+    {
+        return _currentTemperature > LowestTemperature;
+    }
+
+    private bool Accept(double difference, double temperature)
     {
         const double boltzmanConstant = 1.00000000000000000000000380649;
         double probability = Math.Exp(-difference / (boltzmanConstant * temperature));

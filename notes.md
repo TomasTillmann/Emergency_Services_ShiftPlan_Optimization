@@ -1,3 +1,27 @@
+# TODO
+- vytvorit vhodne reprezentujici data:
+    - svet bude vzdy realny
+        - k casu dojezdu do ruznych lokaci muzu pricitat nahodne pronasobene zpozdeni (0-20min napr.)
+        - naparsovat data z reality
+
+    - trenovani:
+        - natrenovat pro genericke situace, tedy kdy se incidenty deji rovnomerne uniforme (prijemne data)
+        - kriticke data := hodne incidentu naraz, hodne incidentu na jednom miste, nejaka kombinace tohohle
+        - natrenovat pro genericke situace ale i se spetkou okrajovych pripadu, jestli se chova dobre pro prijemne data, a lepe pro kriticke data
+
+    - nejaky jeden .cs skript ktery na techle datech spusti vsechny simulace paralelne a vyplyvne statistiky
+
+- pridat nejake nove optimizery
+    - dokoncit ACO, muzu ty cesty tam nejak lepe propojit nebo idk, musim se podivat do te knihy ACO
+
+- premyslet nad tim prostorem
+- popsat ten prostor dobre, sepsat uz vsechno
+
+
+ADDITIONAL:
+- zoptimalizovat simulaci, treba Spany pouzit na tu simulaci ? nejak, nebo nejaky AOT?
+
+
 # Constraint Programming in pursuit of the holy grail - barak
 
 - CSP Problem definition

@@ -2,6 +2,7 @@
 using Logging;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -134,35 +135,37 @@ public static class Extensions
         }
     }
 
-    public static void ShowGraph(this ShiftPlan shiftPlan, Seconds end)
+    public static void ShowGraph(this ShiftPlan shiftPlan, Seconds end, TextWriter writer = null)
     {
+        writer ??= Console.Out;
+        
         int index = 1;
         foreach(var shift in shiftPlan.Shifts)
         {
-            Logger.Instance.WriteForce($"{index++}: ");
+            writer.WriteLine($"{index++}: ");
 
             for(Seconds time = 0.ToSeconds(); time < end; time += (5 * 60).ToSeconds())
             {
                 if(time.Value % 1.ToHours().ToSeconds().Value == 0)
                 {
-                    Logger.Instance.WriteForce($"{time.Value / (60 * 60)}");
+                    writer.WriteLine($"{time.Value / (60 * 60)}");
                 }
                 else
                 {
-                    Logger.Instance.WriteForce(shift.Work.IsInInterval(time) ? "-" : " ");
+                    writer.WriteLine(shift.Work.IsInInterval(time) ? "-" : " ");
                 }
             }
 
-            Logger.Instance.WriteLineForce(Environment.NewLine);
-            Logger.Instance.WriteForce($"{shift.Id}: ");
+            writer.WriteLine(Environment.NewLine);
+            writer.WriteLine($"{shift.Id}: ");
 
             for(Seconds time = 0.ToSeconds(); time < end; time += (5 * 60).ToSeconds())
             {
-                Logger.Instance.WriteForce(shift.PlannedIncident(time) is not null ? "=" : " ");
+                writer.WriteLine(shift.PlannedIncident(time) is not null ? "=" : " ");
             }
 
-            Logger.Instance.WriteLineForce(Environment.NewLine);
-            Logger.Instance.WriteLineForce(Environment.NewLine);
+            writer.WriteLine(Environment.NewLine);
+            writer.WriteLine(Environment.NewLine);
         }
     }
 }
