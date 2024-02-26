@@ -1,9 +1,10 @@
-﻿//#define RunTabuSearch
+﻿#define RunTabuSearch
 //#define RunSimulatedAnnealing
 //#define HowDoNeighboursLook
 //#define HowDoesRandomSampleLook
-#define RunACO
+//#define RunACO
 //#define PlotConvergence
+//#define RunReport
 
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
@@ -24,13 +25,37 @@ namespace Client;
 
 class Program
 {
+    #if RunReport
+    static void Main()
+    {
+        using Report report = new(Console.Out);
+        
+        World world = Worlds.GetNormal_1();
+        Domain domain = Domains.GetStandardDomain();
+        
+        DataProvider dataProvider = new(20);
+        List<SuccessRatedIncidents> incidents = new()
+        {
+            dataProvider.GetIncidents(80, 23.ToHours(), successRateThreshold: 1)
+        };
+        
+        List<IOptimizer> optimizers = new()
+        {
+            new TabuSearchOptimizer(world, domain),
+            new SimulatedAnnealingOptimizer(world, domain),
+        };
+        
+        report.Run(optimizers, incidents);
+    }
+#endif
+    
 #if RunTabuSearch
     static void Main()
     {
         DataProvider dataProvider = new(20);
         List<SuccessRatedIncidents> incidents = new()
         {
-            dataProvider.GetIncidents(80, 23.ToHours(), successRateThreshold: 1)
+            dataProvider.GetIncidents(80, 23.ToHours(), successRateThreshold: 0.7)
         };
 
         //List<SuccessRatedIncidents> incidents = new()
@@ -58,7 +83,7 @@ class Program
 
         Logger.Instance.WriteLineForce($"Optimizing took: {sw.ElapsedMilliseconds}ms.");
 
-        Simulating simulation = new(dataProvider.GetWorld());
+        Simulation simulation = new(dataProvider.GetWorld());
         foreach(var optimal in optimals)
         {
             Statistics stats = simulation.Run(incidents.First().Value, optimal);

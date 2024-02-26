@@ -11,7 +11,7 @@ public class Logger : IDisposable
 
     private Logger()
     {
-        writer = new StreamWriter("Log.txt", append: true);
+        writer = new StreamWriter("/home/tom/School/Bakalarka/Emergency_Services_ShiftPlan_Optimization/src/Log.txt", append: true);
 
         writer.WriteLine();
         writer.WriteLine(LogDivider);

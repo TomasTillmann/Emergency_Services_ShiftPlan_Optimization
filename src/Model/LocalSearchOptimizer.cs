@@ -9,6 +9,8 @@ public abstract class LocalSearchOptimizer : MetaheuristicOptimizer
 
     private readonly ShiftsTravel shiftTravel;
 
+    public abstract IEnumerable<ShiftPlan> FindOptimalFrom(ShiftPlan startShiftPlan, List<SuccessRatedIncidents> incidentsSets);
+
     protected LocalSearchOptimizer(World world, Domain constraints) : base(world, constraints)
     {
         shiftTravel = new ShiftsTravel(constraints);
