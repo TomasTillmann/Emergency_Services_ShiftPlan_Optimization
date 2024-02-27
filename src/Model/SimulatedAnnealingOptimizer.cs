@@ -1,5 +1,4 @@
 ﻿using ESSP.DataModel;
-using Logging;
 using Model.Extensions;
 using Optimizing;
 using System;
@@ -12,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Optimization;
 
-public class SimulatedAnnealingOptimizer : LocalSearchOptimizer
+public class SimulatedAnnealingOptimizer : LocalSearchOptimizer, IStepOptimizer
 {
     #region Parameters
    
@@ -26,7 +25,7 @@ public class SimulatedAnnealingOptimizer : LocalSearchOptimizer
     public int CurrStep { get; protected set; }
     
     public ShiftPlan StartShiftPlan { get; set; }
-    public ShiftPlan OptimalShiftPlan { get; protected set; }
+    public IEnumerable<ShiftPlan> OptimalShiftPlans => new List<ShiftPlan> { _globalBest };
 
     public readonly Random Random;
 
@@ -64,24 +63,26 @@ public class SimulatedAnnealingOptimizer : LocalSearchOptimizer
             = ShiftPlan.ConstructRandom(World.Depots, Constraints.AllowedShiftStartingTimes.ToList(),
                 Constraints.AllowedShiftDurations.ToList(), Random);
         
-        StepThroughInit(incidentsSets);
-        (this as IStepOptimizer).Run();
-        return new List<ShiftPlan> { OptimalShiftPlan };
+        InitStepThroughOptimizer(incidentsSets);
+        Run();
+        return OptimalShiftPlans;
     }
     
     public override IEnumerable<ShiftPlan> FindOptimalFrom(ShiftPlan startShiftPlan, List<SuccessRatedIncidents> incidentsSets)
     {
         StartShiftPlan = startShiftPlan;
-        StepThroughInit(incidentsSets);
-        (this as IStepOptimizer).Run();
-        return new List<ShiftPlan> { OptimalShiftPlan };
+        InitStepThroughOptimizer(incidentsSets);
+        Run();
+        return OptimalShiftPlans;
     }
 
-    public void StepThroughInit(List<SuccessRatedIncidents> incidentsSets)
+    public void InitStepThroughOptimizer(List<SuccessRatedIncidents> incidentsSets)
     {
         if (StartShiftPlan is null)
         {
-            throw new InvalidOperationException($"Must set {nameof(StartShiftPlan)} before initializing.");
+            StartShiftPlan
+                = ShiftPlan.ConstructRandom(World.Depots, Constraints.AllowedShiftStartingTimes.ToList(),
+                    Constraints.AllowedShiftDurations.ToList(), Random);
         }
         
         _incidentsSets = incidentsSets;
@@ -101,8 +102,6 @@ public class SimulatedAnnealingOptimizer : LocalSearchOptimizer
         {
             Step();
         }
-
-        OptimalShiftPlan = _globalBest;
     }
 
     public void Step()
@@ -156,7 +155,7 @@ public class SimulatedAnnealingOptimizer : LocalSearchOptimizer
 
     public bool IsFinished()
     {
-        return _currentTemperature > LowestTemperature;
+        return _currentTemperature <= LowestTemperature;
     }
 
     private bool Accept(double difference, double temperature)

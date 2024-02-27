@@ -1,5 +1,5 @@
-﻿#define RunTabuSearch
-//#define RunSimulatedAnnealing
+﻿//#define RunTabuSearch
+#define RunSimulatedAnnealing
 //#define HowDoNeighboursLook
 //#define HowDoesRandomSampleLook
 //#define RunACO
@@ -12,7 +12,6 @@ using BenchmarkDotNet.Running;
 using DataHandling;
 using DataModel.Interfaces;
 using ESSP.DataModel;
-using Logging;
 using Model.Extensions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -52,11 +51,14 @@ class Program
 #if RunTabuSearch
     static void Main()
     {
+        using Visualizer visualizer = new(Console.Out);
         DataProvider dataProvider = new(20);
         List<SuccessRatedIncidents> incidents = new()
         {
-            dataProvider.GetIncidents(80, 23.ToHours(), successRateThreshold: 0.7)
+            dataProvider.GetIncidents(70, 23.ToHours(), successRateThreshold: 0.7)
         };
+
+        visualizer.WriteSuccessRatedIncidentsSet(incidents);
 
         //List<SuccessRatedIncidents> incidents = new()
         //{
@@ -71,25 +73,19 @@ class Program
         (
             world: dataProvider.GetWorld(),
             constraints: dataProvider.GetDomain(),
-            iterations: 50,
-            tabuSize: 20,
+            iterations: 30,
+            tabuSize: 10,
             neighboursLimit: 30
         );
 
-        //Console.WriteLine(incidents.Visualize(separator: "\n"));
-        Stopwatch sw = Stopwatch.StartNew();
-
         IEnumerable<ShiftPlan> optimals = optimizer.FindOptimal(incidents);
 
-        Logger.Instance.WriteLineForce($"Optimizing took: {sw.ElapsedMilliseconds}ms.");
-
         Simulation simulation = new(dataProvider.GetWorld());
-        foreach(var optimal in optimals)
+        foreach(ShiftPlan optimal in optimals)
         {
             Statistics stats = simulation.Run(incidents.First().Value, optimal);
-            optimal.ShowGraph(24.ToHours().ToSeconds());
-            Logger.Instance.WriteLineForce(stats);
-            Logger.Instance.WriteLineForce();
+            visualizer.WriteStats(stats);
+            visualizer.WriteGraph(optimal, 24.ToHours().ToSeconds());
         }
     }
 #endif
@@ -97,11 +93,16 @@ class Program
 #if RunSimulatedAnnealing
     static void Main()
     {
+        using TextWriter writer = Console.Out;
+        using Visualizer visualizer = new(writer);
+        
         DataProvider dataProvider = new(50);
         List<SuccessRatedIncidents> incidents = new()
         {
-            dataProvider.GetIncidents(200, 22.ToHours().ToSeconds() + 30.ToMinutes().ToSeconds(), successRateThreshold: 1)
+            dataProvider.GetIncidents(200, 22.ToHours().ToSeconds() + 30.ToMinutes().ToSeconds(), successRateThreshold: 0.9)
         };
+        
+        visualizer.WriteSuccessRatedIncidentsSet(incidents);
 
         //List<SuccessRatedIncidents> incidents = new()
         //{
@@ -112,7 +113,7 @@ class Program
         //    }, 1)
         //};
 
-        IOptimizer optimizer = new SimulatedAnnealingOptimizer
+        SimulatedAnnealingOptimizer optimizer = new
         (
             world: dataProvider.GetWorld(),
             constraints: dataProvider.GetDomain(),
@@ -126,17 +127,29 @@ class Program
         //Console.WriteLine(incidents.Visualize(separator: "\n"));
         Stopwatch sw = Stopwatch.StartNew();
 
-        IEnumerable<ShiftPlan> optimals = optimizer.FindOptimal(incidents);
+        //IEnumerable<ShiftPlan> optimals = optimizer.FindOptimal(incidents);
+        optimizer.InitStepThroughOptimizer(incidents);
 
-        Logger.Instance.WriteLineForce($"Optimizing took: {sw.ElapsedMilliseconds}ms.");
-
+        while (!optimizer.IsFinished())
+        {
+            writer.WriteLine($"Curr step: {optimizer.CurrStep}");
+            writer.WriteLine($"Curr temp: {optimizer.CurrentTemperature}");
+            writer.WriteLine($"Global best: {optimizer.GlobalBest}");
+            writer.WriteLine($"Global best fitness: {optimizer.GlobalBestFitness}");
+            writer.WriteLine($"Curr best: {optimizer.CurrentBest}");
+            writer.WriteLine($"Curr best fitness: {optimizer.CurrentBestFitness}");
+            writer.WriteLine("------------------");
+            writer.Flush();
+            
+            optimizer.Step();
+        }
+        
         Simulation simulation = new(dataProvider.GetWorld());
-        foreach(var optimal in optimals)
+        foreach(var optimal in optimizer.OptimalShiftPlans)
         {
             Statistics stats = simulation.Run(incidents.First().Value, optimal);
-            optimal.ShowGraph(24.ToHours().ToSeconds());
-            Logger.Instance.WriteLineForce(stats);
-            Logger.Instance.WriteLineForce();
+            visualizer.WriteStats(stats);
+            visualizer.WriteGraph(optimal, 24.ToHours().ToSeconds());
         }
     }
 #endif

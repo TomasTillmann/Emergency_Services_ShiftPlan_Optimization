@@ -1,9 +1,12 @@
 ﻿using DataModel.Interfaces;
 using Model.Extensions;
+using Id = System.UInt32;
 
 namespace ESSP.DataModel;
-public class Incident : ILocatable
+public class Incident : ILocatable, IIdentifiable
 {
+    private static Id nextId = 0;
+    public Id Id { get; }
     public Coordinate Location { get; set; }
 
     public Seconds Occurence { get; set; }
@@ -21,6 +24,8 @@ public class Incident : ILocatable
         OnSceneDuration = onSceneDuration;
         InHospitalDelivery = inHospitalDelivery;
         Type = type;
+
+        Id = nextId++;
     }
 
     public override string ToString()

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using DataModel.Interfaces;
 using ESSP.DataModel;
-using Logging;
 
 namespace Simulating;
 

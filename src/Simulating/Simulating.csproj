@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DataModel\DataModel.csproj" />
-    <ProjectReference Include="..\Logger\Logger.csproj" />
   </ItemGroup>
 
     <ItemGroup>
