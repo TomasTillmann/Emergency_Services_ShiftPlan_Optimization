@@ -1,1 +1,141 @@
-{"UnhandledIncidents":[],"HandledIncidents":[{"Location":{"X":{"Value":41441},"Y":{"Value":644}},"Occurence":{"Value":265},"OnSceneDuration":{"Value":660},"InHospitalDelivery":{"Value":840},"Type":{"Name":"IncType7","MaximumResponseTime":{"Value":36000},"AllowedAmbulanceTypes":[{"Name":"AmbT1","Cost":200.0}]}},{"Location":{"X":{"Value":18258},"Y":{"Value":13371}},"Occurence":{"Value":5932},"OnSceneDuration":{"Value":1860},"InHospitalDelivery":{"Value":360},"Type":{"Name":"IncType7","MaximumResponseTime":{"Value":36000},"AllowedAmbulanceTypes":[{"Name":"AmbT1","Cost":200.0}]}},{"Location":{"X":{"Value":14480},"Y":{"Value":32407}},"Occurence":{"Value":12411},"OnSceneDuration":{"Value":660},"InHospitalDelivery":{"Value":840},"Type":{"Name":"IncType7","MaximumResponseTime":{"Value":36000},"AllowedAmbulanceTypes":[{"Name":"AmbT1","Cost":200.0}]}},{"Location":{"X":{"Value":16662},"Y":{"Value":38805}},"Occurence":{"Value":12834},"OnSceneDuration":{"Value":840},"InHospitalDelivery":{"Value":480},"Type":{"Name":"IncType7","MaximumResponseTime":{"Value":36000},"AllowedAmbulanceTypes":[{"Name":"AmbT1","Cost":200.0}]}},{"Location":{"X":{"Value":31723},"Y":{"Value":31266}},"Occurence":{"Value":16615},"OnSceneDuration":{"Value":1080},"InHospitalDelivery":{"Value":420},"Type":{"Name":"IncType7","MaximumResponseTime":{"Value":36000},"AllowedAmbulanceTypes":[{"Name":"AmbT1","Cost":200.0}]}},{"Location":{"X":{"Value":1357},"Y":{"Value":10987}},"Occurence":{"Value":22934},"OnSceneDuration":{"Value":660},"InHospitalDelivery":{"Value":480},"Type":{"Name":"IncType7","MaximumResponseTime":{"Value":36000},"AllowedAmbulanceTypes":[{"Name":"AmbT1","Cost":200.0}]}}],"AllIncidents":[{"Location":{"X":{"Value":41441},"Y":{"Value":644}},"Occurence":{"Value":265},"OnSceneDuration":{"Value":660},"InHospitalDelivery":{"Value":840},"Type":{"Name":"IncType7","MaximumResponseTime":{"Value":36000},"AllowedAmbulanceTypes":[{"Name":"AmbT1","Cost":200.0}]}},{"Location":{"X":{"Value":18258},"Y":{"Value":13371}},"Occurence":{"Value":5932},"OnSceneDuration":{"Value":1860},"InHospitalDelivery":{"Value":360},"Type":{"Name":"IncType7","MaximumResponseTime":{"Value":36000},"AllowedAmbulanceTypes":[{"Name":"AmbT1","Cost":200.0}]}},{"Location":{"X":{"Value":14480},"Y":{"Value":32407}},"Occurence":{"Value":12411},"OnSceneDuration":{"Value":660},"InHospitalDelivery":{"Value":840},"Type":{"Name":"IncType7","MaximumResponseTime":{"Value":36000},"AllowedAmbulanceTypes":[{"Name":"AmbT1","Cost":200.0}]}},{"Location":{"X":{"Value":16662},"Y":{"Value":38805}},"Occurence":{"Value":12834},"OnSceneDuration":{"Value":840},"InHospitalDelivery":{"Value":480},"Type":{"Name":"IncType7","MaximumResponseTime":{"Value":36000},"AllowedAmbulanceTypes":[{"Name":"AmbT1","Cost":200.0}]}},{"Location":{"X":{"Value":31723},"Y":{"Value":31266}},"Occurence":{"Value":16615},"OnSceneDuration":{"Value":1080},"InHospitalDelivery":{"Value":420},"Type":{"Name":"IncType7","MaximumResponseTime":{"Value":36000},"AllowedAmbulanceTypes":[{"Name":"AmbT1","Cost":200.0}]}},{"Location":{"X":{"Value":1357},"Y":{"Value":10987}},"Occurence":{"Value":22934},"OnSceneDuration":{"Value":660},"InHospitalDelivery":{"Value":480},"Type":{"Name":"IncType7","MaximumResponseTime":{"Value":36000},"AllowedAmbulanceTypes":[{"Name":"AmbT1","Cost":200.0}]}}],"SuccessRate":1.0}
+{
+  "UnhandledIncidents": [],
+  "HandledIncidents": [
+    {
+      "Location": { "X": { "Value": 41441 }, "Y": { "Value": 644 } },
+      "Occurence": { "Value": 265 },
+      "OnSceneDuration": { "Value": 660 },
+      "InHospitalDelivery": { "Value": 840 },
+      "Type": {
+        "Name": "IncType7",
+        "MaximumResponseTime": { "Value": 36000 },
+        "AllowedAmbulanceTypes": [{ "Name": "AmbT1", "Cost": 200 }]
+      }
+    },
+    {
+      "Location": { "X": { "Value": 18258 }, "Y": { "Value": 13371 } },
+      "Occurence": { "Value": 5932 },
+      "OnSceneDuration": { "Value": 1860 },
+      "InHospitalDelivery": { "Value": 360 },
+      "Type": {
+        "Name": "IncType7",
+        "MaximumResponseTime": { "Value": 36000 },
+        "AllowedAmbulanceTypes": [{ "Name": "AmbT1", "Cost": 200 }]
+      }
+    },
+    {
+      "Location": { "X": { "Value": 14480 }, "Y": { "Value": 32407 } },
+      "Occurence": { "Value": 12411 },
+      "OnSceneDuration": { "Value": 660 },
+      "InHospitalDelivery": { "Value": 840 },
+      "Type": {
+        "Name": "IncType7",
+        "MaximumResponseTime": { "Value": 36000 },
+        "AllowedAmbulanceTypes": [{ "Name": "AmbT1", "Cost": 200 }]
+      }
+    },
+    {
+      "Location": { "X": { "Value": 16662 }, "Y": { "Value": 38805 } },
+      "Occurence": { "Value": 12834 },
+      "OnSceneDuration": { "Value": 840 },
+      "InHospitalDelivery": { "Value": 480 },
+      "Type": {
+        "Name": "IncType7",
+        "MaximumResponseTime": { "Value": 36000 },
+        "AllowedAmbulanceTypes": [{ "Name": "AmbT1", "Cost": 200 }]
+      }
+    },
+    {
+      "Location": { "X": { "Value": 31723 }, "Y": { "Value": 31266 } },
+      "Occurence": { "Value": 16615 },
+      "OnSceneDuration": { "Value": 1080 },
+      "InHospitalDelivery": { "Value": 420 },
+      "Type": {
+        "Name": "IncType7",
+        "MaximumResponseTime": { "Value": 36000 },
+        "AllowedAmbulanceTypes": [{ "Name": "AmbT1", "Cost": 200 }]
+      }
+    },
+    {
+      "Location": { "X": { "Value": 1357 }, "Y": { "Value": 10987 } },
+      "Occurence": { "Value": 22934 },
+      "OnSceneDuration": { "Value": 660 },
+      "InHospitalDelivery": { "Value": 480 },
+      "Type": {
+        "Name": "IncType7",
+        "MaximumResponseTime": { "Value": 36000 },
+        "AllowedAmbulanceTypes": [{ "Name": "AmbT1", "Cost": 200 }]
+      }
+    }
+  ],
+  "AllIncidents": [
+    {
+      "Location": { "X": { "Value": 41441 }, "Y": { "Value": 644 } },
+      "Occurence": { "Value": 265 },
+      "OnSceneDuration": { "Value": 660 },
+      "InHospitalDelivery": { "Value": 840 },
+      "Type": {
+        "Name": "IncType7",
+        "MaximumResponseTime": { "Value": 36000 },
+        "AllowedAmbulanceTypes": [{ "Name": "AmbT1", "Cost": 200 }]
+      }
+    },
+    {
+      "Location": { "X": { "Value": 18258 }, "Y": { "Value": 13371 } },
+      "Occurence": { "Value": 5932 },
+      "OnSceneDuration": { "Value": 1860 },
+      "InHospitalDelivery": { "Value": 360 },
+      "Type": {
+        "Name": "IncType7",
+        "MaximumResponseTime": { "Value": 36000 },
+        "AllowedAmbulanceTypes": [{ "Name": "AmbT1", "Cost": 200 }]
+      }
+    },
+    {
+      "Location": { "X": { "Value": 14480 }, "Y": { "Value": 32407 } },
+      "Occurence": { "Value": 12411 },
+      "OnSceneDuration": { "Value": 660 },
+      "InHospitalDelivery": { "Value": 840 },
+      "Type": {
+        "Name": "IncType7",
+        "MaximumResponseTime": { "Value": 36000 },
+        "AllowedAmbulanceTypes": [{ "Name": "AmbT1", "Cost": 200 }]
+      }
+    },
+    {
+      "Location": { "X": { "Value": 16662 }, "Y": { "Value": 38805 } },
+      "Occurence": { "Value": 12834 },
+      "OnSceneDuration": { "Value": 840 },
+      "InHospitalDelivery": { "Value": 480 },
+      "Type": {
+        "Name": "IncType7",
+        "MaximumResponseTime": { "Value": 36000 },
+        "AllowedAmbulanceTypes": [{ "Name": "AmbT1", "Cost": 200 }]
+      }
+    },
+    {
+      "Location": { "X": { "Value": 31723 }, "Y": { "Value": 31266 } },
+      "Occurence": { "Value": 16615 },
+      "OnSceneDuration": { "Value": 1080 },
+      "InHospitalDelivery": { "Value": 420 },
+      "Type": {
+        "Name": "IncType7",
+        "MaximumResponseTime": { "Value": 36000 },
+        "AllowedAmbulanceTypes": [{ "Name": "AmbT1", "Cost": 200 }]
+      }
+    },
+    {
+      "Location": { "X": { "Value": 1357 }, "Y": { "Value": 10987 } },
+      "Occurence": { "Value": 22934 },
+      "OnSceneDuration": { "Value": 660 },
+      "InHospitalDelivery": { "Value": 480 },
+      "Type": {
+        "Name": "IncType7",
+        "MaximumResponseTime": { "Value": 36000 },
+        "AllowedAmbulanceTypes": [{ "Name": "AmbT1", "Cost": 200 }]
+      }
+    }
+  ],
+  "SuccessRate": 1.0
+}
+
