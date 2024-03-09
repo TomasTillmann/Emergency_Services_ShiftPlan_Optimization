@@ -16,8 +16,7 @@ public readonly struct DepotOpt
       Ambulances[i] = new AmbulanceOpt
       {
         Type = ambulances[i].Type,
-        ReroutePenaltySec = ambulances[i].ReroutePenaltySec,
-        Location = ambulances[i].Location
+        Location = location
       };
     }
   }

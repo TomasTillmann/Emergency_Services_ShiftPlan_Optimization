@@ -1,67 +1,96 @@
+using System.Collections.Immutable;
 using DataModel.Interfaces;
 using ESSP.DataModel;
 
-namespace ESSP.SimulatingOptimized;
+namespace SimulatingOptimized;
 
 public sealed class SimulationOptimized
 {
-  public IReadOnlyList<Depot> Depots { get; }
-  public IDistanceCalculator DistanceCalculator { get; }
-  public Seconds CurrentTime { get; private set; } = 0.ToSeconds();
+  public ImmutableArray<DepotOpt> Depots { get; }
+  public DistanceCalculatorOpt DistanceCalculator { get; }
 
-  private readonly ShiftEvaluator shiftEvaluator;
-  private readonly PlannableIncident.Factory plannableIncidentFactory;
+  public int CurrentTimeSec { get; private set; } = 0;
 
-  public SimulationOptimized(World world)
+  private readonly ShiftEvaluatorOpt _shiftEvaluator;
+  private readonly PlannableIncidentOpt.Factory _plannableIncidentFactory;
+
+  public SimulationOptimized(WorldOpt world) : this(world.Depots, world.Hospitals, world.IncTypeToAllowedAmbTypesTable, world.DistanceCalculator) { }
+
+  public SimulationOptimized(ImmutableArray<DepotOpt> depots, ImmutableArray<HospitalOpt> hospitals, IncTypeToAllowedAmbTypesTable ambToIncTypesTable, DistanceCalculatorOpt distanceCalculator)
   {
-    Depots = world.Depots;
-    DistanceCalculator = world.DistanceCalculator;
+    Depots = depots;
+    DistanceCalculator = distanceCalculator;
 
-    plannableIncidentFactory = new PlannableIncident.Factory(DistanceCalculator, world.Hospitals);
-    shiftEvaluator = new ShiftEvaluator(plannableIncidentFactory);
+    _plannableIncidentFactory = new PlannableIncidentOpt.Factory(DistanceCalculator, hospitals);
+    _shiftEvaluator = new ShiftEvaluatorOpt(distanceCalculator, hospitals, ambToIncTypesTable);
   }
 
-  /// <summary>
-  /// Runs the simulation for given <paramref name="shiftPlan"/> on given <paramref name="incidents"/>.
-  /// Returns statistics, including success rate of given <paramref name="shiftPlan"/>.
-  /// </summary>
-  /// <param name="incidents">Have to be sorted in ascending order by occurence. It is not sorted nor checked internally for faster performance.</param>
-  /// <param name="shiftPlan"></param>
-  /// <returns></returns>
-  public void Run(IReadOnlyList<Incident> incidents, ShiftPlan shiftPlan)
+  public ShiftPlanOpt Run(IncidentOpt[] incidents)
   {
-    CurrentTime = 0.ToSeconds();
+    ShiftPlanOpt simulateOnThisShiftPlan = ShiftPlanOpt.GetFrom(Depots, incidents.Length);
 
-    foreach (Incident currentIncident in incidents)
+    // Prepare shiftPlan for simulation.  
+    simulateOnThisShiftPlan.ClearPlannedIncidents();
+
+    // Sort in order to simulate incidents in order of occurence
+    Array.Sort(incidents, (x, y) => x.OccurenceSec.CompareTo(y.OccurenceSec));
+
+    for (int i = 0; i < incidents.Length; ++i)
     {
-      CurrentTime = currentIncident.Occurence;
-      Step(currentIncident);
+      // ref
+      IncidentOpt currentIncident = incidents[i];
+      CurrentTimeSec = currentIncident.OccurenceSec;
+
+      Step(in currentIncident, simulateOnThisShiftPlan);
     }
+
+    return simulateOnThisShiftPlan;
   }
 
-  private void Step(Incident currentIncident)
+  private void Step(in IncidentOpt currentIncident, ShiftPlanOpt simulateOnThisShiftPlan)
   {
-    Shift bestShift = null;
-    foreach (Shift shift in shiftPlan.Shifts)
-    {
-      if (shiftEvaluator.IsHandling(shift, currentIncident))
-      {
-        if (bestShift is null)
-        {
-          bestShift = shift;
-          continue;
-        }
+    //TODO: is this O(1)?
+    //Span<ShiftOpt> shifts = simulateOnThisShiftPlan.Shifts.AsSpan();
 
-        bestShift = shiftEvaluator.GetBetter(bestShift, shift, currentIncident);
+    ShiftOpt[] shifts = simulateOnThisShiftPlan.Shifts;
+
+    // Has to be assigned to something in order to compile, but it will be reassigned to first handling shift found.
+    // If not, than the other loop won't happen, therefore it's value is irrelevant.
+    ShiftOpt bestShift = shifts[0];
+    ShiftOpt shift;
+
+    // find handlingShift
+    int findBetterFromIndex = shifts.Length;
+    for (int i = 0; i < shifts.Length; ++i)
+    {
+      shift = shifts[i];
+
+      if (_shiftEvaluator.IsHandling(shift, in currentIncident))
+      {
+        bestShift = shift;
+        findBetterFromIndex = i + 1;
+        break;
       }
     }
 
-    if (bestShift is null)
+    for (int i = findBetterFromIndex; i < shifts.Length; ++i)
     {
-      statistics.SetUnhandled(currentIncident);
+      shift = shifts[i];
+
+      if (_shiftEvaluator.IsHandling(shift, in currentIncident))
+      {
+        bestShift = _shiftEvaluator.GetBetter(bestShift, shift, in currentIncident);
+      }
+    }
+
+    // no hadnling shift exists
+    if (findBetterFromIndex == shifts.Length)
+    {
+      // Do nothing, cannot plan this incident.
+      // TODO: Update some stats
       return;
     }
 
-    bestShift.Plan(plannableIncidentFactory.Get(currentIncident, bestShift));
+    bestShift.Plan(_plannableIncidentFactory.GetCopy(in currentIncident, bestShift));
   }
 }

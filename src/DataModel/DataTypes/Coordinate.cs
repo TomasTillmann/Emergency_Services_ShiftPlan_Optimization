@@ -2,12 +2,6 @@
 
 namespace ESSP.DataModel
 {
-  public readonly struct CoordinateOpt
-  {
-    public int XMet { get; init; }
-    public int YMet { get; init; }
-  }
-
   public readonly struct Coordinate
   {
     public Meters X { get; init; }

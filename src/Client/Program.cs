@@ -1,15 +1,17 @@
 ﻿//#define RunTabuSearch
-#define RunSimulatedAnnealing
+//#define RunSimulatedAnnealing
 //#define HowDoNeighboursLook
 //#define HowDoesRandomSampleLook
 //#define RunACO
 //#define PlotConvergence
 //#define RunReport
+#define OptimizedSimul 
 
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 using DataHandling;
+using DataModel;
 using DataModel.Interfaces;
 using ESSP.DataModel;
 using Model.Extensions;
@@ -18,13 +20,14 @@ using Newtonsoft.Json.Linq;
 using Optimization;
 using Optimizing;
 using Simulating;
+using SimulatingOptimized;
 using System.Diagnostics;
 
 namespace Client;
 
 class Program
 {
-    #if RunReport
+#if RunReport
     static void Main()
     {
         using Report report = new(Console.Out);
@@ -47,7 +50,7 @@ class Program
         report.Run(optimizers, incidents);
     }
 #endif
-    
+
 #if RunTabuSearch
     static void Main()
     {
@@ -374,7 +377,27 @@ class Program
     }
 #endif
 
-    // BENCHMARK OF SIMULATION
+#if OptimizedSimul
+  static void Main()
+  {
+    Visualizer visualizer = new(Console.Out);
+
+    DataModelGenerator dataGenerator = new();
+    WorldOpt world = dataGenerator.GenerateExampleWorld();
+    IncidentOpt[] incidents = dataGenerator.GenerateExampleIncidents();
+    DataParser dataParser = new();
+
+    string json = dataParser.ParseToJson(world);
+    WorldOpt parsedWorld = dataParser.ParseFromJson(json);
+
+    SimulationOptimized simulation = new(world);
+    ShiftPlanOpt simulatedOn = simulation.Run(incidents);
+
+    visualizer.WriteGraph(simulatedOn, 24.ToHours().ToSeconds());
+  }
+#endif
+
+  // BENCHMARK OF SIMULATION
 #if false
     static void Main()
     {
@@ -388,37 +411,37 @@ class Program
 //[RPlotExporter]
 public class SimulationBenchmark
 {
-    DataProvider dataProvider;
-    Simulation simulation;
+  DataProvider dataProvider;
+  Simulation simulation;
 
-    [Params(100)]
-    public int ambulancesCount = 10;
+  [Params(100)]
+  public int ambulancesCount = 10;
 
-    [Params(2000)]
-    public int incidentsCount = 10;
+  [Params(2000)]
+  public int incidentsCount = 10;
 
-    List<Incident> incidents;
-    ShiftPlan shiftPlan;
+  List<Incident> incidents;
+  ShiftPlan shiftPlan;
 
-    [GlobalSetup]
-    public void Setup()
-    {
-        dataProvider = new(ambulancesCount: ambulancesCount);
+  [GlobalSetup]
+  public void Setup()
+  {
+    dataProvider = new(ambulancesCount: ambulancesCount);
 
-        simulation = new(dataProvider.GetWorld());
+    simulation = new(dataProvider.GetWorld());
 
-        shiftPlan = ShiftPlan.ConstructFrom(dataProvider.GetDepots(),
-            dataProvider.GetDomain().AllowedShiftStartingTimes.Min(),
-            dataProvider.GetDomain().AllowedShiftDurations.Max());
+    shiftPlan = ShiftPlan.ConstructFrom(dataProvider.GetDepots(),
+        dataProvider.GetDomain().AllowedShiftStartingTimes.Min(),
+        dataProvider.GetDomain().AllowedShiftDurations.Max());
 
-        incidents = dataProvider.GetIncidents(incidentsCount, 23.ToHours(), 1).Value;
-    }
+    incidents = dataProvider.GetSuccessRatedIncidents(incidentsCount, 23.ToHours(), 1).Value;
+  }
 
-    [Benchmark]
-    public void RunSimulation()
-    {
-        simulation.Run(incidents, shiftPlan);
-    }
+  [Benchmark]
+  public void RunSimulation()
+  {
+    simulation.Run(incidents, shiftPlan);
+  }
 }
 
 // RESULTS

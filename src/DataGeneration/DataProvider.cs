@@ -1,106 +1,168 @@
 ﻿using DataModel.Interfaces;
 using ESSP.DataModel;
 using Model.Extensions;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace DataHandling;
 
+public class DataParser
+{
+  private readonly WorldModelMapper _worldModelMapper = new();
+
+  /// The file has to contain serialize <see cref=WorldModel/>
+  public WorldOpt ParseFromJson(string json)
+  {
+    WorldModel model = JsonConvert.DeserializeObject<WorldModel>(json);
+    return _worldModelMapper.MapBack(model);
+  }
+
+  public string ParseToJson(WorldOpt world)
+  {
+    WorldModel model = _worldModelMapper.Map(world);
+    string json = JsonConvert.SerializeObject(model);
+    return json;
+  }
+}
+
+public class DataProviderForOpt
+{
+  private readonly DataProvider _dataProvider;
+
+  public DataProviderForOpt(int ambulancesCount)
+  {
+    _dataProvider = new DataProvider(ambulancesCount);
+  }
+
+  public List<IncidentOpt> GetIncidents(int count, int durationSec)
+  {
+    List<Incident> incidents = _dataProvider.GetIncidents(count, durationSec.ToSeconds());
+    IEnumerable<IncidentOpt> incidentsOpt = incidents.Select(inc => new IncidentOpt
+    {
+      Location = new CoordinateOpt
+      {
+        XMet = inc.Location.X.Value,
+        YMet = inc.Location.Y.Value
+      },
+      OccurenceSec = inc.Occurence.Value,
+      OnSceneDurationSec = inc.OnSceneDuration.Value,
+      InHospitalDeliverySec = inc.InHospitalDelivery.Value,
+      Type = new IncidentTypeOpt
+      {
+        MaximumResponseTimeSec = inc.Type.MaximumResponseTime.Value
+      }
+    });
+
+    return incidentsOpt.ToList();
+  }
+
+  public List<Depot> GetDepots(int count)
+  {
+    throw new NotImplementedException("TODO");
+  }
+}
+
 public class DataProvider
 {
-    private Meters dimX;
-    private Meters dimY;
-    private Random random = new(42);
+  private Meters dimX;
+  private Meters dimY;
+  private Random random = new(42);
 
-    private World world;
+  private World world;
 
-    private List<Depot> depots;
+  private List<Depot> depots;
 
-    private List<Hospital> hospitals;
+  private List<Hospital> hospitals;
 
-    private List<Ambulance> ambulances;
+  private List<Ambulance> ambulances;
 
-    private List<AmbulanceType> ambulanceTypes;
+  private List<AmbulanceType> ambulanceTypes;
 
-    private List<IncidentType> incidentTypes;
+  private List<IncidentType> incidentTypes;
 
-    private IDistanceCalculator distanceCalculator = new DistanceCalculator();
+  private IDistanceCalculator distanceCalculator = new DistanceCalculator();
 
-    public DataProvider(int ambulancesCount)
+  public DataProvider(int ambulancesCount)
+  {
+    dimX = 50_000.ToMeters();
+    dimY = 50_000.ToMeters();
+
+    GenerateAmbulanceTypes();
+    GenerateIncidentTypes();
+    GenerateAmbulances(ambulancesCount);
+    GenerateDepots(100);
+    GenerateHospitals();
+    GenerateWorld();
+  }
+
+  public SuccessRatedIncidents GetSuccessRatedIncidents(int count, Seconds duration, double successRateThreshold = 0.8)
+  {
+    List<Incident> incidents = GetIncidents(count, duration);
+    return new SuccessRatedIncidents(incidents, successRateThreshold);
+  }
+
+  public List<Incident> GetIncidents(int count, Seconds duration)
+  {
+    List<Incident> incidents = new();
+    for (int i = 0; i < count; ++i)
     {
-        dimX = 50_000.ToMeters();
-        dimY = 50_000.ToMeters();
-
-        GenerateAmbulanceTypes();
-        GenerateIncidentTypes();
-        GenerateAmbulances(ambulancesCount);
-        GenerateDepots();
-        GenerateHospitals();
-        GenerateWorld();
+      incidents.Add
+      (
+          new Incident
+          (
+              location: new Coordinate(random.Next(0, dimX.Value).ToMeters(), random.Next(0, dimY.Value).ToMeters()),
+              occurence: random.Next(0, duration.Value).ToSeconds(),
+              onSceneDuration: random.Next(10, 40).ToMinutes().ToSeconds(),
+              inHospitalDelivery: random.Next(5, 20).ToMinutes().ToSeconds(),
+              type: incidentTypes[random.Next(0, incidentTypes.Count - 1)]
+          )
+      );
     }
 
-    public SuccessRatedIncidents GetIncidents(int count, Seconds duration, double successRateThreshold = 0.8)
-    {
-        List<Incident> incidents = new();
-        for(int i = 0; i < count; ++i)
-        {
-            incidents.Add
-            (
-                new Incident
-                (
-                    location: new Coordinate(random.Next(0, dimX.Value).ToMeters(), random.Next(0, dimY.Value).ToMeters()),
-                    occurence: random.Next(0, duration.Value).ToSeconds(),
-                    onSceneDuration: random.Next(10, 40).ToMinutes().ToSeconds(),
-                    inHospitalDelivery: random.Next(5, 20).ToMinutes().ToSeconds(),
-                    type: incidentTypes[random.Next(0, incidentTypes.Count - 1)]
-                )
-            );
-        }
+    incidents.Sort((x, y) => x.Occurence.CompareTo(y.Occurence));
+    return incidents;
+  }
 
-        incidents.Sort((x, y) => x.Occurence.CompareTo(y.Occurence));
+  public World GetWorld()
+  {
+    return world;
+  }
 
-        return new SuccessRatedIncidents(incidents, successRateThreshold);
-    }
+  public List<IncidentType> GetIncidentTypes()
+  {
+    return incidentTypes;
+  }
 
-    public World GetWorld()
-    {
-        return world;
-    }
+  public List<Hospital> GetHospitals()
+  {
+    return hospitals;
+  }
 
-    public List<IncidentType> GetIncidentTypes()
-    {
-        return incidentTypes;
-    }
+  public List<Depot> GetDepots()
+  {
+    return depots;
+  }
 
-    public List<Hospital> GetHospitals()
-    {
-        return hospitals;
-    }
+  public List<Ambulance> GetAmbulances()
+  {
+    return ambulances;
+  }
 
-    public List<Depot> GetDepots()
-    {
-        return depots;
-    }
+  public List<AmbulanceType> GetAmbulanceTypes()
+  {
+    return ambulanceTypes;
+  }
 
-    public List<Ambulance> GetAmbulances()
-    {
-        return ambulances;
-    }
+  public IDistanceCalculator GetDistanceCalculator()
+  {
+    return distanceCalculator;
+  }
 
-    public List<AmbulanceType> GetAmbulanceTypes()
-    {
-        return ambulanceTypes; 
-    }
-
-    public IDistanceCalculator GetDistanceCalculator()
-    {
-        return distanceCalculator; 
-    }
-
-    private void GenerateIncidentTypes()
-    {
-        incidentTypes = new List<IncidentType>()
+  private void GenerateIncidentTypes()
+  {
+    incidentTypes = new List<IncidentType>()
         {
             //new IncidentType("IncType1", 15.ToMinutes().ToSeconds(), ambulanceTypes.GetRangeRandom(random).ToHashSet()),
             //new IncidentType("IncType2", 30.ToMinutes().ToSeconds(), ambulanceTypes.GetRangeRandom(random).ToHashSet()),
@@ -110,47 +172,47 @@ public class DataProvider
             //new IncidentType("IncType6", 3.ToHours().ToSeconds(), ambulanceTypes.GetRangeRandom(random).ToHashSet()),
             new IncidentType("IncType7", 1.ToHours().ToSeconds(), ambulanceTypes.GetRandomRange(random, minCount: 1).ToHashSet()),
         };
-    }
+  }
 
-    private void GenerateWorld()
+  private void GenerateWorld()
+  {
+    world = new World(depots, hospitals, distanceCalculator);
+  }
+
+  private void GenerateHospitals()
+  {
+    hospitals = new List<Hospital>();
+
+    Meters stepY = (dimY.Value / 5).ToMeters();
+    Meters stepX = (dimX.Value / 5).ToMeters();
+
+    for (Meters y = 300.ToMeters(); y < dimY; y += stepY)
+      for (Meters x = 300.ToMeters(); x < dimX; x += stepX)
+        hospitals.Add(new Hospital(new Coordinate(x, y)));
+  }
+
+  public void GenerateDepots(int count)
+  {
+    depots = new List<Depot>();
+    List<Ambulance> ambulances = new(this.ambulances);
+
+    Meters stepY = (dimY.Value / 5).ToMeters();
+    Meters stepX = (dimX.Value / 5).ToMeters();
+
+    for (Meters y = 10.ToMeters(); y < dimY; y += stepY)
     {
-        world = new World(depots, hospitals, distanceCalculator);
+      for (Meters x = 10.ToMeters(); x < dimX; x += stepX)
+      {
+        HashSet<Ambulance> selectedAmbulances = ambulances.GetRandomRange(random, minCount: 1, maxCount: 20).ToHashSet();
+        ambulances.RemoveAll(amb => selectedAmbulances.Contains(amb));
+
+        depots.Add(new Depot(new Coordinate(x, y), selectedAmbulances.ToList()));
+      }
     }
+  }
 
-    private void GenerateHospitals()
-    {
-        hospitals = new List<Hospital>();
-
-        Meters stepY = (dimY.Value / 5).ToMeters();
-        Meters stepX = (dimX.Value / 5).ToMeters();
-
-        for(Meters y = 300.ToMeters(); y < dimY; y += stepY)
-            for(Meters x = 300.ToMeters(); x < dimX; x += stepX)
-                hospitals.Add(new Hospital(new Coordinate(x, y)));
-    }
-
-    private void GenerateDepots()
-    {
-        depots = new List<Depot>();
-        List<Ambulance> ambulances = new(this.ambulances);
-
-        Meters stepY = (dimY.Value / 5).ToMeters();
-        Meters stepX = (dimX.Value / 5).ToMeters();
-
-        for (Meters y = 10.ToMeters(); y < dimY; y += stepY)
-        {
-            for (Meters x = 10.ToMeters(); x < dimX; x += stepX)
-            {
-                HashSet<Ambulance> selectedAmbulances = ambulances.GetRandomRange(random, minCount: 1, maxCount: 20).ToHashSet();
-                ambulances.RemoveAll(amb => selectedAmbulances.Contains(amb));
-
-                depots.Add(new Depot(new Coordinate(x, y), selectedAmbulances.ToList()));
-            }
-        }
-    }
-
-    private void GenerateAmbulances(int ambulancesCount)
-    {
+  private void GenerateAmbulances(int ambulancesCount)
+  {
 #if false
         ambulances = new List<Ambulance>
         {
@@ -163,20 +225,20 @@ public class DataProvider
 #endif
 
 #if true
-        ambulances = new List<Ambulance>();
-        //List<Seconds> reroutePenalties = new() { 15.ToSeconds(), 30.ToSeconds(), 70.ToSeconds() };
-        List<Seconds> reroutePenalties = new() { 500.ToSeconds() };
+    ambulances = new List<Ambulance>();
+    //List<Seconds> reroutePenalties = new() { 15.ToSeconds(), 30.ToSeconds(), 70.ToSeconds() };
+    List<Seconds> reroutePenalties = new() { 500.ToSeconds() };
 
-        for(int i = 0; i < ambulancesCount; ++i)
-        {
-            ambulances.Add(new Ambulance(ambulanceTypes.GetRandomElement(random), new Coordinate(), reroutePenalties.GetRandomElement(random)));
-        }
-#endif
-    }
-
-    private void GenerateAmbulanceTypes()
+    for (int i = 0; i < ambulancesCount; ++i)
     {
-        ambulanceTypes = new List<AmbulanceType>()
+      ambulances.Add(new Ambulance(ambulanceTypes.GetRandomElement(random), new Coordinate(), reroutePenalties.GetRandomElement(random)));
+    }
+#endif
+  }
+
+  private void GenerateAmbulanceTypes()
+  {
+    ambulanceTypes = new List<AmbulanceType>()
         {
             new AmbulanceType("AmbT1", 200),
             //new AmbulanceType("AmbT2", 400),
@@ -185,10 +247,10 @@ public class DataProvider
             //new AmbulanceType("AmbT5", 1500),
             //new AmbulanceType("AmbT6", 5000),
         };
-    }
+  }
 
-    public Domain GetDomain()
-    {
+  public Domain GetDomain()
+  {
 #if false
         List<Seconds> allowedShiftStartingTimes = new();
         for(Hours hour = 0.ToHours(); hour <= 20.ToHours(); ++hour)
@@ -197,7 +259,7 @@ public class DataProvider
         }
 #endif
 
-        HashSet<Seconds> allowedShiftStartingTimes = new()
+    HashSet<Seconds> allowedShiftStartingTimes = new()
         {
             0.ToHours(),
             6.ToHours(),
@@ -209,7 +271,7 @@ public class DataProvider
             //2.ToSeconds()
         };
 
-        HashSet<Seconds> allowedShiftDurations = new()
+    HashSet<Seconds> allowedShiftDurations = new()
         {
             0.ToHours(),
             4.ToHours(),
@@ -221,6 +283,6 @@ public class DataProvider
             //100.ToSeconds()
         };
 
-        return new Domain(allowedShiftStartingTimes, allowedShiftDurations);
-    }
+    return new Domain(allowedShiftStartingTimes, allowedShiftDurations);
+  }
 }
