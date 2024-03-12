@@ -383,12 +383,81 @@ class Program
     Visualizer visualizer = new(Console.Out);
 
     DataModelGenerator dataGenerator = new();
-    WorldOpt world = dataGenerator.GenerateExampleWorld();
-    IncidentOpt[] incidents = dataGenerator.GenerateExampleIncidents();
+    WorldOpt world = dataGenerator.GenerateWorld(
+      worldSize: new CoordinateModel { XMet = 50_000, YMet = 50_000 },
+      depotsCount: 30,
+      hospitalsCount: 20,
+      ambulancesOnDepotNormalExpected: 20,
+      ambulanceOnDepotNormalStddev: 10,
+      ambTypes: new AmbulanceTypeModel[] {
+        new AmbulanceTypeModel
+        {
+          Name = "A1",
+          Cost = 400
+        },
+        new AmbulanceTypeModel
+        {
+          Name = "A2",
+          Cost = 1000
+        },
+        new AmbulanceTypeModel
+        {
+          Name = "A3",
+          Cost = 1200
+        },
+        new AmbulanceTypeModel
+        {
+          Name = "A4",
+          Cost = 5000
+        },
+      },
+      ambTypeCategorical: new double[] { 0.5, 0.3, 0.15, 0.05 },
+      incToAmbTypesTable: new Dictionary<string, HashSet<string>>
+      {
+        { "I2", new HashSet<string> { "A2", "A3", "A4" } }
+      },
+      random: new Random(42)
+    );
+    IncidentOpt[] incidents = dataGenerator.GenerateIncidents(
+      worldSize: new CoordinateModel { XMet = 50_000, YMet = 50_000 },
+      incidentsCount: 5_000,
+      duration: 24.ToHours().ToSeconds(),
+      onSceneDurationNormalExpected: 20.ToMinutes().ToSeconds(),
+      onSceneDurationNormalStddev: 10.ToMinutes().ToSeconds(),
+      inHospitalDeliveryNormalExpected: 15.ToMinutes().ToSeconds(),
+      inHospitalDeliveryNormalStddev: 10.ToMinutes().ToSeconds(),
+      incTypes: new IncidentTypeModel[] {
+        new IncidentTypeModel
+        {
+          Name = "I1",
+          MaximumResponseTimeSec = 2.ToHours().ToMinutes().ToSeconds().Value
+        },
+        new IncidentTypeModel
+        {
+          Name = "I2",
+          MaximumResponseTimeSec = 1.ToHours().ToMinutes().ToSeconds().Value
+        },
+        new IncidentTypeModel
+        {
+          Name = "I3",
+          MaximumResponseTimeSec = 30.ToMinutes().ToSeconds().Value
+        },
+      },
+      incTypesCategorical: new double[] { 0.7, 0.2, 0.1 },
+      random: new Random(42)
+    );
+
     DataParser dataParser = new();
 
-    string json = dataParser.ParseToJson(world);
-    WorldOpt parsedWorld = dataParser.ParseFromJson(json);
+    using StreamWriter worldWriter = new StreamWriter("world.json");
+    using StreamWriter incidentsWriter = new StreamWriter("incidents.json");
+
+    string json = dataParser.ParseWorldToJson(world);
+    worldWriter.WriteLine(json);
+
+    json = dataParser.ParseIncidentsToJson(incidents);
+    incidentsWriter.WriteLine(json);
+    return;
 
     SimulationOptimized simulation = new(world);
     ShiftPlanOpt simulatedOn = simulation.Run(incidents);
