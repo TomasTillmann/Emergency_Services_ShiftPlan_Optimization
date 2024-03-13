@@ -73,7 +73,7 @@ public class Visualizer : IDisposable
       }
 
       _writer.WriteLine();
-      //_writer.Write($"{shift.Id}: ");
+      _writer.Write($"{shift.Id}: ");
 
       for (Seconds time = 0.ToSeconds(); time < end; time += (5 * 60).ToSeconds())
       {

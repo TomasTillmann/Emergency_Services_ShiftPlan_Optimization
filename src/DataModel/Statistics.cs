@@ -33,7 +33,7 @@ public sealed class Statistics
   public override string ToString()
   {
     return $"SuccessRate: {SuccessRate}\n" +
-           $"AllIncidents: Count: {AllIncidents.Count}, {AllIncidents.Visualize("| ")}\n" +
-           $"UnhandledIncidents: Count: {UnhandledIncidents.Count}, {UnhandledIncidents.Visualize("| ")}\n";
+           $"AllIncidents: Count: {AllIncidents.Count}" +
+           $"UnhandledIncidents: Count: {UnhandledIncidents.Count}";
   }
 }

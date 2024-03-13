@@ -1,31 +1,11 @@
 ﻿using DataModel.Interfaces;
 using ESSP.DataModel;
 using Model.Extensions;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace DataHandling;
-
-public class DataParser
-{
-  private readonly WorldModelMapper _worldModelMapper = new();
-
-  /// The file has to contain serialize <see cref=WorldModel/>
-  public WorldOpt ParseFromJson(string json)
-  {
-    WorldModel model = JsonConvert.DeserializeObject<WorldModel>(json);
-    return _worldModelMapper.MapBack(model);
-  }
-
-  public string ParseToJson(WorldOpt world)
-  {
-    WorldModel model = _worldModelMapper.Map(world);
-    string json = JsonConvert.SerializeObject(model);
-    return json;
-  }
-}
 
 public class DataProviderForOpt
 {
@@ -92,7 +72,7 @@ public class DataProvider
     GenerateAmbulanceTypes();
     GenerateIncidentTypes();
     GenerateAmbulances(ambulancesCount);
-    GenerateDepots(100);
+    GenerateDepots(400);
     GenerateHospitals();
     GenerateWorld();
   }
@@ -170,7 +150,7 @@ public class DataProvider
             //new IncidentType("IncType4", 1.ToHours().ToSeconds(), ambulanceTypes.GetRangeRandom(random).ToHashSet()),
             //new IncidentType("IncType5", 1.ToHours().ToSeconds(), ambulanceTypes.GetRangeRandom(random).ToHashSet()),
             //new IncidentType("IncType6", 3.ToHours().ToSeconds(), ambulanceTypes.GetRangeRandom(random).ToHashSet()),
-            new IncidentType("IncType7", 1.ToHours().ToSeconds(), ambulanceTypes.GetRandomRange(random, minCount: 1).ToHashSet()),
+            new IncidentType("IncType7", 22.ToHours().ToSeconds(), ambulanceTypes.GetRandomRange(random, minCount: 1).ToHashSet()),
         };
   }
 
@@ -203,7 +183,7 @@ public class DataProvider
     {
       for (Meters x = 10.ToMeters(); x < dimX; x += stepX)
       {
-        HashSet<Ambulance> selectedAmbulances = ambulances.GetRandomRange(random, minCount: 1, maxCount: 20).ToHashSet();
+        HashSet<Ambulance> selectedAmbulances = ambulances.GetRandomRange(random, minCount: 5, maxCount: 40).ToHashSet();
         ambulances.RemoveAll(amb => selectedAmbulances.Contains(amb));
 
         depots.Add(new Depot(new Coordinate(x, y), selectedAmbulances.ToList()));

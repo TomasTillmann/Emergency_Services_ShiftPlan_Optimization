@@ -5,6 +5,9 @@ namespace ESSP.DataModel;
 // TODO: Maybe make a struct, to use caches when iterating over. But maybe it is redundant.
 public class ShiftOpt
 {
+  private static long _nextId = 1;
+
+  public long Id { get; init; }
   public AmbulanceOpt Ambulance { get; init; }
   public DepotOpt Depot { get; init; }
   public IntervalOpt Work { get; init; } = IntervalOpt.GetByStartAndDuration(0, 24.ToHours().ToSeconds().Value);
@@ -14,11 +17,12 @@ public class ShiftOpt
   private int _index;
   private PlannableIncidentOpt[] _plannedIncidents { get; init; }
 
-
   public ShiftOpt(int plannedIncidentsSize)
   {
     _plannedIncidents = new PlannableIncidentOpt[plannedIncidentsSize];
     _index = -1;
+
+    Id = _nextId++;
   }
 
   public void Plan(PlannableIncidentOpt plannableIncident)
