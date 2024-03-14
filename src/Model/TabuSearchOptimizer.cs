@@ -1,5 +1,4 @@
 ﻿using ESSP.DataModel;
-using Logging;
 using Model.Extensions;
 using System;
 using System.Collections.Generic;
@@ -112,7 +111,8 @@ public sealed class TabuSearchOptimizer : LocalSearchOptimizer, ILocalSearchStep
     
     public ShiftPlan StartShiftPlan { get; set; }
 
-    public ShiftPlan OptimalShiftPlan { get; private set; }
+
+    public IEnumerable<ShiftPlan> OptimalShiftPlans => new List<ShiftPlan> { _globalBest.Value };
     public int CurrStep { get; private set; }
 
     /// <param name="world"></param>
@@ -138,24 +138,26 @@ public sealed class TabuSearchOptimizer : LocalSearchOptimizer, ILocalSearchStep
             = ShiftPlan.ConstructRandom(World.Depots, Constraints.AllowedShiftStartingTimes.ToList(),
                 Constraints.AllowedShiftDurations.ToList(), Random);
         
-        StepThroughInit(incidentsSets);
+        InitStepThroughOptimizer(incidentsSets);
         (this as IStepOptimizer).Run();
-        return new List<ShiftPlan> { OptimalShiftPlan };
+        return OptimalShiftPlans;
     }
     
     public override IEnumerable<ShiftPlan> FindOptimalFrom(ShiftPlan startShiftPlan, List<SuccessRatedIncidents> incidentsSets)
     {
         StartShiftPlan = startShiftPlan;
-        StepThroughInit(incidentsSets);
+        InitStepThroughOptimizer(incidentsSets);
         (this as IStepOptimizer).Run();
-        return new List<ShiftPlan> { OptimalShiftPlan };
+        return OptimalShiftPlans;
     }
     
-    public void StepThroughInit(List<SuccessRatedIncidents> incidentsSets)
+    public void InitStepThroughOptimizer(List<SuccessRatedIncidents> incidentsSets)
     {
         if (StartShiftPlan is null)
         {
-            throw new InvalidOperationException($"Must set {nameof(StartShiftPlan)} before initializing.");
+            StartShiftPlan
+                = ShiftPlan.ConstructRandom(World.Depots, Constraints.AllowedShiftStartingTimes.ToList(),
+                    Constraints.AllowedShiftDurations.ToList(), Random);
         }
         
         _startShiftPlanTabu = new ShiftPlanTabu(StartShiftPlan); 
@@ -168,6 +170,14 @@ public sealed class TabuSearchOptimizer : LocalSearchOptimizer, ILocalSearchStep
 
         _tabu = new LinkedList<Move>();
         // TODO: Init tabu?
+    }
+
+    public void Run()
+    {
+        while (!IsFinished())
+        {
+            Step();
+        }
     }
     
     public void Step()

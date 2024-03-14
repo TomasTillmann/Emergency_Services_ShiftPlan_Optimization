@@ -1,13 +1,13 @@
-﻿using System;
-using DataModel.Interfaces;
+﻿using DataModel.Interfaces;
 
 namespace ESSP.DataModel;
+
 public class Hospital : ILocatable
 {
-    public Coordinate Location { get; set; }
+  public Coordinate Location { get; set; }
 
-    public Hospital(Coordinate coordinate)
-    {
-        Location = coordinate;
-    }
+  public Hospital(Coordinate coordinate)
+  {
+    Location = coordinate;
+  }
 }

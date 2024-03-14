@@ -1,18 +1,7 @@
-﻿//#define Log
-
-using ESSP.DataModel;
-using Logging;
+﻿using ESSP.DataModel;
 using Model.Extensions;
 using Optimizing;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
-using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Optimization;
 
@@ -299,37 +288,16 @@ public class AntColonizationOptimizer : MetaheuristicOptimizer
 
             for (int antIndex = 0; antIndex < ants.Length; antIndex++)
             {
-#if Log
-                Logger.Instance.WriteLineForce($"Partition: {partition}");
-#endif
-
                 Ant ant = ants[antIndex];
-#if Log
-                Logger.Instance.WriteLineForce($"{ant.VisitedLocations.Select(index => Intervals[index.J]).Visualize(" | ")}");
-#endif
                 totalEval = 0;
 
                 for(int i = 0; i < neighbours.Length; i++)
                 {
                     double heuristic = Math.Pow(Heuristic(ant, neighbours[i]), Alpha);
-#if Log
-                    Logger.Instance.WriteLineForce($"heur {heuristic}, interval: {Intervals[neighbours[i].J]}");
-#endif
-
                     double pheromones = Math.Pow(Pheromones(ant, neighbours[i]), Beta);
-#if Log
-                    Logger.Instance.WriteLineForce($"ph: {pheromones}, interval: {Intervals[neighbours[i].J]}");
-#endif
 
                     neighbourEvals[i] = heuristic * pheromones;
-#if Log
-                    Logger.Instance.WriteLineForce($"eval: {neighbourEvals[i]}, interval: {Intervals[neighbours[i].J]}");
-#endif
-
                     totalEval += neighbourEvals[i];
-#if Log
-                    Logger.Instance.WriteLineForce();
-#endif
                 }
 
                 for(int i = 0; i < neighbours.Length; i++)
@@ -341,19 +309,10 @@ public class AntColonizationOptimizer : MetaheuristicOptimizer
                 //Index randomNeighbour = neighbours[randomIndex]; 
                 Index randomNeighbour = distribution.BasedOn(neighbourEvals).Sample(neighbours);
 
-#if Log
-                Logger.Instance.WriteLineForce($"Selected: {randomNeighbour}");
-#endif
-
                 ant.Location = randomNeighbour;
                 ant.AddToCoverage(Intervals[randomNeighbour.J]);
                 ant.Duration += Intervals[randomNeighbour.J].Duration;
                 ant.VisitedLocations[partition + 1] = randomNeighbour;
-
-#if Log
-                Logger.Instance.WriteLineForce($"{ant.VisitedLocations.Select(index => Intervals[index.J]).Visualize(" | ")}");
-                Logger.Instance.WriteLineForce();
-#endif
             }
         }
     }
@@ -513,19 +472,5 @@ public class AntColonizationOptimizer : MetaheuristicOptimizer
         }
 
         return ants;
-    }
-
-    private void LogInfo(Ant[] ants, Index[] globalBest, Stopwatch sw, List<SuccessRatedIncidents> incidentsSet)
-    {
-        Logger.Instance.WriteLineForce($"One step took: {sw.ElapsedMilliseconds}ms"); sw.Reset();
-        Logger.Instance.WriteLineForce($"Global best: {Fitness(globalBest, incidentsSet)} ({globalBest.Visualize("| ")})");
-        ants.ToList().ForEach(ant => Logger.Instance.WriteLineForce($"Visited:\n{ant.VisitedLocations.Visualize("| ")}"));
-        for(int i = 0; i < Graph.Partitions; i++)
-        {
-            for(int j = 0; j < Graph.Intervals; j++)
-            {
-                Logger.Instance.WriteLineForce($"{i},{j}: {Graph[i,j]}");
-            }
-        }
     }
 }

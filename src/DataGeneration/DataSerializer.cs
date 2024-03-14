@@ -7,11 +7,13 @@ namespace DataHandling;
 
 public static class DataSerializer
 {
-    private class PrivateResolver : DefaultContractResolver {
+    private class PrivateResolver : DefaultContractResolver
+    {
         protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
         {
             var prop = base.CreateProperty(member, memberSerialization);
-            if (!prop.Writable) {
+            if (!prop.Writable)
+            {
                 var property = member as PropertyInfo;
                 var hasPrivateSetter = property?.GetSetMethod(true) != null;
                 prop.Writable = hasPrivateSetter;
@@ -20,8 +22,9 @@ public static class DataSerializer
             return prop;
         }
 
-}
-    public static string Path { get; } = "D:/Playground/EmergencyServicesShiftPlanOptimization/src/Data/";
+    }
+
+    public static string Path { get; } = "/home/tom/School/Bakalarka/Emergency_Services_ShiftPlan_Optimization/src/Data";
 
     public static void Serialize<T>(T data, string file)
     {

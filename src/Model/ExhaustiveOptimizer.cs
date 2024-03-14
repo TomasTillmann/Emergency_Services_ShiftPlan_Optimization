@@ -1,5 +1,4 @@
 ﻿using ESSP.DataModel;
-using Logging;
 using Model.Extensions;
 using Simulating;
 

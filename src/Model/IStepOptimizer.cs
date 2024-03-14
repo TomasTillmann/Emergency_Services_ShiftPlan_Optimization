@@ -10,7 +10,8 @@ public interface IStepOptimizer : IOptimizer
     /// <summary>
     /// Found optimal shift plan. Is set only after <see cref="IsFinished" />.
     /// </summary>
-    ShiftPlan OptimalShiftPlan { get; }
+
+    IEnumerable<ShiftPlan> OptimalShiftPlans { get; }
     
     /// <summary>
     /// Current step number.
@@ -20,7 +21,8 @@ public interface IStepOptimizer : IOptimizer
     /// <summary>
     /// Call before first call to <see cref="Step" />.
     /// </summary>
-    void StepThroughInit(List<SuccessRatedIncidents> incidentsSets);
+
+    void InitStepThroughOptimizer(List<SuccessRatedIncidents> incidentsSets);
 
     /// <summary>
     /// Does one move in the space.
@@ -30,13 +32,8 @@ public interface IStepOptimizer : IOptimizer
     /// <summary>
     /// Runs step until it's finished. More efficient than doing Steps for yourself, since for example, the stats are not updated.
     /// </summary>
-    void Run()
-    {
-        while (!IsFinished())
-        {
-            Step();
-        }
-    }
+
+    void Run();
     
     /// <summary>
     /// Whether the optimizer finished and optimalShift is found and initialized.
