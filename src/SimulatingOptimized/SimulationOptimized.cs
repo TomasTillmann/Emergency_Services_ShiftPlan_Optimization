@@ -25,15 +25,15 @@ public sealed class SimulationOptimized
     _shiftEvaluator = new ShiftEvaluatorOpt(distanceCalculator, hospitals, ambToIncTypesTable);
   }
 
-  public ShiftPlanOpt Run(IncidentOpt[] incidents)
+  /// <param name="incidents"/> have to be sorted in order of <see cref="IncidentOpt.OccurenceSec"/>
+  /// <param name="simulateOnThisShiftPlan"/> needs to have cleared PlannedIncidents, by <see cref="ShiftPlan.ClearAllPlannedIncidents()" 
+  public void Run(ImmutableArray<IncidentOpt> incidents, ShiftPlanOpt simulateOnThisShiftPlan)
   {
-    ShiftPlanOpt simulateOnThisShiftPlan = ShiftPlanOpt.GetFrom(Depots, incidents.Length);
-
     // Prepare shiftPlan for simulation.  
-    simulateOnThisShiftPlan.ClearPlannedIncidents();
+    // simulateOnThisShiftPlan.ClearPlannedIncidents();
 
     // Sort in order to simulate incidents in order of occurence
-    Array.Sort(incidents, (x, y) => x.OccurenceSec.CompareTo(y.OccurenceSec));
+    // Array.Sort(incidents, (x, y) => x.OccurenceSec.CompareTo(y.OccurenceSec));
 
     for (int i = 0; i < incidents.Length; ++i)
     {
@@ -43,8 +43,6 @@ public sealed class SimulationOptimized
 
       Step(in currentIncident, simulateOnThisShiftPlan);
     }
-
-    return simulateOnThisShiftPlan;
   }
 
   private void Step(in IncidentOpt currentIncident, ShiftPlanOpt simulateOnThisShiftPlan)

@@ -422,7 +422,7 @@ class Program
     ));
 
     IncidentOptMapper incidentMapper = new();
-    IncidentOpt[] incidents = dataGenerator.GenerateIncidentModels(
+    ImmutableArray<IncidentOpt> incidents = dataGenerator.GenerateIncidentModels(
       worldSize: new CoordinateModel { XMet = 50_000, YMet = 50_000 },
       incidentsCount: 5_000,
       duration: 22.ToHours().ToSeconds() + 30.ToMinutes().ToSeconds(),
@@ -449,7 +449,7 @@ class Program
       },
       incTypesCategorical: new double[] { 0.7, 0.2, 0.1 },
       random: new Random(42)
-    ).Select(inc => incidentMapper.MapBack(inc)).ToArray();
+    ).Select(inc => incidentMapper.MapBack(inc)).ToImmutableArray();
 
     // DataParser dataParser = new();
 
@@ -464,16 +464,18 @@ class Program
 
     SimulationOptimized simulation = new(world);
 
+    ShiftPlanOpt simulatedOn = ShiftPlanOpt.GetFrom(world.Depots, incidents.Length);
+
     Stopwatch sw = Stopwatch.StartNew();
-    ShiftPlanOpt simulatedOn = simulation.Run(incidents);
+    simulation.Run(incidents, simulatedOn);
     sw.Stop();
 
-    visualizer.WriteGraph(simulatedOn, 24.ToHours().ToSeconds());
+    // visualizer.WriteGraph(simulatedOn, 24.ToHours().ToSeconds());
     Console.WriteLine($"Simulating {incidents.Length} incidents on {simulatedOn.Shifts.Length} shifts took {sw.Elapsed}.");
 
     Console.WriteLine("-------");
 
-    DataProvider dataProvider = new(700);
+    DataProvider dataProvider = new(640);
     List<Incident> incidentsOld = dataProvider.GetIncidents(5_000, 22.ToHours().ToSeconds() + 30.ToMinutes().ToSeconds());
     World worldOld = dataProvider.GetWorld();
 
@@ -484,7 +486,7 @@ class Program
     Statistics stats = simulationOld.Run(incidentsOld.ToImmutableArray(), simulatedOnOld);
     sw.Stop();
 
-    visualizer.WriteGraph(simulatedOnOld, 24.ToHours().ToSeconds());
+    // visualizer.WriteGraph(simulatedOnOld, 24.ToHours().ToSeconds());
     Console.WriteLine($"Simulating {incidentsOld.Count} incidents on {simulatedOnOld.Shifts.Count} shifts took {sw.Elapsed}.");
     Console.WriteLine(stats);
   }
