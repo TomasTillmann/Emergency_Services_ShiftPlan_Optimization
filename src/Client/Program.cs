@@ -1,4 +1,4 @@
-﻿//#define RunTabuSearch
+﻿#define RunTabuSearch
 //#define RunSimulatedAnnealing
 //#define HowDoNeighboursLook
 //#define HowDoesRandomSampleLook
@@ -6,6 +6,7 @@
 //#define PlotConvergence
 //#define RunReport
 #define OptimizedSimul 
+
 
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;

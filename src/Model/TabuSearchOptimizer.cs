@@ -111,6 +111,7 @@ public sealed class TabuSearchOptimizer : LocalSearchOptimizer, ILocalSearchStep
     
     public ShiftPlan StartShiftPlan { get; set; }
 
+
     public IEnumerable<ShiftPlan> OptimalShiftPlans => new List<ShiftPlan> { _globalBest.Value };
     public int CurrStep { get; private set; }
 

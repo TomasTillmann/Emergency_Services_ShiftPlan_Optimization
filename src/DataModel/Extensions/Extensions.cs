@@ -1,6 +1,7 @@
 ﻿using ESSP.DataModel;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace Model.Extensions;
@@ -124,6 +125,7 @@ public static class Extensions
   public static void ModifyToLargest(this ShiftPlan shiftPlan, Domain constraints)
   {
     Seconds largestDuration = constraints.AllowedShiftDurations.FindMaxSubset(_ => _).First();
+
 
     foreach (Shift shift in shiftPlan.Shifts)
     {

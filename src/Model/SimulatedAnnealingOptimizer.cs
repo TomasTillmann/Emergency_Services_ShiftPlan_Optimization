@@ -27,6 +27,7 @@ public class SimulatedAnnealingOptimizer : LocalSearchOptimizer, IStepOptimizer
     public ShiftPlan StartShiftPlan { get; set; }
     public IEnumerable<ShiftPlan> OptimalShiftPlans => new List<ShiftPlan> { _globalBest };
 
+
     public readonly Random Random;
 
     private List<SuccessRatedIncidents> _incidentsSets;
@@ -63,6 +64,7 @@ public class SimulatedAnnealingOptimizer : LocalSearchOptimizer, IStepOptimizer
             = ShiftPlan.ConstructRandom(World.Depots, Constraints.AllowedShiftStartingTimes.ToList(),
                 Constraints.AllowedShiftDurations.ToList(), Random);
         
+
         InitStepThroughOptimizer(incidentsSets);
         Run();
         return OptimalShiftPlans;
@@ -155,6 +157,7 @@ public class SimulatedAnnealingOptimizer : LocalSearchOptimizer, IStepOptimizer
 
     public bool IsFinished()
     {
+
         return _currentTemperature <= LowestTemperature;
     }
 
