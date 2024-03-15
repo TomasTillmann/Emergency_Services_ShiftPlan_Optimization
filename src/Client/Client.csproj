@@ -11,7 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DataGeneration\DataProvider.csproj" />
+    <ProjectReference Include="..\DataGeneration\DataGeneration.csproj" />
     <ProjectReference Include="..\DataModel\DataModel.csproj" />
     <ProjectReference Include="..\Simulating\Simulating.csproj" />
     <ProjectReference Include="..\SimulatingOptimized\SimulatingOptimized.csproj" />
