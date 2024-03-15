@@ -1,6 +1,5 @@
 ﻿#define OptimizedSimul 
 
-using DataHandling;
 using ESSP.DataModel;
 using Simulating;
 using SimulatingOptimized;
@@ -95,33 +94,12 @@ class Program
     // json = dataParser.ParseIncidentsToJson(incidents);
     // incidentsWriter.WriteLine(json);
 
-    SimulationOptimized simulation = new(world);
 
     ShiftPlanOpt simulatedOn = ShiftPlanOpt.GetFrom(world.Depots, incidents.Length);
 
     Stopwatch sw = Stopwatch.StartNew();
-    simulation.Run(incidents, simulatedOn);
+    SimulationOptimized simulation = new(world);
     sw.Stop();
-
-    // visualizer.WriteGraph(simulatedOn, 24.ToHours().ToSeconds());
-    Console.WriteLine($"Simulating {incidents.Length} incidents on {simulatedOn.Shifts.Length} shifts took {sw.Elapsed}.");
-
-    Console.WriteLine("-------");
-
-    DataProvider dataProvider = new(640);
-    List<Incident> incidentsOld = dataProvider.GetIncidents(5_000, 22.ToHours().ToSeconds() + 30.ToMinutes().ToSeconds());
-    World worldOld = dataProvider.GetWorld();
-
-    Simulation simulationOld = new(worldOld);
-    ShiftPlan simulatedOnOld = ShiftPlan.ConstructFrom(worldOld.Depots, 0.ToSeconds(), 24.ToHours().ToSeconds());
-
-    sw.Restart();
-    Statistics stats = simulationOld.Run(incidentsOld.ToImmutableArray(), simulatedOnOld);
-    sw.Stop();
-
-    // visualizer.WriteGraph(simulatedOnOld, 24.ToHours().ToSeconds());
-    Console.WriteLine($"Simulating {incidentsOld.Count} incidents on {simulatedOnOld.Shifts.Count} shifts took {sw.Elapsed}.");
-    Console.WriteLine(stats);
   }
 #endif
 }
