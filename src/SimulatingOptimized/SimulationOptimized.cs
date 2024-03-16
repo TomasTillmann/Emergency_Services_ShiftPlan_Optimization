@@ -6,28 +6,28 @@ namespace SimulatingOptimized;
 
 public sealed class SimulationOptimized
 {
-  public ImmutableArray<DepotOpt> Depots { get; }
-  public DistanceCalculatorOpt DistanceCalculator { get; }
+  public ImmutableArray<Depot> Depots { get; }
+  public DistanceCalculator DistanceCalculator { get; }
 
   public int CurrentTimeSec { get; private set; } = 0;
 
-  private readonly ShiftEvaluatorOpt _shiftEvaluator;
-  private readonly PlannableIncidentOpt.Factory _plannableIncidentFactory;
+  private readonly ShiftEvaluator _shiftEvaluator;
+  private readonly PlannableIncident.Factory _plannableIncidentFactory;
 
-  public SimulationOptimized(WorldOpt world) : this(world.Depots, world.Hospitals, world.IncTypeToAllowedAmbTypesTable, world.DistanceCalculator) { }
+  public SimulationOptimized(World world) : this(world.Depots, world.Hospitals, world.IncTypeToAllowedAmbTypesTable, world.DistanceCalculator) { }
 
-  public SimulationOptimized(ImmutableArray<DepotOpt> depots, ImmutableArray<HospitalOpt> hospitals, IncTypeToAllowedAmbTypesTable ambToIncTypesTable, DistanceCalculatorOpt distanceCalculator)
+  public SimulationOptimized(ImmutableArray<Depot> depots, ImmutableArray<Hospital> hospitals, IncTypeToAllowedAmbTypesTable ambToIncTypesTable, DistanceCalculator distanceCalculator)
   {
     Depots = depots;
     DistanceCalculator = distanceCalculator;
 
-    _plannableIncidentFactory = new PlannableIncidentOpt.Factory(DistanceCalculator, hospitals);
-    _shiftEvaluator = new ShiftEvaluatorOpt(distanceCalculator, hospitals, ambToIncTypesTable);
+    _plannableIncidentFactory = new PlannableIncident.Factory(DistanceCalculator, hospitals);
+    _shiftEvaluator = new ShiftEvaluator(distanceCalculator, hospitals, ambToIncTypesTable);
   }
 
-  /// <param name="incidents"/> have to be sorted in order of <see cref="IncidentOpt.OccurenceSec"/>
+  /// <param name="incidents"/> have to be sorted in order of <see cref="Incident.OccurenceSec"/>
   /// <param name="simulateOnThisShiftPlan"/> needs to have cleared PlannedIncidents, by <see cref="ShiftPlan.ClearAllPlannedIncidents()" 
-  public void Run(ImmutableArray<IncidentOpt> incidents, ShiftPlanOpt simulateOnThisShiftPlan)
+  public void Run(ImmutableArray<Incident> incidents, ShiftPlan simulateOnThisShiftPlan)
   {
     // Prepare shiftPlan for simulation.  
     // simulateOnThisShiftPlan.ClearPlannedIncidents();
@@ -38,24 +38,24 @@ public sealed class SimulationOptimized
     for (int i = 0; i < incidents.Length; ++i)
     {
       // ref
-      IncidentOpt currentIncident = incidents[i];
+      Incident currentIncident = incidents[i];
       CurrentTimeSec = currentIncident.OccurenceSec;
 
       Step(in currentIncident, simulateOnThisShiftPlan);
     }
   }
 
-  private void Step(in IncidentOpt currentIncident, ShiftPlanOpt simulateOnThisShiftPlan)
+  private void Step(in Incident currentIncident, ShiftPlan simulateOnThisShiftPlan)
   {
     //TODO: is this O(1)?
     //Span<ShiftOpt> shifts = simulateOnThisShiftPlan.Shifts.AsSpan();
 
-    ShiftOpt[] shifts = simulateOnThisShiftPlan.Shifts;
+    Shift[] shifts = simulateOnThisShiftPlan.Shifts;
 
     // Has to be assigned to something in order to compile, but it will be reassigned to first handling shift found.
     // If not, than the other loop won't happen, therefore it's value is irrelevant.
-    ShiftOpt bestShift = shifts[0];
-    ShiftOpt shift;
+    Shift bestShift = shifts[0];
+    Shift shift;
 
     // find handlingShift
     int findBetterFromIndex = shifts.Length;

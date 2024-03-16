@@ -1,77 +1,67 @@
-﻿using System;
-using System.Collections.Generic;
+using System;
 
 namespace ESSP.DataModel
 {
   public readonly struct Interval
   {
-    public Seconds Start { get; init; }
+    public int StartSec { get; init; }
+    public int EndSec { get; init; }
+    public int DurationSec => EndSec - StartSec;
 
-    public Seconds End { get; init; }
+    public static Interval Empty = new Interval { StartSec = 0, EndSec = 0 };
 
-    public Seconds Duration => End - Start;
-
-    public static Interval Empty = new Interval(0.ToSeconds(), 0.ToSeconds());
-
-    private Interval(Seconds start, Seconds end)
+    public static Interval GetByStartAndDuration(int startSec, int durationSec)
     {
-      Start = start;
-      End = end;
-    }
-
-    public static Interval GetByStartAndDuration(Seconds start, Seconds duration)
-    {
-      return new Interval(start, start + duration);
-    }
-
-    public static Interval GetByStartAndDurationFromSeconds(int start, int duration)
-    {
-      return new Interval(start.ToSeconds(), (start + duration).ToSeconds());
-    }
-
-    public static Interval GetByStartAndEnd(Seconds start, Seconds end)
-    {
-      return new Interval(start, end);
-    }
-
-    public static Interval GetUnion(IEnumerable<Interval> intervals)
-    {
-      Seconds start = Seconds.MaxValue;
-      Seconds end = Seconds.MinValue;
-
-      foreach (Interval interval in intervals)
+      return new Interval
       {
-        if (interval.Start < start)
+        StartSec = startSec,
+        EndSec = startSec + durationSec
+      };
+    }
+
+    public static Interval GetByStartAndEnd(int startSec, int endSec)
+    {
+      return new Interval
+      {
+        StartSec = startSec,
+        EndSec = endSec
+      };
+    }
+
+    public static Interval GetUnion(Interval[] intervals)
+    {
+      int startSec = int.MaxValue;
+      int endSec = int.MinValue;
+
+      for (int i = 0; i < intervals.Length; ++i)
+      {
+        Interval interval = intervals[i];
+        if (interval.StartSec < startSec)
         {
-          start = interval.Start;
+          startSec = interval.StartSec;
         }
 
-        if (interval.End > end)
+        if (interval.EndSec > endSec)
         {
-          end = interval.End;
+          endSec = interval.EndSec;
         }
       }
 
-      return GetByStartAndEnd(start, end);
+      return GetByStartAndEnd(startSec, endSec);
     }
 
-    public bool IsInInterval(Seconds time)
+    public bool IsInInterval(int timeSec)
     {
-      return Start <= time && time <= End;
+      return StartSec <= timeSec && timeSec <= EndSec;
     }
 
     public bool IsSubsetOf(Interval interval)
     {
-      return interval.IsInInterval(Start) && interval.IsInInterval(End);
+      return interval.IsInInterval(StartSec) && interval.IsInInterval(EndSec);
     }
 
-    public override string ToString()
-    {
-      return $"({Start} : {End})";
-    }
-
-    public static bool operator ==(Interval i1, Interval i2) => i1.Start == i2.Start && i1.End == i2.End;
-    public static bool operator !=(Interval i1, Interval i2) => i1.Start != i2.Start || i1.End != i2.End;
+    public static bool operator ==(Interval i1, Interval i2) => i1.StartSec == i2.StartSec && i1.EndSec == i2.EndSec;
+    public static bool operator !=(Interval i1, Interval i2) => i1.StartSec != i2.StartSec || i1.EndSec != i2.EndSec;
 
     public override bool Equals(object obj)
     {
@@ -85,7 +75,8 @@ namespace ESSP.DataModel
 
     public override int GetHashCode()
     {
-      return HashCode.Combine(Start.GetHashCode(), End.GetHashCode());
+      return HashCode.Combine(StartSec.GetHashCode(), EndSec.GetHashCode());
     }
   }
 }
+

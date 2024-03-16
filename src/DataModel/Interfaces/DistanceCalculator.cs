@@ -1,64 +1,91 @@
 using System;
-using System.Collections.Generic;
+using System.Collections.Immutable;
 using ESSP.DataModel;
-using Model.Extensions;
 
 namespace DataModel.Interfaces;
 
-public class DistanceCalculator : IDistanceCalculator
+public class DistanceCalculator
 {
-  public static MetersPerSecond Speed { get; } = 80.ToKmPerHour();
+  /// average speed of the ambulance
+  public static int SpeedMetPerSec { get; } = 80.ToKmPerHour().Value;
 
+  private ImmutableArray<Hospital> _hospitals;
 
-  public IEnumerable<T> GetNearestLocatable<T>(ILocatable locatable, IEnumerable<T> locatables) where T : ILocatable
+  public DistanceCalculator(Hospital[] hospitals)
   {
-    return locatables.FindMinSubset((loc) => GetDistance(loc.Location, locatable.Location));
+    Array.Sort(hospitals, (x, y) => x.Location.CompareTo(y.Location));
+    _hospitals = hospitals.ToImmutableArray();
   }
 
-  public Coordinate GetNewLocation(Coordinate from, Coordinate to, Seconds duration, Seconds currentTime)
+  /// <returns>Nearest hospital by arrival time, not by pure distance. </returns>
+  public Hospital GetNearestHospital(Coordinate location)
   {
-    Meters traveledDistance = DistanceCalculator.Speed * duration;
-    Meters distance = GetDistance(from, to);
+    // It could be found in a binary search manner for each coordinate, but since there is not many hospitals (usually around hundreads),
+    // simple traverse is enough (if not better)
+    // TODO: Precalculate?
+
+    int index = 0;
+    int shortestTravelDurationSec = GetTravelDurationSec(_hospitals[0].Location, location);
+
+    for (int i = 1; i < _hospitals.Length; ++i)
+    {
+      int travelDurationSec = GetTravelDurationSec(_hospitals[i].Location, location);
+      if (travelDurationSec < shortestTravelDurationSec)
+      {
+        shortestTravelDurationSec = travelDurationSec;
+        index = i;
+      }
+    }
+
+    // returns reference, not a copy (array indexing)
+    return _hospitals[index];
+  }
+
+  public Coordinate GetNewLocation(Coordinate from, Coordinate to, int durationDrivingSec, int firstPossibleStartTimeSec)
+  {
+    int traveledDistanceMet = DistanceCalculator.SpeedMetPerSec * durationDrivingSec;
+    int distanceMet = GetDistanceMet(from, to);
 
     // crop it so it can't move behind the destination
-    if (traveledDistance > distance)
+    if (traveledDistanceMet > distanceMet)
     {
       return to;
     }
     //
 
     // angle formula
-    double angle = Math.Atan2(to.Y.Value - from.Y.Value, to.X.Value - from.X.Value);
+    double angle = Math.Atan2(to.YMet - from.YMet, to.XMet - from.XMet);
     //
 
+    // calculate new location on the line based on lines angle and duration of the travel
+    // calculates in centimeter precision, but result is in meters
     return new Coordinate
     {
-      X = ((int)(from.X.Value + traveledDistance.Value * Math.Cos(angle))).ToMeters(),
-      Y = ((int)(from.Y.Value + traveledDistance.Value * Math.Sin(angle))).ToMeters()
+      XMet = (int)(from.XMet + traveledDistanceMet * Math.Cos(angle)),
+      YMet = (int)(from.YMet + traveledDistanceMet * Math.Sin(angle))
     };
   }
 
-  public Seconds GetTravelDuration(ILocatable from, ILocatable to, Seconds currentTime)
+  /// Calculates travel duration by straight line
+  public int GetTravelDurationSec(Coordinate from, Coordinate to)
   {
-    return GetTravelDuration(from.Location, to.Location, currentTime);
+    return GetDistanceMet(from, to) / DistanceCalculator.SpeedMetPerSec;
   }
 
-  public Seconds GetTravelDuration(Coordinate from, Coordinate to, Seconds currentTime)
+  /// returns distance by straight line
+  private int GetDistanceMet(Coordinate x, Coordinate y)
   {
-    return GetDistance(from, to) / DistanceCalculator.Speed;
+    return EuclidianMet(x, y);
   }
 
-
-  private Meters GetDistance(Coordinate x, Coordinate y)
+  /// classic euclidian distance obtained by pythagoreon theorem
+  private int EuclidianMet(Coordinate x, Coordinate y)
   {
-    return Euclidian(x, y);
+    long xLen = Meters.DistanceMet(x.XMet, y.XMet);
+    long yLen = Meters.DistanceMet(x.YMet, y.YMet);
+
+    return (int)Math.Sqrt(xLen * xLen + yLen * yLen);
   }
 
-  private Meters Euclidian(Coordinate x, Coordinate y)
-  {
-    long xLen = Meters.Distance(x.X, y.X).Value;
-    long yLen = Meters.Distance(x.Y, y.Y).Value;
-
-    return ((int)Math.Sqrt(xLen * xLen + yLen * yLen)).ToMeters();
-  }
 }
+

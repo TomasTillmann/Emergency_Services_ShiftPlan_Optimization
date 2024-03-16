@@ -1,18 +1,10 @@
-﻿using DataModel.Interfaces;
-
 namespace ESSP.DataModel;
 
-public class Ambulance : ILocatable
+public readonly struct Ambulance
 {
-  public AmbulanceType Type { get; set; }
-  public Seconds ReroutePenalty { get; set; }
-  public Coordinate Location { get; set; }
-  public int Ahoj { get; set; }
+  public static int ReroutePenaltySec { get; set; } = 30;
 
-  public Ambulance(AmbulanceType type, Coordinate location, Seconds reroutePenalty)
-  {
-    Type = type;
-    Location = location;
-    ReroutePenalty = reroutePenalty;
-  }
+  public AmbulanceType Type { get; init; }
+  public Coordinate Location { get; init; }
 }
+

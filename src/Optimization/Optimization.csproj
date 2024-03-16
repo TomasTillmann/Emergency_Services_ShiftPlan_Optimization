@@ -1,13 +1,14 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>Library</OutputType>
     <TargetFramework>net8.0</TargetFramework>
-    <RootNamespace>Simulation</RootNamespace>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\DataModel\DataModel.csproj" />
+    <ProjectReference Include="..\SimulatingOptimized\SimulatingOptimized.csproj" />
   </ItemGroup>
 
     <ItemGroup>
@@ -15,6 +16,5 @@
 			<_Parameter1>ESSP_Tests</_Parameter1>
 		</AssemblyAttribute>
 	</ItemGroup>
-
 
 </Project>

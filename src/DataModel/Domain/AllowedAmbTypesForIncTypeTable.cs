@@ -11,7 +11,7 @@ public class IncTypeToAllowedAmbTypesTable
     _table = table;
   }
 
-  public bool IsAllowed(IncidentTypeOpt incType, AmbulanceTypeOpt ambType)
+  public bool IsAllowed(IncidentType incType, AmbulanceType ambType)
   {
     // open world principle
     if (!_table.ContainsKey(incType.Name))

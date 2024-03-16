@@ -14,10 +14,10 @@ class Program
   static void Main()
   {
     Visualizer visualizer = new(Console.Out);
-    WorldOptMapper worldMapper = new();
+    WorldMapper worldMapper = new();
     DataModelGenerator dataGenerator = new();
 
-    WorldOpt world = worldMapper.MapBack(dataGenerator.GenerateWorldModel(
+    World world = worldMapper.MapBack(dataGenerator.GenerateWorldModel(
       worldSize: new CoordinateModel { XMet = 50_000, YMet = 50_000 },
       depotsCount: 30,
       hospitalsCount: 20,
@@ -53,8 +53,8 @@ class Program
       random: new Random(42)
     ));
 
-    IncidentOptMapper incidentMapper = new();
-    ImmutableArray<IncidentOpt> incidents = dataGenerator.GenerateIncidentModels(
+    IncidentMapper incidentMapper = new();
+    ImmutableArray<Incident> incidents = dataGenerator.GenerateIncidentModels(
       worldSize: new CoordinateModel { XMet = 50_000, YMet = 50_000 },
       incidentsCount: 5_000,
       duration: 22.ToHours().ToSeconds() + 30.ToMinutes().ToSeconds(),
@@ -95,7 +95,7 @@ class Program
     // incidentsWriter.WriteLine(json);
 
 
-    ShiftPlanOpt simulatedOn = ShiftPlanOpt.GetFrom(world.Depots, incidents.Length);
+    ShiftPlan simulatedOn = ShiftPlan.GetFrom(world.Depots, incidents.Length);
 
     Stopwatch sw = Stopwatch.StartNew();
     SimulationOptimized simulation = new(world);

@@ -1,104 +1,98 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using DataModel.Interfaces;
-using Model.Extensions;
+using System;
 
 namespace ESSP.DataModel;
 
-public class Shift : IIdentifiable
+public class Shift
 {
-  private static uint IdGenerator = 1;
+  private static long _nextId = 1;
 
-  public uint Id { get; init; }
-
+  public long Id { get; init; }
   public Ambulance Ambulance { get; init; }
-
   public Depot Depot { get; init; }
 
-  public Interval Work { get; set; }
+  public Interval Work { get; set; } = Interval.GetByStartAndDuration(0, 24.ToHours().ToSeconds().Value);
 
-  public IReadOnlyList<PlannableIncident> PlannedIncidents => plannedIncidents;
+  public int TimeActive { get; private set; }
 
-  private List<PlannableIncident> plannedIncidents = new();
+  private int _index;
+  private PlannableIncident[] _plannedIncidents { get; init; }
 
-  public Shift(Ambulance ambulance, Depot depot, Interval work)
+  public Shift(int plannedIncidentsSize)
   {
-    Ambulance = ambulance;
-    Work = work;
-    Depot = depot;
+    _plannedIncidents = new PlannableIncident[plannedIncidentsSize];
+    _index = -1;
 
-    Id = IdGenerator++;
+    Id = _nextId++;
   }
 
-  public bool IsInDepot(Seconds currentTime)
+  public void Plan(PlannableIncident plannableIncident)
   {
-    if (PlannedIncidents.Count == 0)
+    _plannedIncidents[++_index] = plannableIncident;
+    TimeActive += plannableIncident.IncidentHandling.DurationSec;
+  }
+
+  public PlannableIncident GetCurrentlyHandlingIncident()
+  {
+    return _plannedIncidents[_index];
+  }
+
+  public bool IsInDepot(int currentTimeSec)
+  {
+    if (_index == -1)
     {
       return true;
     }
 
-    return PlannedIncidents.Last().ToDepotDrive.End <= currentTime;
+    return _plannedIncidents[_index].ToDepotDrive.EndSec <= currentTimeSec;
   }
 
-  public bool IsFree(Seconds currentTime)
+  public bool IsFree(int currentTimeSec)
   {
-    return WhenFree(currentTime) == currentTime;
+    return WhenFree(currentTimeSec) == currentTimeSec;
   }
 
   /// <summary>
-  /// Returns either currentTime or when the shift starts driving to depot from handled incident, depending which is earlier.
+  /// Returns when the shift is free.
+  /// Returns either currentTime, when the shift is free in currentTime,
+  /// or when the shift starts driving to depot from handled incident, depending which is earlier.
   /// </summary>
-  public Seconds WhenFree(Seconds currentTime)
+  public int WhenFree(int currentTimeSec)
   {
-    if (PlannedIncidents.Count == 0)
+    if (_index == -1)
     {
-      return currentTime;
+      return currentTimeSec;
     }
 
-    Seconds toDepotDriveStart = PlannedIncidents.Last().ToDepotDrive.Start;
-    return toDepotDriveStart < currentTime ? currentTime : toDepotDriveStart;
-  }
-
-  public Seconds TimeActive()
-  {
-    if (PlannedIncidents.Count == 0)
-    {
-      return 0.ToSeconds();
-    }
-
-    return PlannedIncidents.Sum(inc => inc.IncidentHandling.Duration.Value).ToSeconds();
-  }
-
-  public void Plan(PlannableIncident currentIncident)
-  {
-    Debug.Assert(Interval.GetByStartAndEnd(currentIncident.ToIncidentDrive.Start, currentIncident.ToDepotDrive.Start).IsSubsetOf(Work));
-
-    plannedIncidents.Add(currentIncident);
+    int toDepotDriveStartSec = _plannedIncidents[_index].ToDepotDrive.StartSec;
+    return toDepotDriveStartSec < currentTimeSec ? currentTimeSec : toDepotDriveStartSec;
   }
 
   /// <summary>
   /// Returns incident which is / was handled in <paramref name="currentTime"/>.
   /// If no incidents were planned on this shift at <paramref name="currentTime"/>, returns <see langword="null"/>.
   /// </summary>
-  public PlannableIncident PlannedIncident(Seconds currentTime)
+  public PlannableIncident PlannedIncident(int currentTimeSec)
   {
-    if (PlannedIncidents.Count == 0)
+    //TODO: this method is not called anywhere
+    if (_index == -1)
     {
       return null;
     }
 
-    // always has only one element
-    return PlannedIncidents.Where(inc => inc.WholeInterval.IsInInterval(currentTime)).FirstOrDefault();
+    for (int i = 0; i < _index; ++i)
+    {
+      if (_plannedIncidents[i].WholeInterval.IsInInterval(currentTimeSec))
+      {
+        return _plannedIncidents[i];
+      }
+    }
+
+    return null;
   }
 
   public void ClearPlannedIncidents()
   {
-    plannedIncidents.Clear();
-  }
-
-  public override string ToString()
-  {
-    return $"({Id}) AmbulanceLoc: {Ambulance.Location}, WorkStart: {Work.Start}, WorkEnd: {Work.End}, AmbulanceType: {Ambulance.Type.Name}, Cost: {Ambulance.Type.Cost}\n\tPlanned:\n{plannedIncidents.Visualize("\n", 1)}";
+    Array.Clear(_plannedIncidents);
   }
 }
+
