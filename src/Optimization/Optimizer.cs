@@ -1,7 +1,7 @@
 ﻿using System.Collections.Immutable;
 using ESSP.DataModel;
 using Microsoft.Win32.SafeHandles;
-using SimulatingOptimized;
+using Simulating;
 
 namespace Optimizing;
 
@@ -19,7 +19,7 @@ public abstract class Optimizer : IOptimizer
   /// <inheritdoc/>
   public Weights StartWeights { get; set; }
 
-  protected SimulationOptimized Simulation;
+  protected Simulation Simulation;
 
   public Optimizer(World world, Constraints constraints, ILoss loss)
   {
@@ -28,7 +28,7 @@ public abstract class Optimizer : IOptimizer
     Loss = loss;
     StartWeights = InitWeights();
 
-    Simulation = new SimulationOptimized(world);
+    Simulation = new Simulation(world);
   }
 
   public abstract IEnumerable<Weights> FindOptimal(ImmutableArray<SuccessRatedIncidents> incidentsSets);

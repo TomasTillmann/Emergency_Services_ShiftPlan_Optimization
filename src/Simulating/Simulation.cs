@@ -2,9 +2,9 @@ using System.Collections.Immutable;
 using DataModel.Interfaces;
 using ESSP.DataModel;
 
-namespace SimulatingOptimized;
+namespace Simulating;
 
-public sealed class SimulationOptimized
+public sealed class Simulation
 {
   public ImmutableArray<Depot> Depots { get; }
   public DistanceCalculator DistanceCalculator { get; }
@@ -14,9 +14,9 @@ public sealed class SimulationOptimized
   private readonly ShiftEvaluator _shiftEvaluator;
   private readonly PlannableIncident.Factory _plannableIncidentFactory;
 
-  public SimulationOptimized(World world) : this(world.Depots, world.Hospitals, world.IncTypeToAllowedAmbTypesTable, world.DistanceCalculator) { }
+  public Simulation(World world) : this(world.Depots, world.Hospitals, world.IncTypeToAllowedAmbTypesTable, world.DistanceCalculator) { }
 
-  public SimulationOptimized(ImmutableArray<Depot> depots, ImmutableArray<Hospital> hospitals, IncTypeToAllowedAmbTypesTable ambToIncTypesTable, DistanceCalculator distanceCalculator)
+  public Simulation(ImmutableArray<Depot> depots, ImmutableArray<Hospital> hospitals, IncTypeToAllowedAmbTypesTable ambToIncTypesTable, DistanceCalculator distanceCalculator)
   {
     Depots = depots;
     DistanceCalculator = distanceCalculator;

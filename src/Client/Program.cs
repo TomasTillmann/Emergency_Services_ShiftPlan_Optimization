@@ -1,8 +1,8 @@
 ﻿#define OptimizedSimul 
 
 using ESSP.DataModel;
-using SimulatingOptimized;
-using SimulatingOptimized;
+using Simulating;
+using Simulating;
 using System.Collections.Immutable;
 using System.Diagnostics;
 
@@ -98,7 +98,7 @@ class Program
     ShiftPlan simulatedOn = ShiftPlan.GetFrom(world.Depots, incidents.Length);
 
     Stopwatch sw = Stopwatch.StartNew();
-    SimulationOptimized simulation = new(world);
+    Simulation simulation = new(world);
     sw.Stop();
   }
 #endif

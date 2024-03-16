@@ -1,5 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net8.0</TargetFramework>
@@ -7,15 +6,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="BenchmarkDotNet" Version="0.13.5" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\DataGeneration\DataGeneration.csproj" />
     <ProjectReference Include="..\DataModel\DataModel.csproj" />
-    <ProjectReference Include="..\SimulatingOptimized\SimulatingOptimized.csproj" />
+    <ProjectReference Include="..\Simulating\Simulating.csproj" />
     <ProjectReference Include="..\Optimization\Optimization.csproj" />
   </ItemGroup>
-
-
 </Project>
