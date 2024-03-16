@@ -123,6 +123,8 @@ public class SimulatedAnnealingOptimizer : LocalSearchOptimizer, IStepOptimizer
         if (_currentBestLoss < _globalBestLoss)
         {
           _globalBestWeights = _weights.Copy();
+          ModifyMakeMove(_globalBestWeights, _currentBestMove);
+
           _globalBestLoss = _currentBestLoss;
         }
       }

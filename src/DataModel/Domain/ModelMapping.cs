@@ -138,7 +138,7 @@ public class WorldMapper
     {
       Depots = model.Depots.Select(depot => _depotMapper.MapBack(depot)).ToImmutableArray(),
       Hospitals = hospitals,
-      DistanceCalculator = new DistanceCalculatorOpt(hospitals.ToArray()),
+      DistanceCalculator = new DistanceCalculator(hospitals.ToArray()),
       IncTypeToAllowedAmbTypesTable = new IncTypeToAllowedAmbTypesTable(model.IncToAmbTypesTable)
     };
   }
