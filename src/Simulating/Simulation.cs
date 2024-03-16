@@ -4,19 +4,41 @@ using ESSP.DataModel;
 
 namespace Simulating;
 
-public sealed class Simulation
+public interface ISimulation
+{
+  double SuccessRate { get; }
+
+  void Run(ImmutableArray<Incident> incidents, ShiftPlan simulateOnThisShiftPlan);
+}
+
+public sealed class Simulation : ISimulation
 {
   public ImmutableArray<Depot> Depots { get; }
   public DistanceCalculator DistanceCalculator { get; }
 
-  public int CurrentTimeSec { get; private set; } = 0;
+  /// <summary>
+  /// Success rate of last run simulation.
+  /// </summary>
+  public double SuccessRate => (_totalIncidentsCount - _notHandledIncidentsCount) / _totalIncidentsCount;
+
+  public int CurrentTimeSec { get; private set; }
 
   private readonly ShiftEvaluator _shiftEvaluator;
   private readonly PlannableIncident.Factory _plannableIncidentFactory;
 
-  public Simulation(World world) : this(world.Depots, world.Hospitals, world.IncTypeToAllowedAmbTypesTable, world.DistanceCalculator) { }
+  private int _totalIncidentsCount;
+  private int _notHandledIncidentsCount;
 
-  public Simulation(ImmutableArray<Depot> depots, ImmutableArray<Hospital> hospitals, IncTypeToAllowedAmbTypesTable ambToIncTypesTable, DistanceCalculator distanceCalculator)
+  public Simulation(World world)
+  : this(world.Depots, world.Hospitals, world.IncTypeToAllowedAmbTypesTable, world.DistanceCalculator) { }
+
+  public Simulation
+  (
+     ImmutableArray<Depot> depots,
+     ImmutableArray<Hospital> hospitals,
+     IncTypeToAllowedAmbTypesTable ambToIncTypesTable,
+     DistanceCalculator distanceCalculator
+  )
   {
     Depots = depots;
     DistanceCalculator = distanceCalculator;
@@ -29,11 +51,8 @@ public sealed class Simulation
   /// <param name="simulateOnThisShiftPlan"/> needs to have cleared PlannedIncidents, by <see cref="ShiftPlan.ClearAllPlannedIncidents()" 
   public void Run(ImmutableArray<Incident> incidents, ShiftPlan simulateOnThisShiftPlan)
   {
-    // Prepare shiftPlan for simulation.  
-    // simulateOnThisShiftPlan.ClearPlannedIncidents();
-
-    // Sort in order to simulate incidents in order of occurence
-    // Array.Sort(incidents, (x, y) => x.OccurenceSec.CompareTo(y.OccurenceSec));
+    _totalIncidentsCount = incidents.Length;
+    _notHandledIncidentsCount = 0;
 
     for (int i = 0; i < incidents.Length; ++i)
     {
@@ -47,9 +66,6 @@ public sealed class Simulation
 
   private void Step(in Incident currentIncident, ShiftPlan simulateOnThisShiftPlan)
   {
-    //TODO: is this O(1)?
-    //Span<ShiftOpt> shifts = simulateOnThisShiftPlan.Shifts.AsSpan();
-
     ImmutableArray<Shift> shifts = simulateOnThisShiftPlan.Shifts;
 
     // Has to be assigned to something in order to compile, but it will be reassigned to first handling shift found.
@@ -84,8 +100,7 @@ public sealed class Simulation
     // no hadnling shift exists
     if (findBetterFromIndex == shifts.Length)
     {
-      // Do nothing, cannot plan this incident.
-      // TODO: Update some stats
+      _notHandledIncidentsCount++;
       return;
     }
 

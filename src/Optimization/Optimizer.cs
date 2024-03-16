@@ -1,6 +1,7 @@
 ﻿using System.Collections.Immutable;
 using ESSP.DataModel;
 using Microsoft.Win32.SafeHandles;
+using Model.Extensions;
 using Simulating;
 
 namespace Optimizing;
@@ -19,16 +20,12 @@ public abstract class Optimizer : IOptimizer
   /// <inheritdoc/>
   public Weights StartWeights { get; set; }
 
-  protected Simulation Simulation;
-
   public Optimizer(World world, Constraints constraints, ILoss loss)
   {
     Constraints = constraints;
     World = world;
     Loss = loss;
     StartWeights = InitWeights();
-
-    Simulation = new Simulation(world);
   }
 
   public abstract IEnumerable<Weights> FindOptimal(ImmutableArray<SuccessRatedIncidents> incidentsSets);
@@ -36,7 +33,8 @@ public abstract class Optimizer : IOptimizer
   protected Weights InitWeights()
   {
     // TODO: Construct initial weights cleverly 
-    throw new NotImplementedException("InitWeights not implemented yet.");
+    // HACK: 10_000
+    return ShiftPlan.GetFrom(World.Depots, 10_000).ToWeights();
   }
 }
 

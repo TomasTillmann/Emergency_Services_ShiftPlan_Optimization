@@ -1,7 +1,6 @@
 using System.Collections.Immutable;
-using ESSP.DataModel;
 
-namespace Optimizing;
+namespace ESSP.DataModel;
 
 public class Weights
 {
