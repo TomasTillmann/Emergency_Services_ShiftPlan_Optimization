@@ -35,7 +35,7 @@ public class ShiftPlan
 
     ShiftPlan shiftPlan = new()
     {
-      Shifts = shifts.ToArray()
+      Shifts = shifts.ToImmutableArray()
     };
 
     return shiftPlan;

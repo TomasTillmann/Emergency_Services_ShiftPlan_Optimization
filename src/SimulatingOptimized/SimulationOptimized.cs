@@ -50,7 +50,7 @@ public sealed class SimulationOptimized
     //TODO: is this O(1)?
     //Span<ShiftOpt> shifts = simulateOnThisShiftPlan.Shifts.AsSpan();
 
-    Shift[] shifts = simulateOnThisShiftPlan.Shifts;
+    ImmutableArray<Shift> shifts = simulateOnThisShiftPlan.Shifts;
 
     // Has to be assigned to something in order to compile, but it will be reassigned to first handling shift found.
     // If not, than the other loop won't happen, therefore it's value is irrelevant.

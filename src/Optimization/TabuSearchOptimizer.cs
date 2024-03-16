@@ -1,255 +1,141 @@
 ﻿using ESSP.DataModel;
-using Model.Extensions;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
+using System.Collections.Immutable;
 
 namespace Optimizing;
 
+//TODO: support for end the searh when converges to some minima and doesnt want to go anywhere, instead of just iterations
 public sealed class TabuSearchOptimizer : LocalSearchOptimizer, IStepOptimizer
 {
-  private class ShiftPlanTabu
-  {
-    public ShiftPlan Value;
-
-    public int Count => Value.Shifts.Count;
-    public Shift this[int index] { get => Value.Shifts[index]; set => Value.Shifts[index] = value; }
-
-    public ShiftPlanTabu(ShiftPlan shiftPlan)
-    {
-      Value = shiftPlan;
-    }
-
-    public static ShiftPlanTabu GetAllShiftHavingSameDuration(IReadOnlyList<Depot> depots, Seconds duration)
-    {
-      return new ShiftPlanTabu(ShiftPlan.ConstructFrom(depots, 0.ToSeconds(), duration));
-    }
-
-    public void ClearAllPlannedIncidents()
-    {
-      Value.Shifts.ForEach(shift => shift.ClearPlannedIncidents());
-    }
-
-    internal ShiftPlanTabu Copy()
-    {
-      return new ShiftPlanTabu(Value.Copy());
-    }
-    public int GetCost()
-    {
-      return Value.GetCost();
-    }
-
-    public override string ToString()
-    {
-      return Value.Shifts.Select(shift => (shift.Work.Start.Value / 60 / 60, shift.Work.End.Value / 60 / 60)).Visualize(",");
-    }
-
-    public static bool operator ==(ShiftPlanTabu s1, ShiftPlanTabu s2)
-    {
-      List<Shift>.Enumerator thisEnumerator = s1.Value.Shifts.GetEnumerator();
-      List<Shift>.Enumerator anotherEnumerator = s2.Value.Shifts.GetEnumerator();
-
-      while (thisEnumerator.MoveNext() && anotherEnumerator.MoveNext())
-      {
-        if (thisEnumerator.Current.Work != anotherEnumerator.Current.Work)
-        {
-          return false;
-        }
-      }
-
-      // I know they will be same size - so I don't test that.
-      return true;
-    }
-
-    public static bool operator !=(ShiftPlanTabu s1, ShiftPlanTabu s2) => !(s1 == s2);
-
-    public override bool Equals(object? obj)
-    {
-      if (obj is ShiftPlanTabu s)
-      {
-        return this == s;
-      }
-
-      return false;
-    }
-  }
-
   #region Params
+
   public int Iterations { get; set; }
   public int TabuSize { get; set; }
   public int NeighboursLimit { get; set; }
-
-  public readonly Random Random;
+  public Random Random { get; set; }
 
   #endregion
 
-  private List<SuccessRatedIncidents> _incidentsSets;
-  private ShiftPlanTabu _startShiftPlanTabu;
-  private ShiftPlanTabu _globalBest;
-  private int _globalBestFitness;
-  private ShiftPlanTabu _bestCandidate;
-  private int? _bestCandidateFitness;
-  private ShiftPlanTabu _candidate;
-  private Move? _bestMove;
+  private ImmutableArray<SuccessRatedIncidents> _incidentsSets;
+  private Weights _weights;
+  private Weights _globalBestWeights;
+  private double _globalBestLoss;
+  private double _currentBestLoss;
+  private Move _currentBestMove;
   private LinkedList<Move> _tabu;
 
-  #region InternalState
+  #region ExposedInternalState
 
-  public ShiftPlan GlobalBest => _globalBest.Value;
-  public int GlobalBestFitness => _globalBestFitness;
-  public ShiftPlan BestCandidate => _bestCandidate.Value;
-  public int? BestCandidateFitness => _bestCandidateFitness;
-  public Move? BestMove => _bestMove;
+  public Weights GlobalBestWeights => _globalBestWeights;
+  public double GlobalBestLoss => _globalBestLoss;
+  public double CurrentBestLoss => _currentBestLoss;
+  public Move CurrentBestMove => _currentBestMove;
   public LinkedList<Move> Tabu => _tabu;
 
   #endregion
 
-  public ShiftPlan StartShiftPlan { get; set; }
+  public IEnumerable<Weights> OptimalWeights => new List<Weights> { _globalBestWeights };
 
-
-  public IEnumerable<ShiftPlan> OptimalShiftPlans => new List<ShiftPlan> { _globalBest.Value };
   public int CurrStep { get; private set; }
 
-  /// <param name="world"></param>
-  /// <param name="constraints"></param>
-  /// <param name="iterations"></param>
   /// <param name="tabuSize">If set too high, it could happen, that all neighbours are tabu (and aspiration criterion is not satisfied either).
-  /// <see cref="Exception"/> will be thrown.</param>
-  /// <param name="seed">Seed used for random sample of neighbours list.</param>
-  /// <param name="neighboursLimit">If count of neighbours is exceeded, uniformly random sample of this size will be taken as representants of all neighbours.
-  /// The more the shifts, the more the neighbours. Running hundreads of simulations in one iteration can be too expensive. This helps this issue.</param>
-  /// <param name="seed">Initial <see cref="ShiftPlan"/> is selected randomly. When limiting neighbours to search by <paramref name="neighboursLimit"/>, neighbours to search are selected at random.</param>
-  public TabuSearchOptimizer(World world, Constraints constraints, int iterations = 150, int tabuSize = 50, int neighboursLimit = int.MaxValue, Random? random = null) : base(world, constraints)
+  /// <param name="neighboursLimit">If count of neighbours is exceeded, only first <paramref name="neighboursLimit"/> neighbours will be tried.
+  public TabuSearchOptimizer
+  (
+    World world,
+    Constraints constraints,
+    ILoss loss,
+    int iterations = 150,
+    int tabuSize = 50,
+    int neighboursLimit = int.MaxValue,
+    Random? random = null
+  )
+  : base(world, constraints, loss)
   {
-    Random = random ?? new Random();
     Iterations = iterations;
     TabuSize = tabuSize;
     NeighboursLimit = neighboursLimit;
+    Random = random ?? new Random();
   }
 
-  public override IEnumerable<ShiftPlan> FindOptimal(List<SuccessRatedIncidents> incidentsSets)
+  public override IEnumerable<Weights> FindOptimal(ImmutableArray<SuccessRatedIncidents> incidentsSets)
   {
-    StartShiftPlan
-        = ShiftPlan.ConstructRandom(World.Depots, Constraints.AllowedShiftStartingTimes.ToList(),
-            Constraints.AllowedShiftDurations.ToList(), Random);
-
     InitStepOptimizer(incidentsSets);
-    (this as IStepOptimizer).Run();
-    return OptimalShiftPlans;
-  }
 
-  public override IEnumerable<ShiftPlan> FindOptimalFrom(ShiftPlan startShiftPlan, List<SuccessRatedIncidents> incidentsSets)
-  {
-    StartShiftPlan = startShiftPlan;
-    InitStepOptimizer(incidentsSets);
-    (this as IStepOptimizer).Run();
-    return OptimalShiftPlans;
-  }
-
-  public void InitStepOptimizer(List<SuccessRatedIncidents> incidentsSets)
-  {
-    if (StartShiftPlan is null)
-    {
-      StartShiftPlan
-          = ShiftPlan.ConstructRandom(World.Depots, Constraints.AllowedShiftStartingTimes.ToList(),
-              Constraints.AllowedShiftDurations.ToList(), Random);
-    }
-
-    _startShiftPlanTabu = new ShiftPlanTabu(StartShiftPlan);
-    _incidentsSets = incidentsSets;
-    _globalBest = _startShiftPlanTabu;
-    _bestCandidate = _startShiftPlanTabu;
-
-    _globalBestFitness = Fitness(_globalBest.Value, incidentsSets);
-    _bestCandidateFitness = _globalBestFitness;
-
-    _tabu = new LinkedList<Move>();
-    // TODO: Init tabu?
-  }
-
-  public void Run()
-  {
     while (!IsFinished())
     {
-      Step();
+      StepInternal();
     }
+
+    return OptimalWeights;
+  }
+
+  public void InitStepOptimizer(ImmutableArray<SuccessRatedIncidents> incidentsSets)
+  {
+    _incidentsSets = incidentsSets;
+    _weights = StartWeights;
+    _globalBestWeights = _weights;
+    _globalBestLoss = GetLossInternal(_globalBestWeights);
+
+    _tabu = new LinkedList<Move>();
   }
 
   public void Step()
   {
-    int Fitness(ShiftPlanTabu shiftPlanTabu)
-    {
-      return DampedFitness(shiftPlanTabu.Value, _incidentsSets);
-    }
-
-    List<Move> neighbourHoodMoves = GetNeighborhoodMoves(_bestCandidate).ToList();
-    if (neighbourHoodMoves.Count > NeighboursLimit)
-    {
-      neighbourHoodMoves = neighbourHoodMoves.GetRandomSamples(NeighboursLimit, Random);
-    }
-
-    _bestMove = null;
-    _bestCandidateFitness = null;
-
-    foreach (Move move in neighbourHoodMoves)
-    {
-      _candidate = ModifyMakeMove(_bestCandidate, move);
-
-      int candidateFitness = Fitness(_candidate);
-
-      if (_tabu.Contains(move))
-      {
-        // aspiration criterion
-        if (candidateFitness < _globalBestFitness)
-        {
-          if (_bestCandidateFitness is null || candidateFitness < _bestCandidateFitness)
-          {
-            _bestMove = move;
-            _bestCandidateFitness = candidateFitness;
-          }
-        }
-      }
-      else
-      {
-        if (_bestCandidateFitness is null || candidateFitness < _bestCandidateFitness)
-        {
-          _bestMove = move;
-          _bestCandidateFitness = candidateFitness;
-        }
-      }
-
-      ModifyUnmakeMove(_bestCandidate, move);
-    }
-
-    if (_bestMove is null || _bestCandidateFitness is null)
-    {
-      throw new ArgumentException("All neighbours were tabu and none of them also satisfied aspiration criterion. Perhaps you set tabu size too high?");
-    }
-
-    _bestCandidate = ModifyMakeMove(_bestCandidate.Copy(), _bestMove);
-
-    if (_bestCandidateFitness < _globalBestFitness)
-    {
-      _globalBest = _bestCandidate;
-      _globalBestFitness = _bestCandidateFitness.Value;
-    }
-
-    _tabu.AddLast(_bestMove);
-    if (_tabu.Count > TabuSize)
-    {
-      _tabu.RemoveFirst();
-    }
-
+    StepInternal();
     CurrStep++;
   }
 
   public bool IsFinished()
   {
     return CurrStep == Iterations;
+  }
+
+  private void StepInternal()
+  {
+    //TODO: Something more sophisticated than just taking the first
+    IEnumerable<Move> movesToNeighbours = GetMovesToNeighbours(_weights).Take(NeighboursLimit);
+
+    // might be in local minima already 
+    _currentBestMove = Move.Identity;
+    _currentBestLoss = GetLossInternal(_weights);
+
+    foreach (Move move in movesToNeighbours)
+    {
+      ModifyMakeMove(_weights, move);
+
+      double neighbourLoss = GetLossInternal(_weights);
+
+      // not in tabu, or aspiration criterion is satisfied (possibly in tabu)
+      if (!_tabu.Contains(move) || neighbourLoss < _globalBestLoss)
+      {
+        // update current best move
+        if (neighbourLoss < _currentBestLoss)
+        {
+          _currentBestMove = move;
+          _currentBestLoss = neighbourLoss;
+        }
+      }
+
+      ModifyUnmakeMove(_weights, move);
+    }
+
+    if (_currentBestLoss < _globalBestLoss)
+    {
+      _globalBestWeights = _weights.Copy();
+      ModifyMakeMove(_globalBestWeights, _currentBestMove);
+
+      _globalBestLoss = _currentBestLoss;
+    }
+
+    _tabu.AddLast(_currentBestMove);
+    if (_tabu.Count > TabuSize)
+    {
+      _tabu.RemoveFirst();
+    }
+  }
+
+  private double GetLossInternal(Weights weights)
+  {
+    return Loss.Get(weights, _incidentsSets);
   }
 }
