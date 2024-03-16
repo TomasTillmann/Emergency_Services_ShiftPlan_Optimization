@@ -1,61 +1,25 @@
-﻿using System;
+using System;
 
 namespace ESSP.DataModel
 {
-  public readonly struct Coordinate
+  public readonly struct Coordinate : IComparable<Coordinate>
   {
-    public Meters X { get; init; }
+    public int XMet { get; init; }
+    public int YMet { get; init; }
 
-    public Meters Y { get; init; }
-
-    public Coordinate(Meters x, Meters y)
+    /// lexicographical comparision - first by X and than by Y
+    public int CompareTo(Coordinate other)
     {
-      X = x;
-      Y = y;
-    }
-
-    public static Coordinate FromMeters(int x, int y)
-    {
-      return new Coordinate(x.ToMeters(), y.ToMeters());
-    }
-
-    #region Operators
-
-    public static Coordinate operator -(Coordinate c1, Coordinate c2) => new Coordinate(c1.X - c2.X, c1.Y - c2.Y);
-    public static Coordinate operator +(Coordinate c1, Coordinate c2) => new Coordinate(c1.X + c2.X, c1.Y + c2.Y);
-    public static bool operator ==(Coordinate c1, Coordinate c2) => c1.X == c2.X && c1.Y == c2.Y;
-    public static bool operator !=(Coordinate c1, Coordinate c2) => c1.X != c2.X && c1.Y != c2.Y;
-
-    #endregion
-
-    public static Coordinate GetRandom(Random random, Coordinate areaPosition, Meters xSize, Meters ySize)
-    {
-      return new Coordinate
-      (
-          random.Next(areaPosition.X.Value, xSize.Value).ToMeters(),
-          random.Next(areaPosition.Y.Value, ySize.Value).ToMeters()
-      );
-    }
-
-    public override bool Equals(object obj)
-    {
-      if (obj is Coordinate coord)
+      int comp = XMet.CompareTo(other.XMet);
+      if (comp == 0)
       {
-        return this == coord;
+        return YMet.CompareTo(other.YMet);
       }
-
-      return false;
+      else
+      {
+        return comp;
+      }
     }
-
-    public override int GetHashCode()
-    {
-      return HashCode.Combine(X.GetHashCode(), Y.GetHashCode());
-    }
-
-    public override string ToString()
-    {
-      return $"X: {X}, Y: {Y}";
-    }
-
   }
 }
+

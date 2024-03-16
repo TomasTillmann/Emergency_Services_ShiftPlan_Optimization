@@ -18,7 +18,7 @@ public class Visualizer : IDisposable
     _writer.Dispose();
   }
 
-  public void WriteGraph(ShiftPlanOpt shiftPlan, Seconds end)
+  public void WriteGraph(ShiftPlan shiftPlan, Seconds end)
   {
     int index = 1;
     foreach (var shift in shiftPlan.Shifts)

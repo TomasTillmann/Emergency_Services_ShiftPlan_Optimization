@@ -1,22 +1,24 @@
-﻿using System.Collections.Generic;
-using DataModel.Interfaces;
-
 namespace ESSP.DataModel;
 
-public class Depot : ILocatable
+public readonly struct Depot
 {
-  public Coordinate Location { get; set; }
+  public Coordinate Location { get; }
+  public Ambulance[] Ambulances { get; }
 
-  public IList<Ambulance> Ambulances { get; set; }
-
-  public Depot(Coordinate coordinate, IList<Ambulance> ambulances)
+  /// sets ambulances locations to passed location
+  public Depot(Coordinate location, Ambulance[] ambulances)
   {
-    Location = coordinate;
-    Ambulances = ambulances;
+    Location = location;
+    Ambulances = new Ambulance[ambulances.Length];
 
-    foreach (Ambulance ambulance in Ambulances)
+    for (int i = 0; i < ambulances.Length; ++i)
     {
-      ambulance.Location = Location;
+      Ambulances[i] = new Ambulance
+      {
+        Type = ambulances[i].Type,
+        Location = location
+      };
     }
   }
 }
+

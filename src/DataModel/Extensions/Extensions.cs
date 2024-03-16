@@ -121,15 +121,4 @@ public static class Extensions
     random = random ?? new Random();
     return collection.OrderBy(x => random.Next()).Take(count).ToList();
   }
-
-  public static void ModifyToLargest(this ShiftPlan shiftPlan, Domain constraints)
-  {
-    Seconds largestDuration = constraints.AllowedShiftDurations.FindMaxSubset(_ => _).First();
-
-
-    foreach (Shift shift in shiftPlan.Shifts)
-    {
-      shift.Work = Interval.GetByStartAndDuration(0.ToSeconds(), largestDuration);
-    }
-  }
 }

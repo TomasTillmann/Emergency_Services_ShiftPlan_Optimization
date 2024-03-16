@@ -1,46 +1,21 @@
-﻿using Model.Extensions;
-using Optimizing;
-using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Collections.Immutable;
 
 namespace ESSP.DataModel;
 
-public class ShiftPlan : IShifts
+public class ShiftPlan
 {
-  public List<Shift> Shifts { get; set; }
+  public ImmutableArray<Shift> Shifts { get; init; }
 
-  public int Count => Shifts.Count;
-  public Shift this[int index] { get => Shifts[index]; set => Shifts[index] = value; }
-
-  public ShiftPlan(List<Shift> shifts)
+  public void ClearPlannedIncidents()
   {
-    Shifts = shifts;
-  }
-
-  public static ShiftPlan ConstructRandom(IReadOnlyList<Depot> depots, List<Seconds> allowedStartingTimes, List<Seconds> allowedShiftDurations, Random? random = null)
-  {
-    ShiftPlan shiftPlanDefault = ConstructEmpty(depots);
-    foreach (Shift shift in shiftPlanDefault.Shifts)
+    for (int i = 0; i < Shifts.Length; ++i)
     {
-      shift.Work = Interval.GetByStartAndDuration(allowedStartingTimes.GetRandomElement(random), allowedShiftDurations.GetRandomElement(random));
+      Shifts[i].ClearPlannedIncidents();
     }
-
-    return shiftPlanDefault;
   }
 
-  public static ShiftPlan ConstructFrom(IReadOnlyList<Depot> depots, Seconds allShiftsStartingTime, Seconds allShiftsDuration)
-  {
-    ShiftPlan defaultShiftPlan = ConstructEmpty(depots);
-    foreach (Shift shift in defaultShiftPlan.Shifts)
-    {
-      shift.Work = Interval.GetByStartAndDuration(allShiftsStartingTime, allShiftsDuration);
-    }
-
-    return defaultShiftPlan;
-  }
-
-  public static ShiftPlan ConstructEmpty(IReadOnlyList<Depot> depots)
+  public static ShiftPlan GetFrom(ImmutableArray<Depot> depots, int incidentsSize)
   {
     List<Shift> shifts = new();
 
@@ -48,30 +23,22 @@ public class ShiftPlan : IShifts
     {
       foreach (Ambulance ambulance in depot.Ambulances)
       {
-        shifts.Add(new Shift(ambulance, depot, Interval.Empty));
+        shifts.Add(
+            new Shift(incidentsSize)
+            {
+              Ambulance = ambulance,
+              Depot = depot,
+            }
+        );
       }
     }
 
-    return new ShiftPlan(shifts);
-  }
+    ShiftPlan shiftPlan = new()
+    {
+      Shifts = shifts.ToArray()
+    };
 
-  public int GetCost()
-  {
-    return Shifts.Select(shift => shift.Ambulance.Type.Cost * shift.Work.Duration.Value).Sum();
-  }
-
-  public void ClearAllPlannedIncidents()
-  {
-    Shifts.ForEach(shift => shift.ClearPlannedIncidents());
-  }
-
-  public ShiftPlan Copy()
-  {
-    return new ShiftPlan(Shifts.Select(shift => new Shift(shift.Ambulance, shift.Depot, shift.Work)).ToList());
-  }
-
-  public override string ToString()
-  {
-    return Shifts.Visualize(toString: shift => $"{shift.Work.Start}-{shift.Work.End}");
+    return shiftPlan;
   }
 }
+

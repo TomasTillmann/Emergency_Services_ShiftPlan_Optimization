@@ -2,8 +2,9 @@
 
 public enum MoveType
 {
-    Shorter,
-    Longer,
-    Earlier,
-    Later,
+  Shorter,
+  Longer,
+  Earlier,
+  Later,
+  NoMove,
 }
