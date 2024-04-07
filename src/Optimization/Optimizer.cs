@@ -20,21 +20,41 @@ public abstract class Optimizer : IOptimizer
   /// <inheritdoc/>
   public Weights StartWeights { get; set; }
 
-  public Optimizer(World world, Constraints constraints, ILoss loss)
+  /// Random
+  protected readonly Random _random;
+
+  public Optimizer(World world, Constraints constraints, ILoss loss, Random? random = null)
   {
+    _random = random ?? new Random();
     Constraints = constraints;
     World = world;
     Loss = loss;
-    StartWeights = InitWeights();
+    StartWeights = InitWeights(world.AllAmbulancesCount, constraints);
   }
 
   public abstract IEnumerable<Weights> FindOptimal(ImmutableArray<SuccessRatedIncidents> incidentsSets);
 
-  protected Weights InitWeights()
+  protected Weights InitWeights(int allAmbulancesCount, Constraints constraints)
   {
-    // TODO: Construct initial weights cleverly 
-    // HACK: 10_000
-    return ShiftPlan.GetFrom(World.Depots, 10_000).ToWeights();
+    Weights startWeights = new()
+    {
+      Value = new Interval[allAmbulancesCount]
+    };
+
+    for (int i = 0; i < allAmbulancesCount; ++i)
+    {
+      startWeights.Value[i] = Interval.GetByStartAndDuration
+      (
+       constraints.GetRandomStartingTimeSec(this._random),
+       constraints.GetRandomDurationTimeSec(this._random)
+      );
+    }
+
+    return startWeights;
+  }
+
+  public virtual void Dispose()
+  {
   }
 }
 

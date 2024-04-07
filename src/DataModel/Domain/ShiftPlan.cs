@@ -16,13 +16,13 @@ public class ShiftPlan
     }
   }
 
-  public int GetCost()
+  public double GetCost()
   {
-    return Shifts.Select(shift => shift.Ambulance.Type.Cost * shift.Work.DurationSec).Sum();
+    return Shifts.Select(shift => shift.Ambulance.Type.Cost * shift.Work.DurationSec / 24 / 24).Sum();
   }
 
   //HACK: dirty implementation with the weights
-  public static ShiftPlan GetFrom(ImmutableArray<Depot> depots, int incidentsSize, Weights? weights = null)
+  public static ShiftPlan GetFrom(ImmutableArray<Depot> depots, Weights? weights = null)
   {
     List<Shift> shifts = new();
 
@@ -32,7 +32,7 @@ public class ShiftPlan
       foreach (Ambulance ambulance in depot.Ambulances)
       {
         shifts.Add(
-            new Shift(incidentsSize)
+            new Shift
             {
               Ambulance = ambulance,
               Depot = depot,

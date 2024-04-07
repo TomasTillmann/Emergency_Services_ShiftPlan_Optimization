@@ -1,4 +1,3 @@
-using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using ESSP.DataModel;
 
@@ -6,41 +5,8 @@ namespace Optimizing;
 
 public abstract class LocalSearchOptimizer : Optimizer
 {
-  /// <summary>
-  /// Calculated from passed <see cref="Constraints"/>.
-  /// </summary>
-  private readonly int _minDurationSec;
-
-  /// <summary>
-  /// Calculated from passed <see cref="Constraints"/>.
-  /// </summary>
-  private readonly int _maxDurationSec;
-
-  /// <summary>
-  /// Calculated from passed <see cref="Constraints"/>.
-  /// </summary>
-  private readonly int _earliestStartingTimeSec;
-
-  /// <summary>
-  /// Calculated from passed <see cref="Constraints"/>.
-  /// </summary>
-  private readonly int _latestStartingTimeSec;
-
-  private readonly int[] _allowedDurationsSecSorted;
-
-  private readonly int[] _allowedStartingTimesSecSorted;
-
-  public LocalSearchOptimizer(World world, Constraints constraints, ILoss loss)
-  : base(world, constraints, loss)
-  {
-    _allowedDurationsSecSorted = constraints.AllowedShiftDurationsSec.ToList().OrderBy(duration => duration).ToArray();
-    _minDurationSec = _allowedDurationsSecSorted.First();
-    _maxDurationSec = _allowedDurationsSecSorted.Last();
-
-    _allowedStartingTimesSecSorted = constraints.AllowedShiftStartingTimesSec.ToList().OrderBy(duration => duration).ToArray();
-    _earliestStartingTimeSec = _allowedStartingTimesSecSorted.First();
-    _latestStartingTimeSec = _allowedStartingTimesSecSorted.Last();
-  }
+  public LocalSearchOptimizer(World world, Constraints constraints, ILoss loss, Random? random = null)
+  : base(world, constraints, loss, random) { }
 
   /// <summary>
   /// Modifes <paramref name="weights"/> by <paramref name="move"/>.
@@ -132,29 +98,38 @@ public abstract class LocalSearchOptimizer : Optimizer
   /// <summary>
   /// Enumerates all legal <see cref="Move"/>s, except <see cref="MoveType.NoMove"/>, to neighbouring <see cref="Weights"/> of <paramref name="weights"/>.
   /// </summary>
-  public IEnumerable<Move> GetMovesToNeighbours(Weights weights)
+  public IEnumerable<Move> GetMovesToNeighbours(Weights weights, int neighboursLimit)
   {
-    for (int weightIndex = 0; weightIndex < weights.Value.Length; ++weightIndex)
+    neighboursLimit = neighboursLimit > weights.Value.Length ? weights.Value.Length : neighboursLimit;
+
+    int[] permutated = new int[weights.Value.Length];
+    for (int i = 0; i < permutated.Length; ++i)
     {
-      Interval weight = weights.Value[weightIndex];
+      permutated[i] = i;
+    }
 
+    Permutate(toPermutate: permutated, neighboursLimit);
+    //Console.WriteLine(string.Join(",", permutated));
+
+    for (int weightIndex = 0; weightIndex < neighboursLimit; ++weightIndex)
+    {
       Move? move;
-      if (TryGenerateMove(weights, weightIndex, MoveType.Shorter, out move))
+      if (TryGenerateMove(weights, permutated[weightIndex], MoveType.Shorter, out move))
       {
         yield return move.Value;
       }
 
-      if (TryGenerateMove(weights, weightIndex, MoveType.Longer, out move))
+      if (TryGenerateMove(weights, permutated[weightIndex], MoveType.Longer, out move))
       {
         yield return move.Value;
       }
 
-      if (TryGenerateMove(weights, weightIndex, MoveType.Later, out move))
+      if (TryGenerateMove(weights, permutated[weightIndex], MoveType.Later, out move))
       {
         yield return move.Value;
       }
 
-      if (TryGenerateMove(weights, weightIndex, MoveType.Earlier, out move))
+      if (TryGenerateMove(weights, permutated[weightIndex], MoveType.Earlier, out move))
       {
         yield return move.Value;
       }
@@ -170,7 +145,8 @@ public abstract class LocalSearchOptimizer : Optimizer
     switch (type)
     {
       case MoveType.Shorter:
-        if (weights.Value[weightIndex].DurationSec != _minDurationSec)
+        int durationSec = weights.Value[weightIndex].DurationSec;
+        if (durationSec != Constraints.MinDurationSec)
         {
           move = new Move
           {
@@ -184,7 +160,7 @@ public abstract class LocalSearchOptimizer : Optimizer
         return false;
 
       case MoveType.Longer:
-        if (weights.Value[weightIndex].DurationSec != _maxDurationSec)
+        if (weights.Value[weightIndex].DurationSec != Constraints.MaxDurationSec)
         {
           move = new Move
           {
@@ -197,7 +173,7 @@ public abstract class LocalSearchOptimizer : Optimizer
         return false;
 
       case MoveType.Earlier:
-        if (weights.Value[weightIndex].StartSec != _earliestStartingTimeSec)
+        if (weights.Value[weightIndex].StartSec != Constraints.EarliestStartingTimeSec)
         {
           move = new Move
           {
@@ -210,7 +186,7 @@ public abstract class LocalSearchOptimizer : Optimizer
         return false;
 
       case MoveType.Later:
-        if (weights.Value[weightIndex].StartSec != _latestStartingTimeSec)
+        if (weights.Value[weightIndex].StartSec != Constraints.LatestStartingTimeSec)
         {
           move = new Move
           {
@@ -238,25 +214,40 @@ public abstract class LocalSearchOptimizer : Optimizer
 
   private int GetShorter(int durationSec)
   {
-    int index = Array.BinarySearch(_allowedDurationsSecSorted, durationSec);
-    return _allowedDurationsSecSorted[index - 1];
+    int index = Array.BinarySearch(Constraints.AllowedDurationsSecSorted, durationSec);
+    return Constraints.AllowedDurationsSecSorted[index - 1];
   }
 
   private int GetLonger(int durationSec)
   {
-    int index = Array.BinarySearch(_allowedDurationsSecSorted, durationSec);
-    return _allowedDurationsSecSorted[index + 1];
+    int index = Array.BinarySearch(Constraints.AllowedDurationsSecSorted, durationSec);
+    return Constraints.AllowedDurationsSecSorted[index + 1];
   }
 
   private int GetEarlier(int startTimeSec)
   {
-    int index = Array.BinarySearch(_allowedStartingTimesSecSorted, startTimeSec);
-    return _allowedStartingTimesSecSorted[index - 1];
+    int index = Array.BinarySearch(Constraints.AllowedStartingTimesSecSorted, startTimeSec);
+    return Constraints.AllowedStartingTimesSecSorted[index - 1];
   }
 
   private int GetLater(int startTimeSec)
   {
-    int index = Array.BinarySearch(_allowedStartingTimesSecSorted, startTimeSec);
-    return _allowedStartingTimesSecSorted[index + 1];
+    int index = Array.BinarySearch(Constraints.AllowedStartingTimesSecSorted, startTimeSec);
+    return Constraints.AllowedStartingTimesSecSorted[index + 1];
+  }
+
+  /// <summary>
+  /// Fisher-Yates permutation algorithm with limit when to end the permutation
+  /// </summary>
+  private void Permutate(int[] toPermutate, int limit)
+  {
+    for (int i = 0; i < limit; ++i)
+    {
+      int nextSwap = _random.Next(i, toPermutate.Length);
+
+      int temp = toPermutate[i];
+      toPermutate[i] = toPermutate[nextSwap];
+      toPermutate[nextSwap] = temp;
+    }
   }
 }

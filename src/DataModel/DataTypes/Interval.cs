@@ -77,6 +77,11 @@ namespace ESSP.DataModel
     {
       return HashCode.Combine(StartSec.GetHashCode(), EndSec.GetHashCode());
     }
+
+    public override string ToString()
+    {
+      return $"({StartSec}, {EndSec})";
+    }
   }
 }
 

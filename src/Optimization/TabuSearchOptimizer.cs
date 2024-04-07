@@ -4,24 +4,26 @@ using System.Collections.Immutable;
 namespace Optimizing;
 
 //TODO: support for end the searh when converges to some minima and doesnt want to go anywhere, instead of just iterations
-public sealed class TabuSearchOptimizer : LocalSearchOptimizer, IStepOptimizer
+public sealed class TabuSearchOptimizer : LocalSearchOptimizer, IStepOptimizer, IDisposable
 {
+  private readonly StreamWriter _debug = new(@"/home/tom/School/Bakalarka/Emergency_Services_ShiftPlan_Optimization/src/logs" + "/tabu.log");
+
   #region Params
 
   public int Iterations { get; set; }
   public int TabuSize { get; set; }
   public int NeighboursLimit { get; set; }
-  public Random Random { get; set; }
+  public Random Random => _random;
 
   #endregion
 
   private ImmutableArray<SuccessRatedIncidents> _incidentsSets;
-  private Weights _weights;
   private Weights _globalBestWeights;
   private double _globalBestLoss;
   private double _currentBestLoss;
   private Move _currentBestMove;
   private LinkedList<Move> _tabu;
+  private bool _isStuck;
 
   #region ExposedInternalState
 
@@ -44,17 +46,18 @@ public sealed class TabuSearchOptimizer : LocalSearchOptimizer, IStepOptimizer
     World world,
     Constraints constraints,
     ILoss loss,
-    int iterations = 150,
-    int tabuSize = 50,
-    int neighboursLimit = int.MaxValue,
+    int iterations = 50,
+    int tabuSize = 15,
+    int neighboursLimit = 20,
     Random? random = null
   )
-  : base(world, constraints, loss)
+  : base(world, constraints, loss, random)
   {
     Iterations = iterations;
     TabuSize = tabuSize;
     NeighboursLimit = neighboursLimit;
-    Random = random ?? new Random();
+    _tabu = new LinkedList<Move>();
+    _isStuck = false;
   }
 
   public override IEnumerable<Weights> FindOptimal(ImmutableArray<SuccessRatedIncidents> incidentsSets)
@@ -72,11 +75,10 @@ public sealed class TabuSearchOptimizer : LocalSearchOptimizer, IStepOptimizer
   public void InitStepOptimizer(ImmutableArray<SuccessRatedIncidents> incidentsSets)
   {
     _incidentsSets = incidentsSets;
-    _weights = StartWeights;
-    _globalBestWeights = _weights;
+    _globalBestWeights = StartWeights;
     _globalBestLoss = GetLossInternal(_globalBestWeights);
 
-    _tabu = new LinkedList<Move>();
+    _tabu.Clear();
   }
 
   public void Step()
@@ -87,44 +89,58 @@ public sealed class TabuSearchOptimizer : LocalSearchOptimizer, IStepOptimizer
 
   public bool IsFinished()
   {
-    return CurrStep == Iterations;
+    return CurrStep == Iterations || _isStuck;
   }
 
   private void StepInternal()
   {
-    //TODO: Something more sophisticated than just taking the first
-    IEnumerable<Move> movesToNeighbours = GetMovesToNeighbours(_weights).Take(NeighboursLimit);
+    IEnumerable<Move> movesToNeighbours = GetMovesToNeighbours(_globalBestWeights, NeighboursLimit);
 
-    // might be in local minima already 
-    _currentBestMove = Move.Identity;
-    _currentBestLoss = GetLossInternal(_weights);
+    _debug.WriteLine("moves: " + string.Join(", ", movesToNeighbours));
+    _debug.WriteLine("global best loss: " + _globalBestLoss);
+    _debug.WriteLine("global best weights: " + string.Join(", ", _globalBestWeights));
 
+    _currentBestLoss = double.MaxValue;
     foreach (Move move in movesToNeighbours)
     {
-      ModifyMakeMove(_weights, move);
+      ModifyMakeMove(_globalBestWeights, move);
+      _debug.WriteLine("neighbour: " + string.Join(", ", _globalBestWeights));
 
-      double neighbourLoss = GetLossInternal(_weights);
+      double neighbourLoss = GetLossInternal(_globalBestWeights);
+      _debug.WriteLine("neighbour loss: " + neighbourLoss);
 
-      // not in tabu, or aspiration criterion is satisfied (possibly in tabu)
+      // Not in tabu, or aspiration criterion is satisfied (possibly in tabu).
       if (!_tabu.Contains(move) || neighbourLoss < _globalBestLoss)
       {
-        // update current best move
+        // Is better than current? Always true when aspiration criterion was satisfied.
         if (neighbourLoss < _currentBestLoss)
         {
           _currentBestMove = move;
+          _debug.WriteLine("current best move updated to: " + _currentBestMove);
+
           _currentBestLoss = neighbourLoss;
+          _debug.WriteLine("current best loss updated to: " + _currentBestLoss);
         }
       }
 
-      ModifyUnmakeMove(_weights, move);
+      ModifyUnmakeMove(_globalBestWeights, move);
+    }
+
+    // This happens iff all neighbours are in tabu and worse than already found global best.
+    if (_currentBestLoss == double.MaxValue)
+    {
+      _isStuck = true;
+      return;
     }
 
     if (_currentBestLoss < _globalBestLoss)
     {
-      _globalBestWeights = _weights.Copy();
       ModifyMakeMove(_globalBestWeights, _currentBestMove);
+      _debug.WriteLine("global best weights updated to: " + string.Join(", ", _globalBestWeights));
+      _debug.WriteLine("updated by move: " + _currentBestMove);
 
       _globalBestLoss = _currentBestLoss;
+      _debug.WriteLine("global best loss updated to: " + _globalBestLoss);
     }
 
     _tabu.AddLast(_currentBestMove);
@@ -132,10 +148,17 @@ public sealed class TabuSearchOptimizer : LocalSearchOptimizer, IStepOptimizer
     {
       _tabu.RemoveFirst();
     }
+
+    _debug.WriteLine("==================");
   }
 
   private double GetLossInternal(Weights weights)
   {
     return Loss.Get(weights, _incidentsSets);
+  }
+
+  public override void Dispose()
+  {
+    _debug.Dispose();
   }
 }

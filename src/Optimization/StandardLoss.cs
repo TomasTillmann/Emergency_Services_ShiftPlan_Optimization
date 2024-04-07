@@ -8,21 +8,23 @@ public class StandardLoss : Loss
   public StandardLoss(World world, int incidentsSize)
   : base(world, incidentsSize) { }
 
-  //HACK: dont overwrite all weight always, but only those that actually changed
   public override double Get(Weights weights, ImmutableArray<SuccessRatedIncidents> incidentsSet)
   {
+    //TODO: dont overwrite all weight always, but only those that actually changed
+    // create shift plan according to weights
     for (int i = 0; i < weights.Value.Length; ++i)
     {
       Shift shift = SimulateOnThisShiftPlan.Shifts[i];
       shift.Work = weights.Value[i];
     }
+    //
 
     //HACK: do for all incidentsSet
     Simulation.Run(incidentsSet.First().Value, SimulateOnThisShiftPlan);
 
     double threshold = incidentsSet.First().SuccessRate;
     double successRate = Simulation.SuccessRate;
-    int cost = SimulateOnThisShiftPlan.GetCost();
+    double cost = SimulateOnThisShiftPlan.GetCost();
 
     // TODO:
     // We need a loss which:

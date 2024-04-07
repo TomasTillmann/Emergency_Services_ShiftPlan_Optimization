@@ -3,7 +3,7 @@ using ESSP.DataModel;
 
 namespace Optimizing;
 
-public interface IOptimizer
+public interface IOptimizer : IDisposable
 {
   public Constraints Constraints { get; }
 
