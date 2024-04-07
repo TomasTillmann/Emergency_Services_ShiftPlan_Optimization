@@ -1,4 +1,5 @@
-using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace ESSP.DataModel;
 
@@ -14,38 +15,39 @@ public class Shift
 
   public int TimeActive { get; private set; }
 
-  private int _index;
-  private PlannableIncident[] _plannedIncidents { get; init; }
+  private List<PlannableIncident> _plannedIncidents { get; init; }
 
-  public Shift(int plannedIncidentsSize)
+  public Shift()
   {
-    _plannedIncidents = new PlannableIncident[plannedIncidentsSize];
-    _index = -1;
+    _plannedIncidents = new List<PlannableIncident>();
 
     Id = _nextId++;
   }
 
   public void Plan(PlannableIncident plannableIncident)
   {
-    _plannedIncidents[++_index] = plannableIncident;
+    _plannedIncidents.Add(plannableIncident);
     TimeActive += plannableIncident.IncidentHandling.DurationSec;
   }
 
   public PlannableIncident GetCurrentlyHandlingIncident()
   {
-    return _plannedIncidents[_index];
+    return _plannedIncidents.Last();
   }
 
   public bool IsInDepot(int currentTimeSec)
   {
-    if (_index == -1)
+    if (!_plannedIncidents.Any())
     {
       return true;
     }
 
-    return _plannedIncidents[_index].ToDepotDrive.EndSec <= currentTimeSec;
+    return _plannedIncidents.Last().ToDepotDrive.EndSec <= currentTimeSec;
   }
 
+  /// <summary>
+  /// Returns true if shift is free in current time and false if not.
+  /// </summary>
   public bool IsFree(int currentTimeSec)
   {
     return WhenFree(currentTimeSec) == currentTimeSec;
@@ -58,32 +60,32 @@ public class Shift
   /// </summary>
   public int WhenFree(int currentTimeSec)
   {
-    if (_index == -1)
+    if (!_plannedIncidents.Any())
     {
       return currentTimeSec;
     }
 
-    int toDepotDriveStartSec = _plannedIncidents[_index].ToDepotDrive.StartSec;
+    int toDepotDriveStartSec = _plannedIncidents.Last().ToDepotDrive.StartSec;
     return toDepotDriveStartSec < currentTimeSec ? currentTimeSec : toDepotDriveStartSec;
   }
 
   /// <summary>
+  /// Used only in <see cref="Visualizer"/>
   /// Returns incident which is / was handled in <paramref name="currentTime"/>.
   /// If no incidents were planned on this shift at <paramref name="currentTime"/>, returns <see langword="null"/>.
   /// </summary>
   public PlannableIncident PlannedIncident(int currentTimeSec)
   {
-    //TODO: this method is not called anywhere
-    if (_index == -1)
+    if (!_plannedIncidents.Any())
     {
       return null;
     }
 
-    for (int i = 0; i < _index; ++i)
+    foreach (var inc in _plannedIncidents)
     {
-      if (_plannedIncidents[i].WholeInterval.IsInInterval(currentTimeSec))
+      if (inc.WholeInterval.IsInInterval(currentTimeSec))
       {
-        return _plannedIncidents[i];
+        return inc;
       }
     }
 
@@ -92,7 +94,7 @@ public class Shift
 
   public void ClearPlannedIncidents()
   {
-    Array.Clear(_plannedIncidents);
+    _plannedIncidents.Clear();
   }
 }
 

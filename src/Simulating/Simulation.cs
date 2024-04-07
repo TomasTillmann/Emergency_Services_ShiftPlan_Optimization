@@ -19,7 +19,7 @@ public sealed class Simulation : ISimulation
   /// <summary>
   /// Success rate of last run simulation.
   /// </summary>
-  public double SuccessRate => (_totalIncidentsCount - _notHandledIncidentsCount) / _totalIncidentsCount;
+  public double SuccessRate => (_totalIncidentsCount - _notHandledIncidentsCount) / (double)_totalIncidentsCount;
 
   public int CurrentTimeSec { get; private set; }
 
@@ -48,9 +48,10 @@ public sealed class Simulation : ISimulation
   }
 
   /// <param name="incidents"/> have to be sorted in order of <see cref="Incident.OccurenceSec"/>
-  /// <param name="simulateOnThisShiftPlan"/> needs to have cleared PlannedIncidents, by <see cref="ShiftPlan.ClearAllPlannedIncidents()" 
+  /// <param name="simulateOnThisShiftPlan"/> Will clear PlannedIncidents, by <see cref="ShiftPlan.ClearAllPlannedIncidents()" 
   public void Run(ImmutableArray<Incident> incidents, ShiftPlan simulateOnThisShiftPlan)
   {
+    simulateOnThisShiftPlan.ClearPlannedIncidents();
     _totalIncidentsCount = incidents.Length;
     _notHandledIncidentsCount = 0;
 

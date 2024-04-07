@@ -47,7 +47,7 @@ public record AmbulanceModel
 public record AmbulanceTypeModel
 {
   public string Name { get; set; }
-  public int Cost { get; set; }
+  public double Cost { get; set; }
 }
 
 public record HospitalModel

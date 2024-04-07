@@ -20,7 +20,7 @@ public class SimulatedAnnealingOptimizer : LocalSearchOptimizer, IStepOptimizer
   public double HighestTemperature { get; set; }
   public double TemperatureReductionFactor { get; set; }
   public int NeighboursLimit { get; set; }
-  public Random Random { get; set; }
+  public Random Random => _random;
 
   #endregion
 
@@ -56,18 +56,17 @@ public class SimulatedAnnealingOptimizer : LocalSearchOptimizer, IStepOptimizer
       World world,
       Constraints constraints,
       ILoss loss,
-      double lowestTemperature = 0.1,
-      double highestTemperature = 50,
-      double temperatureReductionFactor = 0.2,
+      double lowestTemperature = 0.001,
+      double highestTemperature = 100,
+      double temperatureReductionFactor = 0.98,
       int neighbourLimit = int.MaxValue,
       Random? random = null
-  ) : base(world, constraints, loss)
+  ) : base(world, constraints, loss, random)
   {
     LowestTemperature = lowestTemperature;
     HighestTemperature = highestTemperature;
     TemperatureReductionFactor = temperatureReductionFactor;
     NeighboursLimit = neighbourLimit;
-    Random = random ?? new Random();
   }
 
   /// <inheritdoc/>
@@ -107,8 +106,9 @@ public class SimulatedAnnealingOptimizer : LocalSearchOptimizer, IStepOptimizer
 
   private void StepInternal()
   {
-    //TODO: do some random sampling, instead of just choosing first n moves
-    IEnumerable<Move> moves = GetMovesToNeighbours(_weights).Take(NeighboursLimit);
+    //TODO: do some random sampling, instead of just choosing first n GetMovesToNeighbours
+    //TODO: optimize. Dont generate moves which you will discard by Take(). Just generate _neigbourLimit_ number of moves.
+    IEnumerable<Move> moves = GetMovesToNeighbours(_weights, NeighboursLimit);
 
     foreach (Move move in moves)
     {
@@ -123,6 +123,10 @@ public class SimulatedAnnealingOptimizer : LocalSearchOptimizer, IStepOptimizer
         if (_currentBestLoss < _globalBestLoss)
         {
           _globalBestWeights = _weights.Copy();
+
+          Console.WriteLine("Global best update:");
+          Console.WriteLine(_globalBestWeights);
+
           ModifyMakeMove(_globalBestWeights, _currentBestMove);
 
           _globalBestLoss = _currentBestLoss;
