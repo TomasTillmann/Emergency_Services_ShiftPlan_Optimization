@@ -24,9 +24,9 @@ class Program
     // World and constraints init
     World world = worldMapper.MapBack(dataGenerator.GenerateWorldModel(
       worldSize: new CoordinateModel { XMet = 50_000, YMet = 50_000 },
-      depotsCount: 10,
+      depotsCount: 20,
       hospitalsCount: 20,
-      ambulancesOnDepotNormalExpected: 6,
+      ambulancesOnDepotNormalExpected: 10,
       ambulanceOnDepotNormalStddev: 1,
       ambTypes: new AmbulanceTypeModel[] {
         new AmbulanceTypeModel
@@ -62,7 +62,7 @@ class Program
     IncidentMapper incidentMapper = new();
     ImmutableArray<Incident> incidents = dataGenerator.GenerateIncidentModels(
       worldSize: new CoordinateModel { XMet = 50_000, YMet = 50_000 },
-      incidentsCount: 200,
+      incidentsCount: 300,
       duration: 22.ToHours().ToSeconds() + 30.ToMinutes().ToSeconds(),
       onSceneDurationNormalExpected: 20.ToMinutes().ToSeconds(),
       onSceneDurationNormalStddev: 10.ToMinutes().ToSeconds(),
@@ -91,7 +91,7 @@ class Program
     ).Select(inc => incidentMapper.MapBack(inc)).ToImmutableArray();
 
     //TODO: Add clipping so even if start time + duration sec > simulationTime it doesn't break anything
-    Constraints constrains = new()
+    Constraints constraints = new()
     {
       AllowedShiftStartingTimesSec = new HashSet<int>()
       {
@@ -103,6 +103,8 @@ class Program
 
       AllowedShiftDurationsSec = new HashSet<int>()
       {
+        4.ToHours().ToMinutes().ToSeconds().Value,
+        6.ToHours().ToMinutes().ToSeconds().Value,
         8.ToHours().ToMinutes().ToSeconds().Value,
         12.ToHours().ToMinutes().ToSeconds().Value,
       }
@@ -110,14 +112,14 @@ class Program
     //
 
     // Optimizer init
-    ILoss loss = new StandardLoss(world, incidents.Length);
+    ILoss loss = new StandardLoss(world, constraints);
 
     IStepOptimizer optimizer = new TabuSearchOptimizer
     (
       world: world,
-      constraints: constrains,
+      constraints: constraints,
       loss: loss,
-      iterations: 200,
+      iterations: 50,
       tabuSize: 1000,
       random: new Random(42)
     );
@@ -138,30 +140,35 @@ class Program
     //
 
     // Optimizing
+    Console.WriteLine($"Amb count: {world.AllAmbulancesCount}");
     Stopwatch sw = Stopwatch.StartNew();
     int step = 0;
     while (!optimizer.IsFinished())
     {
-      Console.WriteLine($"Step {++step}");
+      Console.WriteLine($"Step: {++step}");
       optimizer.Step();
+
+      // Visualization of optimal shift plan so far on trained incidents set
+      Weights optimalWeights = optimizer.OptimalWeights.First();
+      ShiftPlan optimalShiftPlan = ShiftPlan.GetFrom(world.Depots, optimalWeights);
+
+      Simulation simulation = new(world);
+      simulation.Run(incidents, optimalShiftPlan);
+
+      //visualizer.WriteGraph(optimalShiftPlan, 24.ToHours().ToSeconds(), _debug);
+      //_debug.WriteLine($"Success rate: {simulation.SuccessRate}");
+      //_debug.WriteLine($"Step took: {sw.Elapsed.Seconds}s");
+      //
     }
     sw.Stop();
     _debug.WriteLine($"Optimizing took: {sw.Elapsed}");
-    _debug.WriteLine($"one step took: {sw.Elapsed.Seconds / step}s");
+    _debug.WriteLine($"one step took: {sw.Elapsed.Seconds / (double)step}s");
     //
 
-    // Visualization of found optimal shift plan on trained incidents set
-    Weights optimalWeights = optimizer.OptimalWeights.First();
-    ShiftPlan optimalShiftPlan = ShiftPlan.GetFrom(world.Depots, optimalWeights);
-
-    Simulation simulation = new(world);
-    simulation.Run(incidents, optimalShiftPlan);
-
-    visualizer.WriteGraph(optimalShiftPlan, 24.ToHours().ToSeconds(), _debug);
-    _debug.WriteLine($"Success rate: {simulation.SuccessRate}");
     //
 
     optimizer.Dispose();
+    ((StandardLoss)loss)._debug.Dispose();
     _debug.Dispose();
   }
 #endif

@@ -5,8 +5,14 @@ using Simulating;
 
 public class StandardLoss : Loss
 {
-  public StandardLoss(World world, int incidentsSize)
-  : base(world, incidentsSize) { }
+  private readonly double _maxShiftPlanCost;
+  public readonly TextWriter _debug = new StreamWriter(@"/home/tom/School/Bakalarka/Emergency_Services_ShiftPlan_Optimization/src/logs/" + "loss.log");
+
+  public StandardLoss(World world, Constraints constraints)
+  : base(world, constraints)
+  {
+    _maxShiftPlanCost = world.AllAmbulancesCount * constraints.MaxDurationSec / 24 / 24 * world.AmbTypes.Select(t => t.Cost).Max();
+  }
 
   public override double Get(Weights weights, ImmutableArray<SuccessRatedIncidents> incidentsSet)
   {
@@ -19,28 +25,26 @@ public class StandardLoss : Loss
     }
     //
 
-    //HACK: do for all incidentsSet
-    Simulation.Run(incidentsSet.First().Value, SimulateOnThisShiftPlan);
-
-    double threshold = incidentsSet.First().SuccessRate;
-    double successRate = Simulation.SuccessRate;
-    double cost = SimulateOnThisShiftPlan.GetCost();
-
-    // TODO:
-    // We need a loss which:
-    // 1. Is lower when cost is lower and higher when cost is higher.
-    // 2. Is lower when successRate is higher and higher when successRate is lower
-    // 3. Prioritize successRate over cost. SuccessRate needs to be higher than threshold, even if it means much costlier shiftPlan.
-    // 4. Have high entropy.
-
     //HACK:
-    // big jump, some smoother function wigh high entropy will be much better
+    var incidents = incidentsSet.First();
+    //
 
-    if (successRate >= threshold)
-    {
-      return cost;
-    }
+    Simulation.Run(incidents.Value, SimulateOnThisShiftPlan);
 
-    return (int.MaxValue / 2) + (1 - successRate) * cost;
+    double cost = SimulateOnThisShiftPlan.GetCost() / _maxShiftPlanCost;
+    double handled = Simulation.SuccessRate;
+    double thresh = incidents.SuccessRate;
+
+    double eps = 0.001;
+    double handledPart = (thresh + eps) * handled;
+    double costPart = (1 - thresh + eps) * cost;
+    double loss = costPart - handledPart;
+
+    //_debug.WriteLine($"handled: {handled}");
+    //_debug.WriteLine($"cost: {cost}");
+    //_debug.WriteLine($"loss: {loss}");
+    //_debug.WriteLine("-");
+
+    return loss;
   }
 }

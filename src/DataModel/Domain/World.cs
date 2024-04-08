@@ -9,6 +9,7 @@ public class World
   public ImmutableArray<Depot> Depots { get; set; }
   public ImmutableArray<Hospital> Hospitals { get; set; }
   public DistanceCalculator DistanceCalculator { get; set; }
+  public AmbulanceTypeModel[] AmbTypes { get; set; }
   public IncTypeToAllowedAmbTypesTable IncTypeToAllowedAmbTypesTable { get; set; }
 
   private int? _allAmbulancesCount;

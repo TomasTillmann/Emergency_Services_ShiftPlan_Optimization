@@ -5,8 +5,17 @@ namespace Optimizing;
 
 public abstract class LocalSearchOptimizer : Optimizer
 {
-  public LocalSearchOptimizer(World world, Constraints constraints, ILoss loss, Random? random = null)
-  : base(world, constraints, loss, random) { }
+  public int NeighboursLimit { get; set; }
+  protected readonly Move[] movesBuffer;
+
+  public LocalSearchOptimizer(World world, Constraints constraints, ILoss loss, int neighboursLimit, Random? random = null)
+  : base(world, constraints, loss, random)
+  {
+    NeighboursLimit = neighboursLimit >= world.AllAmbulancesCount ? world.AllAmbulancesCount : neighboursLimit;
+
+    int maxMovesCount = constraints.AllowedShiftDurationsSec.Count * constraints.AllowedShiftStartingTimesSec.Count * world.AllAmbulancesCount;
+    movesBuffer = new Move[maxMovesCount];
+  }
 
   /// <summary>
   /// Modifes <paramref name="weights"/> by <paramref name="move"/>.
@@ -96,44 +105,50 @@ public abstract class LocalSearchOptimizer : Optimizer
   }
 
   /// <summary>
-  /// Enumerates all legal <see cref="Move"/>s, except <see cref="MoveType.NoMove"/>, to neighbouring <see cref="Weights"/> of <paramref name="weights"/>.
+  /// Generates neighbouring moves in <see cref="NeighboursLimit"/> limit in randomly permutated order.
+  /// Returns length of generated moves in <see cref="movesBuffer"/>.
   /// </summary>
-  public IEnumerable<Move> GetMovesToNeighbours(Weights weights, int neighboursLimit)
+  public int GetMovesToNeighbours(Weights weights)
   {
-    neighboursLimit = neighboursLimit > weights.Value.Length ? weights.Value.Length : neighboursLimit;
-
-    int[] permutated = new int[weights.Value.Length];
+    Span<int> permutated = stackalloc int[weights.Value.Length];
     for (int i = 0; i < permutated.Length; ++i)
     {
       permutated[i] = i;
     }
 
-    Permutate(toPermutate: permutated, neighboursLimit);
-    //Console.WriteLine(string.Join(",", permutated));
+    // No need to permutate if all neighbours will be traversed. It is more efficient not to permutate ofc.
+    if (NeighboursLimit != weights.Value.Length)
+    {
+      Permutate(toPermutate: permutated, NeighboursLimit);
+      Console.WriteLine(string.Join(",", permutated.ToArray()));
+    }
 
-    for (int weightIndex = 0; weightIndex < neighboursLimit; ++weightIndex)
+    int bufferIndex = 0;
+    for (int weightIndex = 0; weightIndex < NeighboursLimit; ++weightIndex)
     {
       Move? move;
       if (TryGenerateMove(weights, permutated[weightIndex], MoveType.Shorter, out move))
       {
-        yield return move.Value;
+        movesBuffer[bufferIndex++] = move.Value;
       }
 
       if (TryGenerateMove(weights, permutated[weightIndex], MoveType.Longer, out move))
       {
-        yield return move.Value;
+        movesBuffer[bufferIndex++] = move.Value;
       }
 
       if (TryGenerateMove(weights, permutated[weightIndex], MoveType.Later, out move))
       {
-        yield return move.Value;
+        movesBuffer[bufferIndex++] = move.Value;
       }
 
       if (TryGenerateMove(weights, permutated[weightIndex], MoveType.Earlier, out move))
       {
-        yield return move.Value;
+        movesBuffer[bufferIndex++] = move.Value;
       }
     }
+
+    return bufferIndex;
   }
 
   /// <summary>
@@ -239,7 +254,7 @@ public abstract class LocalSearchOptimizer : Optimizer
   /// <summary>
   /// Fisher-Yates permutation algorithm with limit when to end the permutation
   /// </summary>
-  private void Permutate(int[] toPermutate, int limit)
+  private void Permutate(Span<int> toPermutate, int limit)
   {
     for (int i = 0; i < limit; ++i)
     {
