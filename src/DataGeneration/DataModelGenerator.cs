@@ -71,6 +71,7 @@ public class DataModelGenerator
     //
 
     // inc to amb types table
+    worldModel.AmbTypes = ambTypes;
     worldModel.IncToAmbTypesTable = incToAmbTypesTable;
     //
 

@@ -41,14 +41,20 @@ public abstract class Optimizer : IOptimizer
       Value = new Interval[allAmbulancesCount]
     };
 
-    for (int i = 0; i < allAmbulancesCount; ++i)
+    // for (int i = 0; i < allAmbulancesCount; ++i)
+    // {
+    //   startWeights.Value[i] = Interval.GetByStartAndDuration
+    //   (
+    //    constraints.GetRandomStartingTimeSec(this._random),
+    //    constraints.GetRandomDurationTimeSec(this._random)
+    //   );
+    // }
+
+    for (int i = 0; i < startWeights.Value.Length; ++i)
     {
-      startWeights.Value[i] = Interval.GetByStartAndDuration
-      (
-       constraints.GetRandomStartingTimeSec(this._random),
-       constraints.GetRandomDurationTimeSec(this._random)
-      );
+      startWeights.Value[i] = Interval.Empty;
     }
+
 
     return startWeights;
   }

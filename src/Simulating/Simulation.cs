@@ -4,13 +4,6 @@ using ESSP.DataModel;
 
 namespace Simulating;
 
-public interface ISimulation
-{
-  double SuccessRate { get; }
-
-  void Run(ImmutableArray<Incident> incidents, ShiftPlan simulateOnThisShiftPlan);
-}
-
 public sealed class Simulation : ISimulation
 {
   public ImmutableArray<Depot> Depots { get; }
@@ -21,7 +14,19 @@ public sealed class Simulation : ISimulation
   /// </summary>
   public double SuccessRate => (_totalIncidentsCount - _notHandledIncidentsCount) / (double)_totalIncidentsCount;
 
+  /// <summary>
+  /// Current time of the occuring incident. 
+  /// </summary>
   public int CurrentTimeSec { get; private set; }
+
+  /// <summary>
+  /// Total count of incidents the simulation was run on. 
+  /// </summary>
+  public int TotalIncidents => _totalIncidentsCount;
+
+  public int NotHandledIncidents => _notHandledIncidentsCount;
+
+  public int HandledIncidents => _totalIncidentsCount - _notHandledIncidentsCount;
 
   private readonly ShiftEvaluator _shiftEvaluator;
   private readonly PlannableIncident.Factory _plannableIncidentFactory;

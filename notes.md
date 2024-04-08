@@ -17,16 +17,6 @@
 - premyslet nad tim prostorem
 - popsat ten prostor dobre, sepsat uz vsechno
 
-
-ADDITIONAL:
-- zoptimalizovat simulaci, treba Spany pouzit na tu simulaci ? nejak, nebo nejaky AOT?
-
-
-# Constraint Programming in pursuit of the holy grail - barak
-
-- CSP Problem definition
--
-
 # NAPADY
 
 ## Construction search
@@ -311,3 +301,13 @@ Nebo pokud duration shiftPlan je mensi nez pozadavana minimalni hranice, viz niz
   - tu si pak muzes kdo chce vyplnit jak chce, treba realnymi daty
   - a menit jeji velikost
   - zmenenim velikost zmenis prostor, kde se muzou dit incidenty
+
+# Heuristika vyber sousedu
+
+- zacal bych od prazdneho shift plan
+  - podival bych se jak se postupne buildi ten shift plan
+  - prvni validni reseni by melo byt jedno z tech levnejsich, protoze tam jakoby nebude zadny interval zbytecne - overit experimentalne, tedy treba zacit s maximalnim a porovnat, a s nekolika random
+
+
+
+

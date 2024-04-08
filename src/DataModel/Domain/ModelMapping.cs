@@ -30,6 +30,7 @@ public record WorldModel
 {
   public List<DepotModel> Depots { get; set; }
   public List<HospitalModel> Hospitals { get; set; }
+  public AmbulanceTypeModel[] AmbTypes { get; set; }
   public Dictionary<string, HashSet<string>> IncToAmbTypesTable { get; set; }
 }
 
@@ -127,6 +128,7 @@ public class WorldMapper
     {
       Depots = world.Depots.Select(depot => _depotMapper.Map(depot)).ToList(),
       Hospitals = world.Hospitals.Select(hospital => _hospitalMapper.Map(hospital)).ToList(),
+      AmbTypes = world.AmbTypes,
       IncToAmbTypesTable = world.IncTypeToAllowedAmbTypesTable.GetTable()
     };
   }
@@ -139,7 +141,8 @@ public class WorldMapper
       Depots = model.Depots.Select(depot => _depotMapper.MapBack(depot)).ToImmutableArray(),
       Hospitals = hospitals,
       DistanceCalculator = new DistanceCalculator(hospitals.ToArray()),
-      IncTypeToAllowedAmbTypesTable = new IncTypeToAllowedAmbTypesTable(model.IncToAmbTypesTable)
+      AmbTypes = model.AmbTypes,
+      IncTypeToAllowedAmbTypesTable = new IncTypeToAllowedAmbTypesTable(model.IncToAmbTypesTable),
     };
   }
 }

@@ -12,7 +12,6 @@ public sealed class TabuSearchOptimizer : LocalSearchOptimizer, IStepOptimizer, 
 
   public int Iterations { get; set; }
   public int TabuSize { get; set; }
-  public int NeighboursLimit { get; set; }
   public Random Random => _random;
 
   #endregion
@@ -48,14 +47,13 @@ public sealed class TabuSearchOptimizer : LocalSearchOptimizer, IStepOptimizer, 
     ILoss loss,
     int iterations = 50,
     int tabuSize = 15,
-    int neighboursLimit = 20,
+    int neighboursLimit = int.MaxValue,
     Random? random = null
   )
-  : base(world, constraints, loss, random)
+  : base(world, constraints, loss, neighboursLimit, random)
   {
     Iterations = iterations;
     TabuSize = tabuSize;
-    NeighboursLimit = neighboursLimit;
     _tabu = new LinkedList<Move>();
     _isStuck = false;
   }
@@ -94,20 +92,23 @@ public sealed class TabuSearchOptimizer : LocalSearchOptimizer, IStepOptimizer, 
 
   private void StepInternal()
   {
-    IEnumerable<Move> movesToNeighbours = GetMovesToNeighbours(_globalBestWeights, NeighboursLimit);
+    int neighboursCount = GetMovesToNeighbours(_globalBestWeights);
+    Console.WriteLine($"neighbours: {neighboursCount}");
 
-    _debug.WriteLine("moves: " + string.Join(", ", movesToNeighbours));
-    _debug.WriteLine("global best loss: " + _globalBestLoss);
-    _debug.WriteLine("global best weights: " + string.Join(", ", _globalBestWeights));
+    //_debug.WriteLine("moves: " + string.Join(", ", movesBuffer));
+    //_debug.WriteLine("global best loss: " + _globalBestLoss);
+    //_debug.WriteLine("global best weights: " + string.Join(", ", _globalBestWeights));
 
     _currentBestLoss = double.MaxValue;
-    foreach (Move move in movesToNeighbours)
+    for (int i = 0; i < neighboursCount; ++i)
     {
+      Move move = movesBuffer[i];
+
       ModifyMakeMove(_globalBestWeights, move);
-      _debug.WriteLine("neighbour: " + string.Join(", ", _globalBestWeights));
+      //_debug.WriteLine("neighbour: " + string.Join(", ", _globalBestWeights));
 
       double neighbourLoss = GetLossInternal(_globalBestWeights);
-      _debug.WriteLine("neighbour loss: " + neighbourLoss);
+      //_debug.WriteLine("neighbour loss: " + neighbourLoss);
 
       // Not in tabu, or aspiration criterion is satisfied (possibly in tabu).
       if (!_tabu.Contains(move) || neighbourLoss < _globalBestLoss)
@@ -116,10 +117,10 @@ public sealed class TabuSearchOptimizer : LocalSearchOptimizer, IStepOptimizer, 
         if (neighbourLoss < _currentBestLoss)
         {
           _currentBestMove = move;
-          _debug.WriteLine("current best move updated to: " + _currentBestMove);
+          //_debug.WriteLine("current best move updated to: " + _currentBestMove);
 
           _currentBestLoss = neighbourLoss;
-          _debug.WriteLine("current best loss updated to: " + _currentBestLoss);
+          //_debug.WriteLine("current best loss updated to: " + _currentBestLoss);
         }
       }
 
@@ -136,11 +137,11 @@ public sealed class TabuSearchOptimizer : LocalSearchOptimizer, IStepOptimizer, 
     if (_currentBestLoss < _globalBestLoss)
     {
       ModifyMakeMove(_globalBestWeights, _currentBestMove);
-      _debug.WriteLine("global best weights updated to: " + string.Join(", ", _globalBestWeights));
-      _debug.WriteLine("updated by move: " + _currentBestMove);
+      //_debug.WriteLine("global best weights updated to: " + string.Join(", ", _globalBestWeights));
+      //_debug.WriteLine("updated by move: " + _currentBestMove);
 
       _globalBestLoss = _currentBestLoss;
-      _debug.WriteLine("global best loss updated to: " + _globalBestLoss);
+      //_debug.WriteLine("global best loss updated to: " + _globalBestLoss);
     }
 
     _tabu.AddLast(_currentBestMove);
@@ -149,7 +150,7 @@ public sealed class TabuSearchOptimizer : LocalSearchOptimizer, IStepOptimizer, 
       _tabu.RemoveFirst();
     }
 
-    _debug.WriteLine("==================");
+    //_debug.WriteLine("==================");
   }
 
   private double GetLossInternal(Weights weights)
@@ -159,6 +160,6 @@ public sealed class TabuSearchOptimizer : LocalSearchOptimizer, IStepOptimizer, 
 
   public override void Dispose()
   {
-    _debug.Dispose();
+    //_debug.Dispose();
   }
 }

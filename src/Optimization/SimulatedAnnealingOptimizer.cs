@@ -59,14 +59,14 @@ public class SimulatedAnnealingOptimizer : LocalSearchOptimizer, IStepOptimizer
       double lowestTemperature = 0.001,
       double highestTemperature = 100,
       double temperatureReductionFactor = 0.98,
-      int neighbourLimit = int.MaxValue,
+      int neighboursLimit = int.MaxValue,
       Random? random = null
-  ) : base(world, constraints, loss, random)
+  ) : base(world, constraints, loss, neighboursLimit, random)
   {
     LowestTemperature = lowestTemperature;
     HighestTemperature = highestTemperature;
     TemperatureReductionFactor = temperatureReductionFactor;
-    NeighboursLimit = neighbourLimit;
+    NeighboursLimit = neighboursLimit;
   }
 
   /// <inheritdoc/>
@@ -108,10 +108,12 @@ public class SimulatedAnnealingOptimizer : LocalSearchOptimizer, IStepOptimizer
   {
     //TODO: do some random sampling, instead of just choosing first n GetMovesToNeighbours
     //TODO: optimize. Dont generate moves which you will discard by Take(). Just generate _neigbourLimit_ number of moves.
-    IEnumerable<Move> moves = GetMovesToNeighbours(_weights, NeighboursLimit);
+    int neighboursCount = GetMovesToNeighbours(_weights);
 
-    foreach (Move move in moves)
+    for (int i = 0; i < neighboursCount; ++i)
     {
+      Move move = movesBuffer[i];
+
       ModifyMakeMove(_weights, move);
       double neighbourLoss = GetLossInternal(_weights);
 
