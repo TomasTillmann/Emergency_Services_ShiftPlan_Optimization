@@ -62,42 +62,36 @@ public abstract class LocalSearchOptimizer : Optimizer
   /// </summary>
   public void ModifyUnmakeMove(Weights weights, Move move)
   {
-    switch (move.MoveType)
+    MoveType inverseMoveType = GetInverseMoveType(move.MoveType);
+
+    ModifyMakeMove(
+      weights,
+      new Move
+      {
+        WeightIndex = move.WeightIndex,
+        MoveType = inverseMoveType
+      }
+    );
+  }
+
+  public static MoveType GetInverseMoveType(MoveType moveType)
+  {
+    switch (moveType)
     {
       case MoveType.Shorter:
-        ModifyMakeMove(weights, new Move
-        {
-          WeightIndex = move.WeightIndex,
-          MoveType = MoveType.Longer
-        });
-        break;
+        return MoveType.Longer;
 
       case MoveType.Longer:
-        ModifyMakeMove(weights, new Move
-        {
-          WeightIndex = move.WeightIndex,
-          MoveType = MoveType.Shorter
-        });
-        break;
+        return MoveType.Shorter;
 
       case MoveType.Earlier:
-        ModifyMakeMove(weights, new Move
-        {
-          WeightIndex = move.WeightIndex,
-          MoveType = MoveType.Later
-        });
-        break;
+        return MoveType.Later;
 
       case MoveType.Later:
-        ModifyMakeMove(weights, new Move
-        {
-          WeightIndex = move.WeightIndex,
-          MoveType = MoveType.Earlier
-        });
-        break;
+        return MoveType.Earlier;
 
       case MoveType.NoMove:
-        break;
+        return MoveType.NoMove;
 
       default:
         throw new ArgumentOutOfRangeException();

@@ -20,6 +20,11 @@ namespace ESSP.DataModel
         return comp;
       }
     }
+
+    public override string ToString()
+    {
+      return $"({XMet}, {YMet})";
+    }
   }
 }
 

@@ -18,6 +18,7 @@ public sealed class TabuSearchOptimizer : LocalSearchOptimizer, IStepOptimizer, 
 
   private ImmutableArray<SuccessRatedIncidents> _incidentsSets;
   private Weights _globalBestWeights;
+  private Weights _weights;
   private double _globalBestLoss;
   private double _currentBestLoss;
   private Move _currentBestMove;
@@ -27,6 +28,7 @@ public sealed class TabuSearchOptimizer : LocalSearchOptimizer, IStepOptimizer, 
   #region ExposedInternalState
 
   public Weights GlobalBestWeights => _globalBestWeights;
+  public Weights CurrentWeights => _weights;
   public double GlobalBestLoss => _globalBestLoss;
   public double CurrentBestLoss => _currentBestLoss;
   public Move CurrentBestMove => _currentBestMove;
@@ -74,6 +76,7 @@ public sealed class TabuSearchOptimizer : LocalSearchOptimizer, IStepOptimizer, 
   {
     _incidentsSets = incidentsSets;
     _globalBestWeights = StartWeights;
+    _weights = StartWeights;
     _globalBestLoss = GetLossInternal(_globalBestWeights);
 
     _tabu.Clear();
@@ -92,7 +95,7 @@ public sealed class TabuSearchOptimizer : LocalSearchOptimizer, IStepOptimizer, 
 
   private void StepInternal()
   {
-    int neighboursCount = GetMovesToNeighbours(_globalBestWeights);
+    int neighboursCount = GetMovesToNeighbours(_weights);
     Console.WriteLine($"neighbours: {neighboursCount}");
 
     //_debug.WriteLine("moves: " + string.Join(", ", movesBuffer));
@@ -104,10 +107,10 @@ public sealed class TabuSearchOptimizer : LocalSearchOptimizer, IStepOptimizer, 
     {
       Move move = movesBuffer[i];
 
-      ModifyMakeMove(_globalBestWeights, move);
+      ModifyMakeMove(_weights, move);
       //_debug.WriteLine("neighbour: " + string.Join(", ", _globalBestWeights));
 
-      double neighbourLoss = GetLossInternal(_globalBestWeights);
+      double neighbourLoss = GetLossInternal(_weights);
       //_debug.WriteLine("neighbour loss: " + neighbourLoss);
 
       // Not in tabu, or aspiration criterion is satisfied (possibly in tabu).
@@ -124,7 +127,7 @@ public sealed class TabuSearchOptimizer : LocalSearchOptimizer, IStepOptimizer, 
         }
       }
 
-      ModifyUnmakeMove(_globalBestWeights, move);
+      ModifyUnmakeMove(_weights, move);
     }
 
     // This happens iff all neighbours are in tabu and worse than already found global best.
@@ -134,9 +137,13 @@ public sealed class TabuSearchOptimizer : LocalSearchOptimizer, IStepOptimizer, 
       return;
     }
 
+    // move in the best direction
+    ModifyMakeMove(_weights, _currentBestMove);
+
+    // update global best
     if (_currentBestLoss < _globalBestLoss)
     {
-      ModifyMakeMove(_globalBestWeights, _currentBestMove);
+      _globalBestWeights = _weights.Copy();
       //_debug.WriteLine("global best weights updated to: " + string.Join(", ", _globalBestWeights));
       //_debug.WriteLine("updated by move: " + _currentBestMove);
 
@@ -144,7 +151,16 @@ public sealed class TabuSearchOptimizer : LocalSearchOptimizer, IStepOptimizer, 
       //_debug.WriteLine("global best loss updated to: " + _globalBestLoss);
     }
 
-    _tabu.AddLast(_currentBestMove);
+    // Tabu the inverse move, not the actual move. Only this way, it will not "move back".
+    _tabu.AddLast
+    (
+      new Move
+      {
+        WeightIndex = _currentBestMove.WeightIndex,
+        MoveType = LocalSearchOptimizer.GetInverseMoveType(_currentBestMove.MoveType)
+      }
+    );
+
     if (_tabu.Count > TabuSize)
     {
       _tabu.RemoveFirst();
