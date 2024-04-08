@@ -28,6 +28,8 @@ public sealed class Simulation : ISimulation
 
   public int HandledIncidents => _totalIncidentsCount - _notHandledIncidentsCount;
 
+  public List<Incident> UnhandledIncidents = new();
+
   private readonly ShiftEvaluator _shiftEvaluator;
   private readonly PlannableIncident.Factory _plannableIncidentFactory;
 
@@ -107,6 +109,7 @@ public sealed class Simulation : ISimulation
     if (findBetterFromIndex == shifts.Length)
     {
       _notHandledIncidentsCount++;
+      UnhandledIncidents.Add(currentIncident); // remove for faster perf
       return;
     }
 

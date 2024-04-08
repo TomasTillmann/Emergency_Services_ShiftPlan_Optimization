@@ -307,7 +307,19 @@ Nebo pokud duration shiftPlan je mensi nez pozadavana minimalni hranice, viz niz
 - zacal bych od prazdneho shift plan
   - podival bych se jak se postupne buildi ten shift plan
   - prvni validni reseni by melo byt jedno z tech levnejsich, protoze tam jakoby nebude zadny interval zbytecne - overit experimentalne, tedy treba zacit s maximalnim a porovnat, a s nekolika random
+  - tak jsem to zkusil a:
+    - problem je, ze bude trvat hrozne dlouho
+    - pokud mam treba 200 sanitek, a treba 500 incidentu denne a treba 4 mozne start times a 4 duration times, tak to mam 200 * 4 * 4 = 3200 sousedu v kazdem kroku na projiti
+    - cili v kazdem kroku 3200 simulaci na 500 incidentech
+      - ano, hrozne moc intervalu bude prazdnych, takze simulace probehne velmi rychle, ale i tak to je jeden krok na par vterin
+      - a prvnich 200 kroku iterace by jen optimizer vyplnil 200 intervalu nekam, coz by furt bylo nevalidni reseni
 
+- seradit podle vytizenosti intervalu
+  - pomuze i s tim, ze se uniforme rozdeli prace
 
+- pokud neni dosazen desired success rate, tak nema smysl zkracovat smeny, tak tyhle sousedy nenavstevovat
 
+- vybirat procentualne, treba jednu tretinu z maximalniho poctu a kouknout jak se chova
 
+# Geneticke algoritmy
+- krizeni by mohlo dost pomoct
