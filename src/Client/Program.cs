@@ -121,7 +121,7 @@ class Program
       visualizer.PlotGraph(optimizer.CurrentWeights, world, successRatedIncidents.First().Value, _debug);
       Console.WriteLine($"Step: {++step}");
       optimizer.Step();
-      _debug.WriteLine($"Current best move: {optimizer.CurrentBestMove}");
+      _debug.WriteLine($"Current best move: {optimizer.CurrentMove}");
       _debug.WriteLine($"Cost: {ShiftPlan.GetFrom(world.Depots, optimizer.CurrentWeights).GetCost()}");
     }
     sw.Stop();

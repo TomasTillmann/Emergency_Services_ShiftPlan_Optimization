@@ -21,8 +21,6 @@ public class SimulatedAnnealingOptimizer : LocalSearchOptimizer, IStepOptimizer
   public double LowestTemperature { get; set; }
   public double HighestTemperature { get; set; }
   public double TemperatureReductionFactor { get; set; }
-  public int NeighboursLimit { get; set; }
-  public Random Random => _random;
 
   #endregion
 
@@ -32,8 +30,8 @@ public class SimulatedAnnealingOptimizer : LocalSearchOptimizer, IStepOptimizer
   private ImmutableArray<SuccessRatedIncidents> _incidentsSets;
   private Weights _globalBestWeights;
   private double _globalBestLoss;
-  private Move _currentBestMove;
-  private double _currentBestLoss;
+  private Move _currentMove;
+  private double _currentLoss;
   private double _currentTemperature;
 
   #region ExposedInternalState
@@ -44,11 +42,11 @@ public class SimulatedAnnealingOptimizer : LocalSearchOptimizer, IStepOptimizer
 
   public Weights CurrentWeights => _weights;
 
-  public double GlobalBestFitness => _globalBestLoss;
+  public double GlobalBestLoss => _globalBestLoss;
 
-  public Move CurrentBestMove => _currentBestMove;
+  public Move CurrentMove => _currentMove;
 
-  public double CurrentBestFitness => _currentBestLoss;
+  public double CurrentLoss => _currentLoss;
 
   public double CurrentTemperature => _currentTemperature;
 
@@ -68,7 +66,6 @@ public class SimulatedAnnealingOptimizer : LocalSearchOptimizer, IStepOptimizer
     LowestTemperature = lowestTemperature;
     HighestTemperature = highestTemperature;
     TemperatureReductionFactor = temperatureReductionFactor;
-    NeighboursLimit = neighboursLimit;
   }
 
   /// <inheritdoc/>
@@ -90,7 +87,7 @@ public class SimulatedAnnealingOptimizer : LocalSearchOptimizer, IStepOptimizer
     _globalBestWeights = StartWeights;
     _weights = StartWeights;
     _globalBestLoss = Loss.Get(_globalBestWeights, incidentsSets);
-    _currentBestLoss = _globalBestLoss;
+    _currentLoss = _globalBestLoss;
     _currentTemperature = HighestTemperature;
   }
 
@@ -107,56 +104,40 @@ public class SimulatedAnnealingOptimizer : LocalSearchOptimizer, IStepOptimizer
 
   private void StepInternal()
   {
+    _debug.WriteLine($"global loss: {_globalBestLoss}");
+
     int neighboursCount = GetMovesToNeighbours(_weights);
 
-    _debug.WriteLine($"global best weights: {_globalBestWeights}");
-    _debug.WriteLine($"global best loss: {_globalBestLoss}");
+    // Select uniformly randomly one neighbour.
+    _currentMove = movesBuffer[_random.Next(0, neighboursCount)];
 
-    _currentBestLoss = double.MaxValue;
-    for (int i = 0; i < neighboursCount; ++i)
+    // Move to the neighbour.
+    ModifyMakeMove(_weights, _currentMove);
+
+    // Get neighbour loss.
+    double neighbourLoss = GetLossInternal(_weights);
+
+    // Is the neighbour better than global best?
+    if (neighbourLoss < _globalBestLoss)
     {
-      Move move = movesBuffer[i];
-
-      ModifyMakeMove(_weights, move);
-      double neighbourLoss = GetLossInternal(_weights);
-
-      if (neighbourLoss < _currentBestLoss)
-      {
-        _debug.WriteLine($"current best loss updated to: " + neighbourLoss);
-        _debug.WriteLine($"current best move updated to: " + move);
-        _currentBestMove = move;
-        _currentBestLoss = neighbourLoss;
-
-        if (_currentBestLoss < _globalBestLoss)
-        {
-          _debug.WriteLine($"global best loss updated to: " + _currentBestLoss);
-          _globalBestWeights = _weights.Copy();
-          _globalBestLoss = _currentBestLoss;
-        }
-      }
-      else if (Accept(_currentBestLoss - neighbourLoss, _currentTemperature))
-      {
-        _debug.WriteLine($"accepted loss: " + _currentBestLoss);
-        _debug.WriteLine($"accepted move: " + move);
-        _currentBestMove = move;
-        _currentBestLoss = neighbourLoss;
-      }
-
-      ModifyUnmakeMove(_weights, move);
+      _debug.WriteLine($"global loss updated to: {neighbourLoss}");
+      _globalBestLoss = _currentLoss;
+      _globalBestWeights = _weights.Copy();
     }
 
-    _debug.WriteLine($"move made: " + _currentBestMove);
-    _debug.WriteLine($"made move loss: " + _currentBestLoss);
+    // Should we move to the neighbour?
+    if (Accept(neighbourLoss - _currentLoss, _currentTemperature))
+    {
+      _debug.WriteLine($"accepted move: {_currentMove}");
+      _currentLoss = neighbourLoss;
+    }
+    else
+    {
+      ModifyUnmakeMove(_weights, _currentMove);
+    }
 
-    // Go to the neigbour either with best loss, or the one accepted with possibly worse loss.
-    // With higher temperature, there is higher chance of exploration of neighbours instead of converting to local minima.
-    ModifyMakeMove(_weights, _currentBestMove);
-
-    // Reduce the temperature, to increase chance of exploiting best neighbours, instead of exploring the neighbours.
     _currentTemperature *= TemperatureReductionFactor;
     _debug.WriteLine($"current temp: {_currentTemperature}");
-
-    _debug.WriteLine("=");
   }
 
   private double GetLossInternal(Weights weights)
@@ -166,10 +147,11 @@ public class SimulatedAnnealingOptimizer : LocalSearchOptimizer, IStepOptimizer
 
   private bool Accept(double difference, double temperature)
   {
+    // boltzman distribution
     const double boltzmanConstant = 1.00000000000000000000000380649;
     double probability = Math.Exp(-difference / (boltzmanConstant * temperature));
-    double random = Random.Next(0, 100) / 100d;
 
+    double random = _random.Next(0, 100) / 100d;
     return random < probability;
   }
 }
