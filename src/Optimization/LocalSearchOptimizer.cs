@@ -8,7 +8,7 @@ public abstract class LocalSearchOptimizer : Optimizer
   public int NeighboursLimit { get; set; }
   protected readonly Move[] movesBuffer;
 
-  public LocalSearchOptimizer(World world, Constraints constraints, ILoss loss, int neighboursLimit, Random? random = null)
+  public LocalSearchOptimizer(World world, Constraints constraints, ILoss loss, int neighboursLimit = int.MaxValue, Random? random = null)
   : base(world, constraints, loss, random)
   {
     NeighboursLimit = neighboursLimit >= world.AllAmbulancesCount ? world.AllAmbulancesCount : neighboursLimit;

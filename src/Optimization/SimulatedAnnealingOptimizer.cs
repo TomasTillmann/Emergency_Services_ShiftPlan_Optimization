@@ -14,8 +14,6 @@ namespace Optimization;
 
 public class SimulatedAnnealingOptimizer : LocalSearchOptimizer, IStepOptimizer
 {
-  public readonly StreamWriter _debug = new(@"/home/tom/School/Bakalarka/Emergency_Services_ShiftPlan_Optimization/src/logs" + "/SA.log");
-
   #region Parameters
 
   public double LowestTemperature { get; set; }
@@ -104,7 +102,7 @@ public class SimulatedAnnealingOptimizer : LocalSearchOptimizer, IStepOptimizer
 
   private void StepInternal()
   {
-    _debug.WriteLine($"global loss: {_globalBestLoss}");
+    Debug.WriteLine($"global loss: {_globalBestLoss}");
 
     int neighboursCount = GetMovesToNeighbours(_weights);
 
@@ -120,7 +118,7 @@ public class SimulatedAnnealingOptimizer : LocalSearchOptimizer, IStepOptimizer
     // Is the neighbour better than global best?
     if (neighbourLoss < _globalBestLoss)
     {
-      _debug.WriteLine($"global loss updated to: {neighbourLoss}");
+      Debug.WriteLine($"global loss updated to: {neighbourLoss}");
       _globalBestLoss = _currentLoss;
       _globalBestWeights = _weights.Copy();
     }
@@ -128,7 +126,7 @@ public class SimulatedAnnealingOptimizer : LocalSearchOptimizer, IStepOptimizer
     // Should we move to the neighbour?
     if (Accept(neighbourLoss - _currentLoss, _currentTemperature))
     {
-      _debug.WriteLine($"accepted move: {_currentMove}");
+      Debug.WriteLine($"accepted move: {_currentMove}");
       _currentLoss = neighbourLoss;
     }
     else
@@ -137,7 +135,7 @@ public class SimulatedAnnealingOptimizer : LocalSearchOptimizer, IStepOptimizer
     }
 
     _currentTemperature *= TemperatureReductionFactor;
-    _debug.WriteLine($"current temp: {_currentTemperature}");
+    Debug.WriteLine($"current temp: {_currentTemperature}");
   }
 
   private double GetLossInternal(Weights weights)

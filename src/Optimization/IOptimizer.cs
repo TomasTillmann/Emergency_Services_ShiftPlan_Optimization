@@ -3,11 +3,13 @@ using ESSP.DataModel;
 
 namespace Optimizing;
 
-public interface IOptimizer : IDisposable
+public interface IOptimizer
 {
-  public Constraints Constraints { get; }
+  TextWriter Debug { get; set; }
 
-  public World World { get; }
+  Constraints Constraints { get; }
+
+  World World { get; }
 
   /// <summary>
   /// <see cref="Shift.Work"/> Interval of each <see cref="Shift"/>.
@@ -19,7 +21,7 @@ public interface IOptimizer : IDisposable
   /// <summary>
   /// Loss function which is tried to be minimezed by the <see cref="Optimizer"/>
   /// </summary>
-  public ILoss Loss { get; set; }
+  ILoss Loss { get; set; }
 
   /// <summary>
   /// Tries to find the most optimal shift plans from starting <see cref="StartWeights"/>.
