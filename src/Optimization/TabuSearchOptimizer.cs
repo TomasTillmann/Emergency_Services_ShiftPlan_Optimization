@@ -4,10 +4,8 @@ using System.Collections.Immutable;
 namespace Optimizing;
 
 //TODO: support for end the searh when converges to some minima and doesnt want to go anywhere, instead of just iterations
-public sealed class TabuSearchOptimizer : LocalSearchOptimizer, IStepOptimizer, IDisposable
+public sealed class TabuSearchOptimizer : LocalSearchOptimizer, IStepOptimizer
 {
-  private readonly StreamWriter _debug = new(@"/home/tom/School/Bakalarka/Emergency_Services_ShiftPlan_Optimization/src/logs" + "/tabu.log");
-
   #region Params
 
   public int Iterations { get; set; }
@@ -66,7 +64,8 @@ public sealed class TabuSearchOptimizer : LocalSearchOptimizer, IStepOptimizer, 
 
     while (!IsFinished())
     {
-      StepInternal();
+      Debug.WriteLine($"Step: {CurrStep}");
+      Step();
     }
 
     return OptimalWeights;
@@ -96,10 +95,9 @@ public sealed class TabuSearchOptimizer : LocalSearchOptimizer, IStepOptimizer, 
   private void StepInternal()
   {
     int neighboursCount = GetMovesToNeighbours(_weights);
-    Console.WriteLine($"neighbours: {neighboursCount}");
 
     //_debug.WriteLine("moves: " + string.Join(", ", movesBuffer));
-    //_debug.WriteLine("global best loss: " + _globalBestLoss);
+    Debug.WriteLine("global best loss: " + _globalBestLoss);
     //_debug.WriteLine("global best weights: " + string.Join(", ", _globalBestWeights));
 
     _currentBestLoss = double.MaxValue;
@@ -123,7 +121,7 @@ public sealed class TabuSearchOptimizer : LocalSearchOptimizer, IStepOptimizer, 
           //_debug.WriteLine("current best move updated to: " + _currentBestMove);
 
           _currentBestLoss = neighbourLoss;
-          //_debug.WriteLine("current best loss updated to: " + _currentBestLoss);
+          Debug.WriteLine("current best loss updated to: " + _currentBestLoss);
         }
       }
 
@@ -133,6 +131,7 @@ public sealed class TabuSearchOptimizer : LocalSearchOptimizer, IStepOptimizer, 
     // This happens iff all neighbours are in tabu and worse than already found global best.
     if (_currentBestLoss == double.MaxValue)
     {
+      Debug.WriteLine("STUCK");
       _isStuck = true;
       return;
     }
@@ -144,8 +143,8 @@ public sealed class TabuSearchOptimizer : LocalSearchOptimizer, IStepOptimizer, 
     if (_currentBestLoss < _globalBestLoss)
     {
       _globalBestWeights = _weights.Copy();
-      //_debug.WriteLine("global best weights updated to: " + string.Join(", ", _globalBestWeights));
-      //_debug.WriteLine("updated by move: " + _currentBestMove);
+      Debug.WriteLine("global best weights updated to: " + string.Join(", ", _globalBestWeights));
+      Debug.WriteLine("global best move updated to: " + _currentBestMove);
 
       _globalBestLoss = _currentBestLoss;
       //_debug.WriteLine("global best loss updated to: " + _globalBestLoss);
@@ -166,16 +165,11 @@ public sealed class TabuSearchOptimizer : LocalSearchOptimizer, IStepOptimizer, 
       _tabu.RemoveFirst();
     }
 
-    //_debug.WriteLine("==================");
+    Debug.WriteLine("==================");
   }
 
   private double GetLossInternal(Weights weights)
   {
     return Loss.Get(weights, _incidentsSets);
-  }
-
-  public override void Dispose()
-  {
-    //_debug.Dispose();
   }
 }

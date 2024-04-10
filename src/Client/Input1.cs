@@ -3,8 +3,10 @@ using ESSP.DataModel;
 
 public class Input1 : IInputParametrization
 {
-  public Input Get()
+  public Input Get(Random random = null)
   {
+    random ??= new Random();
+
     WorldMapper worldMapper = new();
     DataModelGenerator dataGenerator = new();
 
@@ -43,7 +45,7 @@ public class Input1 : IInputParametrization
         { "I1", new HashSet<string> { "A1", "A2", "A3", "A4" } },
         //{ "I2", new HashSet<string> { "A2", "A3", "A4" } }
       },
-      random: new Random(42)
+      random: random
     ));
 
     // Incidents init
@@ -75,7 +77,7 @@ public class Input1 : IInputParametrization
       },
       //incTypesCategorical: new double[] { 0.7, 0.2, 0.1 },
       incTypesCategorical: new double[] { 1 },
-      random: new Random(42)
+      random: random
     ).Select(inc => incidentMapper.MapBack(inc)).ToImmutableArray();
     //
 

@@ -6,7 +6,6 @@ using Simulating;
 public class StandardLoss : Loss
 {
   private readonly double _maxShiftPlanCost;
-  public readonly TextWriter _debug = new StreamWriter(@"/home/tom/School/Bakalarka/Emergency_Services_ShiftPlan_Optimization/src/logs/" + "loss.log");
 
   public StandardLoss(World world, Constraints constraints)
   : base(world, constraints)
@@ -39,11 +38,6 @@ public class StandardLoss : Loss
     double handledPart = (thresh + eps) * handled;
     double costPart = (1 - thresh + eps) * cost;
     double loss = costPart - handledPart;
-
-    //_debug.WriteLine($"handled: {handled}");
-    //_debug.WriteLine($"cost: {cost}");
-    //_debug.WriteLine($"loss: {loss}");
-    //_debug.WriteLine("-");
 
     return loss;
   }

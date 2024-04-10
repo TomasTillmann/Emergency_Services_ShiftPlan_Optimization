@@ -1,5 +1,5 @@
 public interface IInputParametrization
 {
-  Input Get();
+  Input Get(Random random = null);
 }
 

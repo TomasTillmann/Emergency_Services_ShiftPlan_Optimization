@@ -8,6 +8,8 @@ namespace Optimizing;
 
 public abstract class Optimizer : IOptimizer
 {
+  public TextWriter Debug { get; set; }
+
   /// <inheritdoc/>
   public Constraints Constraints { get; }
 
@@ -56,10 +58,6 @@ public abstract class Optimizer : IOptimizer
     // }
 
     return startWeights;
-  }
-
-  public virtual void Dispose()
-  {
   }
 }
 
