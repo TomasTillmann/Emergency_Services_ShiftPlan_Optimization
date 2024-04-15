@@ -6,7 +6,7 @@ namespace ESSP.DataModel;
 
 public class Weights
 {
-  public Interval[] Shifts { get; init; }
+  public Interval[] MedicTeamShifts { get; init; }
 
   /// <summary>
   /// Is size of Depots. 
@@ -14,6 +14,9 @@ public class Weights
   /// </summary>
   public int[] MedicTeamAllocations { get; init; }
 
+  /// <summary>
+  /// How many teams are allocated. Always has to be sum of <see cref="MedicTeamAllocations"/>.
+  /// </summary>
   public int AllocatedTeamsCount { get; set; }
 
   /// <summary>
@@ -22,14 +25,17 @@ public class Weights
   /// </summary>
   public int[] AmbulancesAllocations { get; init; }
 
+  /// <summary>
+  /// How many ambulances are allocated. Always has to be sum of <see cref="AmbulancesAllocations"/>.
+  /// </summary>
   public int AllocatedAmbulancesCount { get; set; }
 
   public Weights Copy()
   {
-    Interval[] value = new Interval[Shifts.Length];
-    for (int i = 0; i < Shifts.Length; ++i)
+    Interval[] value = new Interval[MedicTeamShifts.Length];
+    for (int i = 0; i < MedicTeamShifts.Length; ++i)
     {
-      value[i] = Shifts[i];
+      value[i] = MedicTeamShifts[i];
     }
 
     int[] medicTeamAllocations = new int[MedicTeamAllocations.Length];
@@ -46,7 +52,7 @@ public class Weights
 
     return new Weights
     {
-      Shifts = value,
+      MedicTeamShifts = value,
       MedicTeamAllocations = medicTeamAllocations
     };
   }
@@ -54,8 +60,8 @@ public class Weights
   public override string ToString()
   {
     StringBuilder str = new();
-    str.AppendJoin(',', Shifts).Append(Environment.NewLine).AppendJoin(',', MedicTeamAllocations);
-    str.AppendJoin(',', Shifts).Append(Environment.NewLine).AppendJoin(',', AmbulancesAllocations);
+    str.AppendJoin(',', MedicTeamShifts).Append(Environment.NewLine).AppendJoin(',', MedicTeamAllocations);
+    str.AppendJoin(',', MedicTeamShifts).Append(Environment.NewLine).AppendJoin(',', AmbulancesAllocations);
     return str.ToString();
   }
 }

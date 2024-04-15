@@ -11,6 +11,8 @@ public interface IOptimizer
 
   World World { get; }
 
+  Constraints Constraints { get; }
+
   /// <summary>
   /// <see cref="MedicTeam.Shift"/> Interval of each <see cref="MedicTeam"/>.
   /// Initialized at the construction time of the optimizer in <see cref="Optimizer"/> by <see cref="Optimizer.InitWeights"/>.

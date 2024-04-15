@@ -104,12 +104,13 @@ class Program
 
     IInputParametrization input = new Input1();
     World world = input.GetWorld();
+    Constraints constraints = input.GetConstraints();
     ShiftTimes shiftTimes = input.GetShiftTimes();
     ImmutableArray<Incident> incidents = input.GetIncidents();
 
     Simulation simulation = new(world);
     ILoss loss = new StandardLoss(simulation, shiftTimes);
-    IOptimizer optimizer = new TabuSearchOptimizer(world, shiftTimes, loss);
+    IOptimizer optimizer = new TabuSearchOptimizer(world, constraints, shiftTimes, loss);
 
     loss.Map(optimizer.StartWeights);
 

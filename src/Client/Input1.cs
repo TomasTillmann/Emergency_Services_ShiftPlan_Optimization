@@ -5,10 +5,23 @@ public class Input1 : IInputParametrization
 {
   private readonly Random _random;
   private readonly DataModelGenerator _dataGenerator = new();
+  private const int avaialbeMedicTeamsCount = 50;
+  private const int availableAmbulancesCount = 200;
 
   public Input1(Random random = null)
   {
     _random = random ?? new Random();
+  }
+
+  public Constraints GetConstraints()
+  {
+    return new Constraints
+    {
+      AvailableMedicTeamsCount = avaialbeMedicTeamsCount,
+      AvailableAmbulancesCount = availableAmbulancesCount,
+      MaxMedicTeamsOnDepotCount = 15,
+      MaxAmbulancesOnDepotCount = 30
+    };
   }
 
   public World GetWorld()
@@ -20,9 +33,9 @@ public class Input1 : IInputParametrization
       worldSize: new CoordinateModel { XMet = 50_000, YMet = 50_000 },
       depotsCount: 10,
       hospitalsCount: 20,
-      availableMedicTeamsCount: 60,
-      availableAmbulancesCount: 200,
-      goldenTimeSec: 15.ToMinutes().ToSeconds().Value,
+      availableMedicTeamsCount: avaialbeMedicTeamsCount,
+      availableAmbulancesCount: availableAmbulancesCount,
+      goldenTimeSec: 3.ToHours().ToMinutes().ToSeconds().Value,
       random: _random
     ));
 

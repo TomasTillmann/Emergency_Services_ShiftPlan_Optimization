@@ -43,6 +43,7 @@ public sealed class TabuSearchOptimizer : LocalSearchOptimizer, IStepOptimizer
   public TabuSearchOptimizer
   (
     World world,
+    Constraints constraints,
     ShiftTimes shiftTimes,
     ILoss loss,
     int iterations = 50,
@@ -50,7 +51,7 @@ public sealed class TabuSearchOptimizer : LocalSearchOptimizer, IStepOptimizer
     int neighboursLimit = int.MaxValue,
     Random? random = null
   )
-  : base(world, shiftTimes, loss, neighboursLimit, random)
+  : base(world, constraints, shiftTimes, loss, neighboursLimit, random)
   {
     Iterations = iterations;
     TabuSize = tabuSize;

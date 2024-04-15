@@ -63,7 +63,7 @@ public class Visualizer : IDisposable
   public void WriteWeights(Weights weights)
   {
     int index = 1;
-    foreach (var weight in weights.Shifts)
+    foreach (var weight in weights.MedicTeamShifts)
     {
       _writer.Write($"{index++}: ");
 
@@ -92,7 +92,7 @@ public class Visualizer : IDisposable
     optimizer.Loss.Map(weights);
     optimizer.Loss.Simulation.Run(incidents);
 
-    WriteGraph(optimizer.Loss.Simulation.EmergencyServicePlan.Teams, incidents, writer);
+    WriteGraph(optimizer.Loss.Simulation.EmergencyServicePlan.MedicTeams, incidents, writer);
     writer.WriteLine();
     writer.WriteLine("Unhandled:");
     writer.WriteLine(string.Join("\n", optimizer.Loss.Simulation.UnhandledIncidents));

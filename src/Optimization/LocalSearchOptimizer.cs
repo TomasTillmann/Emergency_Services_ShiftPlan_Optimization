@@ -8,8 +8,8 @@ public abstract class LocalSearchOptimizer : Optimizer
   public int NeighboursLimit { get; set; }
   protected readonly Move[] movesBuffer;
 
-  public LocalSearchOptimizer(World world, ShiftTimes shiftPlans, ILoss loss, int neighboursLimit = int.MaxValue, Random? random = null)
-  : base(world, shiftPlans, loss, random)
+  public LocalSearchOptimizer(World world, Constraints constraints, ShiftTimes shiftPlans, ILoss loss, int neighboursLimit = int.MaxValue, Random? random = null)
+  : base(world, constraints, shiftPlans, loss, random)
   {
     NeighboursLimit = neighboursLimit >= world.AvailableMedicTeams.Length ? world.AvailableMedicTeams.Length : neighboursLimit;
 
@@ -24,7 +24,7 @@ public abstract class LocalSearchOptimizer : Optimizer
   /// </summary>
   public void ModifyMakeMove(Weights weights, Move move)
   {
-    Interval weight = weights.Shifts[move.WeightIndex];
+    Interval weight = weights.MedicTeamShifts[move.WeightIndex];
 
     int durationSec;
     int startingTimeSec;
@@ -33,22 +33,22 @@ public abstract class LocalSearchOptimizer : Optimizer
     {
       case MoveType.Shorter:
         durationSec = GetShorter(weight.DurationSec);
-        weights.Shifts[move.WeightIndex] = Interval.GetByStartAndDuration(weight.StartSec, durationSec);
+        weights.MedicTeamShifts[move.WeightIndex] = Interval.GetByStartAndDuration(weight.StartSec, durationSec);
         break;
 
       case MoveType.Longer:
         durationSec = GetLonger(weight.DurationSec);
-        weights.Shifts[move.WeightIndex] = Interval.GetByStartAndDuration(weight.StartSec, durationSec);
+        weights.MedicTeamShifts[move.WeightIndex] = Interval.GetByStartAndDuration(weight.StartSec, durationSec);
         break;
 
       case MoveType.Later:
         startingTimeSec = GetLater(weight.StartSec);
-        weights.Shifts[move.WeightIndex] = Interval.GetByStartAndDuration(startingTimeSec, weight.DurationSec);
+        weights.MedicTeamShifts[move.WeightIndex] = Interval.GetByStartAndDuration(startingTimeSec, weight.DurationSec);
         break;
 
       case MoveType.Earlier:
         startingTimeSec = GetEarlier(weight.StartSec);
-        weights.Shifts[move.WeightIndex] = Interval.GetByStartAndDuration(startingTimeSec, weight.DurationSec);
+        weights.MedicTeamShifts[move.WeightIndex] = Interval.GetByStartAndDuration(startingTimeSec, weight.DurationSec);
         break;
 
       case MoveType.NoMove:
@@ -106,14 +106,14 @@ public abstract class LocalSearchOptimizer : Optimizer
   /// </summary>
   public int GetMovesToNeighbours(Weights weights)
   {
-    Span<int> permutated = stackalloc int[weights.Shifts.Length];
+    Span<int> permutated = stackalloc int[weights.MedicTeamShifts.Length];
     for (int i = 0; i < permutated.Length; ++i)
     {
       permutated[i] = i;
     }
 
     // No need to permutate if all neighbours will be traversed. It is more efficient not to permutate ofc.
-    if (NeighboursLimit != weights.Shifts.Length)
+    if (NeighboursLimit != weights.MedicTeamShifts.Length)
     {
       Permutate(toPermutate: permutated, NeighboursLimit);
       Console.WriteLine(string.Join(",", permutated.ToArray()));
@@ -156,7 +156,7 @@ public abstract class LocalSearchOptimizer : Optimizer
     switch (type)
     {
       case MoveType.Shorter:
-        int durationSec = weights.Shifts[weightIndex].DurationSec;
+        int durationSec = weights.MedicTeamShifts[weightIndex].DurationSec;
         if (durationSec != ShiftTimes.MinDurationSec)
         {
           move = new Move
@@ -171,7 +171,7 @@ public abstract class LocalSearchOptimizer : Optimizer
         return false;
 
       case MoveType.Longer:
-        if (weights.Shifts[weightIndex].DurationSec != ShiftTimes.MaxDurationSec)
+        if (weights.MedicTeamShifts[weightIndex].DurationSec != ShiftTimes.MaxDurationSec)
         {
           move = new Move
           {
@@ -184,7 +184,7 @@ public abstract class LocalSearchOptimizer : Optimizer
         return false;
 
       case MoveType.Earlier:
-        if (weights.Shifts[weightIndex].StartSec != ShiftTimes.EarliestStartingTimeSec)
+        if (weights.MedicTeamShifts[weightIndex].StartSec != ShiftTimes.EarliestStartingTimeSec)
         {
           move = new Move
           {
@@ -197,7 +197,7 @@ public abstract class LocalSearchOptimizer : Optimizer
         return false;
 
       case MoveType.Later:
-        if (weights.Shifts[weightIndex].StartSec != ShiftTimes.LatestStartingTimeSec)
+        if (weights.MedicTeamShifts[weightIndex].StartSec != ShiftTimes.LatestStartingTimeSec)
         {
           move = new Move
           {

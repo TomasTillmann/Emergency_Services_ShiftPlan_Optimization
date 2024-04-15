@@ -37,7 +37,7 @@ public sealed class Simulation : ISimulation
 
     EmergencyServicePlan = new EmergencyServicePlan
     {
-      Teams = World.AvailableMedicTeams,
+      MedicTeams = World.AvailableMedicTeams,
       Ambulances = World.AvailableAmbulances
     };
   }
@@ -47,7 +47,7 @@ public sealed class Simulation : ISimulation
   /// </summary>
   public void Run(ImmutableArray<Incident> incidents)
   {
-    int totalIncidentsCount = incidents.Length;
+    TotalIncidents = incidents.Length;
     int notHandledIncidentsCount = 0;
 
     for (int i = 0; i < incidents.Length; ++i)
@@ -63,7 +63,7 @@ public sealed class Simulation : ISimulation
       int findBetterFromIndex = int.MaxValue;
       for (int j = 0; j < EmergencyServicePlan.AllocatedTeamsCount; ++j)
       {
-        medicTeam = EmergencyServicePlan.Teams[j];
+        medicTeam = EmergencyServicePlan.MedicTeams[j];
 
         if (_medicTeamsEvaluator.IsHandling(medicTeam, in currentIncident))
         {
@@ -83,7 +83,7 @@ public sealed class Simulation : ISimulation
 
       for (int j = findBetterFromIndex; j < EmergencyServicePlan.AllocatedTeamsCount; ++j)
       {
-        medicTeam = EmergencyServicePlan.Teams[j];
+        medicTeam = EmergencyServicePlan.MedicTeams[j];
 
         if (_medicTeamsEvaluator.IsHandling(medicTeam, in currentIncident))
         {

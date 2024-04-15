@@ -10,13 +10,14 @@ public class HillClimbOptimizer : LocalSearchOptimizer
   public HillClimbOptimizer
   (
     World world,
+    Constraints constraints,
     ShiftTimes shiftTimes,
     ILoss loss,
     int neighboursLimit = int.MaxValue,
     int steps = 50,
     Random? random = null
   )
-  : base(world, shiftTimes, loss, neighboursLimit, random)
+  : base(world, constraints, shiftTimes, loss, neighboursLimit, random)
   {
     Steps = steps;
   }

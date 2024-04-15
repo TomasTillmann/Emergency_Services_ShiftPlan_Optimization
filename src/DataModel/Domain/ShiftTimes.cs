@@ -51,12 +51,20 @@ public class ShiftTimes
   public int GetRandomStartingTimeSec(Random random = null)
   {
     random ??= new Random();
-    return AllowedShiftStartingTimesSec.ElementAt(random.Next(0, AllowedShiftStartingTimesSec.Count()));
+    return AllowedStartingTimesSecSorted.ElementAt(random.Next(0, AllowedShiftStartingTimesSec.Count()));
   }
 
   public int GetRandomDurationTimeSec(Random random = null)
   {
     random ??= new Random();
-    return AllowedShiftDurationsSec.ElementAt(random.Next(0, AllowedShiftDurationsSec.Count()));
+    return AllowedDurationsSecSorted.ElementAt(random.Next(0, AllowedShiftDurationsSec.Count()));
+  }
+
+  public int GetRandomNonZeroDurationTimeSec(Random random = null)
+  {
+    random ??= new Random();
+
+    // First element is 0 duration. It's ordered by duration.
+    return AllowedDurationsSecSorted.ElementAt(random.Next(1, AllowedShiftDurationsSec.Count()));
   }
 }
