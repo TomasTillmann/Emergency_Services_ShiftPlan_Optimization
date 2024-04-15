@@ -10,23 +10,23 @@ public class HillClimbOptimizer : LocalSearchOptimizer
   public HillClimbOptimizer
   (
     World world,
-    Constraints constraints,
+    ShiftTimes shiftTimes,
     ILoss loss,
     int neighboursLimit = int.MaxValue,
     int steps = 50,
     Random? random = null
   )
-  : base(world, constraints, loss, neighboursLimit, random)
+  : base(world, shiftTimes, loss, neighboursLimit, random)
   {
     Steps = steps;
   }
 
-  public override IEnumerable<Weights> FindOptimal(ImmutableArray<SuccessRatedIncidents> incidentsSets)
+  public override IEnumerable<Weights> FindOptimal(SuccessRatedIncidents incidents)
   {
     Weights currentWeights = StartWeights;
     Weights globalBestWeights = currentWeights;
 
-    double currentBestLoss = Loss.Get(currentWeights, incidentsSets);
+    double currentBestLoss = Loss.Get(currentWeights, incidents);
     double globalBestLoss = currentBestLoss;
 
     for (int step = 0; step < Steps; ++step)
@@ -42,7 +42,7 @@ public class HillClimbOptimizer : LocalSearchOptimizer
 
         ModifyMakeMove(currentWeights, move);
 
-        double neighbourLoss = Loss.Get(currentWeights, incidentsSets);
+        double neighbourLoss = Loss.Get(currentWeights, incidents);
         if (neighbourLoss < currentBestLoss)
         {
           Debug.WriteLine($"curr loss updated to: {neighbourLoss}");

@@ -14,12 +14,4 @@ public static class Extensions
     random = random ?? new Random();
     return collection.OrderBy(x => random.Next()).Take(count).ToList();
   }
-
-  public static Weights ToWeights(this ShiftPlan shiftPlan)
-  {
-    return new Weights
-    {
-      Value = shiftPlan.Shifts.Select(shift => shift.Work).ToArray()
-    };
-  }
 }

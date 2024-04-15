@@ -8,12 +8,14 @@ public abstract class LocalSearchOptimizer : Optimizer
   public int NeighboursLimit { get; set; }
   protected readonly Move[] movesBuffer;
 
-  public LocalSearchOptimizer(World world, Constraints constraints, ILoss loss, int neighboursLimit = int.MaxValue, Random? random = null)
-  : base(world, constraints, loss, random)
+  public LocalSearchOptimizer(World world, ShiftTimes shiftPlans, ILoss loss, int neighboursLimit = int.MaxValue, Random? random = null)
+  : base(world, shiftPlans, loss, random)
   {
-    NeighboursLimit = neighboursLimit >= world.AllAmbulancesCount ? world.AllAmbulancesCount : neighboursLimit;
+    NeighboursLimit = neighboursLimit >= world.AvailableMedicTeams.Length ? world.AvailableMedicTeams.Length : neighboursLimit;
 
-    int maxMovesCount = constraints.AllowedShiftDurationsSec.Count * constraints.AllowedShiftStartingTimesSec.Count * world.AllAmbulancesCount;
+    // All possible combinations of shift durations + allocation of ambulances to depots, meaning increase count or decrease count move, and
+    // the same for allocation of medic teams. Hence 2 * 2 * depots count. 
+    int maxMovesCount = shiftPlans.AllowedShiftDurationsSec.Count * shiftPlans.AllowedShiftStartingTimesSec.Count * World.AvailableMedicTeams.Length + 4 * World.Depots.Length;
     movesBuffer = new Move[maxMovesCount];
   }
 
@@ -22,7 +24,7 @@ public abstract class LocalSearchOptimizer : Optimizer
   /// </summary>
   public void ModifyMakeMove(Weights weights, Move move)
   {
-    Interval weight = weights.Value[move.WeightIndex];
+    Interval weight = weights.Shifts[move.WeightIndex];
 
     int durationSec;
     int startingTimeSec;
@@ -31,22 +33,22 @@ public abstract class LocalSearchOptimizer : Optimizer
     {
       case MoveType.Shorter:
         durationSec = GetShorter(weight.DurationSec);
-        weights.Value[move.WeightIndex] = Interval.GetByStartAndDuration(weight.StartSec, durationSec);
+        weights.Shifts[move.WeightIndex] = Interval.GetByStartAndDuration(weight.StartSec, durationSec);
         break;
 
       case MoveType.Longer:
         durationSec = GetLonger(weight.DurationSec);
-        weights.Value[move.WeightIndex] = Interval.GetByStartAndDuration(weight.StartSec, durationSec);
+        weights.Shifts[move.WeightIndex] = Interval.GetByStartAndDuration(weight.StartSec, durationSec);
         break;
 
       case MoveType.Later:
         startingTimeSec = GetLater(weight.StartSec);
-        weights.Value[move.WeightIndex] = Interval.GetByStartAndDuration(startingTimeSec, weight.DurationSec);
+        weights.Shifts[move.WeightIndex] = Interval.GetByStartAndDuration(startingTimeSec, weight.DurationSec);
         break;
 
       case MoveType.Earlier:
         startingTimeSec = GetEarlier(weight.StartSec);
-        weights.Value[move.WeightIndex] = Interval.GetByStartAndDuration(startingTimeSec, weight.DurationSec);
+        weights.Shifts[move.WeightIndex] = Interval.GetByStartAndDuration(startingTimeSec, weight.DurationSec);
         break;
 
       case MoveType.NoMove:
@@ -104,14 +106,14 @@ public abstract class LocalSearchOptimizer : Optimizer
   /// </summary>
   public int GetMovesToNeighbours(Weights weights)
   {
-    Span<int> permutated = stackalloc int[weights.Value.Length];
+    Span<int> permutated = stackalloc int[weights.Shifts.Length];
     for (int i = 0; i < permutated.Length; ++i)
     {
       permutated[i] = i;
     }
 
     // No need to permutate if all neighbours will be traversed. It is more efficient not to permutate ofc.
-    if (NeighboursLimit != weights.Value.Length)
+    if (NeighboursLimit != weights.Shifts.Length)
     {
       Permutate(toPermutate: permutated, NeighboursLimit);
       Console.WriteLine(string.Join(",", permutated.ToArray()));
@@ -154,8 +156,8 @@ public abstract class LocalSearchOptimizer : Optimizer
     switch (type)
     {
       case MoveType.Shorter:
-        int durationSec = weights.Value[weightIndex].DurationSec;
-        if (durationSec != Constraints.MinDurationSec)
+        int durationSec = weights.Shifts[weightIndex].DurationSec;
+        if (durationSec != ShiftTimes.MinDurationSec)
         {
           move = new Move
           {
@@ -169,7 +171,7 @@ public abstract class LocalSearchOptimizer : Optimizer
         return false;
 
       case MoveType.Longer:
-        if (weights.Value[weightIndex].DurationSec != Constraints.MaxDurationSec)
+        if (weights.Shifts[weightIndex].DurationSec != ShiftTimes.MaxDurationSec)
         {
           move = new Move
           {
@@ -182,7 +184,7 @@ public abstract class LocalSearchOptimizer : Optimizer
         return false;
 
       case MoveType.Earlier:
-        if (weights.Value[weightIndex].StartSec != Constraints.EarliestStartingTimeSec)
+        if (weights.Shifts[weightIndex].StartSec != ShiftTimes.EarliestStartingTimeSec)
         {
           move = new Move
           {
@@ -195,7 +197,7 @@ public abstract class LocalSearchOptimizer : Optimizer
         return false;
 
       case MoveType.Later:
-        if (weights.Value[weightIndex].StartSec != Constraints.LatestStartingTimeSec)
+        if (weights.Shifts[weightIndex].StartSec != ShiftTimes.LatestStartingTimeSec)
         {
           move = new Move
           {
@@ -223,26 +225,26 @@ public abstract class LocalSearchOptimizer : Optimizer
 
   private int GetShorter(int durationSec)
   {
-    int index = Array.BinarySearch(Constraints.AllowedDurationsSecSorted, durationSec);
-    return Constraints.AllowedDurationsSecSorted[index - 1];
+    int index = Array.BinarySearch(ShiftTimes.AllowedDurationsSecSorted, durationSec);
+    return ShiftTimes.AllowedDurationsSecSorted[index - 1];
   }
 
   private int GetLonger(int durationSec)
   {
-    int index = Array.BinarySearch(Constraints.AllowedDurationsSecSorted, durationSec);
-    return Constraints.AllowedDurationsSecSorted[index + 1];
+    int index = Array.BinarySearch(ShiftTimes.AllowedDurationsSecSorted, durationSec);
+    return ShiftTimes.AllowedDurationsSecSorted[index + 1];
   }
 
   private int GetEarlier(int startTimeSec)
   {
-    int index = Array.BinarySearch(Constraints.AllowedStartingTimesSecSorted, startTimeSec);
-    return Constraints.AllowedStartingTimesSecSorted[index - 1];
+    int index = Array.BinarySearch(ShiftTimes.AllowedStartingTimesSecSorted, startTimeSec);
+    return ShiftTimes.AllowedStartingTimesSecSorted[index - 1];
   }
 
   private int GetLater(int startTimeSec)
   {
-    int index = Array.BinarySearch(Constraints.AllowedStartingTimesSecSorted, startTimeSec);
-    return Constraints.AllowedStartingTimesSecSorted[index + 1];
+    int index = Array.BinarySearch(ShiftTimes.AllowedStartingTimesSecSorted, startTimeSec);
+    return ShiftTimes.AllowedStartingTimesSecSorted[index + 1];
   }
 
   /// <summary>

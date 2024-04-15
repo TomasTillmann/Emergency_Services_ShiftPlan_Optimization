@@ -5,7 +5,9 @@ namespace Simulating;
 
 public interface ISimulation
 {
-  double SuccessRate { get; }
+  EmergencyServicePlan EmergencyServicePlan { get; }
+
+  World World { get; }
 
   int TotalIncidents { get; }
 
@@ -13,6 +15,10 @@ public interface ISimulation
 
   int HandledIncidents { get; }
 
-  void Run(ImmutableArray<Incident> incidents, ShiftPlan simulateOnThisShiftPlan);
+  double SuccessRate { get; }
+
+  List<Incident> UnhandledIncidents { get; }
+
+  void Run(ImmutableArray<Incident> incidents);
 }
 

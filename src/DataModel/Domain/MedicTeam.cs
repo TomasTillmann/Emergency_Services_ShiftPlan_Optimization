@@ -1,23 +1,24 @@
+using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 
 namespace ESSP.DataModel;
 
-public class Shift
+public class MedicTeam
 {
   private static long _nextId = 1;
 
   public long Id { get; init; }
-  public Ambulance Ambulance { get; init; }
-  public Depot Depot { get; init; }
 
-  public Interval Work { get; set; } = Interval.GetByStartAndDuration(0, 24.ToHours().ToSeconds().Value);
+  public Interval Shift { get; set; } = Interval.GetByStartAndDuration(0, 0);
+  public Depot Depot { get; set; }
 
   public int TimeActive { get; private set; }
 
-  private List<PlannableIncident> _plannedIncidents { get; init; }
+  private readonly List<PlannableIncident> _plannedIncidents;
 
-  public Shift()
+  public MedicTeam()
   {
     _plannedIncidents = new List<PlannableIncident>();
 
@@ -27,6 +28,8 @@ public class Shift
   public void Plan(PlannableIncident plannableIncident)
   {
     _plannedIncidents.Add(plannableIncident);
+    Depot.Ambulances[plannableIncident.AmbulanceIndex].WhenFree = plannableIncident.ToDepotDrive.EndSec;
+
     TimeActive += plannableIncident.IncidentHandling.DurationSec;
   }
 

@@ -3,86 +3,59 @@ using ESSP.DataModel;
 
 public class Input1 : IInputParametrization
 {
-  public Input Get(Random random = null)
-  {
-    random ??= new Random();
+  private readonly Random _random;
+  private readonly DataModelGenerator _dataGenerator = new();
 
+  public Input1(Random random = null)
+  {
+    _random = random ?? new Random();
+  }
+
+  public World GetWorld()
+  {
     WorldMapper worldMapper = new();
-    DataModelGenerator dataGenerator = new();
 
     // World init
-    World world = worldMapper.MapBack(dataGenerator.GenerateWorldModel(
+    World world = worldMapper.MapBack(_dataGenerator.GenerateWorldModel(
       worldSize: new CoordinateModel { XMet = 50_000, YMet = 50_000 },
       depotsCount: 10,
       hospitalsCount: 20,
-      ambulancesOnDepotNormalExpected: 5,
-      ambulanceOnDepotNormalStddev: 1,
-      ambTypes: new AmbulanceTypeModel[] {
-        new AmbulanceTypeModel
-        {
-          Name = "A1",
-          Cost = 40
-        },
-       new AmbulanceTypeModel
-       {
-         Name = "A2",
-         Cost = 100
-       },
-       new AmbulanceTypeModel
-       {
-         Name = "A3",
-         Cost = 120
-       },
-       new AmbulanceTypeModel
-       {
-         Name = "A4",
-         Cost = 500
-       },
-      },
-      ambTypeCategorical: new double[] { 0.5, 0.3, 0.15, 0.05 },
-      incToAmbTypesTable: new Dictionary<string, HashSet<string>>
-      {
-        { "I1", new HashSet<string> { "A1", "A2", "A3", "A4" } },
-        //{ "I2", new HashSet<string> { "A2", "A3", "A4" } }
-      },
-      random: random
+      availableMedicTeamsCount: 60,
+      availableAmbulancesCount: 200,
+      goldenTimeSec: 15.ToMinutes().ToSeconds().Value,
+      random: _random
     ));
 
+    return world;
+  }
+
+  public ImmutableArray<Incident> GetIncidents()
+  {
     // Incidents init
     IncidentMapper incidentMapper = new();
-    ImmutableArray<Incident> incidents = dataGenerator.GenerateIncidentModels(
+    ImmutableArray<Incident> incidents = _dataGenerator.GenerateIncidentModels(
       worldSize: new CoordinateModel { XMet = 50_000, YMet = 50_000 },
-      incidentsCount: 400,
+      incidentsCount: 250,
       duration: 21.ToHours().ToSeconds(),
       onSceneDurationNormalExpected: 20.ToMinutes().ToSeconds(),
       onSceneDurationNormalStddev: 10.ToMinutes().ToSeconds(),
       inHospitalDeliveryNormalExpected: 15.ToMinutes().ToSeconds(),
       inHospitalDeliveryNormalStddev: 10.ToMinutes().ToSeconds(),
-      incTypes: new IncidentTypeModel[] {
-       new IncidentTypeModel
-       {
-         Name = "I1",
-         MaximumResponseTimeSec = 2.ToHours().ToMinutes().ToSeconds().Value
-       },
-       // new IncidentTypeModel
-       // {
-       //   Name = "I2",
-       //   MaximumResponseTimeSec = 1.ToHours().ToMinutes().ToSeconds().Value
-       // },
-       // new IncidentTypeModel
-       // {
-       //   Name = "I3",
-       //   MaximumResponseTimeSec = 30.ToMinutes().ToSeconds().Value
-       // },
-      },
-      //incTypesCategorical: new double[] { 0.7, 0.2, 0.1 },
-      incTypesCategorical: new double[] { 1 },
-      random: random
+      random: _random
     ).Select(inc => incidentMapper.MapBack(inc)).ToImmutableArray();
+
+
+    // TODO: Move success rate as knob to optimizing
+    var successRatedIncidents = new SuccessRatedIncidents { Value = incidents, SuccessRate = 1 };
     //
 
-    // Constraints init
-    Constraints constraints = new()
+    return incidents;
+  }
+
+  public ShiftTimes GetShiftTimes()
+  {
+    // shift times init
+    ShiftTimes shiftTimes = new()
     {
       AllowedShiftStartingTimesSec = new HashSet<int>()
       {
@@ -100,18 +73,6 @@ public class Input1 : IInputParametrization
     };
     //
 
-    // Success rated incidents init
-    var successRatedIncidents = new List<SuccessRatedIncidents>()
-    {
-      new SuccessRatedIncidents { Value = incidents, SuccessRate = 1 }
-    }.ToImmutableArray();
-    //
-
-    return new Input
-    {
-      World = world,
-      Constraints = constraints,
-      SuccessRatedIncidents = successRatedIncidents
-    };
+    return shiftTimes;
   }
 }

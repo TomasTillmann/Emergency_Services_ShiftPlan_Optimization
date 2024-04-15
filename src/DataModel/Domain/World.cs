@@ -6,12 +6,10 @@ namespace ESSP.DataModel;
 
 public class World
 {
-  public ImmutableArray<Depot> Depots { get; set; }
-  public ImmutableArray<Hospital> Hospitals { get; set; }
-  public DistanceCalculator DistanceCalculator { get; set; }
-  public AmbulanceTypeModel[] AmbTypes { get; set; }
-  public IncTypeToAllowedAmbTypesTable IncTypeToAllowedAmbTypesTable { get; set; }
-
-  private int? _allAmbulancesCount;
-  public int AllAmbulancesCount => _allAmbulancesCount ??= Depots.Sum(depot => depot.Ambulances.Count());
+  public ImmutableArray<Depot> Depots { get; init; }
+  public ImmutableArray<Hospital> Hospitals { get; init; }
+  public DistanceCalculator DistanceCalculator { get; init; }
+  public ImmutableArray<MedicTeam> AvailableMedicTeams { get; init; }
+  public ImmutableArray<Ambulance> AvailableAmbulances { get; init; }
+  public int GoldenTimeSec { get; init; }
 }

@@ -1,24 +1,13 @@
+using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+
 namespace ESSP.DataModel;
 
-public readonly struct Depot
+public class Depot
 {
-  public Coordinate Location { get; }
-  public Ambulance[] Ambulances { get; }
+  public Coordinate Location { get; init; }
 
-  /// sets ambulances locations to passed location
-  public Depot(Coordinate location, Ambulance[] ambulances)
-  {
-    Location = location;
-    Ambulances = new Ambulance[ambulances.Length];
-
-    for (int i = 0; i < ambulances.Length; ++i)
-    {
-      Ambulances[i] = new Ambulance
-      {
-        Type = ambulances[i].Type,
-        Location = location
-      };
-    }
-  }
+  public List<Ambulance> Ambulances { get; init; }
 }
 

@@ -1,8 +1,15 @@
 using System.Collections.Immutable;
 using ESSP.DataModel;
 using Optimizing;
+using Simulating;
 
 public interface ILoss
 {
-  public double Get(Weights weights, ImmutableArray<SuccessRatedIncidents> incidentsSet);
+  ISimulation Simulation { get; }
+
+  void Map(Weights weights);
+
+  double GetEmergencyServicePlanCost(Weights weights);
+
+  double Get(Weights weights, SuccessRatedIncidents incidents);
 }

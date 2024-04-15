@@ -5,32 +5,19 @@ using Simulating;
 
 public class StandardLoss : Loss
 {
-  private readonly double _maxShiftPlanCost;
+  private readonly double _maxEmergencyServicePlanCost;
 
-  public StandardLoss(World world, Constraints constraints)
-  : base(world, constraints)
+  public StandardLoss(Simulation simulation, ShiftTimes shiftTimes)
+  : base(simulation)
   {
-    _maxShiftPlanCost = world.AllAmbulancesCount * constraints.MaxDurationSec / 24 / 24 * world.AmbTypes.Select(t => t.Cost).Max();
+    _maxEmergencyServicePlanCost = simulation.World.AvailableMedicTeams.Length * shiftTimes.MaxDurationSec / 60;
   }
 
-  public override double Get(Weights weights, ImmutableArray<SuccessRatedIncidents> incidentsSet)
+  public override double Get(Weights weights, SuccessRatedIncidents incidents)
   {
-    //TODO: dont overwrite all weight always, but only those that actually changed
-    // create shift plan according to weights
-    for (int i = 0; i < weights.Value.Length; ++i)
-    {
-      Shift shift = SimulateOnThisShiftPlan.Shifts[i];
-      shift.Work = weights.Value[i];
-    }
-    //
+    RunSimulation(weights, incidents);
 
-    //HACK:
-    var incidents = incidentsSet.First();
-    //
-
-    Simulation.Run(incidents.Value, SimulateOnThisShiftPlan);
-
-    double cost = SimulateOnThisShiftPlan.GetCost() / _maxShiftPlanCost;
+    double cost = Simulation.EmergencyServicePlan.GetShiftDurationsSum() / _maxEmergencyServicePlanCost;
     double handled = Simulation.SuccessRate;
     double thresh = incidents.SuccessRate;
 

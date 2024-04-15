@@ -11,7 +11,7 @@ public abstract class Optimizer : IOptimizer
   public TextWriter Debug { get; set; }
 
   /// <inheritdoc/>
-  public Constraints Constraints { get; }
+  public ShiftTimes ShiftTimes { get; }
 
   /// <inheritdoc/>
   public World World { get; }
@@ -25,27 +25,27 @@ public abstract class Optimizer : IOptimizer
   /// Random
   protected readonly Random _random;
 
-  public Optimizer(World world, Constraints constraints, ILoss loss, Random? random = null)
+  public Optimizer(World world, ShiftTimes shiftTimes, ILoss loss, Random? random = null)
   {
     _random = random ?? new Random();
-    Constraints = constraints;
+    ShiftTimes = shiftTimes;
     World = world;
     Loss = loss;
-    StartWeights = InitWeights(world.AllAmbulancesCount, constraints);
+    StartWeights = InitWeights(world.AvailableMedicTeams.Length, shiftTimes);
   }
 
-  public abstract IEnumerable<Weights> FindOptimal(ImmutableArray<SuccessRatedIncidents> incidentsSets);
+  public abstract IEnumerable<Weights> FindOptimal(SuccessRatedIncidents incidents);
 
-  protected Weights InitWeights(int allAmbulancesCount, Constraints constraints)
+  protected Weights InitWeights(int allAmbulancesCount, ShiftTimes constraints)
   {
     Weights startWeights = new()
     {
-      Value = new Interval[allAmbulancesCount]
+      Shifts = new Interval[allAmbulancesCount]
     };
 
     for (int i = 0; i < allAmbulancesCount; ++i)
     {
-      startWeights.Value[i] = Interval.GetByStartAndDuration
+      startWeights.Shifts[i] = Interval.GetByStartAndDuration
       (
        constraints.GetRandomStartingTimeSec(this._random),
        constraints.GetRandomDurationTimeSec(this._random)

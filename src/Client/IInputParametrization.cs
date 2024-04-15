@@ -1,5 +1,10 @@
+using System.Collections.Immutable;
+using ESSP.DataModel;
+
 public interface IInputParametrization
 {
-  Input Get(Random random = null);
+  World GetWorld();
+  ImmutableArray<Incident> GetIncidents();
+  ShiftTimes GetShiftTimes();
 }
 

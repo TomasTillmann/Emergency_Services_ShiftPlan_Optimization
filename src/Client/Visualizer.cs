@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using ESSP.DataModel;
+using Optimizing;
 using Simulating;
 
 namespace Client;
@@ -20,14 +21,15 @@ public class Visualizer : IDisposable
     _writer.Dispose();
   }
 
-  public void WriteGraph(ShiftPlan shiftPlan, ImmutableArray<Incident> incidents, Seconds end, TextWriter writer = null)
+  public void WriteGraph(ImmutableArray<MedicTeam> medicTeams, ImmutableArray<Incident> incidents, TextWriter writer = null)
   {
     writer ??= _writer;
 
     int index = 0;
-    foreach (var shift in shiftPlan.Shifts)
+    foreach (var medicTeam in medicTeams)
     {
       writer.Write($"{index++}: ");
+      Seconds end = 24.ToHours().ToMinutes().ToSeconds();
 
       for (Seconds time = 0.ToSeconds(); time < end; time += (5 * 60).ToSeconds())
       {
@@ -37,15 +39,15 @@ public class Visualizer : IDisposable
         }
         else
         {
-          writer.Write(shift.Work.IsInInterval(time.Value) ? "-" : " ");
+          writer.Write(medicTeam.Shift.IsInInterval(time.Value) ? "-" : " ");
         }
       }
 
       writer.WriteLine();
-      PlannableIncident last = shift.PlannedIncident(0);
+      PlannableIncident last = medicTeam.PlannedIncident(0);
       for (Seconds time = 0.ToSeconds(); time < end; time += (5 * 60).ToSeconds())
       {
-        var current = shift.PlannedIncident(time.Value);
+        var current = medicTeam.PlannedIncident(time.Value);
         char c = current == last ? '=' : 'I';
         if (current is null) c = ' ';
         writer.Write(c);
@@ -58,14 +60,14 @@ public class Visualizer : IDisposable
     writer.Flush();
   }
 
-  public void WriteWeights(Weights weights, Seconds end)
+  public void WriteWeights(Weights weights)
   {
     int index = 1;
-    foreach (var weight in weights.Value)
+    foreach (var weight in weights.Shifts)
     {
       _writer.Write($"{index++}: ");
 
-      for (Seconds time = 0.ToSeconds(); time < end; time += (5 * 60).ToSeconds())
+      for (Seconds time = 0.ToSeconds(); time < 24.ToHours().ToMinutes().ToSeconds(); time += (5 * 60).ToSeconds())
       {
         if (time.Value % 1.ToHours().ToSeconds().Value == 0)
         {
@@ -83,20 +85,18 @@ public class Visualizer : IDisposable
     _writer.Flush();
   }
 
-  public void PlotGraph(Weights weights, World world, ImmutableArray<Incident> incidents, TextWriter writer = null)
+  public void PlotGraph(IOptimizer optimizer, Weights weights, ImmutableArray<Incident> incidents, TextWriter writer = null)
   {
     writer ??= _writer;
 
-    ShiftPlan shiftPlan = ShiftPlan.GetFrom(world.Depots, weights);
+    optimizer.Loss.Map(weights);
+    optimizer.Loss.Simulation.Run(incidents);
 
-    Simulation simulation = new(world);
-    simulation.Run(incidents, shiftPlan);
-
-    WriteGraph(shiftPlan, incidents, 24.ToHours().ToSeconds(), writer);
+    WriteGraph(optimizer.Loss.Simulation.EmergencyServicePlan.Teams, incidents, writer);
     writer.WriteLine();
     writer.WriteLine("Unhandled:");
-    writer.WriteLine(string.Join("\n", simulation.UnhandledIncidents));
-    writer.WriteLine($"Success rate: {simulation.SuccessRate}");
+    writer.WriteLine(string.Join("\n", optimizer.Loss.Simulation.UnhandledIncidents));
+    writer.WriteLine($"Success rate: {optimizer.Loss.Simulation.SuccessRate}");
 
     writer.Flush();
   }

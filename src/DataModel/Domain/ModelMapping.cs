@@ -15,23 +15,16 @@ public record IncidentModel
   public int OccurenceSec { get; set; }
   public int OnSceneDurationSec { get; set; }
   public int InHospitalDeliverySec { get; set; }
-  public IncidentTypeModel Type { get; set; }
-}
-
-public record IncidentTypeModel
-{
-  public string Name { get; set; }
-  public int MaximumResponseTimeSec { get; set; }
 }
 
 /// World
-
 public record WorldModel
 {
   public List<DepotModel> Depots { get; set; }
   public List<HospitalModel> Hospitals { get; set; }
-  public AmbulanceTypeModel[] AmbTypes { get; set; }
-  public Dictionary<string, HashSet<string>> IncToAmbTypesTable { get; set; }
+  public List<MedicTeam> AvailableMedicTeams { get; set; }
+  public List<Ambulance> AvailableAmbulances { get; set; }
+  public int GoldenTimeSec { get; set; }
 }
 
 public record DepotModel
@@ -42,13 +35,6 @@ public record DepotModel
 
 public record AmbulanceModel
 {
-  public AmbulanceTypeModel Type { get; set; }
-}
-
-public record AmbulanceTypeModel
-{
-  public string Name { get; set; }
-  public double Cost { get; set; }
 }
 
 public record HospitalModel
@@ -67,7 +53,6 @@ public record CoordinateModel
 public class IncidentMapper
 {
   private readonly CoordinateMapper _coordinateMapper = new();
-  private readonly IncidentTypeMapper _incidentTypeMapper = new();
 
   public IncidentModel Map(Incident incident)
   {
@@ -77,7 +62,6 @@ public class IncidentMapper
       OccurenceSec = incident.OccurenceSec,
       OnSceneDurationSec = incident.OnSceneDurationSec,
       InHospitalDeliverySec = incident.InHospitalDeliverySec,
-      Type = _incidentTypeMapper.Map(incident.Type)
     };
   }
 
@@ -89,28 +73,6 @@ public class IncidentMapper
       OccurenceSec = model.OccurenceSec,
       OnSceneDurationSec = model.OnSceneDurationSec,
       InHospitalDeliverySec = model.InHospitalDeliverySec,
-      Type = _incidentTypeMapper.MapBack(model.Type)
-    };
-  }
-}
-
-public class IncidentTypeMapper
-{
-  public IncidentTypeModel Map(IncidentType type)
-  {
-    return new IncidentTypeModel
-    {
-      Name = type.Name,
-      MaximumResponseTimeSec = type.MaximumResponseTimeSec
-    };
-  }
-
-  public IncidentType MapBack(IncidentTypeModel model)
-  {
-    return new IncidentType
-    {
-      Name = model.Name,
-      MaximumResponseTimeSec = model.MaximumResponseTimeSec
     };
   }
 }
@@ -128,8 +90,9 @@ public class WorldMapper
     {
       Depots = world.Depots.Select(depot => _depotMapper.Map(depot)).ToList(),
       Hospitals = world.Hospitals.Select(hospital => _hospitalMapper.Map(hospital)).ToList(),
-      AmbTypes = world.AmbTypes,
-      IncToAmbTypesTable = world.IncTypeToAllowedAmbTypesTable.GetTable()
+      AvailableMedicTeams = world.AvailableMedicTeams.ToList(),
+      AvailableAmbulances = world.AvailableAmbulances.ToList(),
+      GoldenTimeSec = world.GoldenTimeSec
     };
   }
 
@@ -141,8 +104,9 @@ public class WorldMapper
       Depots = model.Depots.Select(depot => _depotMapper.MapBack(depot)).ToImmutableArray(),
       Hospitals = hospitals,
       DistanceCalculator = new DistanceCalculator(hospitals.ToArray()),
-      AmbTypes = model.AmbTypes,
-      IncTypeToAllowedAmbTypesTable = new IncTypeToAllowedAmbTypesTable(model.IncToAmbTypesTable),
+      AvailableMedicTeams = model.AvailableMedicTeams.ToImmutableArray(),
+      AvailableAmbulances = model.AvailableAmbulances.ToImmutableArray(),
+      GoldenTimeSec = model.GoldenTimeSec
     };
   }
 }
@@ -157,59 +121,30 @@ public class DepotMapper
     return new DepotModel
     {
       Location = _coordinateMapper.Map(depot.Location),
-      Ambulances = depot.Ambulances.Select(amb => _ambulanceMapper.Map(amb)).ToList()
     };
   }
 
   public Depot MapBack(DepotModel model)
   {
-    return new Depot(
-      location: _coordinateMapper.MapBack(model.Location),
-      ambulances: model.Ambulances.Select(amb => _ambulanceMapper.MapBack(amb)).ToArray()
-    );
+    return new Depot
+    {
+      Location = _coordinateMapper.MapBack(model.Location),
+    };
   }
 }
 
 public class AmbulanceMapper
 {
-  private readonly AmbulanceTypeMapper _ambulanceTypeMapper = new();
   private readonly CoordinateMapper _coordinateMapper = new();
 
   public AmbulanceModel Map(Ambulance ambulance)
   {
-    return new AmbulanceModel
-    {
-      Type = _ambulanceTypeMapper.Map(ambulance.Type),
-    };
+    return new AmbulanceModel();
   }
 
   public Ambulance MapBack(AmbulanceModel model)
   {
-    return new Ambulance
-    {
-      Type = _ambulanceTypeMapper.MapBack(model.Type),
-    };
-  }
-}
-
-public class AmbulanceTypeMapper
-{
-  public AmbulanceTypeModel Map(AmbulanceType type)
-  {
-    return new AmbulanceTypeModel
-    {
-      Cost = type.Cost,
-      Name = type.Name
-    };
-  }
-
-  public AmbulanceType MapBack(AmbulanceTypeModel model)
-  {
-    return new AmbulanceType
-    {
-      Cost = model.Cost,
-      Name = model.Name
-    };
+    return new Ambulance();
   }
 }
 

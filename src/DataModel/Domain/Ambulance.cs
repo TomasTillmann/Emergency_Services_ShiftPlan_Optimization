@@ -1,10 +1,9 @@
 namespace ESSP.DataModel;
 
-public readonly struct Ambulance
+public class Ambulance
 {
-  public static int ReroutePenaltySec { get; set; } = 30;
+  public static int ReroutePenaltySec { get; set; } = 60 * 10;
 
-  public AmbulanceType Type { get; init; }
-  public Coordinate Location { get; init; }
+  public int WhenFree { get; set; }
 }
 

@@ -3,40 +3,35 @@ using DataModel.Interfaces;
 
 namespace ESSP.DataModel;
 
-public class ShiftEvaluator
+public class MedicTeamsEvaluator
 {
-  private PlannableIncident.Factory plannableIncidentFactory;
-  private IncTypeToAllowedAmbTypesTable ambToIncTypesTable;
+  private readonly PlannableIncident.Factory _plannableIncidentFactory;
+  private readonly int _goldenTimeSec;
 
-  public ShiftEvaluator(DistanceCalculator distanceCalculator, ImmutableArray<Hospital> hospitals, IncTypeToAllowedAmbTypesTable ambToIncTypesTable)
+  public MedicTeamsEvaluator(DistanceCalculator distanceCalculator, ImmutableArray<Hospital> hospitals, int goldenTimeSec)
   {
-    this.plannableIncidentFactory = new PlannableIncident.Factory(distanceCalculator, hospitals);
-    this.ambToIncTypesTable = ambToIncTypesTable;
+    this._plannableIncidentFactory = new PlannableIncident.Factory(distanceCalculator, hospitals);
+    _goldenTimeSec = goldenTimeSec;
   }
 
-  public bool IsHandling(Shift shift, in Incident incident)
+  public bool IsHandling(MedicTeam medicTeam, in Incident incident)
   {
-    PlannableIncident plannableIncident = plannableIncidentFactory.Get(incident, shift);
+    PlannableIncident plannableIncident = _plannableIncidentFactory.Get(incident, medicTeam);
 
-    return IsHandling(shift, in plannableIncident);
+    return IsHandling(medicTeam, plannableIncident);
   }
 
-  private bool IsHandling(Shift shift, in PlannableIncident plannableIncident)
+  public bool IsHandling(MedicTeam medicTeam, PlannableIncident plannableIncident)
   {
     // 1
     if (plannableIncident.ToIncidentDrive.StartSec + plannableIncident.ToIncidentDrive.DurationSec
-        > plannableIncident.Incident.OccurenceSec + plannableIncident.Incident.Type.MaximumResponseTimeSec)
+        > plannableIncident.Incident.OccurenceSec + _goldenTimeSec)
     {
       return false;
     }
 
     // 1, 2, 3, 4
-    if (plannableIncident.InHospitalDelivery.EndSec > shift.Work.EndSec)
-    {
-      return false;
-    }
-
-    if (!ambToIncTypesTable.IsAllowed(plannableIncident.Incident.Type, shift.Ambulance.Type))
+    if (plannableIncident.InHospitalDelivery.EndSec > medicTeam.Shift.EndSec)
     {
       return false;
     }
@@ -46,34 +41,33 @@ public class ShiftEvaluator
 
   /// <summary>
   /// Rreturns better shift out of the two based on defined conditions.
-  /// If both shifts are equaly good, <paramref name="shift1"/> is returned.
+  /// If both shifts are equaly good, <paramref name="medicTeam1"/> is returned.
   /// </summary>
-  public Shift GetBetter(Shift shift1, Shift shift2, in Incident incident)
+  public MedicTeam GetBetter(MedicTeam medicTeam1, MedicTeam medicTeam2, in Incident incident)
   {
     // 1
-    bool isShift1Free = shift1.IsFree(incident.OccurenceSec);
-    if (!(isShift1Free && shift2.IsFree(incident.OccurenceSec)))
+    bool isShift1Free = medicTeam1.IsFree(incident.OccurenceSec);
+    if (!(isShift1Free && medicTeam2.IsFree(incident.OccurenceSec)))
     {
-      return isShift1Free ? shift1 : shift2;
+      return isShift1Free ? medicTeam1 : medicTeam2;
     }
 
     // 2
-    Interval shift1ToIncidentDrive = plannableIncidentFactory.GetToIncidentDrive(incident.OccurenceSec, incident.Location, shift1);
-    Interval shift2ToIncidentDrive = plannableIncidentFactory.GetToIncidentDrive(incident.OccurenceSec, incident.Location, shift2);
+    Interval shift1ToIncidentDrive = _plannableIncidentFactory.GetToIncidentDrive(incident.OccurenceSec, incident.Location, medicTeam1);
+    Interval shift2ToIncidentDrive = _plannableIncidentFactory.GetToIncidentDrive(incident.OccurenceSec, incident.Location, medicTeam2);
 
     if (shift1ToIncidentDrive.EndSec != shift2ToIncidentDrive.EndSec)
     {
-      return shift1ToIncidentDrive.EndSec < shift2ToIncidentDrive.EndSec ? shift1 : shift2;
+      return shift1ToIncidentDrive.EndSec < shift2ToIncidentDrive.EndSec ? medicTeam1 : medicTeam2;
     }
 
     // 3
-    if (shift1.TimeActive != shift2.TimeActive)
+    if (medicTeam1.TimeActive != medicTeam2.TimeActive)
     {
-      return shift1.TimeActive < shift2.TimeActive ? shift1 : shift2;
+      return medicTeam1.TimeActive < medicTeam2.TimeActive ? medicTeam1 : medicTeam2;
     }
 
-    // 4
-    return shift1.Ambulance.Type.Cost <= shift2.Ambulance.Type.Cost ? shift1 : shift2;
+    return medicTeam1;
   }
 }
 

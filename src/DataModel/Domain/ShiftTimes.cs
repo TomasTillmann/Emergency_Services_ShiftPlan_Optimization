@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace ESSP.DataModel;
 
-public class Constraints
+public class ShiftTimes
 {
   public int MinDurationSec { get; init; }
   public int MaxDurationSec { get; init; }

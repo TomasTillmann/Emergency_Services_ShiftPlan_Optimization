@@ -14,7 +14,7 @@ public sealed class TabuSearchOptimizer : LocalSearchOptimizer, IStepOptimizer
 
   #endregion
 
-  private ImmutableArray<SuccessRatedIncidents> _incidentsSets;
+  private SuccessRatedIncidents _incidentsSets;
   private Weights _globalBestWeights;
   private Weights _weights;
   private double _globalBestLoss;
@@ -43,14 +43,14 @@ public sealed class TabuSearchOptimizer : LocalSearchOptimizer, IStepOptimizer
   public TabuSearchOptimizer
   (
     World world,
-    Constraints constraints,
+    ShiftTimes shiftTimes,
     ILoss loss,
     int iterations = 50,
     int tabuSize = 15,
     int neighboursLimit = int.MaxValue,
     Random? random = null
   )
-  : base(world, constraints, loss, neighboursLimit, random)
+  : base(world, shiftTimes, loss, neighboursLimit, random)
   {
     Iterations = iterations;
     TabuSize = tabuSize;
@@ -58,9 +58,9 @@ public sealed class TabuSearchOptimizer : LocalSearchOptimizer, IStepOptimizer
     _isStuck = false;
   }
 
-  public override IEnumerable<Weights> FindOptimal(ImmutableArray<SuccessRatedIncidents> incidentsSets)
+  public override IEnumerable<Weights> FindOptimal(SuccessRatedIncidents incidents)
   {
-    InitStepOptimizer(incidentsSets);
+    InitStepOptimizer(incidents);
 
     while (!IsFinished())
     {
@@ -71,9 +71,9 @@ public sealed class TabuSearchOptimizer : LocalSearchOptimizer, IStepOptimizer
     return OptimalWeights;
   }
 
-  public void InitStepOptimizer(ImmutableArray<SuccessRatedIncidents> incidentsSets)
+  public void InitStepOptimizer(SuccessRatedIncidents incidents)
   {
-    _incidentsSets = incidentsSets;
+    _incidentsSets = incidents;
     _globalBestWeights = StartWeights;
     _weights = StartWeights;
     _globalBestLoss = GetLossInternal(_globalBestWeights);

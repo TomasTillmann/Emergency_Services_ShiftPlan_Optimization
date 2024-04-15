@@ -25,7 +25,7 @@ public class SimulatedAnnealingOptimizer : LocalSearchOptimizer, IStepOptimizer
   public IEnumerable<Weights> OptimalWeights => new List<Weights> { _globalBestWeights };
 
   private Weights _weights;
-  private ImmutableArray<SuccessRatedIncidents> _incidentsSets;
+  private SuccessRatedIncidents _incidentsSets;
   private Weights _globalBestWeights;
   private double _globalBestLoss;
   private Move _currentMove;
@@ -52,14 +52,14 @@ public class SimulatedAnnealingOptimizer : LocalSearchOptimizer, IStepOptimizer
 
   public SimulatedAnnealingOptimizer(
       World world,
-      Constraints constraints,
+      ShiftTimes shiftTimes,
       ILoss loss,
       double lowestTemperature = 0.001,
       double highestTemperature = 100,
       double temperatureReductionFactor = 0.98,
       int neighboursLimit = int.MaxValue,
       Random? random = null
-  ) : base(world, constraints, loss, neighboursLimit, random)
+  ) : base(world, shiftTimes, loss, neighboursLimit, random)
   {
     LowestTemperature = lowestTemperature;
     HighestTemperature = highestTemperature;
@@ -67,9 +67,9 @@ public class SimulatedAnnealingOptimizer : LocalSearchOptimizer, IStepOptimizer
   }
 
   /// <inheritdoc/>
-  public override IEnumerable<Weights> FindOptimal(ImmutableArray<SuccessRatedIncidents> incidentsSets)
+  public override IEnumerable<Weights> FindOptimal(SuccessRatedIncidents incidents)
   {
-    InitStepOptimizer(incidentsSets);
+    InitStepOptimizer(incidents);
 
     while (!IsFinished())
     {
@@ -79,12 +79,12 @@ public class SimulatedAnnealingOptimizer : LocalSearchOptimizer, IStepOptimizer
     return OptimalWeights;
   }
 
-  public void InitStepOptimizer(ImmutableArray<SuccessRatedIncidents> incidentsSets)
+  public void InitStepOptimizer(SuccessRatedIncidents incidents)
   {
-    _incidentsSets = incidentsSets;
+    _incidentsSets = incidents;
     _globalBestWeights = StartWeights;
     _weights = StartWeights;
-    _globalBestLoss = Loss.Get(_globalBestWeights, incidentsSets);
+    _globalBestLoss = Loss.Get(_globalBestWeights, incidents);
     _currentLoss = _globalBestLoss;
     _currentTemperature = HighestTemperature;
   }

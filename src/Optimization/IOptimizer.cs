@@ -7,12 +7,12 @@ public interface IOptimizer
 {
   TextWriter Debug { get; set; }
 
-  Constraints Constraints { get; }
+  ShiftTimes ShiftTimes { get; }
 
   World World { get; }
 
   /// <summary>
-  /// <see cref="Shift.Work"/> Interval of each <see cref="Shift"/>.
+  /// <see cref="MedicTeam.Shift"/> Interval of each <see cref="MedicTeam"/>.
   /// Initialized at the construction time of the optimizer in <see cref="Optimizer"/> by <see cref="Optimizer.InitWeights"/>.
   /// You can set to any value you would like and the optimizer will start optimizing from it.
   /// </summary>
@@ -27,9 +27,9 @@ public interface IOptimizer
   /// Tries to find the most optimal shift plans from starting <see cref="StartWeights"/>.
   /// You can initialize <see cref="StartWeights"/> before calling <see cref="FindOptimal(ImmutableArray{SuccessRatedIncidents})"/>.
   /// <see cref="StartWeights"/> are initialized in <see cref="Optimizer"/> constructor by <see cref="Optimizer.InitWeights"/>.
-  /// Note, that more <see cref="ShiftPlan"/> can have the same, most optimal loss, that's why enumeration is returned.
+  /// Note, that more <see cref="EmergencyServicePlan"/> can have the same, most optimal loss, that's why enumeration is returned.
   /// The loss is calculated by provided <see cref="ILoss"/> implementation.
   /// </summary>
-  IEnumerable<Weights> FindOptimal(ImmutableArray<SuccessRatedIncidents> incidentsSet);
+  IEnumerable<Weights> FindOptimal(SuccessRatedIncidents incidents);
 }
 
