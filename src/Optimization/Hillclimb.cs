@@ -13,11 +13,12 @@ public class HillClimbOptimizer : LocalSearchOptimizer
     Constraints constraints,
     ShiftTimes shiftTimes,
     ILoss loss,
-    int neighboursLimit = int.MaxValue,
+    int shiftChangesLimit = int.MaxValue,
+    int shiftAllocationsLimit = int.MaxValue,
     int steps = 50,
     Random? random = null
   )
-  : base(world, constraints, shiftTimes, loss, neighboursLimit, random)
+  : base(world, constraints, shiftTimes, loss, shiftChangesLimit, shiftAllocationsLimit, random)
   {
     Steps = steps;
   }
@@ -44,6 +45,8 @@ public class HillClimbOptimizer : LocalSearchOptimizer
         ModifyMakeMove(currentWeights, move);
 
         double neighbourLoss = Loss.Get(currentWeights, incidents);
+        Debug.WriteLine($"Neighbour loss: {neighbourLoss}");
+
         if (neighbourLoss < currentBestLoss)
         {
           Debug.WriteLine($"curr loss updated to: {neighbourLoss}");

@@ -41,7 +41,6 @@ public class ShiftTimes
     init
     {
       _allowedDurationsSec = value;
-      _allowedDurationsSec.Add(0);
       AllowedDurationsSecSorted = _allowedDurationsSec.ToList().OrderBy(duration => duration).ToArray();
       MinDurationSec = AllowedDurationsSecSorted.First();
       MaxDurationSec = AllowedDurationsSecSorted.Last();
@@ -55,12 +54,6 @@ public class ShiftTimes
   }
 
   public int GetRandomDurationTimeSec(Random random = null)
-  {
-    random ??= new Random();
-    return AllowedDurationsSecSorted.ElementAt(random.Next(0, AllowedShiftDurationsSec.Count()));
-  }
-
-  public int GetRandomNonZeroDurationTimeSec(Random random = null)
   {
     random ??= new Random();
 

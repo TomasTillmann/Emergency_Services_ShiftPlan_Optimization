@@ -39,7 +39,7 @@ public sealed class TabuSearchOptimizer : LocalSearchOptimizer, IStepOptimizer
   public int CurrStep { get; private set; }
 
   /// <param name="tabuSize">If set too high, it could happen, that all neighbours are tabu (and aspiration criterion is not satisfied either).
-  /// <param name="neighboursLimit">If count of neighbours is exceeded, only first <paramref name="neighboursLimit"/> neighbours will be tried.
+  /// <param name="shiftChangesLimit">If count of neighbours is exceeded, only first <paramref name="shiftChangesLimit"/> neighbours will be tried.
   public TabuSearchOptimizer
   (
     World world,
@@ -48,10 +48,11 @@ public sealed class TabuSearchOptimizer : LocalSearchOptimizer, IStepOptimizer
     ILoss loss,
     int iterations = 50,
     int tabuSize = 15,
-    int neighboursLimit = int.MaxValue,
+    int shiftChangesLimit = int.MaxValue,
+    int allocationsLimit = int.MaxValue,
     Random? random = null
   )
-  : base(world, constraints, shiftTimes, loss, neighboursLimit, random)
+  : base(world, constraints, shiftTimes, loss, shiftChangesLimit, allocationsLimit, random)
   {
     Iterations = iterations;
     TabuSize = tabuSize;

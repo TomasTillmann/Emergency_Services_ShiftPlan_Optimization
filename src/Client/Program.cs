@@ -106,17 +106,19 @@ class Program
     World world = input.GetWorld();
     Constraints constraints = input.GetConstraints();
     ShiftTimes shiftTimes = input.GetShiftTimes();
-    ImmutableArray<Incident> incidents = input.GetIncidents();
+    ImmutableArray<Incident> incidentsValue = input.GetIncidents();
+    SuccessRatedIncidents incidents = new() { Value = incidentsValue, SuccessRate = 1 };
 
     Simulation simulation = new(world);
+
     ILoss loss = new StandardLoss(simulation, shiftTimes);
-    IOptimizer optimizer = new TabuSearchOptimizer(world, constraints, shiftTimes, loss);
+    IOptimizer optimizer = new HillClimbOptimizer(world, constraints, shiftTimes, loss);
+    optimizer.Debug = _debug;
 
-    loss.Map(optimizer.StartWeights);
+    var optimal = optimizer.FindOptimal(incidents).First();
 
-    simulation.Run(incidents);
-
-    visualizer.PlotGraph(optimizer, optimizer.StartWeights, incidents);
+    visualizer.PlotGraph(optimizer, optimizer.StartWeights, incidents.Value);
+    visualizer.PlotGraph(optimizer, optimal, incidents.Value);
 
     visualizer.Dispose();
   }

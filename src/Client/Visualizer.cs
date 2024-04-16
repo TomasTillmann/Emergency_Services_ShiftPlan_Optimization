@@ -48,8 +48,25 @@ public class Visualizer : IDisposable
       for (Seconds time = 0.ToSeconds(); time < end; time += (5 * 60).ToSeconds())
       {
         var current = medicTeam.PlannedIncident(time.Value);
-        char c = current == last ? '=' : 'I';
-        if (current is null) c = ' ';
+        char c;
+
+        if (current is null)
+        {
+          c = ' ';
+        }
+        else if (current.ToIncidentDrive.IsInInterval(time.Value))
+        {
+          c = '>';
+        }
+        else if (current == last)
+        {
+          c = '=';
+        }
+        else
+        {
+          c = 'I';
+        }
+
         writer.Write(c);
         last = current;
       }
@@ -91,6 +108,12 @@ public class Visualizer : IDisposable
 
     optimizer.Loss.Map(weights);
     optimizer.Loss.Simulation.Run(incidents);
+
+    // foreach (var bbbb in optimizer.Loss.Simulation.EmergencyServicePlan.MedicTeams.Select(team => team.GetPlannableIncidents()))
+    // {
+    //   Console.WriteLine(string.Join("\n", bbbb.Select(b => $"{b.ToIncidentDrive.EndSec - b.Incident.OccurenceSec}, {b.Incident.OccurenceSec}, {b.Incident.Location}, {b.AmbulanceIndex}")));
+    //   Console.WriteLine();
+    // }
 
     WriteGraph(optimizer.Loss.Simulation.EmergencyServicePlan.MedicTeams, incidents, writer);
     writer.WriteLine();

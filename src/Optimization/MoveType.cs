@@ -2,9 +2,13 @@
 
 public enum MoveType
 {
-  Shorter,
-  Longer,
-  Earlier,
-  Later,
+  ShiftShorter,
+  ShiftLonger,
+  ShiftEarlier,
+  ShiftLater,
+  AllocateMedicTeam,
+  DeallocateMedicTeam,
+  AllocateAmbulance,
+  DeallocateAmbulance,
   NoMove,
 }

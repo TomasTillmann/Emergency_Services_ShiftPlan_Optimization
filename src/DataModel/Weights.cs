@@ -60,8 +60,14 @@ public class Weights
   public override string ToString()
   {
     StringBuilder str = new();
-    str.AppendJoin(',', MedicTeamShifts).Append(Environment.NewLine).AppendJoin(',', MedicTeamAllocations);
-    str.AppendJoin(',', MedicTeamShifts).Append(Environment.NewLine).AppendJoin(',', AmbulancesAllocations);
+
+    str
+      .AppendJoin(',', MedicTeamShifts)
+      .Append(Environment.NewLine)
+      .AppendJoin(',', MedicTeamAllocations)
+      .Append(Environment.NewLine)
+      .AppendJoin(',', AmbulancesAllocations);
+
     return str.ToString();
   }
 }

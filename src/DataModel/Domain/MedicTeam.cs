@@ -16,6 +16,11 @@ public class MedicTeam
 
   public int TimeActive { get; private set; }
 
+  /// <summary>
+  /// Use only for debugging purposes.
+  /// </summary>
+  public ImmutableList<PlannableIncident> GetPlannableIncidents() => _plannedIncidents.ToImmutableList();
+
   private readonly List<PlannableIncident> _plannedIncidents;
 
   public MedicTeam()
@@ -28,7 +33,7 @@ public class MedicTeam
   public void Plan(PlannableIncident plannableIncident)
   {
     _plannedIncidents.Add(plannableIncident);
-    Depot.Ambulances[plannableIncident.AmbulanceIndex].WhenFree = plannableIncident.ToDepotDrive.EndSec;
+    Depot.Ambulances[plannableIncident.AmbulanceIndex].WhenFreeSec = plannableIncident.ToDepotDrive.EndSec;
 
     TimeActive += plannableIncident.IncidentHandling.DurationSec;
   }

@@ -36,6 +36,7 @@ public abstract class Optimizer : IOptimizer
     Loss = loss;
     Constraints = constraints;
     StartWeights = InitWeights();
+    Loss.Map(StartWeights);
   }
 
   public abstract IEnumerable<Weights> FindOptimal(SuccessRatedIncidents incidents);
@@ -95,7 +96,7 @@ public abstract class Optimizer : IOptimizer
       startWeights.MedicTeamShifts[i] = Interval.GetByStartAndDuration
       (
         ShiftTimes.GetRandomStartingTimeSec(this._random),
-        ShiftTimes.GetRandomNonZeroDurationTimeSec(this._random)
+        ShiftTimes.GetRandomDurationTimeSec(this._random)
       );
     }
     //

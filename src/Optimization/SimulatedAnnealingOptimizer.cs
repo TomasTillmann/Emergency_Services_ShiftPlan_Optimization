@@ -58,9 +58,10 @@ public class SimulatedAnnealingOptimizer : LocalSearchOptimizer, IStepOptimizer
       double lowestTemperature = 0.001,
       double highestTemperature = 100,
       double temperatureReductionFactor = 0.98,
-      int neighboursLimit = int.MaxValue,
+      int shiftChangesLimit = int.MaxValue,
+      int allocationsLimit = int.MaxValue,
       Random? random = null
-  ) : base(world, constraints, shiftTimes, loss, neighboursLimit, random)
+  ) : base(world, constraints, shiftTimes, loss, shiftChangesLimit, allocationsLimit, random)
   {
     LowestTemperature = lowestTemperature;
     HighestTemperature = highestTemperature;

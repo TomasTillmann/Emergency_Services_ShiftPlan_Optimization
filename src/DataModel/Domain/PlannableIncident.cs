@@ -22,6 +22,7 @@ public partial class PlannableIncident
   {
     this.Incident = toCopy.Incident;
     this.NearestHospital = toCopy.NearestHospital;
+    this.AmbulanceIndex = toCopy.AmbulanceIndex;
     this.ToIncidentDrive = toCopy.ToIncidentDrive;
     this.OnSceneDuration = toCopy.OnSceneDuration;
     this.ToHospitalDrive = toCopy.ToHospitalDrive;
@@ -31,6 +32,11 @@ public partial class PlannableIncident
 
   public Interval IncidentHandling => Interval.GetByStartAndEnd(ToIncidentDrive.StartSec, ToDepotDrive.StartSec);
   public Interval WholeInterval => Interval.GetByStartAndEnd(ToIncidentDrive.StartSec, ToDepotDrive.EndSec);
+
+  public override string ToString()
+  {
+    return $"({Incident.OccurenceSec}), {ToIncidentDrive}, {OnSceneDuration}, {ToHospitalDrive}, {InHospitalDelivery}, {ToDepotDrive}";
+  }
 }
 
 
@@ -114,9 +120,9 @@ public partial class PlannableIncident
         // That cannot be time before the shift starts, and it's either the time the shift starts or when the earliest ambulance is available.
         for (int i = 0; i < medicTeam.Depot.Ambulances.Count; ++i)
         {
-          if (whenAmbulanceFree > medicTeam.Depot.Ambulances[i].WhenFree)
+          if (whenAmbulanceFree > medicTeam.Depot.Ambulances[i].WhenFreeSec)
           {
-            whenAmbulanceFree = medicTeam.Depot.Ambulances[i].WhenFree;
+            whenAmbulanceFree = medicTeam.Depot.Ambulances[i].WhenFreeSec;
             possibleStartingTime = Math.Max(firstPossibleStartTimeSec, whenAmbulanceFree);
             ambIndex = i;
           }

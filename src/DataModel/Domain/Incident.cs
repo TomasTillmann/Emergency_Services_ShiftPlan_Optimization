@@ -17,5 +17,10 @@ public readonly struct Incident
   public int OccurenceSec { get; init; }
   public int OnSceneDurationSec { get; init; }
   public int InHospitalDeliverySec { get; init; }
+
+  public override string ToString()
+  {
+    return $"({Location}, {OccurenceSec})";
+  }
 }
 

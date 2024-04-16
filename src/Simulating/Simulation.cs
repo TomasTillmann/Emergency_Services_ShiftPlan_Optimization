@@ -47,8 +47,20 @@ public sealed class Simulation : ISimulation
   /// </summary>
   public void Run(ImmutableArray<Incident> incidents)
   {
+    // Clear planned incidents from previous iterations.
+    for (int i = 0; i < EmergencyServicePlan.MedicTeams.Length; ++i)
+    {
+      EmergencyServicePlan.MedicTeams[i].ClearPlannedIncidents();
+    }
+
+    // Set WhenFree to 0 seconds to all ambulances
+    for (int i = 0; i < EmergencyServicePlan.Ambulances.Length; ++i)
+    {
+      EmergencyServicePlan.Ambulances[i].WhenFreeSec = 0;
+    }
+
+    NotHandledIncidents = 0;
     TotalIncidents = incidents.Length;
-    int notHandledIncidentsCount = 0;
 
     for (int i = 0; i < incidents.Length; ++i)
     {
@@ -76,9 +88,9 @@ public sealed class Simulation : ISimulation
       // No hadnling medic team exists. 
       if (findBetterFromIndex == int.MaxValue)
       {
-        notHandledIncidentsCount++;
+        NotHandledIncidents++;
         UnhandledIncidents.Add(currentIncident); // remove for faster perf
-        return;
+        continue;
       }
 
       for (int j = findBetterFromIndex; j < EmergencyServicePlan.AllocatedTeamsCount; ++j)
