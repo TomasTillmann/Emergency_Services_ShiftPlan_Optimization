@@ -495,6 +495,10 @@ INPUT ./uvod.tex
 OUTPUT tmp/kap01.aux
 INPUT ./kap01.tex
 INPUT ./kap01.tex
+INPUT /home/tom/.texlive2022/texmf-var/luatex-cache/generic/fonts/otl/lmroman10-regular.luc
+INPUT /home/tom/.texlive2022/texmf-var/luatex-cache/generic/fonts/otl/lmromancaps10-regular.luc
+INPUT /home/tom/.texlive2022/texmf-var/luatex-cache/generic/fonts/otl/lmroman8-regular.luc
+INPUT /home/tom/.texlive2022/texmf-var/luatex-cache/generic/fonts/otl/lmroman6-regular.luc
 OUTPUT tmp/zaver.aux
 INPUT ./zaver.tex
 INPUT ./zaver.tex

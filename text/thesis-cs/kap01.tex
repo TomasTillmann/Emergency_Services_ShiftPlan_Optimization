@@ -43,11 +43,11 @@ Můžeme na to nahlížet jako na přiřazení časových intervalů, směn, na 
 které budou na výjezdových stanicích pro záchranáře k dispozici.
 Nechť $S$ je množina výjezdových stanic, $I \subseteq (\mathbb{R^+}, \mathbb{R^+})$ množina všech časových intervalů a $I_C \subset I$ množina možných časových intervalů.
 Například, $(8, 17) \in I_C$, značí směnu od 8 hodin do 17 hodin.
-Dále nechť $T$ množina týmu, které nám jsou k dispozici a $A$ množina záchranných vozidel, které nám jsou k dispozici. Definujme
+Dále nechť $Z$ množina týmu, které nám jsou k dispozici a $A$ množina záchranných vozidel, které nám jsou k dispozici. Definujme
 
 \begin{align}
-p_I \colon T &\rightarrow I_C \\
-p_S \colon T &\rightarrow S \\
+p_I \colon Z &\rightarrow I_C \\
+p_S \colon Z &\rightarrow S \\
 p_A \colon A &\rightarrow S 
 \end{align}
 .
@@ -63,15 +63,85 @@ p = (p_I, p_S, p_A)
 \\
 Všimněme si, že s takovou definicí můžeme na optimalizační problém nahlížet jako na tři podoptimalizační úlohy.
 První, optimálně namapovat týmy záchranářu na výjezdové stanice, druhý, optimálně každému týmu přiřadit směnu a třetí, optimálně alokovat záchranná vozidla na jednotlivé výjezdové stanice.
-Může se stát, že některé týmy nebudeme chtít vůbec naalokovat, například z důvodu zvýšení efektivity plánu, pak je odebereme z $T$. To stejné platí pro záchranná vozidla, odebereme z $A$.
+Může se stát, že některé týmy nebudeme chtít vůbec naalokovat, například z důvodu zvýšení efektivity plánu, pak je odebereme z $Z$. To stejné platí pro záchranná vozidla, odebereme z $A$.
 
 \clearpage
 
 \section{Simulace}
 
 Momentálně máme popsanou optimalizační úlohu, kterou řešíme. Ještě nám ale chybí jedna velmi podstatná část.
-Tou je konkrétní způsob, definice ohodnocovací funkce $q$, kterým zjistíme kvalitu libovolného plánu pohotovostní služby.
+Konkrétní způsob, definice ohodnocovací funkce $q$, kterým zjistíme kvalitu libovolného plánu pohotovostní služby.
 Jak již bylo zmíněno, ta by se měla co nejvíce odrážet z úspěšnosti odbavených incidentů a efektivity alokace týmů záchranářů a záchranných vozidel.
-To je pro 
+Je velmi důležité, aby $q$ ohodnocovalo plány co nejdůvěryhodněji a aby hodnocení kvality plánu podle $q$ co nejvíce odpovídalo kvalitě plánu v reálném světě na reálných datech.
+Pokud by $q$ neohodnocovalo plány důvěryhodně, pak by plán s nejvyšší kvalitou podle $q$ nemusel být vůbec výhodným a kvalitním pro reálné využití.
+To by znamenalo, že nejkvalitnější nalezené plány pohotovostních služeb by nebyli nijak zajímavé a navrhnutá řešení v této práci by neměla žádnou hodnotu pro praktické využití.
+Aby $q$ splňoval tyto požadavky, navrhuji pro daný plán spustit simulaci.
+Pokud simulace bude důvěrně napodobovat průběh plánu jak by plán obstál v reálném světě, pak $q$ používající simulaci
+bude odpovídat nejvěrohodněji reálné situaci a tedy bude ohodnocená kvalita plánu nejdůvěrnější.
+Přístup použití simulace má ještě jednu podstatnou výhodu.
+Různé pohotovostní služby mohou používat různé způsoby a pravidla, například pro výběr záchranné jednotky pro odbavení incidentu co právě nastal, nebo do jaké nemocnice incident odbavit.
+V mnou implementované simulaci jsou použité pravidla vybrané na základě konzultace se společností, která se danou problematikou zabývá přes 25 let a sami podobná pravidla používají pro plánovaní sanitek
+u několika jejich klientů ve Spojených státech.
+Není však problém naimplementovat pravidla zcela jiná, komplikovanější nebo klidně i stochastická.
+Použití simulace přináší příjemnou flexibilitu a zároveň lze díky ní nejlépe popsat jak konkrétně má plán pohotovostní služby v konkrétních situacích reagovat.
+\\
+\\
+Jedná se o deterministickou diskrétní simulaci, kde událost je nastání incidentu $I_i \in I$ v čase $T_i \in T$ a stav simulace $S$
+jsou stavy záchranných vozidel $S_A$ a stavy týmů záchranářů $S_Z$.
+Simulace si první setřídí sadu incidentů podle času nastání $T$.
+Následně se simulace pohybuje po těchto časech od nejdřívějšího až po poslední incident podle nastání.
+V každém kroku simulace $i$, kterých je celkem $|T|$, si simulace aktualizuje stavy $S_A$ a $S_Z$.
+V každém kroku deterministicky vybere $z_i \in Z$ a pro něj $a_i \in A$, který obslouží $I_i$. 
+Po doběhnutí simulace jsou k dispozici statistiky, jako procento úspěšně odbavených incidentů a celková vytíženost týmů.
+Statistiky pak vhodně použije $q$ pro vypočítání celkové kvality plánu.
+
+\clearpage
+
+\begin{algorithmic}[1]  % [1] způsobí, že číslujeme kroky algoritmu
+\Function{Simulation}{$I$}
+	\State $I \gets \mbox{Setřídí incidenty podle času nastání}$
+	\State $\text{SuccessRate} \gets 100\%$
+	\State $S_A \gets \mbox{Inicializuje}$
+	\State $S_Z \gets \mbox{Inicializuje}$
+  \State $T$ \gets 0
+  \For{$I_i \in I,~ i \in \{0, 1, \dots , |I|\}$}
+    \State $T \gets \mbox{Čas nastání $I_i$}$
+    \State $z \gets \mbox{GetBestTeam($I_i$)}$
+    \If{\mbox{Neexistuje tým který by úspěšně odbavil $I_i$}}
+      \State $\text{SuccessRate} \gets \mbox{Sniž}$
+      \State \textbf{continue}
+    \EndIf
+    \State Naplánuj($z$, $I_i$)
+    \State $S_A \gets \mbox{Update}$
+    \State $S_Z \gets \mbox{Update}$
+  \EndFor
+  \State \Return SuccessRate, GetWorkload($S_Z$)
+\EndFunction
+\end{algorithmic}
+
+\vspace*{25px}
+
+Funkce GetBestTeam první nalezne množinu všech týmů záchranářů, kteří jsou schopni $I_i$ obsloužit.
+Tým záchranářu je schopen obsloužit $I_i$ pokud:
+
+\begin{enumerate}
+  \item Je alokován a má přiřazenou směnu. Pokud tým záchranářu není alokován na žádnou výjezdovou stanici a nemá přiřazenou směnu, tak samozřejmě není schopen obsloužit $I_i$.
+  \item Tým je schopen dorazit na místo incidentu do požadované doby. Ať už přímo z výjezdové stanice, nebo při vrácení se po vyřízení incidentu zpět na výjezdovou stanici. 
+    V prvním případě tým potřebuje mít na výjezdové stanici k dispozi volné záchranné vozidlo. V druhém případě už záchranné vozidlo k dispozici má.
+  \item Týmu nekončí směna dřive, než je očekávaný konec celkové doby vyřízení incidentu.
+\end{enumerate}
+
+Následně vybere nejvhodnější tým záchranářu podle pravidel:
+
+\begin{enumerate}
+  \item Upřednostni tým, který je na výjezdové stanici před týmem, který ukončuje vyřízení jednoho z předchozích incidentů. 
+  \item Upřednostni tým, který na místo incidentu dorazí dříve. 
+  \item Upřednostni tým, který již obsloužil méně incidentů a je tedy méně vyčerpaný.
+\end{enumerate}
+
+Na nejhodnější nalezený tým záchranářů $z$ naplánujeme $I_i$. Pro to je potřeba vypočítat očekávaný příjezd záchranné jednotky, dobu strávenou na místě incidentu, očekávaný příjezd
+do nejbližší nemocnice, dobu strávenou v nemocnici a následně očekávaný příjezd zpět na výjezdovou stanici.
+Během jízdy z nemocnice zpět na výjezdovou stanici může dojít k naplánování záchranné jednotky na nový incident, pokud bude podle pravidel vybrán jako nejvhodnější.
+
 
 
