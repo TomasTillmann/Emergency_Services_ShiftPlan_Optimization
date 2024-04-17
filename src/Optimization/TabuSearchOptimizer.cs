@@ -96,14 +96,14 @@ public sealed class TabuSearchOptimizer : LocalSearchOptimizer, IStepOptimizer
 
   private void StepInternal()
   {
-    int neighboursCount = GetMovesToNeighbours(_weights);
+    GetMovesToNeighbours(_weights);
 
     //_debug.WriteLine("moves: " + string.Join(", ", movesBuffer));
     Debug.WriteLine("global best loss: " + _globalBestLoss);
     //_debug.WriteLine("global best weights: " + string.Join(", ", _globalBestWeights));
 
     _currentBestLoss = double.MaxValue;
-    for (int i = 0; i < neighboursCount; ++i)
+    for (int i = 0; i < movesBuffer.Count; ++i)
     {
       Move move = movesBuffer[i];
 
@@ -157,7 +157,7 @@ public sealed class TabuSearchOptimizer : LocalSearchOptimizer, IStepOptimizer
     (
       new Move
       {
-        WeightIndex = _currentBestMove.WeightIndex,
+        MedicTeamOnDepotIndex = _currentBestMove.MedicTeamOnDepotIndex,
         MoveType = LocalSearchOptimizer.GetInverseMoveType(_currentBestMove.MoveType)
       }
     );

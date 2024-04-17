@@ -25,7 +25,7 @@ public class StandardLoss : Loss
     double handled = Simulation.SuccessRate;
     double thresh = incidents.SuccessRate;
 
-    double eps = 0.001;
+    double eps = 0.0000001;
     double handledPart = (thresh + eps) * handled;
     double costPart = (1 - thresh + eps) * planCost;
     double loss = costPart - handledPart;

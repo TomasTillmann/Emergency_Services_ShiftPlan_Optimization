@@ -112,12 +112,13 @@ class Program
     Simulation simulation = new(world);
 
     ILoss loss = new StandardLoss(simulation, shiftTimes);
-    IOptimizer optimizer = new HillClimbOptimizer(world, constraints, shiftTimes, loss);
+    IOptimizer optimizer = new HillClimbOptimizer(world, constraints, shiftTimes, loss, steps: 200);
     optimizer.Debug = _debug;
+
+    visualizer.PlotGraph(optimizer, optimizer.StartWeights, incidents.Value);
 
     var optimal = optimizer.FindOptimal(incidents).First();
 
-    visualizer.PlotGraph(optimizer, optimizer.StartWeights, incidents.Value);
     visualizer.PlotGraph(optimizer, optimal, incidents.Value);
 
     visualizer.Dispose();

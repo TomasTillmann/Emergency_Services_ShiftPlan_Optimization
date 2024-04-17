@@ -37,8 +37,9 @@ public sealed class Simulation : ISimulation
 
     EmergencyServicePlan = new EmergencyServicePlan
     {
-      MedicTeams = World.AvailableMedicTeams,
-      Ambulances = World.AvailableAmbulances
+      AvailableMedicTeams = World.AvailableMedicTeams,
+      AvailableAmbulances = World.AvailableAmbulances,
+      Depots = World.Depots
     };
   }
 
@@ -48,16 +49,19 @@ public sealed class Simulation : ISimulation
   public void Run(ImmutableArray<Incident> incidents)
   {
     // Clear planned incidents from previous iterations.
-    for (int i = 0; i < EmergencyServicePlan.MedicTeams.Length; ++i)
+    for (int i = 0; i < EmergencyServicePlan.AllocatedMedicTeamsCount; ++i)
     {
-      EmergencyServicePlan.MedicTeams[i].ClearPlannedIncidents();
+      EmergencyServicePlan.AvailableMedicTeams[i].ClearPlannedIncidents();
+      EmergencyServicePlan.AvailableMedicTeams[i].TimeActive = 0;
     }
 
     // Set WhenFree to 0 seconds to all ambulances
-    for (int i = 0; i < EmergencyServicePlan.Ambulances.Length; ++i)
+    for (int i = 0; i < EmergencyServicePlan.AllocatedAmbulancesCount; ++i)
     {
-      EmergencyServicePlan.Ambulances[i].WhenFreeSec = 0;
+      EmergencyServicePlan.AvailableAmbulances[i].WhenFreeSec = 0;
     }
+
+    UnhandledIncidents.Clear(); // delete for faster perf, only for debuggin purposes
 
     NotHandledIncidents = 0;
     TotalIncidents = incidents.Length;
@@ -73,9 +77,9 @@ public sealed class Simulation : ISimulation
 
       // Find handling medic team. 
       int findBetterFromIndex = int.MaxValue;
-      for (int j = 0; j < EmergencyServicePlan.AllocatedTeamsCount; ++j)
+      for (int j = 0; j < EmergencyServicePlan.AllocatedMedicTeamsCount; ++j)
       {
-        medicTeam = EmergencyServicePlan.MedicTeams[j];
+        medicTeam = EmergencyServicePlan.AvailableMedicTeams[j];
 
         if (_medicTeamsEvaluator.IsHandling(medicTeam, in currentIncident))
         {
@@ -93,9 +97,9 @@ public sealed class Simulation : ISimulation
         continue;
       }
 
-      for (int j = findBetterFromIndex; j < EmergencyServicePlan.AllocatedTeamsCount; ++j)
+      for (int j = findBetterFromIndex; j < EmergencyServicePlan.AllocatedMedicTeamsCount; ++j)
       {
-        medicTeam = EmergencyServicePlan.MedicTeams[j];
+        medicTeam = EmergencyServicePlan.AvailableMedicTeams[j];
 
         if (_medicTeamsEvaluator.IsHandling(medicTeam, in currentIncident))
         {

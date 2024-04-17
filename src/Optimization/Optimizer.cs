@@ -35,8 +35,8 @@ public abstract class Optimizer : IOptimizer
     World = world;
     Loss = loss;
     Constraints = constraints;
-    StartWeights = InitWeights();
-    Loss.Map(StartWeights);
+    InitWeights();
+    StartWeights.MapTo(Loss.Simulation.EmergencyServicePlan);
   }
 
   public abstract IEnumerable<Weights> FindOptimal(SuccessRatedIncidents incidents);
@@ -45,31 +45,47 @@ public abstract class Optimizer : IOptimizer
   /// Initializes the weights.
   /// Called only once when initializing the optimizer => doesn't have to be efficient. 
   /// </summary>
-  protected Weights InitWeights()
+  protected void InitWeights()
   {
-    Weights startWeights = new()
+    StartWeights = new()
     {
-      MedicTeamShifts = new Interval[World.AvailableMedicTeams.Length],
-      MedicTeamAllocations = new int[World.Depots.Length],
-      AmbulancesAllocations = new int[World.Depots.Length]
+      MedicTeamAllocations = new Interval[World.Depots.Length, Constraints.MaxMedicTeamsOnDepotCount],
+      MedicTeamsPerDepotCount = new int[World.Depots.Length],
+      AmbulancesPerDepotCount = new int[World.Depots.Length],
     };
 
-    // teams allocation
+    // initialze team shifts to deallocated with random start times
+    for (int i = 0; i < StartWeights.MedicTeamAllocations.GetLength(0); ++i)
+    {
+      for (int j = 0; j < StartWeights.MedicTeamAllocations.GetLength(1); ++j)
+      {
+        StartWeights.MedicTeamAllocations[i, j] = Interval.GetByStartAndDuration
+        (
+          ShiftTimes.GetRandomStartingTimeSec(this._random),
+          0
+        );
+      }
+    }
+
+    // random teams allocation
     int teamsOnDepotCount = Math.Min(Constraints.MaxMedicTeamsOnDepotCount, Constraints.AvailableMedicTeamsCount / World.Depots.Length);
     int runningAvailableMedicTeamsCount = Constraints.AvailableMedicTeamsCount;
 
     for (int i = 0; i < World.Depots.Length; ++i)
     {
-      if (runningAvailableMedicTeamsCount - teamsOnDepotCount < 0)
+      for (int j = 0; j < teamsOnDepotCount && runningAvailableMedicTeamsCount > 0; ++j)
       {
-        startWeights.MedicTeamAllocations[i] = runningAvailableMedicTeamsCount;
-        break;
-      }
+        StartWeights.MedicTeamAllocations[i, j] = Interval.GetByStartAndDuration
+        (
+          ShiftTimes.GetRandomStartingTimeSec(this._random),
+          ShiftTimes.GetRandomDurationTimeSec(this._random)
+        );
 
-      startWeights.MedicTeamAllocations[i] = teamsOnDepotCount;
-      runningAvailableMedicTeamsCount -= teamsOnDepotCount;
+        --runningAvailableMedicTeamsCount;
+        ++StartWeights.MedicTeamsPerDepotCount[i];
+      }
     }
-    startWeights.AllocatedTeamsCount = startWeights.MedicTeamAllocations.Sum();
+    StartWeights.AllocatedMedicTeamsCount = Constraints.AvailableMedicTeamsCount - runningAvailableMedicTeamsCount;
     //
 
     // amb allocations
@@ -80,28 +96,15 @@ public abstract class Optimizer : IOptimizer
     {
       if (runningAvailableAmbulancesCount - ambulancesOnDepotCount < 0)
       {
-        startWeights.AmbulancesAllocations[i] = runningAvailableAmbulancesCount;
+        StartWeights.AmbulancesPerDepotCount[i] = runningAvailableAmbulancesCount;
         break;
       }
 
-      startWeights.AmbulancesAllocations[i] = ambulancesOnDepotCount;
+      StartWeights.AmbulancesPerDepotCount[i] = ambulancesOnDepotCount;
       runningAvailableAmbulancesCount -= ambulancesOnDepotCount;
     }
-    startWeights.AllocatedAmbulancesCount = startWeights.AmbulancesAllocations.Sum();
+    StartWeights.AllocatedAmbulancesCount = StartWeights.AmbulancesPerDepotCount.Sum();
     //
-
-    // shift assigment to allocated teams
-    for (int i = 0; i < startWeights.AllocatedTeamsCount; ++i)
-    {
-      startWeights.MedicTeamShifts[i] = Interval.GetByStartAndDuration
-      (
-        ShiftTimes.GetRandomStartingTimeSec(this._random),
-        ShiftTimes.GetRandomDurationTimeSec(this._random)
-      );
-    }
-    //
-
-    return startWeights;
   }
 }
 

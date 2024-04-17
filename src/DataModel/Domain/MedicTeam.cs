@@ -14,7 +14,7 @@ public class MedicTeam
   public Interval Shift { get; set; } = Interval.GetByStartAndDuration(0, 0);
   public Depot Depot { get; set; }
 
-  public int TimeActive { get; private set; }
+  public int TimeActive { get; set; }
 
   /// <summary>
   /// Use only for debugging purposes.

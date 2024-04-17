@@ -20,7 +20,8 @@ public class Input1 : IInputParametrization
       AvailableMedicTeamsCount = avaialbeMedicTeamsCount,
       AvailableAmbulancesCount = availableAmbulancesCount,
       MaxMedicTeamsOnDepotCount = 15,
-      MaxAmbulancesOnDepotCount = 30
+      MaxAmbulancesOnDepotCount = 30,
+      MinAmbulancesOnDepotCount = 1
     };
   }
 
@@ -35,7 +36,7 @@ public class Input1 : IInputParametrization
       hospitalsCount: 20,
       availableMedicTeamsCount: avaialbeMedicTeamsCount,
       availableAmbulancesCount: availableAmbulancesCount,
-      goldenTimeSec: 15.ToMinutes().ToSeconds().Value,
+      goldenTimeSec: 1500.ToMinutes().ToSeconds().Value,
       random: _random
     ));
 
@@ -48,7 +49,7 @@ public class Input1 : IInputParametrization
     IncidentMapper incidentMapper = new();
     ImmutableArray<Incident> incidents = _dataGenerator.GenerateIncidentModels(
       worldSize: new CoordinateModel { XMet = 50_000, YMet = 50_000 },
-      incidentsCount: 150,
+      incidentsCount: 300,
       duration: 21.ToHours().ToSeconds(),
       onSceneDurationNormalExpected: 20.ToMinutes().ToSeconds(),
       onSceneDurationNormalStddev: 10.ToMinutes().ToSeconds(),

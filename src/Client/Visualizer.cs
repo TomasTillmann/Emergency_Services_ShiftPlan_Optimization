@@ -21,13 +21,15 @@ public class Visualizer : IDisposable
     _writer.Dispose();
   }
 
-  public void WriteGraph(ImmutableArray<MedicTeam> medicTeams, ImmutableArray<Incident> incidents, TextWriter writer = null)
+  public void WriteGraph(EmergencyServicePlan plan, ImmutableArray<Incident> incidents, TextWriter writer = null)
   {
     writer ??= _writer;
 
     int index = 0;
-    foreach (var medicTeam in medicTeams)
+    for (int i = 0; i < plan.AllocatedMedicTeamsCount; ++i)
     {
+      MedicTeam medicTeam = plan.AvailableMedicTeams[i];
+
       writer.Write($"{index++}: ");
       Seconds end = 24.ToHours().ToMinutes().ToSeconds();
 
@@ -80,7 +82,7 @@ public class Visualizer : IDisposable
   public void WriteWeights(Weights weights)
   {
     int index = 1;
-    foreach (var weight in weights.MedicTeamShifts)
+    foreach (var weight in weights.MedicTeamAllocations)
     {
       _writer.Write($"{index++}: ");
 
@@ -106,7 +108,7 @@ public class Visualizer : IDisposable
   {
     writer ??= _writer;
 
-    optimizer.Loss.Map(weights);
+    weights.MapTo(optimizer.Loss.Simulation.EmergencyServicePlan);
     optimizer.Loss.Simulation.Run(incidents);
 
     // foreach (var bbbb in optimizer.Loss.Simulation.EmergencyServicePlan.MedicTeams.Select(team => team.GetPlannableIncidents()))
@@ -115,7 +117,7 @@ public class Visualizer : IDisposable
     //   Console.WriteLine();
     // }
 
-    WriteGraph(optimizer.Loss.Simulation.EmergencyServicePlan.MedicTeams, incidents, writer);
+    WriteGraph(optimizer.Loss.Simulation.EmergencyServicePlan, incidents, writer);
     writer.WriteLine();
     writer.WriteLine("Unhandled:");
     writer.WriteLine(string.Join("\n", optimizer.Loss.Simulation.UnhandledIncidents));

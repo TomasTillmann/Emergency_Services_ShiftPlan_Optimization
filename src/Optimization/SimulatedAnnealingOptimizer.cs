@@ -106,10 +106,10 @@ public class SimulatedAnnealingOptimizer : LocalSearchOptimizer, IStepOptimizer
   {
     Debug.WriteLine($"global loss: {_globalBestLoss}");
 
-    int neighboursCount = GetMovesToNeighbours(_weights);
+    GetMovesToNeighbours(_weights);
 
     // Select uniformly randomly one neighbour.
-    _currentMove = movesBuffer[_random.Next(0, neighboursCount)];
+    _currentMove = movesBuffer[_random.Next(0, movesBuffer.Count)];
 
     // Move to the neighbour.
     ModifyMakeMove(_weights, _currentMove);

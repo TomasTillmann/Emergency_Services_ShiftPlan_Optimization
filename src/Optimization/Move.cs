@@ -2,13 +2,14 @@
 
 public readonly struct Move
 {
-  public int WeightIndex { get; init; }
+  public int DepotIndex { get; init; }
+  public int MedicTeamOnDepotIndex { get; init; }
   public MoveType MoveType { get; init; }
 
-  public static Move Identity = new Move { WeightIndex = 0 /* The specific index doesn't matter. */ , MoveType = MoveType.NoMove };
+  public static Move Identity = new Move { MedicTeamOnDepotIndex = -1 /* The specific index doesn't matter. */ , MoveType = MoveType.NoMove };
 
   public override string ToString()
   {
-    return $"({MoveType}, {WeightIndex})";
+    return $"({MoveType}, {DepotIndex}, {MedicTeamOnDepotIndex})";
   }
 }

@@ -3,26 +3,24 @@
 \section{Popis problému}
 
 Pohotovostní služba vlastní pohotovostní vozidla, rozmístěná na výjezdových stanicích umístěných na území, které pohotovostní služba pokrývá.
-Na každé výjezdové stanici působí několik týmu záchranářu. Ti jsou v případě pohotovosti připraveni obsloužit vozidlo na výjezdové stanici a vyjet na místo incidentu.
-Plán pohotovostní služby je alokace záchranářů na konkrétní výjezdové služby v konkrétním časovém úseku v rámci jednoho dne.
+Na každé výjezdové stanici působí několik záchranářu. Ti jsou v případě pohotovosti připraveni obsloužit vozidlo na výjezdové stanici a vyjet na místo incidentu.
 Na výjezd je potřeba více záchranářu. Vždy je nutný řidič a kvalifikovaný lekář. Často je však i potřeba pomocné záchranáře.
 Toto seskupení považujeme za tým záchranářů.
 Tým záchranářů společně se záchraným vozidlem považujeme za záchranou jednotku.
+Plán pohotovostní služby je alokace záchranných vozidel a týmů záchranářů na konkrétní výjezdové stanice a přiřazení pracovní služby každému týmu záchranářů v rámci jednoho dne.
 \\\\
-Pohotovostní plány mají různou kvalitu. Kvalita plánu se odvíjí od počtu incidentů, které byli úspěšně odbaveny a od efektivity využití záchranářů.
+Pohotovostní plány mají různou kvalitu. Kvalita plánu se odvíjí od počtu incidentů, které byli úspěšně odbaveny a od efektivity využití záchranářů a záchranných vozidel.
 Incident je úspěšně odbaven, pokud v čase incidentu je k dispozici záchranná jednotka potřebná pro odbavení incidentu a zároveň jednotka dorazila včas na místo incidentu.
-Incidenty máme různých typů, podle hlediska kritičnosti a podle potřeby výbavy a kvalifikace, kterou musí záchranná jednotka mít. 
-Kritičtější incidenty definují kratší dobu, ve které musí záchranná jednotka dorazit na místo incidentu.
-Stejně tak jsou incidenty, kde je na místě potřeba speciální výbava nebo kvalifikovanější tým záchranářu.
 Pokud v čase incidentu neexistuje záchranná jednotka splňující tyto podmínky, tak incident považujeme za neúspěšně odbaven.
-Efektivní využití záchranářu znamená, že záchranáři nejsou ani maximálně vytížení a ani nemají čas na odpočinek.
+Efektivní využití záchranářu znamená, že záchranáři nejsou ani maximálně vytížení, ale ani nemají čas na odpočinek.
 Maximální vytížení by mohlo vést k hůře odvedené práci a dlouhodobě až k jejich vyhoření.
 Zároveň ale není žádoucí, aby záchranaři byli připraveni na výjezdové stanici a za celou dobu směny neměli ani jeden, nebo jen minimální počet výjezdů.
+Efektivní využití záchranných vozidel znamená, že vozidla nejsou zbytečně přepravována a udržována na výjezdových stanicích.
 Taková situace vede k zbytečnému proplácení mezd záchranářu a údržby záchranných vozidel a pohotovostní službu tak stojí čas a peníze, které by mohla vynaložit efektivnějším způsobem.
 V ideálním případě bychom chtěli, ať je efektivita záchranářu využita rovnoměrně napříč přes všechny výjezdové stanice, i když samozřejmě na některých oblastech dochází
 k incidentům častěji a tedy nutně některé výjezdové stanice budou více vyčerpané než ostatní.
 \\\\
-Kvalita pohotovostního plánu se tedy odvíjí od počtu úspěšně odbavených incidentů a efektivity naplánování záchranářů.
+Kvalita pohotovostního plánu se tedy odvíjí od počtu úspěšně odbavených incidentů, efektivity naplánování záchranářů a záchranných vozidel.
 Přirozeně vyvstává otázka, jakým způsobem najít ten nejkvalitnější plán, za účelem dosáhnutí co největší úspěšnosti za co nejméně zbytečně vynaložených zdrojů? 
 Pro odpověď je první nutno problém formalizovat.
 
@@ -30,7 +28,7 @@ Pro odpověď je první nutno problém formalizovat.
 
 \section{Formalizace problému}
 
-Mějme množinu všech možných plánů pohotovostních služeb $P$. Definujme funkci určující kvalitu plánu $q\colon P \rightarrow \mathbb{R}$.
+Mějme množinu všech možných plánů pohotovostních služeb $P$. Definujme ohodnocovací funkci určující kvalitu plánu $q\colon P \rightarrow \mathbb{R}$.
 Chceme najít takové $p* \in P$, pro které platí:
 
 $$
@@ -40,26 +38,40 @@ $$
 \\
 \\
 Jedná se tedy o maximalizační úlohu. Chceme najít pro jaký plán $p$ nabývá funkce $q$ globální maximum. Tak zjistíme plán s nejvyšší kvalitou.
-Rozmysleme si, jak nadefinujeme plán. Plán je alokace týmů záchranářu na jednotlivé výjezdové stanice v určitý čas v rámci jednoho dne.
-Můžeme na to nahlížet jako na přiřazení časových intervalů, směn, na výjezdové stanice, kde by každý interval odpovídal jednomu týmu záchranářů.
+Rozmysleme si, jak nadefinujeme plán. Plán je alokace týmů záchranářu a záchranných vozidel na jednotlivé výjezdové stanice, kde týmy záchranářů jsou k dispozici v určitý čas v rámci jednoho dne.
+Můžeme na to nahlížet jako na přiřazení časových intervalů, směn, na výjezdové stanice, kde by každý interval odpovídal jednomu týmu záchranářů a na přiřazení záchranných vozidel,
+které budou na výjezdových stanicích pro záchranáře k dispozici.
 Nechť $S$ je množina výjezdových stanic, $I \subseteq (\mathbb{R^+}, \mathbb{R^+})$ množina všech časových intervalů a $I_C \subset I$ množina možných časových intervalů.
 Například, $(8, 17) \in I_C$, značí směnu od 8 hodin do 17 hodin.
-Dále nechť $T$ množina týmu, které nám jsou k dispozici. Definujme
+Dále nechť $T$ množina týmu, které nám jsou k dispozici a $A$ množina záchranných vozidel, které nám jsou k dispozici. Definujme
 
-$$
-p_I \colon T \rightarrow I_C
-$$
-
-a
-
-$$
-p_S \colon T \rightarrow S
-$$
+\begin{align}
+p_I \colon T &\rightarrow I_C \\
+p_S \colon T &\rightarrow S \\
+p_A \colon A &\rightarrow S 
+\end{align}
 .
 \\
 \\
-Plán pohotovostní služby pak je dvojice $p = (p_I, p_S)$.
-Všimněme si, že s takovou definicí můžeme na optimalizační problém nahlížet jako na dvě podoptimalizační úlohy.
-První, optimálně namapovat týmy záchranářu na výjezdové stanice a druhý, optimálně každému týmu přiřadit směnu.
-Může se stát, že některé týmu nebudeme chtít vůbec naalokovat, například z důvodu zvýšení efektivity plánu, pak je odebereme z $T$.
+Plán pohotovostní služby pak je trojice
+
+\begin{align}
+p = (p_I, p_S, p_A)
+\end{align}
+.
+\\
+\\
+Všimněme si, že s takovou definicí můžeme na optimalizační problém nahlížet jako na tři podoptimalizační úlohy.
+První, optimálně namapovat týmy záchranářu na výjezdové stanice, druhý, optimálně každému týmu přiřadit směnu a třetí, optimálně alokovat záchranná vozidla na jednotlivé výjezdové stanice.
+Může se stát, že některé týmy nebudeme chtít vůbec naalokovat, například z důvodu zvýšení efektivity plánu, pak je odebereme z $T$. To stejné platí pro záchranná vozidla, odebereme z $A$.
+
+\clearpage
+
+\section{Simulace}
+
+Momentálně máme popsanou optimalizační úlohu, kterou řešíme. Ještě nám ale chybí jedna velmi podstatná část.
+Tou je konkrétní způsob, definice ohodnocovací funkce $q$, kterým zjistíme kvalitu libovolného plánu pohotovostní služby.
+Jak již bylo zmíněno, ta by se měla co nejvíce odrážet z úspěšnosti odbavených incidentů a efektivity alokace týmů záchranářů a záchranných vozidel.
+To je pro 
+
 

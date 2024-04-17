@@ -23,6 +23,12 @@ public class MedicTeamsEvaluator
 
   public bool IsHandling(MedicTeam medicTeam, PlannableIncident plannableIncident)
   {
+    // Not allocated.
+    if (medicTeam.Shift.DurationSec == 0)
+    {
+      return false;
+    }
+
     // 1
     if (plannableIncident.ToIncidentDrive.StartSec + plannableIncident.ToIncidentDrive.DurationSec
         > plannableIncident.Incident.OccurenceSec + _goldenTimeSec)

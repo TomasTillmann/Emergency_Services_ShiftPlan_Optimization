@@ -6,20 +6,23 @@ namespace Optimizing;
 public abstract class LocalSearchOptimizer : Optimizer
 {
   public int ShiftChangesLimit { get; set; }
-  public int AllocationsLimit { get; set; }
+  public int AmbulancesAllocationsLimit { get; set; }
 
-  protected readonly Move[] movesBuffer;
+  protected readonly List<Move> movesBuffer = new();
 
-  public LocalSearchOptimizer(World world, Constraints constraints, ShiftTimes shiftPlans, ILoss loss, int shiftChangesLimit = int.MaxValue, int allocationsLimit = int.MaxValue, Random? random = null)
-  : base(world, constraints, shiftPlans, loss, random)
+  private int _k1;
+  private int _k2;
+
+  public LocalSearchOptimizer(World world, Constraints constraints, ShiftTimes shiftTimes, ILoss loss, int shiftChangesLimit = int.MaxValue, int allocationsLimit = int.MaxValue, Random? random = null)
+  : base(world, constraints, shiftTimes, loss, random)
   {
     ShiftChangesLimit = shiftChangesLimit;
-    AllocationsLimit = allocationsLimit;
+    AmbulancesAllocationsLimit = allocationsLimit;
 
-    // All possible combinations of shift durations + allocation of ambulances to depots, meaning increase count or decrease count move, and
-    // the same for allocation of medic teams. Hence 2 * 2 * depots count. 
-    int maxMovesCount = shiftPlans.AllowedShiftDurationsSec.Count * shiftPlans.AllowedShiftStartingTimesSec.Count * World.AvailableMedicTeams.Length + 4 * World.Depots.Length;
-    movesBuffer = new Move[maxMovesCount];
+    _k1 = Math.Min(ShiftChangesLimit, Constraints.MaxMedicTeamsOnDepotCount) / Constraints.MaxMedicTeamsOnDepotCount;
+    _k2 = Math.Min(AmbulancesAllocationsLimit, Constraints.MaxAmbulancesOnDepotCount) / Constraints.MaxAmbulancesOnDepotCount;
+    Console.WriteLine("k1: " + _k1);
+    Console.WriteLine("k2: " + _k1);
   }
 
   /// <summary>
@@ -27,50 +30,68 @@ public abstract class LocalSearchOptimizer : Optimizer
   /// </summary>
   public void ModifyMakeMove(Weights weights, Move move)
   {
-    Interval weight = weights.MedicTeamShifts[move.WeightIndex];
-
+    Interval medicTeamShift;
     int durationSec;
     int startingTimeSec;
+    //Console.WriteLine($"ModifyMakeMove: {move}");
 
     switch (move.MoveType)
     {
       case MoveType.ShiftShorter:
-        durationSec = GetShorter(weight.DurationSec);
-        weights.MedicTeamShifts[move.WeightIndex] = Interval.GetByStartAndDuration(weight.StartSec, durationSec);
+        medicTeamShift = weights.MedicTeamAllocations[move.DepotIndex, move.MedicTeamOnDepotIndex];
+        durationSec = medicTeamShift.DurationSec;
+        startingTimeSec = medicTeamShift.StartSec;
+        durationSec = GetShorter(medicTeamShift.DurationSec);
+        weights.MedicTeamAllocations[move.DepotIndex, move.MedicTeamOnDepotIndex] = Interval.GetByStartAndDuration(startingTimeSec, durationSec);
         break;
 
       case MoveType.ShiftLonger:
-        durationSec = GetLonger(weight.DurationSec);
-        weights.MedicTeamShifts[move.WeightIndex] = Interval.GetByStartAndDuration(weight.StartSec, durationSec);
+        medicTeamShift = weights.MedicTeamAllocations[move.DepotIndex, move.MedicTeamOnDepotIndex];
+        durationSec = medicTeamShift.DurationSec;
+        startingTimeSec = medicTeamShift.StartSec;
+        durationSec = GetLonger(medicTeamShift.DurationSec);
+        weights.MedicTeamAllocations[move.DepotIndex, move.MedicTeamOnDepotIndex] = Interval.GetByStartAndDuration(startingTimeSec, durationSec);
         break;
 
       case MoveType.ShiftLater:
-        startingTimeSec = GetLater(weight.StartSec);
-        weights.MedicTeamShifts[move.WeightIndex] = Interval.GetByStartAndDuration(startingTimeSec, weight.DurationSec);
+        medicTeamShift = weights.MedicTeamAllocations[move.DepotIndex, move.MedicTeamOnDepotIndex];
+        durationSec = medicTeamShift.DurationSec;
+        startingTimeSec = medicTeamShift.StartSec;
+        startingTimeSec = GetLater(medicTeamShift.StartSec);
+        weights.MedicTeamAllocations[move.DepotIndex, move.MedicTeamOnDepotIndex] = Interval.GetByStartAndDuration(startingTimeSec, durationSec);
         break;
 
       case MoveType.ShiftEarlier:
-        startingTimeSec = GetEarlier(weight.StartSec);
-        weights.MedicTeamShifts[move.WeightIndex] = Interval.GetByStartAndDuration(startingTimeSec, weight.DurationSec);
+        medicTeamShift = weights.MedicTeamAllocations[move.DepotIndex, move.MedicTeamOnDepotIndex];
+        durationSec = medicTeamShift.DurationSec;
+        startingTimeSec = medicTeamShift.StartSec;
+        startingTimeSec = GetEarlier(medicTeamShift.StartSec);
+        weights.MedicTeamAllocations[move.DepotIndex, move.MedicTeamOnDepotIndex] = Interval.GetByStartAndDuration(startingTimeSec, durationSec);
         break;
 
       case MoveType.AllocateMedicTeam:
-        weights.MedicTeamAllocations[move.WeightIndex]++;
-        weights.AllocatedTeamsCount++;
+        medicTeamShift = weights.MedicTeamAllocations[move.DepotIndex, move.MedicTeamOnDepotIndex];
+        startingTimeSec = medicTeamShift.StartSec;
+        weights.MedicTeamAllocations[move.DepotIndex, move.MedicTeamOnDepotIndex] = Interval.GetByStartAndDuration(startingTimeSec, ShiftTimes.MinDurationSec);
+        weights.MedicTeamsPerDepotCount[move.DepotIndex]++;
+        weights.AllocatedMedicTeamsCount++;
         break;
 
       case MoveType.DeallocateMedicTeam:
-        weights.MedicTeamAllocations[move.WeightIndex]--;
-        weights.AllocatedTeamsCount--;
+        medicTeamShift = weights.MedicTeamAllocations[move.DepotIndex, move.MedicTeamOnDepotIndex];
+        startingTimeSec = medicTeamShift.StartSec;
+        weights.MedicTeamAllocations[move.DepotIndex, move.MedicTeamOnDepotIndex] = Interval.GetByStartAndDuration(startingTimeSec, 0);
+        weights.MedicTeamsPerDepotCount[move.DepotIndex]--;
+        weights.AllocatedMedicTeamsCount--;
         break;
 
       case MoveType.AllocateAmbulance:
-        weights.AmbulancesAllocations[move.WeightIndex]++;
+        weights.AmbulancesPerDepotCount[move.DepotIndex]++;
         weights.AllocatedAmbulancesCount++;
         break;
 
       case MoveType.DeallocateAmbulance:
-        weights.AmbulancesAllocations[move.WeightIndex]--;
+        weights.AmbulancesPerDepotCount[move.DepotIndex]--;
         weights.AllocatedAmbulancesCount--;
         break;
 
@@ -93,7 +114,8 @@ public abstract class LocalSearchOptimizer : Optimizer
       weights,
       new Move
       {
-        WeightIndex = move.WeightIndex,
+        MedicTeamOnDepotIndex = move.MedicTeamOnDepotIndex,
+        DepotIndex = move.DepotIndex,
         MoveType = inverseMoveType
       }
     );
@@ -139,102 +161,106 @@ public abstract class LocalSearchOptimizer : Optimizer
   /// Generates neighbouring moves in <see cref="ShiftChangesLimit"/> limit in randomly permutated order.
   /// Returns length of generated moves in <see cref="movesBuffer"/>.
   /// </summary>
-  public int GetMovesToNeighbours(Weights weights)
+  public void GetMovesToNeighbours(Weights weights)
   {
-    Span<int> permutatedShifts = stackalloc int[weights.MedicTeamShifts.Length];
-    for (int i = 0; i < permutatedShifts.Length; ++i)
-    {
-      permutatedShifts[i] = i;
-    }
-    Permutate(toPermutate: ref permutatedShifts, ShiftChangesLimit);
-    //Console.WriteLine(string.Join(",", permutatedShifts.ToArray()));
-
-    int bufferIndex = 0;
-
-    int shiftChangesNeighboursCount = 0;
-    for (int weightIndex = 0; shiftChangesNeighboursCount < ShiftChangesLimit && weightIndex < permutatedShifts.Length; ++weightIndex)
-    {
-      Move? move;
-      if (TryGenerateMove(weights, permutatedShifts[weightIndex], MoveType.ShiftShorter, out move))
-      {
-        movesBuffer[bufferIndex++] = move.Value;
-        shiftChangesNeighboursCount++;
-      }
-
-      if (TryGenerateMove(weights, permutatedShifts[weightIndex], MoveType.ShiftLonger, out move))
-      {
-        movesBuffer[bufferIndex++] = move.Value;
-        shiftChangesNeighboursCount++;
-      }
-
-      if (TryGenerateMove(weights, permutatedShifts[weightIndex], MoveType.ShiftLater, out move))
-      {
-        movesBuffer[bufferIndex++] = move.Value;
-        shiftChangesNeighboursCount++;
-      }
-
-      if (TryGenerateMove(weights, permutatedShifts[weightIndex], MoveType.ShiftEarlier, out move))
-      {
-        movesBuffer[bufferIndex++] = move.Value;
-        shiftChangesNeighboursCount++;
-      }
-    }
-
     Span<int> permutatedDepots = stackalloc int[World.Depots.Length];
+    Span<int> permutatedShiftsOnDepot = stackalloc int[Constraints.MaxMedicTeamsOnDepotCount];
+
     for (int i = 0; i < permutatedDepots.Length; ++i)
     {
       permutatedDepots[i] = i;
     }
-    Permutate(toPermutate: ref permutatedDepots, AllocationsLimit);
-    //Console.WriteLine(string.Join(",", permutatedDepots.ToArray()));
+    Permutate(toPermutate: ref permutatedDepots);
 
-    int allocationNeighboursCount = 0;
-    for (int weightIndex = 0; allocationNeighboursCount < AllocationsLimit && weightIndex < World.Depots.Length; ++weightIndex)
+    for (int i = 0; i < permutatedShiftsOnDepot.Length; ++i)
     {
-      Move? move;
-      if (TryGenerateMove(weights, permutatedDepots[weightIndex], MoveType.AllocateMedicTeam, out move))
+      permutatedShiftsOnDepot[i] = i;
+    }
+    Permutate(toPermutate: ref permutatedShiftsOnDepot);
+
+    movesBuffer.Clear();
+    int shiftChangesNeighboursCount = 0;
+    int allocationNeighboursCount = 0;
+    Move? move;
+
+    for (int depotIndex = 0; depotIndex < World.Depots.Length; ++depotIndex)
+    {
+      for (int shiftOnDepotIndex = 0; shiftOnDepotIndex < _k1 * Constraints.MaxMedicTeamsOnDepotCount && shiftChangesNeighboursCount < ShiftChangesLimit; ++shiftOnDepotIndex)
       {
-        movesBuffer[bufferIndex++] = move.Value;
+        if (TryGenerateMove(weights, permutatedDepots[depotIndex], permutatedShiftsOnDepot[shiftOnDepotIndex], MoveType.ShiftShorter, out move))
+        {
+          movesBuffer.Add(move.Value);
+          shiftChangesNeighboursCount++;
+        }
+
+        if (TryGenerateMove(weights, permutatedDepots[depotIndex], permutatedShiftsOnDepot[shiftOnDepotIndex], MoveType.ShiftLonger, out move))
+        {
+          movesBuffer.Add(move.Value);
+          shiftChangesNeighboursCount++;
+        }
+
+        if (TryGenerateMove(weights, permutatedDepots[depotIndex], permutatedShiftsOnDepot[shiftOnDepotIndex], MoveType.ShiftEarlier, out move))
+        {
+          movesBuffer.Add(move.Value);
+          shiftChangesNeighboursCount++;
+        }
+
+        if (TryGenerateMove(weights, permutatedDepots[depotIndex], permutatedShiftsOnDepot[shiftOnDepotIndex], MoveType.ShiftLater, out move))
+        {
+          movesBuffer.Add(move.Value);
+          shiftChangesNeighboursCount++;
+        }
+
+        if (TryGenerateMove(weights, permutatedDepots[depotIndex], permutatedShiftsOnDepot[shiftOnDepotIndex], MoveType.AllocateMedicTeam, out move))
+        {
+          movesBuffer.Add(move.Value);
+          shiftChangesNeighboursCount++;
+        }
+
+        if (TryGenerateMove(weights, permutatedDepots[depotIndex], permutatedShiftsOnDepot[shiftOnDepotIndex], MoveType.DeallocateMedicTeam, out move))
+        {
+          movesBuffer.Add(move.Value);
+          shiftChangesNeighboursCount++;
+        }
+      }
+
+      if (TryGenerateMove(weights, permutatedDepots[depotIndex], -1, MoveType.AllocateAmbulance, out move))
+      {
+        movesBuffer.Add(move.Value);
         allocationNeighboursCount++;
       }
 
-      if (TryGenerateMove(weights, permutatedDepots[weightIndex], MoveType.DeallocateMedicTeam, out move))
+      if (TryGenerateMove(weights, permutatedDepots[depotIndex], -1, MoveType.DeallocateAmbulance, out move))
       {
-        movesBuffer[bufferIndex++] = move.Value;
-        allocationNeighboursCount++;
-      }
-
-      if (TryGenerateMove(weights, permutatedDepots[weightIndex], MoveType.AllocateAmbulance, out move))
-      {
-        movesBuffer[bufferIndex++] = move.Value;
-        allocationNeighboursCount++;
-      }
-
-      if (TryGenerateMove(weights, permutatedDepots[weightIndex], MoveType.DeallocateAmbulance, out move))
-      {
-        movesBuffer[bufferIndex++] = move.Value;
+        movesBuffer.Add(move.Value);
         allocationNeighboursCount++;
       }
     }
 
-    return bufferIndex;
+    Debug.WriteLine("moves: " + string.Join(", ", movesBuffer));
+    Console.WriteLine($"Neighbours: {movesBuffer.Count}");
   }
 
   /// <summary>
   /// Tries to generate <see cref="Move"/> of type <paramref name="move"/> on <paramref name="weights"/> on <see cref="Interval"/> on <paramref name="weightIndex"/>.
   /// </summary>
-  public bool TryGenerateMove(Weights weights, int weightIndex, MoveType type, [NotNullWhen(true)] out Move? move)
+  public bool TryGenerateMove(Weights weights, int depotIndex, int medicTeamOnDepotIndex, MoveType type, [NotNullWhen(true)] out Move? move)
   {
-    move = null;
+    int durationSec;
+    int startSec;
+    move = default(Move);
+
     switch (type)
     {
       case MoveType.ShiftShorter:
-        int durationSec = weights.MedicTeamShifts[weightIndex].DurationSec;
-        if (durationSec != ShiftTimes.MinDurationSec)
+        durationSec = weights.MedicTeamAllocations[depotIndex, medicTeamOnDepotIndex].DurationSec;
+        startSec = weights.MedicTeamAllocations[depotIndex, medicTeamOnDepotIndex].StartSec;
+        if (durationSec != ShiftTimes.MinDurationSec && durationSec != 0)
         {
           move = new Move
           {
-            WeightIndex = weightIndex,
+            DepotIndex = depotIndex,
+            MedicTeamOnDepotIndex = medicTeamOnDepotIndex,
             MoveType = MoveType.ShiftShorter
           };
 
@@ -244,11 +270,14 @@ public abstract class LocalSearchOptimizer : Optimizer
         return false;
 
       case MoveType.ShiftLonger:
-        if (weights.MedicTeamShifts[weightIndex].DurationSec != ShiftTimes.MaxDurationSec)
+        durationSec = weights.MedicTeamAllocations[depotIndex, medicTeamOnDepotIndex].DurationSec;
+        startSec = weights.MedicTeamAllocations[depotIndex, medicTeamOnDepotIndex].StartSec;
+        if (durationSec != ShiftTimes.MaxDurationSec && durationSec != 0)
         {
           move = new Move
           {
-            WeightIndex = weightIndex,
+            DepotIndex = depotIndex,
+            MedicTeamOnDepotIndex = medicTeamOnDepotIndex,
             MoveType = MoveType.ShiftLonger
           };
           return true;
@@ -257,11 +286,14 @@ public abstract class LocalSearchOptimizer : Optimizer
         return false;
 
       case MoveType.ShiftEarlier:
-        if (weights.MedicTeamShifts[weightIndex].StartSec != ShiftTimes.EarliestStartingTimeSec)
+        durationSec = weights.MedicTeamAllocations[depotIndex, medicTeamOnDepotIndex].DurationSec;
+        startSec = weights.MedicTeamAllocations[depotIndex, medicTeamOnDepotIndex].StartSec;
+        if (startSec != ShiftTimes.EarliestStartingTimeSec)
         {
           move = new Move
           {
-            WeightIndex = weightIndex,
+            DepotIndex = depotIndex,
+            MedicTeamOnDepotIndex = medicTeamOnDepotIndex,
             MoveType = MoveType.ShiftEarlier
           };
           return true;
@@ -270,11 +302,14 @@ public abstract class LocalSearchOptimizer : Optimizer
         return false;
 
       case MoveType.ShiftLater:
-        if (weights.MedicTeamShifts[weightIndex].StartSec != ShiftTimes.LatestStartingTimeSec)
+        durationSec = weights.MedicTeamAllocations[depotIndex, medicTeamOnDepotIndex].DurationSec;
+        startSec = weights.MedicTeamAllocations[depotIndex, medicTeamOnDepotIndex].StartSec;
+        if (startSec != ShiftTimes.LatestStartingTimeSec)
         {
           move = new Move
           {
-            WeightIndex = weightIndex,
+            DepotIndex = depotIndex,
+            MedicTeamOnDepotIndex = medicTeamOnDepotIndex,
             MoveType = MoveType.ShiftLater
           };
           return true;
@@ -283,11 +318,14 @@ public abstract class LocalSearchOptimizer : Optimizer
         return false;
 
       case MoveType.AllocateMedicTeam:
-        if (weights.MedicTeamAllocations[weightIndex] < Constraints.MaxMedicTeamsOnDepotCount && weights.AllocatedTeamsCount < Constraints.AvailableMedicTeamsCount)
+        durationSec = weights.MedicTeamAllocations[depotIndex, medicTeamOnDepotIndex].DurationSec;
+        startSec = weights.MedicTeamAllocations[depotIndex, medicTeamOnDepotIndex].StartSec;
+        if (durationSec == 0 && weights.MedicTeamsPerDepotCount[depotIndex] < Constraints.MaxMedicTeamsOnDepotCount && weights.AllocatedMedicTeamsCount < Constraints.AvailableMedicTeamsCount)
         {
           move = new Move
           {
-            WeightIndex = weightIndex,
+            DepotIndex = depotIndex,
+            MedicTeamOnDepotIndex = medicTeamOnDepotIndex,
             MoveType = MoveType.AllocateMedicTeam
           };
           return true;
@@ -296,11 +334,14 @@ public abstract class LocalSearchOptimizer : Optimizer
         return false;
 
       case MoveType.DeallocateMedicTeam:
-        if (weights.MedicTeamAllocations[weightIndex] > 0)
+        durationSec = weights.MedicTeamAllocations[depotIndex, medicTeamOnDepotIndex].DurationSec;
+        startSec = weights.MedicTeamAllocations[depotIndex, medicTeamOnDepotIndex].StartSec;
+        if (durationSec == ShiftTimes.MinDurationSec && weights.MedicTeamsPerDepotCount[depotIndex] > 0)
         {
           move = new Move
           {
-            WeightIndex = weightIndex,
+            DepotIndex = depotIndex,
+            MedicTeamOnDepotIndex = medicTeamOnDepotIndex,
             MoveType = MoveType.DeallocateMedicTeam
           };
           return true;
@@ -309,11 +350,12 @@ public abstract class LocalSearchOptimizer : Optimizer
         return false;
 
       case MoveType.AllocateAmbulance:
-        if (weights.AmbulancesAllocations[weightIndex] < Constraints.MaxAmbulancesOnDepotCount && weights.AllocatedAmbulancesCount < Constraints.AvailableAmbulancesCount)
+        if (weights.AmbulancesPerDepotCount[depotIndex] < Constraints.MaxAmbulancesOnDepotCount && weights.AllocatedAmbulancesCount < Constraints.AvailableAmbulancesCount)
         {
           move = new Move
           {
-            WeightIndex = weightIndex,
+            DepotIndex = depotIndex,
+            MedicTeamOnDepotIndex = -1,
             MoveType = MoveType.AllocateAmbulance
           };
           return true;
@@ -322,11 +364,12 @@ public abstract class LocalSearchOptimizer : Optimizer
         return false;
 
       case MoveType.DeallocateAmbulance:
-        if (weights.AmbulancesAllocations[weightIndex] > 0)
+        if (weights.AmbulancesPerDepotCount[depotIndex] > Constraints.MinAmbulancesOnDepotCount)
         {
           move = new Move
           {
-            WeightIndex = weightIndex,
+            DepotIndex = depotIndex,
+            MedicTeamOnDepotIndex = -1,
             MoveType = MoveType.DeallocateAmbulance
           };
           return true;
@@ -337,7 +380,8 @@ public abstract class LocalSearchOptimizer : Optimizer
       case MoveType.NoMove:
         move = new Move
         {
-          WeightIndex = weightIndex,
+          DepotIndex = -1,
+          MedicTeamOnDepotIndex = -1,
           MoveType = MoveType.NoMove
         };
 
@@ -375,11 +419,9 @@ public abstract class LocalSearchOptimizer : Optimizer
   /// <summary>
   /// Fisher-Yates permutation algorithm with limit when to end the permutation
   /// </summary>
-  private void Permutate(ref Span<int> toPermutate, int limit)
+  private void Permutate(ref Span<int> toPermutate)
   {
-    limit = Math.Min(toPermutate.Length, limit);
-
-    for (int i = 0; i < limit; ++i)
+    for (int i = 0; i < toPermutate.Length; ++i)
     {
       int nextSwap = _random.Next(i, toPermutate.Length);
 

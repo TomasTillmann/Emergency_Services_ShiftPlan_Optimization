@@ -33,19 +33,21 @@ public class HillClimbOptimizer : LocalSearchOptimizer
 
     for (int step = 0; step < Steps; ++step)
     {
+      Console.WriteLine($"step: {step}");
       Debug.WriteLine($"globalBestLoss: {globalBestLoss}");
 
-      int neighboursCount = GetMovesToNeighbours(currentWeights);
+      GetMovesToNeighbours(currentWeights);
+
       Move currentBestMove = Move.Identity;
 
-      for (int i = 0; i < neighboursCount; ++i)
+      for (int i = 0; i < movesBuffer.Count; ++i)
       {
         Move move = movesBuffer[i];
 
         ModifyMakeMove(currentWeights, move);
 
         double neighbourLoss = Loss.Get(currentWeights, incidents);
-        Debug.WriteLine($"Neighbour loss: {neighbourLoss}");
+        //Debug.WriteLine($"Neighbour loss: {neighbourLoss}");
 
         if (neighbourLoss < currentBestLoss)
         {
