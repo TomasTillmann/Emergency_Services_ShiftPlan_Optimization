@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Immutable;
 
 namespace ESSP.DataModel;
@@ -25,5 +26,22 @@ public class EmergencyServicePlan
     }
 
     return sum;
+  }
+
+  public double GetExhaustionSum()
+  {
+    double exhaustionSum = 0;
+
+    for (int i = 0; i < AllocatedMedicTeamsCount; ++i)
+    {
+      exhaustionSum += AvailableMedicTeams[i].TimeActiveSec / AvailableMedicTeams[i].Shift.DurationSec;
+    }
+
+    return exhaustionSum;
+  }
+
+  public double GetCost()
+  {
+    return GetShiftDurationsSum() + AllocatedAmbulancesCount;
   }
 }

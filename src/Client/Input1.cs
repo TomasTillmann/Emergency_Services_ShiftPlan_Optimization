@@ -58,11 +58,6 @@ public class Input1 : IInputParametrization
       random: _random
     ).Select(inc => incidentMapper.MapBack(inc)).ToImmutableArray();
 
-
-    // TODO: Move success rate as knob to optimizing
-    var successRatedIncidents = new SuccessRatedIncidents { Value = incidents, SuccessRate = 1 };
-    //
-
     return incidents;
   }
 

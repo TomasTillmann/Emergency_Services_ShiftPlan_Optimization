@@ -14,7 +14,7 @@ public class MedicTeam
   public Interval Shift { get; set; } = Interval.GetByStartAndDuration(0, 0);
   public Depot Depot { get; set; }
 
-  public int TimeActive { get; set; }
+  public int TimeActiveSec { get; set; }
 
   /// <summary>
   /// Use only for debugging purposes.
@@ -35,7 +35,7 @@ public class MedicTeam
     _plannedIncidents.Add(plannableIncident);
     Depot.Ambulances[plannableIncident.AmbulanceIndex].WhenFreeSec = plannableIncident.ToDepotDrive.EndSec;
 
-    TimeActive += plannableIncident.IncidentHandling.DurationSec;
+    TimeActiveSec += plannableIncident.IncidentHandling.DurationSec;
   }
 
   public PlannableIncident GetCurrentlyHandlingIncident()

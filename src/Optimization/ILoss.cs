@@ -9,5 +9,5 @@ public interface ILoss
 
   double GetEmergencyServicePlanCost(Weights weights);
 
-  double Get(Weights weights, SuccessRatedIncidents incidents);
+  double Get(Weights weights, Incidents incidents);
 }

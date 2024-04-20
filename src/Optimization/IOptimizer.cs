@@ -27,11 +27,11 @@ public interface IOptimizer
 
   /// <summary>
   /// Tries to find the most optimal shift plans from starting <see cref="StartWeights"/>.
-  /// You can initialize <see cref="StartWeights"/> before calling <see cref="FindOptimal(ImmutableArray{SuccessRatedIncidents})"/>.
+  /// You can initialize <see cref="StartWeights"/> before calling <see cref="FindOptimal(ImmutableArray{Incidents})"/>.
   /// <see cref="StartWeights"/> are initialized in <see cref="Optimizer"/> constructor by <see cref="Optimizer.InitWeights"/>.
   /// Note, that more <see cref="EmergencyServicePlan"/> can have the same, most optimal loss, that's why enumeration is returned.
   /// The loss is calculated by provided <see cref="ILoss"/> implementation.
   /// </summary>
-  IEnumerable<Weights> FindOptimal(SuccessRatedIncidents incidents);
+  IEnumerable<Weights> FindOptimal(Incidents incidents);
 }
 

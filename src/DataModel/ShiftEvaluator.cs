@@ -68,9 +68,9 @@ public class MedicTeamsEvaluator
     }
 
     // 3
-    if (medicTeam1.TimeActive != medicTeam2.TimeActive)
+    if (medicTeam1.TimeActiveSec != medicTeam2.TimeActiveSec)
     {
-      return medicTeam1.TimeActive < medicTeam2.TimeActive ? medicTeam1 : medicTeam2;
+      return medicTeam1.TimeActiveSec < medicTeam2.TimeActiveSec ? medicTeam1 : medicTeam2;
     }
 
     return medicTeam1;

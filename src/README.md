@@ -82,4 +82,15 @@ Samotny swapping atd nestaci. Je treba intervaly jeste nejak zkracovat.
 ## Evolucni
 1. Geneticke
 
+## Ordinal Optimization
+- vypada ze se spis zabyva u simulaci ktere jsou stochasticke, a nejak meri samply
+- muzu vygenerovat nahodne nejaky plan
+  - nebo nejaky prumerny treba
+  - nebo skoro prazdny
+  - nebo skoro plny
+- vylepsit ho na max a najit lokalni minimum hill climbem
+- udelat tohle hodnekrat, tak ziskam ten ordinal set
+- reknu ze optimum je nejlepsi z ordinal setu
+- nebo muzu pak v budoucnu pouzit na krizeni v gen. algoritmech
+
 

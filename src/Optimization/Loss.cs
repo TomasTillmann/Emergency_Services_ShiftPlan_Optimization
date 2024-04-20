@@ -12,7 +12,7 @@ public abstract class Loss : ILoss
     Simulation = simulation;
   }
 
-  public abstract double Get(Weights weights, SuccessRatedIncidents incidentsSet);
+  public abstract double Get(Weights weights, Incidents incidentsSet);
 
   public double GetEmergencyServicePlanCost(Weights weights)
   {
@@ -20,7 +20,7 @@ public abstract class Loss : ILoss
     return Simulation.EmergencyServicePlan.GetShiftDurationsSum();
   }
 
-  protected void RunSimulation(Weights weights, SuccessRatedIncidents incidents)
+  protected void RunSimulation(Weights weights, Incidents incidents)
   {
     weights.MapTo(Simulation.EmergencyServicePlan);
     Simulation.Run(incidents.Value);

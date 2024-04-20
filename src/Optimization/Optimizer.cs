@@ -39,7 +39,7 @@ public abstract class Optimizer : IOptimizer
     StartWeights.MapTo(Loss.Simulation.EmergencyServicePlan);
   }
 
-  public abstract IEnumerable<Weights> FindOptimal(SuccessRatedIncidents incidents);
+  public abstract IEnumerable<Weights> FindOptimal(Incidents incidents);
 
   /// <summary>
   /// Initializes the weights.

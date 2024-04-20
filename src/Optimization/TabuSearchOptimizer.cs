@@ -14,7 +14,7 @@ public sealed class TabuSearchOptimizer : LocalSearchOptimizer, IStepOptimizer
 
   #endregion
 
-  private SuccessRatedIncidents _incidentsSets;
+  private Incidents _incidentsSets;
   private Weights _globalBestWeights;
   private Weights _weights;
   private double _globalBestLoss;
@@ -60,7 +60,7 @@ public sealed class TabuSearchOptimizer : LocalSearchOptimizer, IStepOptimizer
     _isStuck = false;
   }
 
-  public override IEnumerable<Weights> FindOptimal(SuccessRatedIncidents incidents)
+  public override IEnumerable<Weights> FindOptimal(Incidents incidents)
   {
     InitStepOptimizer(incidents);
 
@@ -73,7 +73,7 @@ public sealed class TabuSearchOptimizer : LocalSearchOptimizer, IStepOptimizer
     return OptimalWeights;
   }
 
-  public void InitStepOptimizer(SuccessRatedIncidents incidents)
+  public void InitStepOptimizer(Incidents incidents)
   {
     _incidentsSets = incidents;
     _globalBestWeights = StartWeights;

@@ -52,7 +52,7 @@ public sealed class Simulation : ISimulation
     for (int i = 0; i < EmergencyServicePlan.AllocatedMedicTeamsCount; ++i)
     {
       EmergencyServicePlan.AvailableMedicTeams[i].ClearPlannedIncidents();
-      EmergencyServicePlan.AvailableMedicTeams[i].TimeActive = 0;
+      EmergencyServicePlan.AvailableMedicTeams[i].TimeActiveSec = 0;
     }
 
     // Set WhenFree to 0 seconds to all ambulances

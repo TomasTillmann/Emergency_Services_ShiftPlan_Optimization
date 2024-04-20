@@ -107,12 +107,12 @@ class Program
     Constraints constraints = input.GetConstraints();
     ShiftTimes shiftTimes = input.GetShiftTimes();
     ImmutableArray<Incident> incidentsValue = input.GetIncidents();
-    SuccessRatedIncidents incidents = new() { Value = incidentsValue, SuccessRate = 1 };
+    Incidents incidents = new() { Value = incidentsValue };
 
     Simulation simulation = new(world);
 
-    ILoss loss = new StandardLoss(simulation, shiftTimes);
-    IOptimizer optimizer = new HillClimbOptimizer(world, constraints, shiftTimes, loss, steps: 200);
+    ILoss loss = new StandardLoss(simulation, shiftTimes, 0.999, 0.8);
+    IOptimizer optimizer = new HillClimbOptimizer(world, constraints, shiftTimes, loss, steps: 40);
     optimizer.Debug = _debug;
 
     visualizer.PlotGraph(optimizer, optimizer.StartWeights, incidents.Value);

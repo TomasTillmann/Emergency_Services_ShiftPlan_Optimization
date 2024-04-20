@@ -25,7 +25,7 @@ public class SimulatedAnnealingOptimizer : LocalSearchOptimizer, IStepOptimizer
   public IEnumerable<Weights> OptimalWeights => new List<Weights> { _globalBestWeights };
 
   private Weights _weights;
-  private SuccessRatedIncidents _incidentsSets;
+  private Incidents _incidentsSets;
   private Weights _globalBestWeights;
   private double _globalBestLoss;
   private Move _currentMove;
@@ -69,7 +69,7 @@ public class SimulatedAnnealingOptimizer : LocalSearchOptimizer, IStepOptimizer
   }
 
   /// <inheritdoc/>
-  public override IEnumerable<Weights> FindOptimal(SuccessRatedIncidents incidents)
+  public override IEnumerable<Weights> FindOptimal(Incidents incidents)
   {
     InitStepOptimizer(incidents);
 
@@ -81,7 +81,7 @@ public class SimulatedAnnealingOptimizer : LocalSearchOptimizer, IStepOptimizer
     return OptimalWeights;
   }
 
-  public void InitStepOptimizer(SuccessRatedIncidents incidents)
+  public void InitStepOptimizer(Incidents incidents)
   {
     _incidentsSets = incidents;
     _globalBestWeights = StartWeights;
