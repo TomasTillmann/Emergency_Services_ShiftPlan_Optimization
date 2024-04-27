@@ -32,6 +32,15 @@ public class Weights
   /// </summary>
   public int AllocatedAmbulancesCount { get; set; }
 
+  public Weights() { }
+
+  public Weights(int depotsCount, int maxMedicTeamsOnDepotCount)
+  {
+    MedicTeamAllocations = new Interval[depotsCount, maxMedicTeamsOnDepotCount];
+    MedicTeamsPerDepotCount = new int[depotsCount];
+    AmbulancesPerDepotCount = new int[depotsCount];
+  }
+
   public void MapTo(EmergencyServicePlan plan)
   {
     int availableMedicTeamIndex = 0;

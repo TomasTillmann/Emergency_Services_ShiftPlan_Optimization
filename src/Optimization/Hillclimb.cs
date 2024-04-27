@@ -23,7 +23,7 @@ public class HillClimbOptimizer : LocalSearchOptimizer
     Steps = steps;
   }
 
-  public override IEnumerable<Weights> FindOptimal(Incidents incidents)
+  public override IEnumerable<Weights> FindOptimal(ImmutableArray<Incident> incidents)
   {
     Weights currentWeights = StartWeights;
     Weights globalBestWeights = currentWeights;

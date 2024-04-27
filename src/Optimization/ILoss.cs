@@ -7,7 +7,9 @@ public interface ILoss
 {
   ISimulation Simulation { get; }
 
-  double GetEmergencyServicePlanCost(Weights weights);
+  double GetCost(Weights weights);
 
-  double Get(Weights weights, Incidents incidents);
+  double Get(Weights weights, ReadOnlySpan<Incident> incidents);
+
+  double Get(Weights weights, ImmutableArray<Incident> incidents);
 }

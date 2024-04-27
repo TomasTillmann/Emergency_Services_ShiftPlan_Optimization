@@ -37,10 +37,13 @@ public class StandardLoss : Loss
     _availableAmbulancesTotalCount = simulation.World.AvailableAmbulances.Length;
   }
 
-  public override double Get(Weights weights, Incidents incidents)
+  public override double Get(Weights weights, ImmutableArray<Incident> incidents)
   {
-    RunSimulation(weights, incidents);
+    return Get(weights, incidents.AsSpan());
+  }
 
+  public override double Get(Weights weights, ReadOnlySpan<Incident> incidents)
+  {
     double exhaustion = Simulation.EmergencyServicePlan.GetExhaustionSum() / Simulation.EmergencyServicePlan.GetShiftDurationsSum();
     double planCost = Simulation.EmergencyServicePlan.GetCost() / (_maxEmergencyServicePlanShiftDuration + _availableAmbulancesTotalCount);
     double handled = Simulation.SuccessRate;

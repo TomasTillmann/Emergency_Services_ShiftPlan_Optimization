@@ -32,6 +32,6 @@ public interface IOptimizer
   /// Note, that more <see cref="EmergencyServicePlan"/> can have the same, most optimal loss, that's why enumeration is returned.
   /// The loss is calculated by provided <see cref="ILoss"/> implementation.
   /// </summary>
-  IEnumerable<Weights> FindOptimal(Incidents incidents);
+  IEnumerable<Weights> FindOptimal(ImmutableArray<Incident> incidents);
 }
 

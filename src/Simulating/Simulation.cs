@@ -46,7 +46,7 @@ public sealed class Simulation : ISimulation
   /// <summary>
   /// Performs simulation on Depots.
   /// </summary>
-  public void Run(ImmutableArray<Incident> incidents)
+  public void Run(ReadOnlySpan<Incident> incidents)
   {
     // Clear planned incidents from previous iterations.
     for (int i = 0; i < EmergencyServicePlan.AllocatedMedicTeamsCount; ++i)

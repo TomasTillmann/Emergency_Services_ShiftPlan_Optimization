@@ -25,7 +25,7 @@ public class SimulatedAnnealingOptimizer : LocalSearchOptimizer, IStepOptimizer
   public IEnumerable<Weights> OptimalWeights => new List<Weights> { _globalBestWeights };
 
   private Weights _weights;
-  private Incidents _incidentsSets;
+  private ImmutableArray<Incident> _incidents;
   private Weights _globalBestWeights;
   private double _globalBestLoss;
   private Move _currentMove;
@@ -69,7 +69,7 @@ public class SimulatedAnnealingOptimizer : LocalSearchOptimizer, IStepOptimizer
   }
 
   /// <inheritdoc/>
-  public override IEnumerable<Weights> FindOptimal(Incidents incidents)
+  public override IEnumerable<Weights> FindOptimal(ImmutableArray<Incident> incidents)
   {
     InitStepOptimizer(incidents);
 
@@ -81,9 +81,9 @@ public class SimulatedAnnealingOptimizer : LocalSearchOptimizer, IStepOptimizer
     return OptimalWeights;
   }
 
-  public void InitStepOptimizer(Incidents incidents)
+  public void InitStepOptimizer(ImmutableArray<Incident> incidents)
   {
-    _incidentsSets = incidents;
+    _incidents = incidents;
     _globalBestWeights = StartWeights;
     _weights = StartWeights;
     _globalBestLoss = Loss.Get(_globalBestWeights, incidents);
@@ -142,7 +142,7 @@ public class SimulatedAnnealingOptimizer : LocalSearchOptimizer, IStepOptimizer
 
   private double GetLossInternal(Weights weights)
   {
-    return Loss.Get(weights, _incidentsSets);
+    return Loss.Get(weights, _incidents);
   }
 
   private bool Accept(double difference, double temperature)

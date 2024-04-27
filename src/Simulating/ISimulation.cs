@@ -19,6 +19,6 @@ public interface ISimulation
 
   List<Incident> UnhandledIncidents { get; }
 
-  void Run(ImmutableArray<Incident> incidents);
+  void Run(ReadOnlySpan<Incident> incidents);
 }
 

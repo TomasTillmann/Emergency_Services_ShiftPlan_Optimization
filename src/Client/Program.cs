@@ -106,8 +106,7 @@ class Program
     World world = input.GetWorld();
     Constraints constraints = input.GetConstraints();
     ShiftTimes shiftTimes = input.GetShiftTimes();
-    ImmutableArray<Incident> incidentsValue = input.GetIncidents();
-    Incidents incidents = new() { Value = incidentsValue };
+    ImmutableArray<Incident> incidents = input.GetIncidents();
 
     Simulation simulation = new(world);
 
@@ -115,11 +114,11 @@ class Program
     IOptimizer optimizer = new HillClimbOptimizer(world, constraints, shiftTimes, loss, steps: 40);
     optimizer.Debug = _debug;
 
-    visualizer.PlotGraph(optimizer, optimizer.StartWeights, incidents.Value);
+    visualizer.PlotGraph(optimizer, optimizer.StartWeights, incidents);
 
     var optimal = optimizer.FindOptimal(incidents).First();
 
-    visualizer.PlotGraph(optimizer, optimal, incidents.Value);
+    visualizer.PlotGraph(optimizer, optimal, incidents);
 
     visualizer.Dispose();
   }

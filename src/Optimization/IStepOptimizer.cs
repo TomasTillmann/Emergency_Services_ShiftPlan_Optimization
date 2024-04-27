@@ -24,7 +24,7 @@ public interface IStepOptimizer : IOptimizer
   /// Call before first call to <see cref="Step" />.
   /// Initializes / resets internal state of optimizer appropriately.
   /// </summary>
-  void InitStepOptimizer(Incidents incidentsSets);
+  void InitStepOptimizer(ImmutableArray<Incident> incidents);
 
   /// <summary>
   /// Does one step of the optimizer. 

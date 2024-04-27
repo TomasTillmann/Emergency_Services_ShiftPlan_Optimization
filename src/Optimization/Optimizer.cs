@@ -39,7 +39,7 @@ public abstract class Optimizer : IOptimizer
     StartWeights.MapTo(Loss.Simulation.EmergencyServicePlan);
   }
 
-  public abstract IEnumerable<Weights> FindOptimal(Incidents incidents);
+  public abstract IEnumerable<Weights> FindOptimal(ImmutableArray<Incident> incidents);
 
   /// <summary>
   /// Initializes the weights.
@@ -47,12 +47,7 @@ public abstract class Optimizer : IOptimizer
   /// </summary>
   protected void InitWeights()
   {
-    StartWeights = new()
-    {
-      MedicTeamAllocations = new Interval[World.Depots.Length, Constraints.MaxMedicTeamsOnDepotCount],
-      MedicTeamsPerDepotCount = new int[World.Depots.Length],
-      AmbulancesPerDepotCount = new int[World.Depots.Length],
-    };
+    StartWeights = new Weights(World.Depots.Length, Constraints.MaxMedicTeamsOnDepotCount);
 
     // initialze team shifts to deallocated with random start times
     for (int i = 0; i < StartWeights.MedicTeamAllocations.GetLength(0); ++i)

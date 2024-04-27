@@ -109,7 +109,7 @@ public class Visualizer : IDisposable
     writer ??= _writer;
 
     weights.MapTo(optimizer.Loss.Simulation.EmergencyServicePlan);
-    optimizer.Loss.Simulation.Run(incidents);
+    optimizer.Loss.Simulation.Run(incidents.AsSpan());
 
     // foreach (var bbbb in optimizer.Loss.Simulation.EmergencyServicePlan.MedicTeams.Select(team => team.GetPlannableIncidents()))
     // {
