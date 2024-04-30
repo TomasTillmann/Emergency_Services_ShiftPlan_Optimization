@@ -6,7 +6,7 @@ public class Input1 : IInputParametrization
   private readonly Random _random;
   private readonly DataModelGenerator _dataGenerator = new();
   private const int avaialbeMedicTeamsCount = 50;
-  private const int availableAmbulancesCount = 200;
+  private const int availableAmbulancesCount = 30;
 
   public Input1(Random random = null)
   {
@@ -36,7 +36,7 @@ public class Input1 : IInputParametrization
       hospitalsCount: 20,
       availableMedicTeamsCount: avaialbeMedicTeamsCount,
       availableAmbulancesCount: availableAmbulancesCount,
-      goldenTimeSec: 1500.ToMinutes().ToSeconds().Value,
+      goldenTimeSec: 20.ToMinutes().ToSeconds().Value,
       random: _random
     ));
 

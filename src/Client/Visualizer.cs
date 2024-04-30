@@ -104,12 +104,12 @@ public class Visualizer : IDisposable
     _writer.Flush();
   }
 
-  public void PlotGraph(IOptimizer optimizer, Weights weights, ImmutableArray<Incident> incidents, TextWriter writer = null)
+  public void PlotGraph(ILoss loss, Weights weights, ImmutableArray<Incident> incidents, TextWriter writer = null)
   {
     writer ??= _writer;
 
-    weights.MapTo(optimizer.Loss.Simulation.EmergencyServicePlan);
-    optimizer.Loss.Simulation.Run(incidents.AsSpan());
+    weights.MapTo(loss.Simulation.EmergencyServicePlan);
+    loss.Simulation.Run(incidents.AsSpan());
 
     // foreach (var bbbb in optimizer.Loss.Simulation.EmergencyServicePlan.MedicTeams.Select(team => team.GetPlannableIncidents()))
     // {
@@ -117,11 +117,14 @@ public class Visualizer : IDisposable
     //   Console.WriteLine();
     // }
 
-    WriteGraph(optimizer.Loss.Simulation.EmergencyServicePlan, incidents, writer);
+    WriteGraph(loss.Simulation.EmergencyServicePlan, incidents, writer);
     writer.WriteLine();
     writer.WriteLine("Unhandled:");
-    writer.WriteLine(string.Join("\n", optimizer.Loss.Simulation.UnhandledIncidents));
-    writer.WriteLine($"Success rate: {optimizer.Loss.Simulation.SuccessRate}");
+    writer.WriteLine(string.Join("\n", loss.Simulation.UnhandledIncidents));
+    writer.WriteLine($"Success rate: {loss.GetSuccessRate()}");
+    writer.WriteLine($"cost: {loss.GetCost()}");
+    writer.WriteLine($"effectivity: {loss.GetEffectivity()}");
+    writer.WriteLine($"loss: {loss.GetLoss()}");
 
     writer.Flush();
   }

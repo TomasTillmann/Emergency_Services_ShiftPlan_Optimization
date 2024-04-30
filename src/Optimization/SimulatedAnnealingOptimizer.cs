@@ -104,7 +104,7 @@ public class SimulatedAnnealingOptimizer : LocalSearchOptimizer, IStepOptimizer
 
   private void StepInternal()
   {
-    Debug.WriteLine($"global loss: {_globalBestLoss}");
+    //Debug.WriteLine($"global loss: {_globalBestLoss}");
 
     GetMovesToNeighbours(_weights);
 
@@ -120,7 +120,7 @@ public class SimulatedAnnealingOptimizer : LocalSearchOptimizer, IStepOptimizer
     // Is the neighbour better than global best?
     if (neighbourLoss < _globalBestLoss)
     {
-      Debug.WriteLine($"global loss updated to: {neighbourLoss}");
+      //Debug.WriteLine($"global loss updated to: {neighbourLoss}");
       _globalBestLoss = _currentLoss;
       _globalBestWeights = _weights.Copy();
     }
@@ -128,7 +128,7 @@ public class SimulatedAnnealingOptimizer : LocalSearchOptimizer, IStepOptimizer
     // Should we move to the neighbour?
     if (Accept(neighbourLoss - _currentLoss, _currentTemperature))
     {
-      Debug.WriteLine($"accepted move: {_currentMove}");
+      //Debug.WriteLine($"accepted move: {_currentMove}");
       _currentLoss = neighbourLoss;
     }
     else
@@ -137,7 +137,7 @@ public class SimulatedAnnealingOptimizer : LocalSearchOptimizer, IStepOptimizer
     }
 
     _currentTemperature *= TemperatureReductionFactor;
-    Debug.WriteLine($"current temp: {_currentTemperature}");
+    //Debug.WriteLine($"current temp: {_currentTemperature}");
   }
 
   private double GetLossInternal(Weights weights)

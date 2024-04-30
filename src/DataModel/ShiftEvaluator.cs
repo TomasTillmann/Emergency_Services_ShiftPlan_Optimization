@@ -29,6 +29,12 @@ public class MedicTeamsEvaluator
       return false;
     }
 
+    // No ambulance available.
+    if (plannableIncident.AmbulanceIndex == -1)
+    {
+      return false;
+    }
+
     // 1
     if (plannableIncident.ToIncidentDrive.StartSec + plannableIncident.ToIncidentDrive.DurationSec
         > plannableIncident.Incident.OccurenceSec + _goldenTimeSec)

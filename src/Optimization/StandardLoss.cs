@@ -10,15 +10,21 @@ public class StandardLoss : Loss
 
   /// <summary>
   /// Number between 0 and 1.
-  /// By how much should be preferred success rate over cost.
+  /// How important is success rate. 
   /// </summary>
   public double Alpha { get; set; }
 
   /// <summary>
   /// Number between 0 and 1.
-  /// How important is effectivity.
+  /// How important is cost. 
   /// </summary>
   public double Beta { get; set; }
+
+  /// <summary>
+  /// Number between 0 and 1.
+  /// How important is effectivity. 
+  /// </summary>
+  public double Gamma { get; set; }
 
   /// <summary>
   /// Number between 0 and 1.
@@ -27,30 +33,38 @@ public class StandardLoss : Loss
   /// </summary>
   public double EffectivityTarget { get; set; }
 
-  public StandardLoss(Simulation simulation, ShiftTimes shiftTimes, double alpha = 0.9, double beta = 0.6, double effectivityTarget = 0.75)
-  : base(simulation)
+  public StandardLoss(Simulation simulation, ShiftTimes shiftTimes, double alpha = 0.8, double beta = 0.15, double gamma = 0.05, double effectivityTarget = 0.75)
+  : base(simulation, shiftTimes)
   {
     Alpha = alpha;
     Beta = beta;
+    Gamma = gamma;
     EffectivityTarget = effectivityTarget;
-    _maxEmergencyServicePlanShiftDuration = simulation.World.AvailableMedicTeams.Length * shiftTimes.MaxDurationSec / 60;
-    _availableAmbulancesTotalCount = simulation.World.AvailableAmbulances.Length;
   }
 
+  /// <inheritdoc/>
   public override double Get(Weights weights, ImmutableArray<Incident> incidents)
   {
     return Get(weights, incidents.AsSpan());
   }
 
+  /// <inheritdoc/>
   public override double Get(Weights weights, ReadOnlySpan<Incident> incidents)
   {
-    double exhaustion = Simulation.EmergencyServicePlan.GetExhaustionSum() / Simulation.EmergencyServicePlan.GetShiftDurationsSum();
-    double planCost = Simulation.EmergencyServicePlan.GetCost() / (_maxEmergencyServicePlanShiftDuration + _availableAmbulancesTotalCount);
-    double handled = Simulation.SuccessRate;
+    RunSimulation(weights, incidents);
+    return GetLoss();
+  }
 
-    double handledPart = Alpha * handled;
-    double costPart = (1 - Alpha) * planCost;
-    double exhaustionError = Beta * Math.Abs(exhaustion - EffectivityTarget);
+  /// <inheritdoc/>
+  public override double GetLoss()
+  {
+    double successRate = GetSuccessRate();
+    double planCost = GetCost();
+    double exhaustion = GetEffectivity();
+
+    double handledPart = Alpha * successRate;
+    double costPart = Beta * planCost;
+    double exhaustionError = Gamma * Math.Abs(exhaustion - EffectivityTarget);
 
     double loss = costPart + exhaustionError - handledPart;
 

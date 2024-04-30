@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Immutable;
+using System.Linq;
 using System.Text;
 
 namespace ESSP.DataModel;
@@ -39,6 +40,67 @@ public class Weights
     MedicTeamAllocations = new Interval[depotsCount, maxMedicTeamsOnDepotCount];
     MedicTeamsPerDepotCount = new int[depotsCount];
     AmbulancesPerDepotCount = new int[depotsCount];
+  }
+
+  public static Weights GetUniformlyRandom(World world, Constraints constraints, ShiftTimes shiftTimes, Random random = null)
+  {
+    random ??= new Random();
+
+    Weights weights = new Weights(world.Depots.Length, constraints.MaxMedicTeamsOnDepotCount);
+
+    // initialze team shifts to deallocated with random start times
+    for (int i = 0; i < weights.MedicTeamAllocations.GetLength(0); ++i)
+    {
+      for (int j = 0; j < weights.MedicTeamAllocations.GetLength(1); ++j)
+      {
+        weights.MedicTeamAllocations[i, j] = Interval.GetByStartAndDuration
+        (
+          shiftTimes.GetRandomStartingTimeSec(random),
+          0
+        );
+      }
+    }
+
+    // random teams allocation
+    int teamsOnDepotCount = Math.Min(constraints.MaxMedicTeamsOnDepotCount, constraints.AvailableMedicTeamsCount / world.Depots.Length);
+    int runningAvailableMedicTeamsCount = constraints.AvailableMedicTeamsCount;
+
+    for (int i = 0; i < world.Depots.Length; ++i)
+    {
+      for (int j = 0; j < teamsOnDepotCount && runningAvailableMedicTeamsCount > 0; ++j)
+      {
+        weights.MedicTeamAllocations[i, j] = Interval.GetByStartAndDuration
+        (
+          shiftTimes.GetRandomStartingTimeSec(random),
+          shiftTimes.GetRandomDurationTimeSec(random)
+        );
+
+        --runningAvailableMedicTeamsCount;
+        ++weights.MedicTeamsPerDepotCount[i];
+      }
+    }
+    weights.AllocatedMedicTeamsCount = constraints.AvailableMedicTeamsCount - runningAvailableMedicTeamsCount;
+    //
+
+    // amb allocations
+    int ambulancesOnDepotCount = Math.Min(constraints.MaxAmbulancesOnDepotCount, constraints.AvailableAmbulancesCount / world.Depots.Length);
+    int runningAvailableAmbulancesCount = constraints.AvailableAmbulancesCount;
+
+    for (int i = 0; i < world.Depots.Length; ++i)
+    {
+      if (runningAvailableAmbulancesCount - ambulancesOnDepotCount < 0)
+      {
+        weights.AmbulancesPerDepotCount[i] = runningAvailableAmbulancesCount;
+        break;
+      }
+
+      weights.AmbulancesPerDepotCount[i] = ambulancesOnDepotCount;
+      runningAvailableAmbulancesCount -= ambulancesOnDepotCount;
+    }
+    weights.AllocatedAmbulancesCount = weights.AmbulancesPerDepotCount.Sum();
+    //
+
+    return weights;
   }
 
   public void MapTo(EmergencyServicePlan plan)

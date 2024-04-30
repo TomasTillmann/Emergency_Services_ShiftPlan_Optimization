@@ -28,16 +28,16 @@ public class EmergencyServicePlan
     return sum;
   }
 
-  public double GetExhaustionSum()
+  public double GetTotalTimeActive()
   {
-    double exhaustionSum = 0;
+    double totalTimeActive = 0;
 
     for (int i = 0; i < AllocatedMedicTeamsCount; ++i)
     {
-      exhaustionSum += AvailableMedicTeams[i].TimeActiveSec / AvailableMedicTeams[i].Shift.DurationSec;
+      totalTimeActive += AvailableMedicTeams[i].TimeActiveSec;
     }
 
-    return exhaustionSum;
+    return totalTimeActive;
   }
 
   public double GetCost()

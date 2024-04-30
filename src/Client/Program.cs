@@ -1,5 +1,6 @@
-﻿//#define AllOptimizers_Parametrized1
-#define simulation_test
+﻿#define AllOptimizers_Parametrized1
+// #define simulation_test
+//#define dynamic_programming
 
 using ESSP.DataModel;
 using Optimization;
@@ -18,82 +19,64 @@ class Program
 #if AllOptimizers_Parametrized1
   static void Main()
   {
-    using Visualizer visualizer = new(Console.Out);
+    Visualizer visualizer = new(_debug);
 
-    // specific input selection
-    IInputParametrization inputParametrization = new Input1();
-    //
+    Random random = new Random(42);
+    IInputParametrization input = new Input1(random);
+    World world = input.GetWorld();
+    Constraints constraints = input.GetConstraints();
+    ShiftTimes shiftTimes = input.GetShiftTimes();
+    ImmutableArray<Incident> incidents = input.GetIncidents();
+    Weights startWeights = Weights.GetUniformlyRandom(world, constraints, shiftTimes, random);
 
-    // dont change the incidents set
-    Input inputInitial = inputParametrization.Get(new Random(666));
-    SuccessRatedIncidents successRatedIncidents = inputInitial.SuccessRatedIncidents;
-    //
+    IOptimizer optimizer;
+    Simulation simulation;
+    ILoss loss;
+    List<IOptimizer> optimizers = new();
 
-    foreach (int randomSeed in Enumerable.Range(0, 100))
+    simulation = new(world);
+    loss = new StandardLoss(simulation, shiftTimes);
+    visualizer.PlotGraph(loss, startWeights, incidents, _debug);
+
+    simulation = new(world);
+    loss = new StandardLoss(simulation, shiftTimes);
+    optimizer = new HillClimbOptimizer(world, constraints, shiftTimes, loss, random: random);
+    optimizer.StartWeights = startWeights;
+    optimizer.Debug = _debug;
+    optimizers.Add(optimizer);
+
+    simulation = new(world);
+    loss = new StandardLoss(simulation, shiftTimes);
+    optimizer = new TabuSearchOptimizer(world, constraints, shiftTimes, loss, random: random);
+    optimizer.StartWeights = startWeights;
+    optimizer.Debug = _debug;
+    optimizers.Add(optimizer);
+
+    simulation = new(world);
+    loss = new StandardLoss(simulation, shiftTimes);
+    optimizer = new DynamicProgrammingOptimizer(world, constraints, shiftTimes, loss, random: random);
+    optimizer.StartWeights = startWeights;
+    optimizer.Debug = _debug;
+    optimizers.Add(optimizer);
+
+    simulation = new(world);
+    loss = new StandardLoss(simulation, shiftTimes);
+    optimizer = new SimulatedAnnealingOptimizer(world, constraints, shiftTimes, loss, random: random);
+    optimizer.StartWeights = startWeights;
+    optimizer.Debug = _debug;
+    optimizers.Add(optimizer);
+
+    foreach (IOptimizer opt in optimizers)
     {
-      Random random = new Random(randomSeed);
-
-      // input parametrization
-      Input input = inputParametrization.Get(new Random());
-
-      World world = input.World;
-      ShiftTimes shiftTimes = input.ShiftTimes;
-      //
-
-      // Optimizer init
-      ILoss loss = new StandardLoss(new Simulation(world), shiftTimes);
-
-      // optimizers init
-      List<IOptimizer> optimizers = new()
-      {
-        new HillClimbOptimizer
-        (
-          world: world,
-          shiftTimes: shiftTimes,
-          loss: loss,
-          steps: 199,
-          random: random
-        ),
-        new TabuSearchOptimizer
-        (
-          world: world,
-          shiftTimes: shiftTimes,
-          loss: loss,
-          iterations: 50,
-          tabuSize: 12,
-          random: random
-        ),
-        new SimulatedAnnealingOptimizer
-        (
-          world: world,
-          shiftTimes: shiftTimes,
-          loss: loss,
-          random: random
-        )
-      };
-      //
-
-      foreach (IOptimizer optimizer in optimizers)
-      {
-        optimizer.Debug = new StreamWriter(_logsPath + optimizer.GetType().Name + randomSeed + ".log");
-
-        // plot starting weights
-        visualizer.PlotGraph(optimizer, optimizer.StartWeights, successRatedIncidents.Value, optimizer.Debug);
-
-        optimizer.Debug.WriteLine($"Amb count: {world.AvailableMedicTeams.Length}");
-
-        // Optimizing
-        Stopwatch sw = Stopwatch.StartNew();
-        Weights optimalWeights = optimizer.FindOptimal(successRatedIncidents).First();
-        sw.Stop();
-
-        // writing result
-        visualizer.PlotGraph(optimizer, optimalWeights, successRatedIncidents.Value, optimizer.Debug);
-        optimizer.Debug.WriteLine($"Optimizing took: {sw.Elapsed}");
-
-        optimizer.Debug.Dispose();
-      }
+      _debug.WriteLine($"{opt.GetType().Name}: ");
+      Stopwatch sw = Stopwatch.StartNew();
+      var optimal = opt.FindOptimal(incidents).First();
+      _debug.WriteLine("Elapsed: " + sw.Elapsed);
+      visualizer.PlotGraph(loss, optimal, incidents);
     }
+
+    visualizer.Dispose();
+    _debug.Dispose();
   }
 #endif
 
@@ -115,6 +98,31 @@ class Program
     optimizer.Debug = _debug;
 
     visualizer.PlotGraph(optimizer, optimizer.StartWeights, incidents);
+
+    var optimal = optimizer.FindOptimal(incidents).First();
+
+    visualizer.PlotGraph(optimizer, optimal, incidents);
+
+    visualizer.Dispose();
+  }
+#endif
+
+#if dynamic_programming
+  public static void Main()
+  {
+    Visualizer visualizer = new(_debug);
+
+    IInputParametrization input = new Input1(new Random(42));
+    World world = input.GetWorld();
+    Constraints constraints = input.GetConstraints();
+    ShiftTimes shiftTimes = input.GetShiftTimes();
+    ImmutableArray<Incident> incidents = input.GetIncidents();
+
+    Simulation simulation = new(world);
+
+    ILoss loss = new StandardLoss(simulation, shiftTimes);
+    IOptimizer optimizer = new DynamicProgrammingOptimizer(world, constraints, shiftTimes, loss);
+    optimizer.Debug = _debug;
 
     var optimal = optimizer.FindOptimal(incidents).First();
 

@@ -100,8 +100,8 @@ public abstract class LocalSearchOptimizer : MoveOptimizer
       }
     }
 
-    Debug.WriteLine("moves: " + string.Join(", ", movesBuffer));
-    Console.WriteLine($"Neighbours: {movesBuffer.Count}");
+    //Debug.WriteLine("moves: " + string.Join(", ", movesBuffer));
+    //Console.WriteLine($"Neighbours: {movesBuffer.Count}");
   }
 
   /// <summary>

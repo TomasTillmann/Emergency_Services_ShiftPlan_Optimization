@@ -222,7 +222,6 @@ public abstract class MoveOptimizer : Optimizer
 
       case MoveType.AllocateMedicTeam:
         durationSec = weights.MedicTeamAllocations[depotIndex, medicTeamOnDepotIndex].DurationSec;
-        startSec = weights.MedicTeamAllocations[depotIndex, medicTeamOnDepotIndex].StartSec;
         if (durationSec == 0 && weights.MedicTeamsPerDepotCount[depotIndex] < Constraints.MaxMedicTeamsOnDepotCount && weights.AllocatedMedicTeamsCount < Constraints.AvailableMedicTeamsCount)
         {
           move = new Move
@@ -238,7 +237,6 @@ public abstract class MoveOptimizer : Optimizer
 
       case MoveType.DeallocateMedicTeam:
         durationSec = weights.MedicTeamAllocations[depotIndex, medicTeamOnDepotIndex].DurationSec;
-        startSec = weights.MedicTeamAllocations[depotIndex, medicTeamOnDepotIndex].StartSec;
         if (durationSec == ShiftTimes.MinDurationSec && weights.MedicTeamsPerDepotCount[depotIndex] > 0)
         {
           move = new Move
