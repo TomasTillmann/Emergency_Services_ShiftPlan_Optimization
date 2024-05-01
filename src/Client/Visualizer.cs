@@ -30,7 +30,7 @@ public class Visualizer : IDisposable
     {
       MedicTeam medicTeam = plan.AvailableMedicTeams[i];
 
-      writer.Write($"{index++}: ");
+      writer.Write($"{medicTeam.Depot.Index}: ");
       Seconds end = 24.ToHours().ToMinutes().ToSeconds();
 
       for (Seconds time = 0.ToSeconds(); time < end; time += (5 * 60).ToSeconds())
@@ -79,43 +79,12 @@ public class Visualizer : IDisposable
     writer.Flush();
   }
 
-  public void WriteWeights(Weights weights)
-  {
-    int index = 1;
-    foreach (var weight in weights.MedicTeamAllocations)
-    {
-      _writer.Write($"{index++}: ");
-
-      for (Seconds time = 0.ToSeconds(); time < 24.ToHours().ToMinutes().ToSeconds(); time += (5 * 60).ToSeconds())
-      {
-        if (time.Value % 1.ToHours().ToSeconds().Value == 0)
-        {
-          _writer.Write($"{time.Value / (60 * 60)}");
-        }
-        else
-        {
-          _writer.Write(weight.IsInInterval(time.Value) ? "-" : " ");
-        }
-      }
-
-      _writer.WriteLine();
-    }
-
-    _writer.Flush();
-  }
-
   public void PlotGraph(ILoss loss, Weights weights, ImmutableArray<Incident> incidents, TextWriter writer = null)
   {
     writer ??= _writer;
 
     weights.MapTo(loss.Simulation.EmergencyServicePlan);
     loss.Simulation.Run(incidents.AsSpan());
-
-    // foreach (var bbbb in optimizer.Loss.Simulation.EmergencyServicePlan.MedicTeams.Select(team => team.GetPlannableIncidents()))
-    // {
-    //   Console.WriteLine(string.Join("\n", bbbb.Select(b => $"{b.ToIncidentDrive.EndSec - b.Incident.OccurenceSec}, {b.Incident.OccurenceSec}, {b.Incident.Location}, {b.AmbulanceIndex}")));
-    //   Console.WriteLine();
-    // }
 
     WriteGraph(loss.Simulation.EmergencyServicePlan, incidents, writer);
     writer.WriteLine();

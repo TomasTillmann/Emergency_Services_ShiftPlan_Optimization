@@ -3,7 +3,6 @@ using System.Collections.Immutable;
 
 namespace Optimizing;
 
-//TODO: support for end the searh when converges to some minima and doesnt want to go anywhere, instead of just iterations
 public sealed class TabuSearchOptimizer : LocalSearchOptimizer
 {
   #region Params
@@ -14,8 +13,8 @@ public sealed class TabuSearchOptimizer : LocalSearchOptimizer
 
   #endregion
 
-  /// <param name="tabuSize">If set too high, it could happen, that all neighbours are tabu (and aspiration criterion is not satisfied either).
-  /// <param name="shiftChangesLimit">If count of neighbours is exceeded, only first <paramref name="shiftChangesLimit"/> neighbours will be tried.
+  /// <param name="tabuSize">If set too high, it could happen, that all neighbours are tabu (and aspiration criterion is not satisfied either). Also it is slower.
+  /// <param name="shiftChangesLimit">If count of neighbours is exceeded, only first <paramref name="shiftChangesLimit"/> neighbours will be tried, permutated.
   public TabuSearchOptimizer
   (
     World world,
@@ -54,8 +53,8 @@ public sealed class TabuSearchOptimizer : LocalSearchOptimizer
 
     for (int step = 0; step < Iterations; ++step)
     {
-      //Console.WriteLine($"step: {step}");
-      //Debug.WriteLine($"globalBestLoss: {globalBestLoss}");
+      Debug.WriteLine($"step: {step}");
+      Debug.WriteLine($"globalBestLoss: {globalBestLoss}");
       currentBestLoss = double.MaxValue;
       Move currentBestMove = default(Move);
 
@@ -68,7 +67,7 @@ public sealed class TabuSearchOptimizer : LocalSearchOptimizer
         ModifyMakeMove(currentWeights, move);
 
         double neighbourLoss = Loss.Get(currentWeights, incidents);
-        //Debug.WriteLine($"Neighbour loss: {neighbourLoss}");
+        // Debug.WriteLine($"Neighbour loss: {neighbourLoss}"); // SPAM
 
         if (neighbourLoss < currentBestLoss)
         {
@@ -87,14 +86,14 @@ public sealed class TabuSearchOptimizer : LocalSearchOptimizer
             // aspiration criterion
             if (neighbourLoss < globalBestLoss)
             {
-              //Debug.WriteLine($"curr loss updated to: {neighbourLoss}");
+              Debug.WriteLine($"curr loss updated to - aspiration criterion satisfied: {neighbourLoss}");
               currentBestMove = move;
               currentBestLoss = neighbourLoss;
             }
           }
           else
           {
-            //Debug.WriteLine($"curr loss updated to: {neighbourLoss}");
+            Debug.WriteLine($"curr loss updated to: {neighbourLoss}");
             currentBestMove = move;
             currentBestLoss = neighbourLoss;
           }
@@ -106,18 +105,18 @@ public sealed class TabuSearchOptimizer : LocalSearchOptimizer
       // All neighbours are tabu and worse than global best. Happens very rarely. 
       if (currentBestLoss == double.MaxValue)
       {
-        //Debug.WriteLine($"stuck");
+        Debug.WriteLine($"stuck");
         return new List<Weights> { globalBestWeights };
       }
 
       // move in the best direction
-      //Debug.WriteLine($"made move: {currentBestMove}");
+      Debug.WriteLine($"made move: {currentBestMove}");
       ModifyMakeMove(currentWeights, currentBestMove);
 
       // update global best
       if (currentBestLoss < globalBestLoss)
       {
-        // Debug.WriteLine($"global best loss updated to: {currentBestLoss}");
+        Debug.WriteLine($"global best loss updated to: {currentBestLoss}");
         globalBestWeights = currentWeights.Copy();
         globalBestLoss = currentBestLoss;
       }
@@ -131,85 +130,9 @@ public sealed class TabuSearchOptimizer : LocalSearchOptimizer
       };
       cyclicTabuIndex %= TabuSize;
 
-      //Debug.WriteLine("======");
+      Debug.WriteLine("======");
     }
 
     return new List<Weights> { globalBestWeights };
   }
-
-  // private void StepInternal()
-  // {
-  //   GetMovesToNeighbours(_weights);
-
-  //   //_debug.WriteLine("moves: " + string.Join(", ", movesBuffer));
-  //   //Debug.WriteLine("global best loss: " + _globalBestLoss);
-  //   //_debug.WriteLine("global best weights: " + string.Join(", ", _globalBestWeights));
-
-  //   _currentBestLoss = double.MaxValue;
-  //   for (int i = 0; i < movesBuffer.Count; ++i)
-  //   {
-  //     Move move = movesBuffer[i];
-
-  //     ModifyMakeMove(_weights, move);
-  //     //_debug.WriteLine("neighbour: " + string.Join(", ", _globalBestWeights));
-
-  //     double neighbourLoss = GetLossInternal(_weights);
-  //     //_debug.WriteLine("neighbour loss: " + neighbourLoss);
-
-  //     // Not in tabu, or aspiration criterion is satisfied (possibly in tabu).
-  //     if (!_tabu.Contains(move) || neighbourLoss < _globalBestLoss)
-  //     {
-  //       // Is better than current? Always true when aspiration criterion was satisfied.
-  //       if (neighbourLoss < _currentBestLoss)
-  //       {
-  //         _currentBestMove = move;
-  //         //_debug.WriteLine("current best move updated to: " + _currentBestMove);
-
-  //         _currentBestLoss = neighbourLoss;
-  //         //Debug.WriteLine("current best loss updated to: " + _currentBestLoss);
-  //       }
-  //     }
-
-  //     ModifyUnmakeMove(_weights, move);
-  //   }
-
-  //   // This happens iff all neighbours are in tabu and worse than already found global best.
-  //   if (_currentBestLoss == double.MaxValue)
-  //   {
-  //     //Debug.WriteLine("STUCK");
-  //     _isStuck = true;
-  //     return;
-  //   }
-
-  //   // move in the best direction
-  //   ModifyMakeMove(_weights, _currentBestMove);
-
-  //   // update global best
-  //   if (_currentBestLoss < _globalBestLoss)
-  //   {
-  //     _globalBestWeights = _weights.Copy();
-  //     //Debug.WriteLine("global best weights updated to: " + string.Join(", ", _globalBestWeights));
-  //     //Debug.WriteLine("global best move updated to: " + _currentBestMove);
-
-  //     _globalBestLoss = _currentBestLoss;
-  //     //_debug.WriteLine("global best loss updated to: " + _globalBestLoss);
-  //   }
-
-  //   // Tabu the inverse move, not the actual move. Only this way, it will not "move back".
-  //   _tabu.AddLast
-  //   (
-  //     new Move
-  //     {
-  //       MedicTeamOnDepotIndex = _currentBestMove.MedicTeamOnDepotIndex,
-  //       MoveType = LocalSearchOptimizer.GetInverseMoveType(_currentBestMove.MoveType)
-  //     }
-  //   );
-
-  //   if (_tabu.Count > TabuSize)
-  //   {
-  //     _tabu.RemoveFirst();
-  //   }
-
-  //   Debug.WriteLine("==================");
-  // }
 }

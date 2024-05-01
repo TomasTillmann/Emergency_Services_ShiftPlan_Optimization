@@ -40,29 +40,29 @@ class Program
 
     simulation = new(world);
     loss = new StandardLoss(simulation, shiftTimes);
-    optimizer = new HillClimbOptimizer(world, constraints, shiftTimes, loss, random: random);
-    optimizer.StartWeights = startWeights;
+    optimizer = new TabuSearchOptimizer(world, constraints, shiftTimes, loss, random: random);
+    optimizer.StartWeights = startWeights.Copy();
     optimizer.Debug = _debug;
     optimizers.Add(optimizer);
 
     simulation = new(world);
     loss = new StandardLoss(simulation, shiftTimes);
-    optimizer = new TabuSearchOptimizer(world, constraints, shiftTimes, loss, random: random);
-    optimizer.StartWeights = startWeights;
+    optimizer = new HillClimbOptimizer(world, constraints, shiftTimes, loss, random: random);
+    optimizer.StartWeights = startWeights.Copy();
     optimizer.Debug = _debug;
     optimizers.Add(optimizer);
 
     simulation = new(world);
     loss = new StandardLoss(simulation, shiftTimes);
     optimizer = new DynamicProgrammingOptimizer(world, constraints, shiftTimes, loss, random: random);
-    optimizer.StartWeights = startWeights;
+    optimizer.StartWeights = startWeights.Copy();
     optimizer.Debug = _debug;
     optimizers.Add(optimizer);
 
     simulation = new(world);
     loss = new StandardLoss(simulation, shiftTimes);
     optimizer = new SimulatedAnnealingOptimizer(world, constraints, shiftTimes, loss, random: random);
-    optimizer.StartWeights = startWeights;
+    optimizer.StartWeights = startWeights.Copy();
     optimizer.Debug = _debug;
     optimizers.Add(optimizer);
 
@@ -73,6 +73,10 @@ class Program
       var optimal = opt.FindOptimal(incidents).First();
       _debug.WriteLine("Elapsed: " + sw.Elapsed);
       visualizer.PlotGraph(loss, optimal, incidents);
+
+      optimal.MedicTeamAllocations[8, 1] = Interval.GetByStartAndDuration(optimal.MedicTeamAllocations[8, 1].StartSec, 8.ToHours().ToMinutes().ToSeconds().Value);
+      visualizer.PlotGraph(loss, optimal, incidents);
+      break;
     }
 
     visualizer.Dispose();

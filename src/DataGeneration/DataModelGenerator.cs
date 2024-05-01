@@ -41,7 +41,8 @@ public class DataModelGenerator
       DepotModel depot = new DepotModel()
       {
         Location = randomLoc,
-        Ambulances = new List<AmbulanceModel>()
+        Ambulances = new List<AmbulanceModel>(),
+        Index = i,
       };
 
       worldModel.Depots.Add(depot);

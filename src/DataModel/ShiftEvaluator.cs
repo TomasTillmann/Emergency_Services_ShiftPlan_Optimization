@@ -43,7 +43,8 @@ public class MedicTeamsEvaluator
     }
 
     // 1, 2, 3, 4
-    if (plannableIncident.InHospitalDelivery.EndSec > medicTeam.Shift.EndSec)
+    const int overdue = 30 * 60;
+    if (plannableIncident.InHospitalDelivery.EndSec > medicTeam.Shift.EndSec + overdue)
     {
       return false;
     }
