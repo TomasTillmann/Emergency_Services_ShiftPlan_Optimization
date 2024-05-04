@@ -9,6 +9,8 @@ public class Depot
   public int Index { get; init; }
   public Coordinate Location { get; init; }
 
+  public List<MedicTeam> MedicTeams { get; init; }
+
   public List<Ambulance> Ambulances { get; init; }
 }
 

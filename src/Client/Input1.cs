@@ -21,16 +21,14 @@ public class Input1 : IInputParametrization
       AvailableAmbulancesCount = availableAmbulancesCount,
       MaxMedicTeamsOnDepotCount = 15,
       MaxAmbulancesOnDepotCount = 30,
-      MinAmbulancesOnDepotCount = 1
+      MinAmbulancesOnDepotCount = 0
     };
   }
 
   public World GetWorld()
   {
-    WorldMapper worldMapper = new();
-
     // World init
-    World world = worldMapper.MapBack(_dataGenerator.GenerateWorldModel(
+    World world = WorldMapper.MapBack(_dataGenerator.GenerateWorldModel(
       worldSize: new CoordinateModel { XMet = 50_000, YMet = 50_000 },
       depotsCount: 10,
       hospitalsCount: 20,
@@ -46,17 +44,16 @@ public class Input1 : IInputParametrization
   public ImmutableArray<Incident> GetIncidents()
   {
     // Incidents init
-    IncidentMapper incidentMapper = new();
     ImmutableArray<Incident> incidents = _dataGenerator.GenerateIncidentModels(
       worldSize: new CoordinateModel { XMet = 50_000, YMet = 50_000 },
-      incidentsCount: 300,
+      incidentsCount: 3,
       duration: 21.ToHours().ToSeconds(),
       onSceneDurationNormalExpected: 20.ToMinutes().ToSeconds(),
       onSceneDurationNormalStddev: 10.ToMinutes().ToSeconds(),
       inHospitalDeliveryNormalExpected: 15.ToMinutes().ToSeconds(),
-      inHospitalDeliveryNormalStddev: 10.ToMinutes().ToSeconds(),
+      inHospitalDeliveryNormalStddev: 5.ToMinutes().ToSeconds(),
       random: _random
-    ).Select(inc => incidentMapper.MapBack(inc)).ToImmutableArray();
+    ).Select(inc => IncidentMapper.MapBack(inc)).ToImmutableArray();
 
     return incidents;
   }

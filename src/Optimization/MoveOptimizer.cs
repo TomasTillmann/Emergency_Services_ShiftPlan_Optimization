@@ -25,49 +25,49 @@ public abstract class MoveOptimizer : Optimizer
     switch (move.MoveType)
     {
       case MoveType.ShiftShorter:
-        medicTeamShift = weights.MedicTeamAllocations[move.DepotIndex, move.MedicTeamOnDepotIndex];
+        medicTeamShift = weights.MedicTeamAllocations[move.DepotIndex, move.OnDepotIndex];
         durationSec = medicTeamShift.DurationSec;
         startingTimeSec = medicTeamShift.StartSec;
         durationSec = GetShorter(medicTeamShift.DurationSec);
-        weights.MedicTeamAllocations[move.DepotIndex, move.MedicTeamOnDepotIndex] = Interval.GetByStartAndDuration(startingTimeSec, durationSec);
+        weights.MedicTeamAllocations[move.DepotIndex, move.OnDepotIndex] = Interval.GetByStartAndDuration(startingTimeSec, durationSec);
         break;
 
       case MoveType.ShiftLonger:
-        medicTeamShift = weights.MedicTeamAllocations[move.DepotIndex, move.MedicTeamOnDepotIndex];
+        medicTeamShift = weights.MedicTeamAllocations[move.DepotIndex, move.OnDepotIndex];
         durationSec = medicTeamShift.DurationSec;
         startingTimeSec = medicTeamShift.StartSec;
         durationSec = GetLonger(medicTeamShift.DurationSec);
-        weights.MedicTeamAllocations[move.DepotIndex, move.MedicTeamOnDepotIndex] = Interval.GetByStartAndDuration(startingTimeSec, durationSec);
+        weights.MedicTeamAllocations[move.DepotIndex, move.OnDepotIndex] = Interval.GetByStartAndDuration(startingTimeSec, durationSec);
         break;
 
       case MoveType.ShiftLater:
-        medicTeamShift = weights.MedicTeamAllocations[move.DepotIndex, move.MedicTeamOnDepotIndex];
+        medicTeamShift = weights.MedicTeamAllocations[move.DepotIndex, move.OnDepotIndex];
         durationSec = medicTeamShift.DurationSec;
         startingTimeSec = medicTeamShift.StartSec;
         startingTimeSec = GetLater(medicTeamShift.StartSec);
-        weights.MedicTeamAllocations[move.DepotIndex, move.MedicTeamOnDepotIndex] = Interval.GetByStartAndDuration(startingTimeSec, durationSec);
+        weights.MedicTeamAllocations[move.DepotIndex, move.OnDepotIndex] = Interval.GetByStartAndDuration(startingTimeSec, durationSec);
         break;
 
       case MoveType.ShiftEarlier:
-        medicTeamShift = weights.MedicTeamAllocations[move.DepotIndex, move.MedicTeamOnDepotIndex];
+        medicTeamShift = weights.MedicTeamAllocations[move.DepotIndex, move.OnDepotIndex];
         durationSec = medicTeamShift.DurationSec;
         startingTimeSec = medicTeamShift.StartSec;
         startingTimeSec = GetEarlier(medicTeamShift.StartSec);
-        weights.MedicTeamAllocations[move.DepotIndex, move.MedicTeamOnDepotIndex] = Interval.GetByStartAndDuration(startingTimeSec, durationSec);
+        weights.MedicTeamAllocations[move.DepotIndex, move.OnDepotIndex] = Interval.GetByStartAndDuration(startingTimeSec, durationSec);
         break;
 
       case MoveType.AllocateMedicTeam:
-        medicTeamShift = weights.MedicTeamAllocations[move.DepotIndex, move.MedicTeamOnDepotIndex];
+        medicTeamShift = weights.MedicTeamAllocations[move.DepotIndex, move.OnDepotIndex];
         startingTimeSec = medicTeamShift.StartSec;
-        weights.MedicTeamAllocations[move.DepotIndex, move.MedicTeamOnDepotIndex] = Interval.GetByStartAndDuration(startingTimeSec, ShiftTimes.MinDurationSec);
+        weights.MedicTeamAllocations[move.DepotIndex, move.OnDepotIndex] = Interval.GetByStartAndDuration(startingTimeSec, ShiftTimes.MinDurationSec);
         weights.MedicTeamsPerDepotCount[move.DepotIndex]++;
         weights.AllocatedMedicTeamsCount++;
         break;
 
       case MoveType.DeallocateMedicTeam:
-        medicTeamShift = weights.MedicTeamAllocations[move.DepotIndex, move.MedicTeamOnDepotIndex];
+        medicTeamShift = weights.MedicTeamAllocations[move.DepotIndex, move.OnDepotIndex];
         startingTimeSec = medicTeamShift.StartSec;
-        weights.MedicTeamAllocations[move.DepotIndex, move.MedicTeamOnDepotIndex] = Interval.GetByStartAndDuration(startingTimeSec, 0);
+        weights.MedicTeamAllocations[move.DepotIndex, move.OnDepotIndex] = Interval.GetByStartAndDuration(startingTimeSec, 0);
         weights.MedicTeamsPerDepotCount[move.DepotIndex]--;
         weights.AllocatedMedicTeamsCount--;
         break;
@@ -101,7 +101,7 @@ public abstract class MoveOptimizer : Optimizer
       weights,
       new Move
       {
-        MedicTeamOnDepotIndex = move.MedicTeamOnDepotIndex,
+        OnDepotIndex = move.OnDepotIndex,
         DepotIndex = move.DepotIndex,
         MoveType = inverseMoveType
       }
@@ -145,7 +145,7 @@ public abstract class MoveOptimizer : Optimizer
   }
 
   /// <summary>
-  /// Tries to generate <see cref="Move"/> of type <paramref name="move"/> on <paramref name="weights"/> on <see cref="Interval"/> on <paramref name="weightIndex"/>.
+  /// Tries to generate <see cref="Move"/> of type <paramref name="move"/> on <paramref name="weights"/>.
   /// </summary>
   public bool TryGenerateMove(Weights weights, int depotIndex, int medicTeamOnDepotIndex, MoveType type, [NotNullWhen(true)] out Move? move)
   {
@@ -163,7 +163,7 @@ public abstract class MoveOptimizer : Optimizer
           move = new Move
           {
             DepotIndex = depotIndex,
-            MedicTeamOnDepotIndex = medicTeamOnDepotIndex,
+            OnDepotIndex = medicTeamOnDepotIndex,
             MoveType = MoveType.ShiftShorter
           };
 
@@ -180,7 +180,7 @@ public abstract class MoveOptimizer : Optimizer
           move = new Move
           {
             DepotIndex = depotIndex,
-            MedicTeamOnDepotIndex = medicTeamOnDepotIndex,
+            OnDepotIndex = medicTeamOnDepotIndex,
             MoveType = MoveType.ShiftLonger
           };
           return true;
@@ -191,12 +191,12 @@ public abstract class MoveOptimizer : Optimizer
       case MoveType.ShiftEarlier:
         durationSec = weights.MedicTeamAllocations[depotIndex, medicTeamOnDepotIndex].DurationSec;
         startSec = weights.MedicTeamAllocations[depotIndex, medicTeamOnDepotIndex].StartSec;
-        if (startSec != ShiftTimes.EarliestStartingTimeSec)
+        if (startSec != ShiftTimes.EarliestStartingTimeSec && durationSec != 0)
         {
           move = new Move
           {
             DepotIndex = depotIndex,
-            MedicTeamOnDepotIndex = medicTeamOnDepotIndex,
+            OnDepotIndex = medicTeamOnDepotIndex,
             MoveType = MoveType.ShiftEarlier
           };
           return true;
@@ -207,12 +207,12 @@ public abstract class MoveOptimizer : Optimizer
       case MoveType.ShiftLater:
         durationSec = weights.MedicTeamAllocations[depotIndex, medicTeamOnDepotIndex].DurationSec;
         startSec = weights.MedicTeamAllocations[depotIndex, medicTeamOnDepotIndex].StartSec;
-        if (startSec != ShiftTimes.LatestStartingTimeSec)
+        if (startSec != ShiftTimes.LatestStartingTimeSec && durationSec != 0)
         {
           move = new Move
           {
             DepotIndex = depotIndex,
-            MedicTeamOnDepotIndex = medicTeamOnDepotIndex,
+            OnDepotIndex = medicTeamOnDepotIndex,
             MoveType = MoveType.ShiftLater
           };
           return true;
@@ -227,7 +227,7 @@ public abstract class MoveOptimizer : Optimizer
           move = new Move
           {
             DepotIndex = depotIndex,
-            MedicTeamOnDepotIndex = medicTeamOnDepotIndex,
+            OnDepotIndex = medicTeamOnDepotIndex,
             MoveType = MoveType.AllocateMedicTeam
           };
           return true;
@@ -242,7 +242,7 @@ public abstract class MoveOptimizer : Optimizer
           move = new Move
           {
             DepotIndex = depotIndex,
-            MedicTeamOnDepotIndex = medicTeamOnDepotIndex,
+            OnDepotIndex = medicTeamOnDepotIndex,
             MoveType = MoveType.DeallocateMedicTeam
           };
           return true;
@@ -256,7 +256,7 @@ public abstract class MoveOptimizer : Optimizer
           move = new Move
           {
             DepotIndex = depotIndex,
-            MedicTeamOnDepotIndex = -1,
+            OnDepotIndex = -1,
             MoveType = MoveType.AllocateAmbulance
           };
           return true;
@@ -270,7 +270,7 @@ public abstract class MoveOptimizer : Optimizer
           move = new Move
           {
             DepotIndex = depotIndex,
-            MedicTeamOnDepotIndex = -1,
+            OnDepotIndex = -1,
             MoveType = MoveType.DeallocateAmbulance
           };
           return true;
@@ -282,7 +282,7 @@ public abstract class MoveOptimizer : Optimizer
         move = new Move
         {
           DepotIndex = -1,
-          MedicTeamOnDepotIndex = -1,
+          OnDepotIndex = -1,
           MoveType = MoveType.NoMove
         };
 

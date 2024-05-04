@@ -28,6 +28,8 @@ public class HillClimbOptimizer : LocalSearchOptimizer
     Weights currentWeights = StartWeights;
     Weights globalBestWeights = currentWeights;
 
+    Visualizer visualizer = new(Debug);
+
     double currentBestLoss = Loss.Get(currentWeights, incidents);
     double globalBestLoss = currentBestLoss;
 
@@ -37,7 +39,6 @@ public class HillClimbOptimizer : LocalSearchOptimizer
       Debug.WriteLine($"globalBestLoss: {globalBestLoss}");
 
       GetMovesToNeighbours(currentWeights);
-
       Move currentBestMove = Move.Identity;
 
       for (int i = 0; i < movesBuffer.Count; ++i)
@@ -47,7 +48,7 @@ public class HillClimbOptimizer : LocalSearchOptimizer
         ModifyMakeMove(currentWeights, move);
 
         double neighbourLoss = Loss.Get(currentWeights, incidents);
-        // Debug.WriteLine($"Neighbour loss: {neighbourLoss}"); // SPAM
+        // Debug.WriteLine($"--- {move}, {neighbourLoss}"); // SPAM
 
         if (neighbourLoss < currentBestLoss)
         {
@@ -78,6 +79,7 @@ public class HillClimbOptimizer : LocalSearchOptimizer
         globalBestLoss = currentBestLoss;
       }
 
+      visualizer.PlotGraph(Loss, currentWeights, incidents, Debug);
       Debug.WriteLine("======");
     }
 

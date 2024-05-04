@@ -105,7 +105,7 @@ public abstract class LocalSearchOptimizer : MoveOptimizer
   }
 
   /// <summary>
-  /// Fisher-Yates permutation algorithm with limit when to end the permutation
+  /// Fisher-Yates permutation algorithm with limit when to end the permutation.
   /// </summary>
   private void Permutate(ref Span<int> toPermutate)
   {

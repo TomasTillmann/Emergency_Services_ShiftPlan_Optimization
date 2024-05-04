@@ -1,9 +1,7 @@
 using System.Collections.Immutable;
 using ESSP.DataModel;
-using Optimizing;
-using Simulating;
 
-namespace Client;
+namespace Optimizing;
 
 public class Visualizer : IDisposable
 {
@@ -87,6 +85,8 @@ public class Visualizer : IDisposable
     loss.Simulation.Run(incidents.AsSpan());
 
     WriteGraph(loss.Simulation.EmergencyServicePlan, incidents, writer);
+    writer.WriteLine("ambulances:");
+    writer.WriteLine(string.Join("\n", loss.Simulation.EmergencyServicePlan.Depots.Select(depot => $"{depot.Index}: {depot.Ambulances.Count}")));
     writer.WriteLine();
     writer.WriteLine("Unhandled:");
     writer.WriteLine(string.Join("\n", loss.Simulation.UnhandledIncidents));

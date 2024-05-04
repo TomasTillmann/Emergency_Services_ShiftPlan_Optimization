@@ -101,8 +101,8 @@ public class DataModelGenerator
       {
         Location = randomLoc,
         OccurenceSec = random.Next(duration.Value),
-        OnSceneDurationSec = (int)onSceneDurationDistribution.Sample(),
-        InHospitalDeliverySec = (int)inHospitalDeliveryDistribution.Sample(),
+        OnSceneDurationSec = Math.Min(Math.Max(10.ToMinutes().ToSeconds().Value, (int)onSceneDurationDistribution.Sample()), 30.ToMinutes().ToSeconds().Value),
+        InHospitalDeliverySec = Math.Min(Math.Max(10.ToMinutes().ToSeconds().Value, (int)inHospitalDeliveryDistribution.Sample()), 30.ToMinutes().ToSeconds().Value),
       };
 
       incidents.Add(incident);

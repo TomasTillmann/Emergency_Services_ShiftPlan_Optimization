@@ -60,13 +60,13 @@ public class StandardLoss : Loss
   {
     double successRate = GetSuccessRate();
     double planCost = GetCost();
-    double exhaustion = GetEffectivity();
+    // double exhaustion = GetEffectivity();
 
     double handledPart = Alpha * successRate;
     double costPart = Beta * planCost;
-    double exhaustionError = Gamma * Math.Abs(exhaustion - EffectivityTarget);
+    // double exhaustionError = Gamma * Math.Abs(exhaustion - EffectivityTarget);
 
-    double loss = costPart + exhaustionError - handledPart;
+    double loss = costPart + /* exhaustionError */ -handledPart;
 
     return loss;
   }

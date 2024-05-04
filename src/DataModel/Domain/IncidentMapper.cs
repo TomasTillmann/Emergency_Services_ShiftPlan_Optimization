@@ -2,11 +2,11 @@ namespace ESSP.DataModel;
 
 /// Incident mapper
 
-public class IncidentMapper
+public static class IncidentMapper
 {
-  private readonly CoordinateMapper _coordinateMapper = new();
+  private static readonly CoordinateMapper _coordinateMapper = new();
 
-  public IncidentModel Map(Incident incident)
+  public static IncidentModel Map(Incident incident)
   {
     return new IncidentModel
     {
@@ -17,7 +17,7 @@ public class IncidentMapper
     };
   }
 
-  public Incident MapBack(IncidentModel model)
+  public static Incident MapBack(IncidentModel model)
   {
     return new Incident
     {

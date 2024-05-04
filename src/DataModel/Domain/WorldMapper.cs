@@ -6,12 +6,12 @@ namespace ESSP.DataModel;
 
 /// World mapper
 
-public class WorldMapper
+public static class WorldMapper
 {
-  private readonly DepotMapper _depotMapper = new();
-  private readonly HospitalMapper _hospitalMapper = new();
+  private static readonly DepotMapper _depotMapper = new();
+  private static readonly HospitalMapper _hospitalMapper = new();
 
-  public WorldModel Map(World world)
+  public static WorldModel Map(World world)
   {
     return new WorldModel
     {
@@ -23,7 +23,7 @@ public class WorldMapper
     };
   }
 
-  public World MapBack(WorldModel model)
+  public static World MapBack(WorldModel model)
   {
     var hospitals = model.Hospitals.Select(hospital => _hospitalMapper.MapBack(hospital)).ToImmutableArray();
     return new World

@@ -1,6 +1,7 @@
 ﻿#define AllOptimizers_Parametrized1
 // #define simulation_test
 //#define dynamic_programming
+//#define serializing
 
 using ESSP.DataModel;
 using Optimization;
@@ -15,6 +16,32 @@ class Program
 {
   private static readonly string _logsPath = @"/home/tom/School/Bakalarka/Emergency_Services_ShiftPlan_Optimization/src/logs/";
   private static readonly StreamWriter _debug = new(_logsPath + "debug.log");
+
+#if serializing
+  static void Main()
+  {
+    const int seed = 42;
+    Random random = new(seed);
+    IInputParametrization input = new Input1(random);
+    World world = input.GetWorld();
+    ImmutableArray<Incident> incidents = input.GetIncidents();
+    Constraints constraints = input.GetConstraints();
+    Simulation simulation = new(world);
+    ShiftTimes shiftTimes = input.GetShiftTimes();
+
+    IOptimizer opt = new HillClimbOptimizer(world, constraints, shiftTimes, new StandardLoss(simulation, shiftTimes));
+    opt.Debug = _debug;
+    opt.FindOptimal(incidents);
+
+    string worldJson = ModelPersistor.Serialize(WorldMapper.Map(world), false);
+    File.WriteAllText(_logsPath + "json/" + $"World_Input1_{seed}.json", worldJson);
+
+    string incidentsJson = ModelPersistor.Serialize(incidents.Select(incident => IncidentMapper.Map(incident)), false);
+    File.WriteAllText(_logsPath + "json/" + $"Incidents_Input1_{seed}.json", incidentsJson);
+
+    _debug.Dispose();
+  }
+#endif
 
 #if AllOptimizers_Parametrized1
   static void Main()
@@ -40,29 +67,29 @@ class Program
 
     simulation = new(world);
     loss = new StandardLoss(simulation, shiftTimes);
-    optimizer = new TabuSearchOptimizer(world, constraints, shiftTimes, loss, random: random);
-    optimizer.StartWeights = startWeights.Copy();
+    optimizer = new HillClimbOptimizer(world, constraints, shiftTimes, loss, steps: 200, random: random);
+    optimizer.StartWeights = startWeights;
     optimizer.Debug = _debug;
     optimizers.Add(optimizer);
 
     simulation = new(world);
     loss = new StandardLoss(simulation, shiftTimes);
-    optimizer = new HillClimbOptimizer(world, constraints, shiftTimes, loss, random: random);
-    optimizer.StartWeights = startWeights.Copy();
+    optimizer = new TabuSearchOptimizer(world, constraints, shiftTimes, loss, tabuSize: 300, iterations: 200, random: random);
+    optimizer.StartWeights = startWeights;
     optimizer.Debug = _debug;
     optimizers.Add(optimizer);
 
     simulation = new(world);
     loss = new StandardLoss(simulation, shiftTimes);
     optimizer = new DynamicProgrammingOptimizer(world, constraints, shiftTimes, loss, random: random);
-    optimizer.StartWeights = startWeights.Copy();
+    optimizer.StartWeights = startWeights;
     optimizer.Debug = _debug;
     optimizers.Add(optimizer);
 
     simulation = new(world);
     loss = new StandardLoss(simulation, shiftTimes);
     optimizer = new SimulatedAnnealingOptimizer(world, constraints, shiftTimes, loss, random: random);
-    optimizer.StartWeights = startWeights.Copy();
+    optimizer.StartWeights = startWeights;
     optimizer.Debug = _debug;
     optimizers.Add(optimizer);
 
@@ -72,9 +99,6 @@ class Program
       Stopwatch sw = Stopwatch.StartNew();
       var optimal = opt.FindOptimal(incidents).First();
       _debug.WriteLine("Elapsed: " + sw.Elapsed);
-      visualizer.PlotGraph(loss, optimal, incidents);
-
-      optimal.MedicTeamAllocations[8, 1] = Interval.GetByStartAndDuration(optimal.MedicTeamAllocations[8, 1].StartSec, 8.ToHours().ToMinutes().ToSeconds().Value);
       visualizer.PlotGraph(loss, optimal, incidents);
       break;
     }

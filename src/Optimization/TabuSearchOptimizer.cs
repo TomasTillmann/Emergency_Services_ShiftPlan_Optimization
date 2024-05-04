@@ -59,12 +59,13 @@ public sealed class TabuSearchOptimizer : LocalSearchOptimizer
       Move currentBestMove = default(Move);
 
       GetMovesToNeighbours(currentWeights);
+      Debug.WriteLine(string.Join(", ", movesBuffer));
 
       for (int i = 0; i < movesBuffer.Count; ++i)
       {
-        Move move = movesBuffer[i];
+        Move currentMove = movesBuffer[i];
 
-        ModifyMakeMove(currentWeights, move);
+        ModifyMakeMove(currentWeights, currentMove);
 
         double neighbourLoss = Loss.Get(currentWeights, incidents);
         // Debug.WriteLine($"Neighbour loss: {neighbourLoss}"); // SPAM
@@ -72,9 +73,9 @@ public sealed class TabuSearchOptimizer : LocalSearchOptimizer
         if (neighbourLoss < currentBestLoss)
         {
           bool isInTabu = false;
-          for (int tabuIndex = 0; tabuIndex < cyclicTabuIndex; ++tabuIndex)
+          for (int tabuIndex = 0; tabuIndex < TabuSize; ++tabuIndex)
           {
-            if (tabu[tabuIndex] == currentBestMove)
+            if (tabu[tabuIndex] == currentMove)
             {
               isInTabu = true;
               break;
@@ -83,23 +84,24 @@ public sealed class TabuSearchOptimizer : LocalSearchOptimizer
 
           if (isInTabu)
           {
+            Debug.WriteLine($"move: {currentMove} is in tabu");
             // aspiration criterion
             if (neighbourLoss < globalBestLoss)
             {
               Debug.WriteLine($"curr loss updated to - aspiration criterion satisfied: {neighbourLoss}");
-              currentBestMove = move;
+              currentBestMove = currentMove;
               currentBestLoss = neighbourLoss;
             }
           }
           else
           {
             Debug.WriteLine($"curr loss updated to: {neighbourLoss}");
-            currentBestMove = move;
+            currentBestMove = currentMove;
             currentBestLoss = neighbourLoss;
           }
         }
 
-        ModifyUnmakeMove(currentWeights, move);
+        ModifyUnmakeMove(currentWeights, currentMove);
       }
 
       // All neighbours are tabu and worse than global best. Happens very rarely. 
@@ -124,11 +126,12 @@ public sealed class TabuSearchOptimizer : LocalSearchOptimizer
       // add move to tabu
       tabu[cyclicTabuIndex++] = new Move
       {
-        MedicTeamOnDepotIndex = currentBestMove.MedicTeamOnDepotIndex,
+        OnDepotIndex = currentBestMove.OnDepotIndex,
         DepotIndex = currentBestMove.DepotIndex,
         MoveType = LocalSearchOptimizer.GetInverseMoveType(currentBestMove.MoveType)
       };
       cyclicTabuIndex %= TabuSize;
+      Debug.WriteLine($"tabu: {string.Join(", ", tabu.ToImmutableArray())}");
 
       Debug.WriteLine("======");
     }
