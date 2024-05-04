@@ -4,51 +4,48 @@ namespace Optimizing;
 
 public abstract class LocalSearchOptimizer : MoveOptimizer
 {
-  public int ShiftChangesLimit { get; set; }
-  public int AmbulancesAllocationsLimit { get; set; }
+  public int NeighboursLimit { get; set; }
+  public bool ShouldPermutate { get; set; }
 
-  private int _k1;
-  private int _k2;
-
-  public LocalSearchOptimizer(World world, Constraints constraints, ShiftTimes shiftTimes, ILoss loss, int shiftChangesLimit = int.MaxValue, int allocationsLimit = int.MaxValue, Random? random = null)
+  public LocalSearchOptimizer(World world, Constraints constraints, ShiftTimes shiftTimes, ILoss loss, bool shouldPermutate = true, int neighboursLimit = int.MaxValue, Random? random = null)
   : base(world, constraints, shiftTimes, loss, random)
   {
-    ShiftChangesLimit = shiftChangesLimit;
-    AmbulancesAllocationsLimit = allocationsLimit;
-
-    _k1 = Math.Min(ShiftChangesLimit, Constraints.MaxMedicTeamsOnDepotCount) / Constraints.MaxMedicTeamsOnDepotCount;
-    _k2 = Math.Min(AmbulancesAllocationsLimit, Constraints.MaxAmbulancesOnDepotCount) / Constraints.MaxAmbulancesOnDepotCount;
+    NeighboursLimit = neighboursLimit;
+    ShouldPermutate = shouldPermutate;
   }
 
   /// <summary>
-  /// Generates neighbouring moves in <see cref="ShiftChangesLimit"/> limit in randomly permutated order.
+  /// Generates neighbouring moves in <see cref="NeighboursLimit"/> limit in randomly permutated order.
   /// Returns length of generated moves in <see cref="movesBuffer"/>.
   /// </summary>
   public void GetMovesToNeighbours(Weights weights)
   {
     Span<int> permutatedDepots = stackalloc int[World.Depots.Length];
-    Span<int> permutatedShiftsOnDepot = stackalloc int[Constraints.MaxMedicTeamsOnDepotCount];
-
     for (int i = 0; i < permutatedDepots.Length; ++i)
     {
       permutatedDepots[i] = i;
     }
-    Permutate(toPermutate: ref permutatedDepots);
 
+    Span<int> permutatedShiftsOnDepot = stackalloc int[Constraints.MaxMedicTeamsOnDepotCount];
     for (int i = 0; i < permutatedShiftsOnDepot.Length; ++i)
     {
       permutatedShiftsOnDepot[i] = i;
     }
-    Permutate(toPermutate: ref permutatedShiftsOnDepot);
+
+    if (ShouldPermutate)
+    {
+      Permutate(toPermutate: permutatedDepots);
+      Permutate(toPermutate: permutatedShiftsOnDepot);
+    }
 
     movesBuffer.Clear();
     int shiftChangesNeighboursCount = 0;
     int allocationNeighboursCount = 0;
     Move? move;
 
-    for (int depotIndex = 0; depotIndex < World.Depots.Length; ++depotIndex)
+    for (int depotIndex = 0; shiftChangesNeighboursCount < NeighboursLimit && depotIndex < World.Depots.Length; ++depotIndex)
     {
-      for (int shiftOnDepotIndex = 0; shiftOnDepotIndex < _k1 * Constraints.MaxMedicTeamsOnDepotCount && shiftChangesNeighboursCount < ShiftChangesLimit; ++shiftOnDepotIndex)
+      for (int shiftOnDepotIndex = 0; shiftOnDepotIndex < Constraints.MaxMedicTeamsOnDepotCount && shiftChangesNeighboursCount < NeighboursLimit; ++shiftOnDepotIndex)
       {
         if (TryGenerateMove(weights, permutatedDepots[depotIndex], permutatedShiftsOnDepot[shiftOnDepotIndex], MoveType.ShiftShorter, out move))
         {
@@ -107,7 +104,7 @@ public abstract class LocalSearchOptimizer : MoveOptimizer
   /// <summary>
   /// Fisher-Yates permutation algorithm with limit when to end the permutation.
   /// </summary>
-  private void Permutate(ref Span<int> toPermutate)
+  private void Permutate(Span<int> toPermutate)
   {
     for (int i = 0; i < toPermutate.Length; ++i)
     {

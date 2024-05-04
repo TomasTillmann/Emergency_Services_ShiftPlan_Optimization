@@ -14,7 +14,7 @@ public sealed class TabuSearchOptimizer : LocalSearchOptimizer
   #endregion
 
   /// <param name="tabuSize">If set too high, it could happen, that all neighbours are tabu (and aspiration criterion is not satisfied either). Also it is slower.
-  /// <param name="shiftChangesLimit">If count of neighbours is exceeded, only first <paramref name="shiftChangesLimit"/> neighbours will be tried, permutated.
+  /// <param name="neighboursLimit">If count of neighbours is exceeded, only first <paramref name="neighboursLimit"/> neighbours will be tried, permutated.
   public TabuSearchOptimizer
   (
     World world,
@@ -23,11 +23,11 @@ public sealed class TabuSearchOptimizer : LocalSearchOptimizer
     ILoss loss,
     int iterations = 50,
     int tabuSize = 50,
-    int shiftChangesLimit = int.MaxValue,
-    int allocationsLimit = int.MaxValue,
+    bool shouldPermutate = true,
+    int neighboursLimit = int.MaxValue,
     Random? random = null
   )
-  : base(world, constraints, shiftTimes, loss, shiftChangesLimit, allocationsLimit, random)
+  : base(world, constraints, shiftTimes, loss, shouldPermutate, neighboursLimit, random)
   {
     Iterations = iterations;
     TabuSize = tabuSize;

@@ -7,15 +7,29 @@ public class RandomSampleHillClimbOptimizer : Optimizer
 {
   private readonly HillClimbOptimizer _hillClimbOptimizer;
 
-  public int SamplesCount { get; set; }
   public int Iterations { get; }
+  public int NeighboursLimit { get; }
+  public bool ContinueIfStuck { get; }
 
-  public RandomSampleHillClimbOptimizer(World world, Constraints constraints, ShiftTimes shiftTimes, ILoss loss, int samples, int iterations, Random? random = null)
+  public int SamplesCount { get; set; }
+
+  public RandomSampleHillClimbOptimizer(
+      World world,
+      Constraints constraints,
+      ShiftTimes shiftTimes,
+      ILoss loss,
+      int samples,
+      int iterations,
+      bool continueIfStuck = false,
+      int neighboursLimit = int.MaxValue,
+      Random? random = null)
   : base(world, constraints, shiftTimes, loss, random)
   {
-    _hillClimbOptimizer = new(world, constraints, shiftTimes, loss, iterations: iterations, random: random);
-    SamplesCount = samples;
+    _hillClimbOptimizer = new(world, constraints, shiftTimes, loss, continueIfStuck: continueIfStuck, neighboursLimit: neighboursLimit, iterations: iterations, random: random);
     Iterations = iterations;
+    NeighboursLimit = neighboursLimit;
+    ContinueIfStuck = continueIfStuck;
+    SamplesCount = samples;
   }
 
   public override IEnumerable<Weights> FindOptimal(ImmutableArray<Incident> incidents)
@@ -34,7 +48,7 @@ public class RandomSampleHillClimbOptimizer : Optimizer
       if (currentLoss < bestLoss)
       {
         bestLoss = currentLoss;
-        bestWeights = optimal;
+        bestWeights = optimal.Copy();
       }
 
       visualizer.PlotGraph(Loss, optimal, incidents, Debug);

@@ -67,7 +67,13 @@ class Program
 
     simulation = new(world);
     loss = new StandardLoss(simulation, shiftTimes);
-    optimizer = new RandomSampleHillClimbOptimizer(world, constraints, shiftTimes, loss, samples: 10, iterations: 130, random: random);
+    optimizer = new RandomSampleHillClimbOptimizer(world, constraints, shiftTimes, loss, neighboursLimit: 30, samples: 50, iterations: 90, random: random);
+    optimizer.Debug = _debug;
+    optimizers.Add(optimizer);
+
+    simulation = new(world);
+    loss = new StandardLoss(simulation, shiftTimes);
+    optimizer = new RandomWalkOptimizer(world, constraints, shiftTimes, loss, iterations: 10_000, random: random);
     optimizer.Debug = _debug;
     optimizers.Add(optimizer);
 

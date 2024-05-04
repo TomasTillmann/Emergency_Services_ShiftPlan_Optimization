@@ -7,20 +7,24 @@ public class HillClimbOptimizer : LocalSearchOptimizer
 {
   public int Steps { get; set; }
 
+  public bool ContinueIfStuck { get; }
+
   public HillClimbOptimizer
   (
     World world,
     Constraints constraints,
     ShiftTimes shiftTimes,
     ILoss loss,
-    int shiftChangesLimit = int.MaxValue,
-    int shiftAllocationsLimit = int.MaxValue,
+    bool continueIfStuck = false,
+    bool shouldPermutate = true,
+    int neighboursLimit = int.MaxValue,
     int iterations = 50,
     Random? random = null
   )
-  : base(world, constraints, shiftTimes, loss, shiftChangesLimit, shiftAllocationsLimit, random)
+  : base(world, constraints, shiftTimes, loss, shouldPermutate, neighboursLimit, random)
   {
     Steps = iterations;
+    ContinueIfStuck = continueIfStuck;
   }
 
   public override IEnumerable<Weights> FindOptimal(ImmutableArray<Incident> incidents)
@@ -61,7 +65,7 @@ public class HillClimbOptimizer : LocalSearchOptimizer
       }
 
       // In local minima.
-      if (currentBestMove.MoveType == Move.Identity.MoveType)
+      if (currentBestMove.MoveType == Move.Identity.MoveType && !ContinueIfStuck)
       {
         //Debug.WriteLine($"stuck");
         return new List<Weights> { globalBestWeights };
