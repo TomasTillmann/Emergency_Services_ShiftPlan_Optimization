@@ -48,7 +48,7 @@ class Program
   {
     Visualizer visualizer = new(_debug);
 
-    Random random = new Random(42);
+    Random random = new Random(66);
     IInputParametrization input = new Input1(random);
     World world = input.GetWorld();
     Constraints constraints = input.GetConstraints();
@@ -67,7 +67,13 @@ class Program
 
     simulation = new(world);
     loss = new StandardLoss(simulation, shiftTimes);
-    optimizer = new HillClimbOptimizer(world, constraints, shiftTimes, loss, steps: 200, random: random);
+    optimizer = new RandomSampleHillClimbOptimizer(world, constraints, shiftTimes, loss, samples: 10, iterations: 130, random: random);
+    optimizer.Debug = _debug;
+    optimizers.Add(optimizer);
+
+    simulation = new(world);
+    loss = new StandardLoss(simulation, shiftTimes);
+    optimizer = new HillClimbOptimizer(world, constraints, shiftTimes, loss, iterations: 200, random: random);
     optimizer.StartWeights = startWeights;
     optimizer.Debug = _debug;
     optimizers.Add(optimizer);

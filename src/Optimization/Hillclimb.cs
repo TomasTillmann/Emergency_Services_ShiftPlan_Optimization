@@ -15,12 +15,12 @@ public class HillClimbOptimizer : LocalSearchOptimizer
     ILoss loss,
     int shiftChangesLimit = int.MaxValue,
     int shiftAllocationsLimit = int.MaxValue,
-    int steps = 50,
+    int iterations = 50,
     Random? random = null
   )
   : base(world, constraints, shiftTimes, loss, shiftChangesLimit, shiftAllocationsLimit, random)
   {
-    Steps = steps;
+    Steps = iterations;
   }
 
   public override IEnumerable<Weights> FindOptimal(ImmutableArray<Incident> incidents)
@@ -35,8 +35,8 @@ public class HillClimbOptimizer : LocalSearchOptimizer
 
     for (int step = 0; step < Steps; ++step)
     {
-      Debug.WriteLine($"step: {step}");
-      Debug.WriteLine($"globalBestLoss: {globalBestLoss}");
+      //Debug.WriteLine($"step: {step}");
+      //Debug.WriteLine($"globalBestLoss: {globalBestLoss}");
 
       GetMovesToNeighbours(currentWeights);
       Move currentBestMove = Move.Identity;
@@ -52,7 +52,7 @@ public class HillClimbOptimizer : LocalSearchOptimizer
 
         if (neighbourLoss < currentBestLoss)
         {
-          Debug.WriteLine($"curr loss updated to: {neighbourLoss}");
+          //Debug.WriteLine($"curr loss updated to: {neighbourLoss}");
           currentBestMove = move;
           currentBestLoss = neighbourLoss;
         }
@@ -63,24 +63,24 @@ public class HillClimbOptimizer : LocalSearchOptimizer
       // In local minima.
       if (currentBestMove.MoveType == Move.Identity.MoveType)
       {
-        Debug.WriteLine($"stuck");
+        //Debug.WriteLine($"stuck");
         return new List<Weights> { globalBestWeights };
       }
 
       // move in the best direction
-      Debug.WriteLine($"made move: {currentBestMove}");
+      //Debug.WriteLine($"made move: {currentBestMove}");
       ModifyMakeMove(currentWeights, currentBestMove);
 
       // update global best
       if (currentBestLoss < globalBestLoss)
       {
-        Debug.WriteLine($"global best loss updated to: {currentBestLoss}");
+        //Debug.WriteLine($"global best loss updated to: {currentBestLoss}");
         globalBestWeights = currentWeights.Copy();
         globalBestLoss = currentBestLoss;
       }
 
-      visualizer.PlotGraph(Loss, currentWeights, incidents, Debug);
-      Debug.WriteLine("======");
+      //visualizer.PlotGraph(Loss, currentWeights, incidents, Debug);
+      //Debug.WriteLine("======");
     }
 
     return new List<Weights> { globalBestWeights };
