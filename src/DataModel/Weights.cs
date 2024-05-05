@@ -12,26 +12,26 @@ public class Weights
   /// <summary>
   /// Is size of Depots. 
   /// i-th value represents how many medic teams are allocated to i-th depot. 
-  /// Sum per i-th values equals <see cref="AllocatedMedicTeamsCount"/>.
+  /// Sum per i-th values equals <see cref="AllAllocatedMedicTeamsCount"/>.
   /// </summary>
   public int[] MedicTeamsPerDepotCount { get; init; }
 
   /// <summary>
   /// How many teams are allocated. Always has to be sum of <see cref="MedicTeamAllocations"/>.
   /// </summary>
-  public int AllocatedMedicTeamsCount { get; set; }
+  public int AllAllocatedMedicTeamsCount { get; set; }
 
   /// <summary>
   /// Is size of Depots. 
   /// i-th value represents how many ambulnaces are allocated to i-th depot. 
-  /// Sum per i-th values equals <see cref="AllocatedAmbulancesCount"/>.
+  /// Sum per i-th values equals <see cref="AllAllocatedAmbulancesCount"/>.
   /// </summary>
   public int[] AmbulancesPerDepotCount { get; init; }
 
   /// <summary>
   /// How many ambulances are allocated. Always has to be sum of <see cref="AmbulancesPerDepotCount"/>.
   /// </summary>
-  public int AllocatedAmbulancesCount { get; set; }
+  public int AllAllocatedAmbulancesCount { get; set; }
 
   public Weights() { }
 
@@ -70,7 +70,7 @@ public class Weights
         }
       }
     }
-    weights.AllocatedMedicTeamsCount = constraints.AvailableMedicTeamsCount - runningAvailableMedicTeamsCount;
+    weights.AllAllocatedMedicTeamsCount = constraints.AvailableMedicTeamsCount - runningAvailableMedicTeamsCount;
     //
 
     // amb allocations
@@ -88,7 +88,7 @@ public class Weights
       weights.AmbulancesPerDepotCount[i] = ambulancesOnDepotCount;
       runningAvailableAmbulancesCount -= ambulancesOnDepotCount;
     }
-    weights.AllocatedAmbulancesCount = weights.AmbulancesPerDepotCount.Sum();
+    weights.AllAllocatedAmbulancesCount = weights.AmbulancesPerDepotCount.Sum();
     //
 
     return weights;
@@ -118,8 +118,38 @@ public class Weights
       }
     }
 
-    plan.AllocatedAmbulancesCount = AllocatedAmbulancesCount;
-    plan.AllocatedMedicTeamsCount = AllocatedMedicTeamsCount;
+    plan.AllocatedAmbulancesCount = AllAllocatedAmbulancesCount;
+    plan.AllocatedMedicTeamsCount = AllAllocatedMedicTeamsCount;
+  }
+
+  public static Weights GetFrom(EmergencyServicePlan plan, int maxMedicTeamsOnDepotCount)
+  {
+    Weights weights = new(plan.Depots.Length, maxMedicTeamsOnDepotCount);
+    Depot lastDepot = plan.AvailableMedicTeams[0].Depot;
+    if (lastDepot is null)
+    {
+      return weights;
+    }
+
+    int availableMedicTeamIndex = 0;
+    for (int depotIndex = 0; depotIndex < plan.Depots.Length; ++depotIndex)
+    {
+      int medicTeamIndex = 0;
+      for (; plan.AvailableMedicTeams[availableMedicTeamIndex].Depot == lastDepot; ++medicTeamIndex)
+      {
+        weights.MedicTeamAllocations[depotIndex, medicTeamIndex] = plan.AvailableMedicTeams[availableMedicTeamIndex].Shift;
+        lastDepot = plan.AvailableMedicTeams[availableMedicTeamIndex].Depot;
+        ++availableMedicTeamIndex;
+      }
+      weights.MedicTeamsPerDepotCount[depotIndex] = medicTeamIndex;
+      weights.AllAllocatedMedicTeamsCount += medicTeamIndex;
+      weights.AmbulancesPerDepotCount[depotIndex] = lastDepot.Ambulances.Count;
+      weights.AllAllocatedAmbulancesCount += lastDepot.Ambulances.Count;
+
+      lastDepot = plan.AvailableMedicTeams[availableMedicTeamIndex].Depot;
+    }
+
+    return weights;
   }
 
   public Weights Copy()
@@ -149,9 +179,9 @@ public class Weights
     {
       MedicTeamAllocations = medicTeamAllocations,
       MedicTeamsPerDepotCount = medicTeamsPerDepotCount,
-      AllocatedMedicTeamsCount = this.AllocatedMedicTeamsCount,
+      AllAllocatedMedicTeamsCount = this.AllAllocatedMedicTeamsCount,
       AmbulancesPerDepotCount = ambulancesPerDepotCount,
-      AllocatedAmbulancesCount = this.AllocatedAmbulancesCount
+      AllAllocatedAmbulancesCount = this.AllAllocatedAmbulancesCount
     };
   }
 }

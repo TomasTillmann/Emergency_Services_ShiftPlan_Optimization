@@ -62,25 +62,31 @@ class Program
     List<IOptimizer> optimizers = new();
 
     IncidentsNormalizer normalizer = new(world, shiftTimes);
-    var histogram = normalizer.GetIncidentsHandlingHistorgram(incidents);
-    _debug.WriteLine(string.Join(", ", histogram));
     incidents = normalizer.Normalize(incidents);
-
-    _debug.Flush();
-    _debug.Dispose();
-
-    return;
+    Console.WriteLine("incidents count: " + incidents.Length);
 
     simulation = new(world);
     loss = new StandardLoss(simulation, shiftTimes);
     visualizer.PlotGraph(loss, startWeights, incidents, _debug);
 
     simulation = new(world);
-    loss = new StandardLoss(simulation, shiftTimes);
+    loss = new SuccessRateLoss(simulation, shiftTimes);
     optimizer = new HillClimbOptimizer(world, constraints, shiftTimes, loss, iterations: 200, random: random);
     optimizer.StartWeights = startWeights;
     optimizer.Debug = _debug;
     optimizers.Add(optimizer);
+
+    FindMaxSuccessRateShiftPlan findMax = new(world, shiftTimes, constraints);
+    var o = findMax.FindOptimal(incidents).First();
+    visualizer.PlotGraph(loss, o, incidents);
+
+    simulation = new(world);
+    loss = new SuccessRateLoss(simulation, shiftTimes);
+    optimizer = new SimulatedAnnealingOptimizer(world, constraints, shiftTimes, loss, random: random);
+    optimizer.StartWeights = startWeights;
+    optimizer.Debug = _debug;
+    optimizers.Add(optimizer);
+
 
     simulation = new(world);
     loss = new StandardLoss(simulation, shiftTimes);
@@ -104,13 +110,6 @@ class Program
     simulation = new(world);
     loss = new StandardLoss(simulation, shiftTimes);
     optimizer = new DynamicProgrammingOptimizer(world, constraints, shiftTimes, loss, random: random);
-    optimizer.StartWeights = startWeights;
-    optimizer.Debug = _debug;
-    optimizers.Add(optimizer);
-
-    simulation = new(world);
-    loss = new StandardLoss(simulation, shiftTimes);
-    optimizer = new SimulatedAnnealingOptimizer(world, constraints, shiftTimes, loss, random: random);
     optimizer.StartWeights = startWeights;
     optimizer.Debug = _debug;
     optimizers.Add(optimizer);

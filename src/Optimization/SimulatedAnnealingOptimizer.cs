@@ -55,9 +55,9 @@ public class SimulatedAnnealingOptimizer : LocalSearchOptimizer, IStepOptimizer
       Constraints constraints,
       ShiftTimes shiftTimes,
       ILoss loss,
-      double lowestTemperature = 0.001,
+      double lowestTemperature = 10,
       double highestTemperature = 100,
-      double temperatureReductionFactor = 0.98,
+      double temperatureReductionFactor = 0.9999,
       bool shouldPermutate = true,
       int neighboursLimit = int.MaxValue,
       Random? random = null
@@ -105,8 +105,8 @@ public class SimulatedAnnealingOptimizer : LocalSearchOptimizer, IStepOptimizer
   private void StepInternal()
   {
     //Debug.WriteLine($"global loss: {_globalBestLoss}");
-
     GetMovesToNeighbours(_weights);
+    Debug.WriteLine("Current temp: " + CurrentTemperature);
 
     // Select uniformly randomly one neighbour.
     _currentMove = movesBuffer[_random.Next(0, movesBuffer.Count)];
@@ -120,7 +120,7 @@ public class SimulatedAnnealingOptimizer : LocalSearchOptimizer, IStepOptimizer
     // Is the neighbour better than global best?
     if (neighbourLoss < _globalBestLoss)
     {
-      //Debug.WriteLine($"global loss updated to: {neighbourLoss}");
+      Debug.WriteLine($"global loss updated to: {neighbourLoss}");
       _globalBestLoss = _currentLoss;
       _globalBestWeights = _weights.Copy();
     }
@@ -128,7 +128,7 @@ public class SimulatedAnnealingOptimizer : LocalSearchOptimizer, IStepOptimizer
     // Should we move to the neighbour?
     if (Accept(neighbourLoss - _currentLoss, _currentTemperature))
     {
-      //Debug.WriteLine($"accepted move: {_currentMove}");
+      Debug.WriteLine($"accepted move: {_currentMove}");
       _currentLoss = neighbourLoss;
     }
     else

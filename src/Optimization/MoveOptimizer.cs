@@ -61,7 +61,7 @@ public abstract class MoveOptimizer : Optimizer
         startingTimeSec = medicTeamShift.StartSec;
         weights.MedicTeamAllocations[move.DepotIndex, move.OnDepotIndex] = Interval.GetByStartAndDuration(startingTimeSec, ShiftTimes.MinDurationSec);
         weights.MedicTeamsPerDepotCount[move.DepotIndex]++;
-        weights.AllocatedMedicTeamsCount++;
+        weights.AllAllocatedMedicTeamsCount++;
         break;
 
       case MoveType.DeallocateMedicTeam:
@@ -69,17 +69,17 @@ public abstract class MoveOptimizer : Optimizer
         startingTimeSec = medicTeamShift.StartSec;
         weights.MedicTeamAllocations[move.DepotIndex, move.OnDepotIndex] = Interval.GetByStartAndDuration(startingTimeSec, 0);
         weights.MedicTeamsPerDepotCount[move.DepotIndex]--;
-        weights.AllocatedMedicTeamsCount--;
+        weights.AllAllocatedMedicTeamsCount--;
         break;
 
       case MoveType.AllocateAmbulance:
         weights.AmbulancesPerDepotCount[move.DepotIndex]++;
-        weights.AllocatedAmbulancesCount++;
+        weights.AllAllocatedAmbulancesCount++;
         break;
 
       case MoveType.DeallocateAmbulance:
         weights.AmbulancesPerDepotCount[move.DepotIndex]--;
-        weights.AllocatedAmbulancesCount--;
+        weights.AllAllocatedAmbulancesCount--;
         break;
 
       case MoveType.NoMove:
@@ -222,7 +222,7 @@ public abstract class MoveOptimizer : Optimizer
 
       case MoveType.AllocateMedicTeam:
         durationSec = weights.MedicTeamAllocations[depotIndex, medicTeamOnDepotIndex].DurationSec;
-        if (durationSec == 0 && weights.MedicTeamsPerDepotCount[depotIndex] < Constraints.MaxMedicTeamsOnDepotCount && weights.AllocatedMedicTeamsCount < Constraints.AvailableMedicTeamsCount)
+        if (durationSec == 0 && weights.MedicTeamsPerDepotCount[depotIndex] < Constraints.MaxMedicTeamsOnDepotCount && weights.AllAllocatedMedicTeamsCount < Constraints.AvailableMedicTeamsCount)
         {
           move = new Move
           {
@@ -251,7 +251,7 @@ public abstract class MoveOptimizer : Optimizer
         return false;
 
       case MoveType.AllocateAmbulance:
-        if (weights.AmbulancesPerDepotCount[depotIndex] < Constraints.MaxAmbulancesOnDepotCount && weights.AllocatedAmbulancesCount < Constraints.AvailableAmbulancesCount)
+        if (weights.AmbulancesPerDepotCount[depotIndex] < Constraints.MaxAmbulancesOnDepotCount && weights.AllAllocatedAmbulancesCount < Constraints.AvailableAmbulancesCount)
         {
           move = new Move
           {

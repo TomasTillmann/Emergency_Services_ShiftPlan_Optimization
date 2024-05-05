@@ -39,11 +39,17 @@ public abstract class Loss : ILoss
     return Simulation.EmergencyServicePlan.GetShiftDurationsSum() / (Simulation.EmergencyServicePlan.GetTotalTimeActive() + 0.00000000000000000000001);
   }
 
-  /// <inheritdoc/>
-  public abstract double Get(Weights weights, ReadOnlySpan<Incident> incidents);
+  public double Get(Weights weights, ReadOnlySpan<Incident> incidents)
+  {
+    RunSimulation(weights, incidents);
+    return GetLoss();
+  }
 
-  /// <inheritdoc/>
-  public abstract double Get(Weights weights, ImmutableArray<Incident> incidents);
+
+  public double Get(Weights weights, ImmutableArray<Incident> incidents)
+  {
+    return Get(weights, incidents.AsSpan());
+  }
 
   protected void RunSimulation(Weights weights, ReadOnlySpan<Incident> incidents)
   {

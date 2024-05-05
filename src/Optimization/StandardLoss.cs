@@ -43,19 +43,6 @@ public class StandardLoss : Loss
   }
 
   /// <inheritdoc/>
-  public override double Get(Weights weights, ImmutableArray<Incident> incidents)
-  {
-    return Get(weights, incidents.AsSpan());
-  }
-
-  /// <inheritdoc/>
-  public override double Get(Weights weights, ReadOnlySpan<Incident> incidents)
-  {
-    RunSimulation(weights, incidents);
-    return GetLoss();
-  }
-
-  /// <inheritdoc/>
   public override double GetLoss()
   {
     double successRate = GetSuccessRate();
@@ -66,7 +53,7 @@ public class StandardLoss : Loss
     double costPart = Beta * planCost;
     // double exhaustionError = Gamma * Math.Abs(exhaustion - EffectivityTarget);
 
-    double loss = costPart + /* exhaustionError */ -handledPart;
+    double loss = costPart /* exhaustionError */ - handledPart;
 
     return loss;
   }
