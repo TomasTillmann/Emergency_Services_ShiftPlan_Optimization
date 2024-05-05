@@ -43,6 +43,9 @@ public class HillClimbOptimizer : LocalSearchOptimizer
       //Debug.WriteLine($"globalBestLoss: {globalBestLoss}");
 
       GetMovesToNeighbours(currentWeights);
+      Debug.WriteLine("---moves");
+      Debug.WriteLine(string.Join("\n", movesBuffer));
+      Debug.WriteLine("---moves");
       Move currentBestMove = Move.Identity;
 
       for (int i = 0; i < movesBuffer.Count; ++i)

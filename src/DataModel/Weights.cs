@@ -48,19 +48,6 @@ public class Weights
 
     Weights weights = new Weights(world.Depots.Length, constraints.MaxMedicTeamsOnDepotCount);
 
-    // initialze team shifts to deallocated with random start times
-    for (int i = 0; i < weights.MedicTeamAllocations.GetLength(0); ++i)
-    {
-      for (int j = 0; j < weights.MedicTeamAllocations.GetLength(1); ++j)
-      {
-        weights.MedicTeamAllocations[i, j] = Interval.GetByStartAndDuration
-        (
-          shiftTimes.GetRandomStartingTimeSec(random),
-          0
-        );
-      }
-    }
-
     // random teams allocation
     int teamsOnDepotCount = Math.Min(constraints.MaxMedicTeamsOnDepotCount, constraints.AvailableMedicTeamsCount / world.Depots.Length);
     int runningAvailableMedicTeamsCount = constraints.AvailableMedicTeamsCount;
@@ -69,14 +56,18 @@ public class Weights
     {
       for (int j = 0; j < teamsOnDepotCount && runningAvailableMedicTeamsCount > 0; ++j)
       {
+        int duration = shiftTimes.GetRandomDurationTimeSec(random);
         weights.MedicTeamAllocations[i, j] = Interval.GetByStartAndDuration
         (
           shiftTimes.GetRandomStartingTimeSec(random),
-          shiftTimes.GetRandomDurationTimeSec(random)
+          duration
         );
 
-        --runningAvailableMedicTeamsCount;
-        ++weights.MedicTeamsPerDepotCount[i];
+        if (duration != 0)
+        {
+          --runningAvailableMedicTeamsCount;
+          ++weights.MedicTeamsPerDepotCount[i];
+        }
       }
     }
     weights.AllocatedMedicTeamsCount = constraints.AvailableMedicTeamsCount - runningAvailableMedicTeamsCount;

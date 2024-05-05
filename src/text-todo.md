@@ -1,5 +1,6 @@
 # TODO
-1. odcitovat nejak logis
-1. odcitovat here api a google api
-1. obhajit si proc je simulace nejvhodnejsi zpusob jak zjistit success rate
-1. pridat pseudokod pro simulaci
+* dynamic + HC (po kazdem kroku nebo jen na konci?)
+* visualizovat dynamic - co prida po kazdem kroku?
+* InitWeights, neni uniformni 
+  * chtelo by zpermutovat sanitky a medic teamy a pak pridelavat
+  * navic sanitky jen rozdelim uniformne, ale nijak nahodne = #sanitek / #depot

@@ -56,8 +56,7 @@ public class ShiftTimes
   public int GetRandomDurationTimeSec(Random random = null)
   {
     random ??= new Random();
-
-    // First element is 0 duration. It's ordered by duration.
-    return AllowedDurationsSecSorted.ElementAt(random.Next(1, AllowedShiftDurationsSec.Count()));
+    int index = random.Next(-1, AllowedShiftDurationsSec.Count());
+    return index == -1 ? 0 : AllowedDurationsSecSorted.ElementAt(index);
   }
 }
