@@ -11,5 +11,6 @@ public class World
   public DistanceCalculator DistanceCalculator { get; init; }
   public ImmutableArray<MedicTeam> AvailableMedicTeams { get; init; }
   public ImmutableArray<Ambulance> AvailableAmbulances { get; init; }
+  public ImmutableArray<AmbulanceType> AvailableAmbulanceTypes { get; init; }
   public int GoldenTimeSec { get; init; }
 }

@@ -33,7 +33,7 @@ public class MedicTeam
   public void Plan(PlannableIncident plannableIncident)
   {
     _plannedIncidents.Add(plannableIncident);
-    Depot.Ambulances[plannableIncident.AmbulanceIndex].WhenFreeSec = plannableIncident.ToDepotDrive.EndSec;
+    Depot.Ambulances[plannableIncident.OnDepotAmbulanceIndex].WhenFreeSec = plannableIncident.ToDepotDrive.EndSec;
 
     TimeActiveSec += plannableIncident.IncidentHandling.DurationSec;
   }

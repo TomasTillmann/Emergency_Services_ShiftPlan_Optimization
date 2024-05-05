@@ -1,10 +1,15 @@
-﻿namespace Optimizing;
+﻿using ESSP.DataModel;
+
+namespace Optimizing;
 
 public readonly struct Move
 {
-  public int DepotIndex { get; init; }
-  public int OnDepotIndex { get; init; }
-  public MoveType MoveType { get; init; }
+  public int DepotIndex { get; init; } = -1;
+  public int OnDepotIndex { get; init; } = -1;
+  public int AmbulanceTypeIndex { get; init; } = -1;
+  public MoveType MoveType { get; init; } = MoveType.NoMove;
+
+  public Move() { }
 
   public static Move Identity = new Move { OnDepotIndex = -1 /* The specific index doesn't matter. */ , MoveType = MoveType.NoMove };
 
@@ -15,6 +20,6 @@ public readonly struct Move
 
   public override string ToString()
   {
-    return $"({MoveType}, {DepotIndex}, {OnDepotIndex})";
+    return $"({MoveType}, {DepotIndex}, {OnDepotIndex}{(MoveType == MoveType.AllocateAmbulance ? $", {AmbulanceTypeIndex}" : "")})";
   }
 }

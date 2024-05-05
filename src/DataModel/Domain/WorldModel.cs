@@ -9,6 +9,7 @@ public record WorldModel
   public List<HospitalModel> Hospitals { get; set; }
   public List<MedicTeam> AvailableMedicTeams { get; set; }
   public List<Ambulance> AvailableAmbulances { get; set; }
+  public List<AmbulanceTypeModel> AvailableAmbulanceTypes { get; set; }
   public int GoldenTimeSec { get; set; }
 }
 

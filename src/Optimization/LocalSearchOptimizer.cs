@@ -32,68 +32,88 @@ public abstract class LocalSearchOptimizer : MoveOptimizer
       permutatedShiftsOnDepot[i] = i;
     }
 
+    Span<int> permutatedAmbulanceOnDepot = stackalloc int[Constraints.MaxAmbulancesOnDepotCount];
+    for (int i = 0; i < permutatedAmbulanceOnDepot.Length; ++i)
+    {
+      permutatedAmbulanceOnDepot[i] = i;
+    }
+
     if (ShouldPermutate)
     {
-      Permutate(toPermutate: permutatedDepots);
-      Permutate(toPermutate: permutatedShiftsOnDepot);
+      Permutate(permutatedDepots);
+      Permutate(permutatedShiftsOnDepot);
+      Permutate(permutatedAmbulanceOnDepot);
     }
 
     movesBuffer.Clear();
-    int shiftChangesNeighboursCount = 0;
-    int allocationNeighboursCount = 0;
+    int neighboursCount = 0;
     Move? move;
 
-    for (int depotIndex = 0; shiftChangesNeighboursCount < NeighboursLimit && depotIndex < World.Depots.Length; ++depotIndex)
+    for (int depotIndex = 0; neighboursCount < NeighboursLimit && depotIndex < World.Depots.Length; ++depotIndex)
     {
-      for (int shiftOnDepotIndex = 0; shiftOnDepotIndex < Constraints.MaxMedicTeamsOnDepotCount && shiftChangesNeighboursCount < NeighboursLimit; ++shiftOnDepotIndex)
+      for (int shiftOnDepotIndex = 0; shiftOnDepotIndex < Constraints.MaxMedicTeamsOnDepotCount; ++shiftOnDepotIndex)
       {
         if (TryGenerateMove(weights, permutatedDepots[depotIndex], permutatedShiftsOnDepot[shiftOnDepotIndex], MoveType.ShiftShorter, out move))
         {
           movesBuffer.Add(move.Value);
-          shiftChangesNeighboursCount++;
+          neighboursCount++;
         }
 
         if (TryGenerateMove(weights, permutatedDepots[depotIndex], permutatedShiftsOnDepot[shiftOnDepotIndex], MoveType.ShiftLonger, out move))
         {
           movesBuffer.Add(move.Value);
-          shiftChangesNeighboursCount++;
+          neighboursCount++;
         }
 
         if (TryGenerateMove(weights, permutatedDepots[depotIndex], permutatedShiftsOnDepot[shiftOnDepotIndex], MoveType.ShiftEarlier, out move))
         {
           movesBuffer.Add(move.Value);
-          shiftChangesNeighboursCount++;
+          neighboursCount++;
         }
 
         if (TryGenerateMove(weights, permutatedDepots[depotIndex], permutatedShiftsOnDepot[shiftOnDepotIndex], MoveType.ShiftLater, out move))
         {
           movesBuffer.Add(move.Value);
-          shiftChangesNeighboursCount++;
+          neighboursCount++;
         }
 
         if (TryGenerateMove(weights, permutatedDepots[depotIndex], permutatedShiftsOnDepot[shiftOnDepotIndex], MoveType.AllocateMedicTeam, out move))
         {
           movesBuffer.Add(move.Value);
-          shiftChangesNeighboursCount++;
+          neighboursCount++;
         }
 
         if (TryGenerateMove(weights, permutatedDepots[depotIndex], permutatedShiftsOnDepot[shiftOnDepotIndex], MoveType.DeallocateMedicTeam, out move))
         {
           movesBuffer.Add(move.Value);
-          shiftChangesNeighboursCount++;
+          neighboursCount++;
+        }
+      }
+
+      for (int ambulanceOnDepotIndex = 0; ambulanceOnDepotIndex < Constraints.MaxAmbulancesOnDepotCount; ++ambulanceOnDepotIndex)
+      {
+        if (TryGenerateMove(weights, permutatedDepots[depotIndex], ambulanceOnDepotIndex, MoveType.DeallocateAmbulance, out move))
+        {
+          movesBuffer.Add(move.Value);
+          neighboursCount++;
         }
       }
 
       if (TryGenerateMove(weights, permutatedDepots[depotIndex], -1, MoveType.AllocateAmbulance, out move))
       {
-        movesBuffer.Add(move.Value);
-        allocationNeighboursCount++;
-      }
-
-      if (TryGenerateMove(weights, permutatedDepots[depotIndex], -1, MoveType.DeallocateAmbulance, out move))
-      {
-        movesBuffer.Add(move.Value);
-        allocationNeighboursCount++;
+        for (int ambulanceTypeIndex = 0; ambulanceTypeIndex < World.AvailableAmbulanceTypes.Length; ++ambulanceTypeIndex)
+        {
+          Move newMove = new Move
+          {
+            DepotIndex = move.Value.DepotIndex,
+            OnDepotIndex = move.Value.OnDepotIndex,
+            MoveType = move.Value.MoveType,
+            AmbulanceTypeIndex = ambulanceTypeIndex
+          };
+          // Debug.WriteLine(newMove);
+          movesBuffer.Add(newMove);
+          neighboursCount++;
+        }
       }
     }
 

@@ -59,12 +59,17 @@ public sealed class TabuSearchOptimizer : LocalSearchOptimizer
       Move currentBestMove = default(Move);
 
       GetMovesToNeighbours(currentWeights);
-      Debug.WriteLine(string.Join(", ", movesBuffer));
+      Debug.WriteLine("---MOVES");
+      Debug.WriteLine(string.Join("\n", movesBuffer));
+      Debug.WriteLine("---MOVES");
+      Debug.Flush();
 
       for (int i = 0; i < movesBuffer.Count; ++i)
       {
         Move currentMove = movesBuffer[i];
 
+        Debug.WriteLine(currentMove);
+        Debug.Flush();
         ModifyMakeMove(currentWeights, currentMove);
 
         double neighbourLoss = Loss.Get(currentWeights, incidents);

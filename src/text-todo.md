@@ -1,5 +1,7 @@
 # TODO
-1. odcitovat nejak logis
-1. odcitovat here api a google api
-1. obhajit si proc je simulace nejvhodnejsi zpusob jak zjistit success rate
-1. pridat pseudokod pro simulaci
+- dynamic + HC (po kazdem kroku?)
+- skutecne tvorim weights uniformne nahodne? Prijde mi nejak malo prazdnych intervalu ...
+
+# GA
+- vyborne pokud nemas gradienty nebo dalsi auxillary informace - nemame, mame jen objective function
+- vyhledava z populace, mensi sance na pouze lokalni optimum

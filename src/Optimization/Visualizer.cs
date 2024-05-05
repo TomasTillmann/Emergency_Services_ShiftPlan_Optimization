@@ -86,7 +86,16 @@ public class Visualizer : IDisposable
 
     WriteGraph(loss.Simulation.EmergencyServicePlan, incidents, writer);
     writer.WriteLine("ambulances:");
-    writer.WriteLine(string.Join("\n", loss.Simulation.EmergencyServicePlan.Depots.Select(depot => $"{depot.Index}: {depot.Ambulances.Count}")));
+    for (int depotIndex = 0; depotIndex < weights.AmbulanceTypeAllocations.GetLength(0); ++depotIndex)
+    {
+      string line = "";
+      for (int onDepotIndex = 0; onDepotIndex < weights.AmbulanceTypeAllocations.GetLength(1); ++onDepotIndex)
+      {
+        line += $"{(weights.AmbulanceTypeAllocations[depotIndex, onDepotIndex] is null ? "NotA" : weights.AmbulanceTypeAllocations[depotIndex, onDepotIndex])}, ";
+      }
+      writer.WriteLine($"{depotIndex}: {line}");
+    }
+
     writer.WriteLine();
     writer.WriteLine("Unhandled:");
     writer.WriteLine(string.Join("\n", loss.Simulation.UnhandledIncidents));

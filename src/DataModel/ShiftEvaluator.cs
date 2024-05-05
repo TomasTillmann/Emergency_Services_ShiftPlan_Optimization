@@ -30,7 +30,7 @@ public class MedicTeamsEvaluator
     }
 
     // No ambulance available.
-    if (plannableIncident.AmbulanceIndex == -1)
+    if (plannableIncident.OnDepotAmbulanceIndex == -1)
     {
       return false;
     }

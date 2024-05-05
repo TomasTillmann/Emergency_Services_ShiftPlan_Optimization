@@ -35,6 +35,12 @@ public class Input1 : IInputParametrization
       availableMedicTeamsCount: avaialbeMedicTeamsCount,
       availableAmbulancesCount: availableAmbulancesCount,
       goldenTimeSec: 20.ToMinutes().ToSeconds().Value,
+      ambulanceTypes: new List<AmbulanceTypeModel>()
+      {
+        new AmbulanceTypeModel { AllowedIncidentTypes = new HashSet<string>() { "I1" }, Cost = 100 },
+        new AmbulanceTypeModel { AllowedIncidentTypes = new HashSet<string>() { "I1", "I2" }, Cost = 300 },
+        new AmbulanceTypeModel { AllowedIncidentTypes = new HashSet<string>() { "I1", "I2", "I3" }, Cost = 700 },
+      },
       random: _random
     ));
 
@@ -52,6 +58,8 @@ public class Input1 : IInputParametrization
       onSceneDurationNormalStddev: 10.ToMinutes().ToSeconds(),
       inHospitalDeliveryNormalExpected: 15.ToMinutes().ToSeconds(),
       inHospitalDeliveryNormalStddev: 5.ToMinutes().ToSeconds(),
+      incidentTypes: new String[] { "I1", "I2", "I3" },
+      incidentTypesDistribution: new double[] { 0.6, 0.3, 0.1 },
       random: _random
     ).Select(inc => IncidentMapper.MapBack(inc)).ToImmutableArray();
 

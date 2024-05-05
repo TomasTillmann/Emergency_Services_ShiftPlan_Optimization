@@ -14,6 +14,7 @@ public class DataModelGenerator
       int availableMedicTeamsCount,
       int availableAmbulancesCount,
       int goldenTimeSec,
+      List<AmbulanceTypeModel> ambulanceTypes,
       Random random = null
   )
   {
@@ -70,6 +71,9 @@ public class DataModelGenerator
     worldModel.GoldenTimeSec = goldenTimeSec;
     //
 
+    // ambulance types
+    worldModel.AvailableAmbulanceTypes = ambulanceTypes;
+
     return worldModel;
   }
 
@@ -81,6 +85,8 @@ public class DataModelGenerator
       Seconds onSceneDurationNormalStddev,
       Seconds inHospitalDeliveryNormalExpected,
       Seconds inHospitalDeliveryNormalStddev,
+      string[] incidentTypes,
+      double[] incidentTypesDistribution,
       Random random = null
   )
   {
@@ -103,6 +109,7 @@ public class DataModelGenerator
         OccurenceSec = random.Next(duration.Value),
         OnSceneDurationSec = Math.Min(Math.Max(10.ToMinutes().ToSeconds().Value, (int)onSceneDurationDistribution.Sample()), 30.ToMinutes().ToSeconds().Value),
         InHospitalDeliverySec = Math.Min(Math.Max(10.ToMinutes().ToSeconds().Value, (int)inHospitalDeliveryDistribution.Sample()), 30.ToMinutes().ToSeconds().Value),
+        Type = incidentTypes[Categorical.Sample(random, incidentTypesDistribution)]
       };
 
       incidents.Add(incident);

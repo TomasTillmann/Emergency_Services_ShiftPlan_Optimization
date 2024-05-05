@@ -17,7 +17,7 @@ public class DynamicProgrammingOptimizer : MoveOptimizer
     ReadOnlySpan<Incident> allIncidents = incidents.AsSpan();
 
     // need empty weights - empty shift plan
-    StartWeights = new Weights(World.Depots.Length, Constraints.MaxMedicTeamsOnDepotCount);
+    StartWeights = new Weights(World.Depots.Length, Constraints.MaxMedicTeamsOnDepotCount, Constraints.MaxAmbulancesOnDepotCount);
     Weights optimal = StartWeights;
 
     double lastSuccessRate = 0;

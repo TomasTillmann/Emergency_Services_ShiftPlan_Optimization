@@ -25,10 +25,10 @@ public class RandomWalkOptimizer : LocalSearchOptimizer
       Debug.WriteLine($"Step: {step}");
 
       GetMovesToNeighbours(weights);
-      //Debug.WriteLine($"{movesBuffer.Count}");
-      //Debug.WriteLine($"{string.Join(", ", movesBuffer)}");
+      Debug.WriteLine($"{movesBuffer.Count}");
+      Debug.WriteLine($"{string.Join(", ", movesBuffer)}");
       Move move = movesBuffer[_random.Next(0, movesBuffer.Count)];
-      //Debug.WriteLine($"{move}");
+      Debug.WriteLine($"{move}");
       ModifyMakeMove(weights, move);
       double currentLoss = Loss.Get(weights, incidents);
 

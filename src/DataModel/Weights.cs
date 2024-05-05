@@ -12,54 +12,45 @@ public class Weights
   /// <summary>
   /// Is size of Depots. 
   /// i-th value represents how many medic teams are allocated to i-th depot. 
-  /// Sum per i-th values equals <see cref="AllocatedMedicTeamsCount"/>.
+  /// Sum per i-th values equals <see cref="AllAllocatedMedicTeamsCount"/>.
   /// </summary>
   public int[] MedicTeamsPerDepotCount { get; init; }
 
   /// <summary>
   /// How many teams are allocated. Always has to be sum of <see cref="MedicTeamAllocations"/>.
   /// </summary>
-  public int AllocatedMedicTeamsCount { get; set; }
+  public int AllAllocatedMedicTeamsCount { get; set; }
+
+  public AmbulanceType[,] AmbulanceTypeAllocations { get; init; }
 
   /// <summary>
   /// Is size of Depots. 
   /// i-th value represents how many ambulnaces are allocated to i-th depot. 
-  /// Sum per i-th values equals <see cref="AllocatedAmbulancesCount"/>.
+  /// Sum per i-th values equals <see cref="AllAllocatedAmbulancesCount"/>.
   /// </summary>
   public int[] AmbulancesPerDepotCount { get; init; }
 
   /// <summary>
   /// How many ambulances are allocated. Always has to be sum of <see cref="AmbulancesPerDepotCount"/>.
   /// </summary>
-  public int AllocatedAmbulancesCount { get; set; }
+  public int AllAllocatedAmbulancesCount { get; set; }
 
   public Weights() { }
 
-  public Weights(int depotsCount, int maxMedicTeamsOnDepotCount)
+  public Weights(int depotsCount, int maxMedicTeamsOnDepotCount, int maxAmbulanceTeamsOnDepotCount)
   {
     MedicTeamAllocations = new Interval[depotsCount, maxMedicTeamsOnDepotCount];
     MedicTeamsPerDepotCount = new int[depotsCount];
+    AmbulanceTypeAllocations = new AmbulanceType[depotsCount, maxAmbulanceTeamsOnDepotCount];
     AmbulancesPerDepotCount = new int[depotsCount];
   }
 
+  // TODO: Permutate, otherwise not uniformly random
   public static Weights GetUniformlyRandom(World world, Constraints constraints, ShiftTimes shiftTimes, Random random = null)
   {
     random ??= new Random();
 
-    Weights weights = new Weights(world.Depots.Length, constraints.MaxMedicTeamsOnDepotCount);
-
-    // initialze team shifts to deallocated with random start times
-    for (int i = 0; i < weights.MedicTeamAllocations.GetLength(0); ++i)
-    {
-      for (int j = 0; j < weights.MedicTeamAllocations.GetLength(1); ++j)
-      {
-        weights.MedicTeamAllocations[i, j] = Interval.GetByStartAndDuration
-        (
-          shiftTimes.GetRandomStartingTimeSec(random),
-          0
-        );
-      }
-    }
+    Weights weights = new Weights(world.Depots.Length, constraints.MaxMedicTeamsOnDepotCount, constraints.MaxAmbulancesOnDepotCount);
 
     // random teams allocation
     int teamsOnDepotCount = Math.Min(constraints.MaxMedicTeamsOnDepotCount, constraints.AvailableMedicTeamsCount / world.Depots.Length);
@@ -69,17 +60,21 @@ public class Weights
     {
       for (int j = 0; j < teamsOnDepotCount && runningAvailableMedicTeamsCount > 0; ++j)
       {
+        int durationSec = shiftTimes.GetRandomDurationTimeSec(random);
         weights.MedicTeamAllocations[i, j] = Interval.GetByStartAndDuration
         (
           shiftTimes.GetRandomStartingTimeSec(random),
-          shiftTimes.GetRandomDurationTimeSec(random)
+          durationSec
         );
 
-        --runningAvailableMedicTeamsCount;
-        ++weights.MedicTeamsPerDepotCount[i];
+        if (durationSec != 0)
+        {
+          --runningAvailableMedicTeamsCount;
+          ++weights.MedicTeamsPerDepotCount[i];
+        }
       }
     }
-    weights.AllocatedMedicTeamsCount = constraints.AvailableMedicTeamsCount - runningAvailableMedicTeamsCount;
+    weights.AllAllocatedMedicTeamsCount = constraints.AvailableMedicTeamsCount - runningAvailableMedicTeamsCount;
     //
 
     // amb allocations
@@ -88,16 +83,19 @@ public class Weights
 
     for (int i = 0; i < world.Depots.Length; ++i)
     {
-      if (runningAvailableAmbulancesCount - ambulancesOnDepotCount < 0)
+      for (int j = 0; j < ambulancesOnDepotCount && runningAvailableAmbulancesCount > 0; ++j)
       {
-        weights.AmbulancesPerDepotCount[i] = runningAvailableAmbulancesCount;
-        break;
-      }
+        int ambTypeIndex = random.Next(-1, world.AvailableAmbulanceTypes.Length);
+        weights.AmbulanceTypeAllocations[i, j] = ambTypeIndex == -1 ? null : world.AvailableAmbulanceTypes[ambTypeIndex];
 
-      weights.AmbulancesPerDepotCount[i] = ambulancesOnDepotCount;
-      runningAvailableAmbulancesCount -= ambulancesOnDepotCount;
+        if (ambTypeIndex != -1)
+        {
+          --runningAvailableAmbulancesCount;
+          ++weights.AmbulancesPerDepotCount[i];
+        }
+      }
     }
-    weights.AllocatedAmbulancesCount = weights.AmbulancesPerDepotCount.Sum();
+    weights.AllAllocatedAmbulancesCount = weights.AmbulancesPerDepotCount.Sum();
     //
 
     return weights;
@@ -121,14 +119,19 @@ public class Weights
       }
 
       plan.Depots[depotIndex].Ambulances.Clear();
-      for (int _ = 0; _ < AmbulancesPerDepotCount[depotIndex]; ++_)
+      for (int ambulanceIndex = 0; ambulanceIndex < AmbulanceTypeAllocations.GetLength(1); ++ambulanceIndex)
       {
-        plan.Depots[depotIndex].Ambulances.Add(plan.AvailableAmbulances[availableAmbIndex++]);
+        if (AmbulanceTypeAllocations[depotIndex, ambulanceIndex] is not null)
+        {
+          plan.AvailableAmbulances[availableAmbIndex].Type = AmbulanceTypeAllocations[depotIndex, ambulanceIndex];
+          plan.Depots[depotIndex].Ambulances.Add(plan.AvailableAmbulances[availableAmbIndex]);
+          ++availableAmbIndex;
+        }
       }
     }
 
-    plan.AllocatedAmbulancesCount = AllocatedAmbulancesCount;
-    plan.AllocatedMedicTeamsCount = AllocatedMedicTeamsCount;
+    plan.AllocatedAmbulancesCount = AllAllocatedAmbulancesCount;
+    plan.AllocatedMedicTeamsCount = AllAllocatedMedicTeamsCount;
   }
 
   public Weights Copy()
@@ -139,6 +142,15 @@ public class Weights
       for (int j = 0; j < medicTeamAllocations.GetLength(1); ++j)
       {
         medicTeamAllocations[i, j] = MedicTeamAllocations[i, j];
+      }
+    }
+
+    AmbulanceType[,] ambulanceTypeAllocations = new AmbulanceType[AmbulanceTypeAllocations.GetLength(0), AmbulanceTypeAllocations.GetLength(1)];
+    for (int i = 0; i < ambulanceTypeAllocations.GetLength(0); ++i)
+    {
+      for (int j = 0; j < ambulanceTypeAllocations.GetLength(1); ++j)
+      {
+        ambulanceTypeAllocations[i, j] = AmbulanceTypeAllocations[i, j];
       }
     }
 
@@ -158,9 +170,10 @@ public class Weights
     {
       MedicTeamAllocations = medicTeamAllocations,
       MedicTeamsPerDepotCount = medicTeamsPerDepotCount,
-      AllocatedMedicTeamsCount = this.AllocatedMedicTeamsCount,
+      AllAllocatedMedicTeamsCount = this.AllAllocatedMedicTeamsCount,
       AmbulancesPerDepotCount = ambulancesPerDepotCount,
-      AllocatedAmbulancesCount = this.AllocatedAmbulancesCount
+      AllAllocatedAmbulancesCount = this.AllAllocatedAmbulancesCount,
+      AmbulanceTypeAllocations = ambulanceTypeAllocations
     };
   }
 }

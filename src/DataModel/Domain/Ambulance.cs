@@ -4,6 +4,8 @@ public class Ambulance
 {
   public static int ReroutePenaltySec { get; set; } = 60 * 10;
 
+  public AmbulanceType Type { get; set; }
+
   public int WhenFreeSec { get; set; }
 }
 

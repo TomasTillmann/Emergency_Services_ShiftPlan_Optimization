@@ -4,12 +4,11 @@ using DataModel.Interfaces;
 
 namespace ESSP.DataModel;
 
-/// World mapper
-
 public static class WorldMapper
 {
   private static readonly DepotMapper _depotMapper = new();
   private static readonly HospitalMapper _hospitalMapper = new();
+  private static readonly AmbulanceTypeMapper _ambulanceTypeMapper = new();
 
   public static WorldModel Map(World world)
   {
@@ -19,6 +18,7 @@ public static class WorldMapper
       Hospitals = world.Hospitals.Select(hospital => _hospitalMapper.Map(hospital)).ToList(),
       AvailableMedicTeams = world.AvailableMedicTeams.ToList(),
       AvailableAmbulances = world.AvailableAmbulances.ToList(),
+      AvailableAmbulanceTypes = world.AvailableAmbulanceTypes.Select(type => _ambulanceTypeMapper.Map(type)).ToList(),
       GoldenTimeSec = world.GoldenTimeSec
     };
   }
@@ -33,6 +33,7 @@ public static class WorldMapper
       DistanceCalculator = new DistanceCalculator(hospitals.ToArray()),
       AvailableMedicTeams = model.AvailableMedicTeams.ToImmutableArray(),
       AvailableAmbulances = model.AvailableAmbulances.ToImmutableArray(),
+      AvailableAmbulanceTypes = model.AvailableAmbulanceTypes.Select(type => _ambulanceTypeMapper.MapBack(type)).ToImmutableArray(),
       GoldenTimeSec = model.GoldenTimeSec
     };
   }

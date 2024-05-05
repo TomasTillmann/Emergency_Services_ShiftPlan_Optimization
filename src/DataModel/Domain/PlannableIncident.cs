@@ -7,7 +7,7 @@ namespace ESSP.DataModel;
 public partial class PlannableIncident
 {
   public Incident Incident { get; private set; }
-  public int AmbulanceIndex { get; private set; }
+  public int OnDepotAmbulanceIndex { get; private set; }
   public Hospital NearestHospital { get; private set; }
   public Interval ToIncidentDrive { get; private set; }
   public Interval OnSceneDuration { get; private set; }
@@ -22,7 +22,7 @@ public partial class PlannableIncident
   {
     this.Incident = toCopy.Incident;
     this.NearestHospital = toCopy.NearestHospital;
-    this.AmbulanceIndex = toCopy.AmbulanceIndex;
+    this.OnDepotAmbulanceIndex = toCopy.OnDepotAmbulanceIndex;
     this.ToIncidentDrive = toCopy.ToIncidentDrive;
     this.OnSceneDuration = toCopy.OnSceneDuration;
     this.ToHospitalDrive = toCopy.ToHospitalDrive;
@@ -74,9 +74,9 @@ public partial class PlannableIncident
 
       _instance.NearestHospital = distanceCalculator.GetNearestHospital(incident.Location);
 
-      _instance.ToIncidentDrive = GetToIncidentDriveAndAmbIndex(incident.OccurenceSec, incident.Location, shift, out int ambIndex);
+      _instance.ToIncidentDrive = GetToIncidentDriveAndAmbIndex(incident.OccurenceSec, incident.Location, shift, incident.Type, out int ambIndex);
 
-      _instance.AmbulanceIndex = ambIndex;
+      _instance.OnDepotAmbulanceIndex = ambIndex;
 
       _instance.OnSceneDuration = Interval.GetByStartAndDuration(_instance.ToIncidentDrive.EndSec, incident.OnSceneDurationSec);
 
@@ -93,19 +93,19 @@ public partial class PlannableIncident
 
     public Interval GetToIncidentDrive(int incidentOccurenceTimeSec, Coordinate incidentLocation, MedicTeam medicTeam)
     {
-      return GetToIncidentDriveAndAmbIndex(incidentOccurenceTimeSec, incidentLocation, medicTeam, out _);
+      return GetToIncidentDriveAndAmbIndex(incidentOccurenceTimeSec, incidentLocation, medicTeam, null, out _);
     }
 
-    private Interval GetToIncidentDriveAndAmbIndex(int incidentOccurenceTimeSec, Coordinate incidentLocation, MedicTeam medicTeam, out int ambIndex)
+    private Interval GetToIncidentDriveAndAmbIndex(int incidentOccurenceTimeSec, Coordinate incidentLocation, MedicTeam medicTeam, string incidentType, out int ambIndex)
     {
-      CalculateStartTimeAndAmbulanceStartingLocation(medicTeam, incidentOccurenceTimeSec, out int startTimeSec, out Coordinate ambStartLoc, out ambIndex);
+      CalculateStartTimeAndAmbulanceStartingLocation(medicTeam, incidentOccurenceTimeSec, incidentType, out int startTimeSec, out Coordinate ambStartLoc, out ambIndex);
 
       int toIncidentTravelDurationSec = distanceCalculator.GetTravelDurationSec(ambStartLoc, incidentLocation);
 
       return Interval.GetByStartAndDuration(startTimeSec, toIncidentTravelDurationSec);
     }
 
-    private void CalculateStartTimeAndAmbulanceStartingLocation(MedicTeam medicTeam, int incidentOccurenceTimeSec, out int startTimeSec, out Coordinate ambStartLoc, out int ambIndex)
+    private void CalculateStartTimeAndAmbulanceStartingLocation(MedicTeam medicTeam, int incidentOccurenceTimeSec, string incidentType, out int startTimeSec, out Coordinate ambStartLoc, out int ambIndex)
     {
       int firstPossibleStartTimeSec = Math.Max(incidentOccurenceTimeSec, medicTeam.Shift.StartSec);
 
@@ -114,13 +114,14 @@ public partial class PlannableIncident
       {
         int whenAmbulanceFree = int.MaxValue;
         int possibleStartingTime = int.MaxValue;
-        ambIndex = -1; // will always be reassigned for the earliest one
+        ambIndex = -1; // will always be reassigned for the earliest one if exists, otherwise remains -1, meaning no ambulance could be allocated 
 
-        // Finds ambulance which is available the earliest, and sets startTimeSec to first possible starting time.
+        // Finds ambulance which has compatible type and is available the earliest, and sets startTimeSec to first possible starting time.
         // That cannot be time before the shift starts, and it's either the time the shift starts or when the earliest ambulance is available.
         for (int i = 0; i < medicTeam.Depot.Ambulances.Count; ++i)
         {
-          if (whenAmbulanceFree > medicTeam.Depot.Ambulances[i].WhenFreeSec)
+          if (medicTeam.Depot.Ambulances[i].Type.AllowedIncidentTypes.Contains(incidentType)
+              && whenAmbulanceFree > medicTeam.Depot.Ambulances[i].WhenFreeSec)
           {
             whenAmbulanceFree = medicTeam.Depot.Ambulances[i].WhenFreeSec;
             possibleStartingTime = Math.Max(firstPossibleStartTimeSec, whenAmbulanceFree);
@@ -137,7 +138,7 @@ public partial class PlannableIncident
       Coordinate hospitalLocation = currentlyHandlingIncident.NearestHospital.Location;
 
       // Medic team will use the same ambulance.
-      ambIndex = currentlyHandlingIncident.AmbulanceIndex;
+      ambIndex = currentlyHandlingIncident.OnDepotAmbulanceIndex;
 
       // Driving to depot from hospital after handling incident.
       if (currentlyHandlingIncident.ToDepotDrive.IsInInterval(firstPossibleStartTimeSec))
