@@ -4,7 +4,7 @@ using ESSP.DataModel;
 
 namespace Simulating;
 
-public sealed class Simulation : ISimulation
+public sealed class Simulation
 {
   public World World { get; }
 
@@ -13,27 +13,29 @@ public sealed class Simulation : ISimulation
   /// <summary>
   /// Total count of incidents the simulation was run on. 
   /// </summary>
-  public int TotalIncidents { get; private set; }
+  public int TotalIncidentsCount { get; private set; }
 
-  public int NotHandledIncidents { get; private set; }
+  public int NotHandledIncidentsCount { get; private set; }
 
-  public int HandledIncidents => TotalIncidents - NotHandledIncidents;
+  public int HandledIncidentsCount => TotalIncidentsCount - NotHandledIncidentsCount;
 
   /// <summary>
   /// Success rate of last run simulation.
   /// </summary>
-  public double SuccessRate => (TotalIncidents - NotHandledIncidents) / (double)TotalIncidents;
+  public double SuccessRate => (TotalIncidentsCount - NotHandledIncidentsCount) / (double)TotalIncidentsCount;
 
-  public List<Incident> UnhandledIncidents { get; } = new();
+  public List<int> UnhandledIncidents { get; } = new();
 
   private readonly MedicTeamsEvaluator _medicTeamsEvaluator;
   private readonly PlannableIncident.Factory _plannableIncidentFactory;
+  private readonly bool _info;
 
-  public Simulation(World world)
+  public Simulation(World world, bool info = false)
   {
     World = world;
     _plannableIncidentFactory = new PlannableIncident.Factory(world.DistanceCalculator, world.Hospitals);
     _medicTeamsEvaluator = new MedicTeamsEvaluator(world.DistanceCalculator, world.Hospitals, world.GoldenTimeSec);
+    _info = info;
 
     EmergencyServicePlan = new EmergencyServicePlan
     {
@@ -61,10 +63,13 @@ public sealed class Simulation : ISimulation
       EmergencyServicePlan.AvailableAmbulances[i].WhenFreeSec = 0;
     }
 
-    UnhandledIncidents.Clear(); // delete for faster perf, only for debuggin purposes
+    if (_info)
+    {
+      UnhandledIncidents.Clear();
+    }
 
-    NotHandledIncidents = 0;
-    TotalIncidents = incidents.Length;
+    NotHandledIncidentsCount = 0;
+    TotalIncidentsCount = incidents.Length;
 
     for (int i = 0; i < incidents.Length; ++i)
     {
@@ -92,8 +97,8 @@ public sealed class Simulation : ISimulation
       // No hadnling medic team exists. 
       if (findBetterFromIndex == int.MaxValue)
       {
-        NotHandledIncidents++;
-        UnhandledIncidents.Add(currentIncident); // remove for faster perf
+        NotHandledIncidentsCount++;
+        if (_info) UnhandledIncidents.Add(i);
         continue;
       }
 

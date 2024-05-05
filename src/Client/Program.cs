@@ -61,6 +61,16 @@ class Program
     ILoss loss;
     List<IOptimizer> optimizers = new();
 
+    IncidentsNormalizer normalizer = new(world, shiftTimes);
+    var histogram = normalizer.GetIncidentsHandlingHistorgram(incidents);
+    _debug.WriteLine(string.Join(", ", histogram));
+    incidents = normalizer.Normalize(incidents);
+
+    _debug.Flush();
+    _debug.Dispose();
+
+    return;
+
     simulation = new(world);
     loss = new StandardLoss(simulation, shiftTimes);
     visualizer.PlotGraph(loss, startWeights, incidents, _debug);

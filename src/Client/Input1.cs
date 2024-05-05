@@ -30,7 +30,7 @@ public class Input1 : IInputParametrization
     // World init
     World world = WorldMapper.MapBack(_dataGenerator.GenerateWorldModel(
       worldSize: new CoordinateModel { XMet = 50_000, YMet = 50_000 },
-      depotsCount: 10,
+      depotsCount: 20,
       hospitalsCount: 20,
       availableMedicTeamsCount: avaialbeMedicTeamsCount,
       availableAmbulancesCount: availableAmbulancesCount,
@@ -46,7 +46,7 @@ public class Input1 : IInputParametrization
     // Incidents init
     ImmutableArray<Incident> incidents = _dataGenerator.GenerateIncidentModels(
       worldSize: new CoordinateModel { XMet = 50_000, YMet = 50_000 },
-      incidentsCount: 230,
+      incidentsCount: 200,
       duration: 21.ToHours().ToSeconds(),
       onSceneDurationNormalExpected: 20.ToMinutes().ToSeconds(),
       onSceneDurationNormalStddev: 10.ToMinutes().ToSeconds(),

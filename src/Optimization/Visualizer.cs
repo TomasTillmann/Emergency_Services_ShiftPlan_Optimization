@@ -89,7 +89,7 @@ public class Visualizer : IDisposable
     writer.WriteLine(string.Join("\n", loss.Simulation.EmergencyServicePlan.Depots.Select(depot => $"{depot.Index}: {depot.Ambulances.Count}")));
     writer.WriteLine();
     writer.WriteLine("Unhandled:");
-    writer.WriteLine(string.Join("\n", loss.Simulation.UnhandledIncidents));
+    writer.WriteLine(string.Join("\n", loss.Simulation.UnhandledIncidents.Select(index => incidents[index])));
     writer.WriteLine($"Success rate: {loss.GetSuccessRate()}");
     writer.WriteLine($"cost: {loss.GetCost()}");
     writer.WriteLine($"effectivity: {loss.GetEffectivity()}");

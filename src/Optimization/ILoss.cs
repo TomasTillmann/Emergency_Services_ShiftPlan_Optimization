@@ -8,7 +8,7 @@ public interface ILoss
   /// <summary>
   /// Underlying simulation. 
   /// </summary>
-  ISimulation Simulation { get; }
+  Simulation Simulation { get; }
 
   /// <summary>
   /// Get loss from last simulation run.

@@ -5,7 +5,7 @@ using Simulating;
 
 public abstract class Loss : ILoss
 {
-  public ISimulation Simulation { get; }
+  public Simulation Simulation { get; }
 
   protected double MaxEmergencyServicePlanShiftDuration { get; }
 
