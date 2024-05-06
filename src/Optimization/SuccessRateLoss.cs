@@ -4,7 +4,7 @@ using Simulating;
 
 namespace Optimizing;
 
-public class SuccessRateLoss : Loss
+public class SuccessRateLoss : ObjectiveFunction
 {
   public SuccessRateLoss(Simulation simulation, ShiftTimes shiftTimes)
   : base(simulation, shiftTimes) { }

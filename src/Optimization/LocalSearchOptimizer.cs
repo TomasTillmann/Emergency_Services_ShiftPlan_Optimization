@@ -7,7 +7,7 @@ public abstract class LocalSearchOptimizer : MoveOptimizer
   public int NeighboursLimit { get; set; }
   public bool ShouldPermutate { get; set; }
 
-  public LocalSearchOptimizer(World world, Constraints constraints, ShiftTimes shiftTimes, ILoss loss, bool shouldPermutate = true, int neighboursLimit = int.MaxValue, Random? random = null)
+  public LocalSearchOptimizer(World world, Constraints constraints, ShiftTimes shiftTimes, IObjectiveFunction loss, bool shouldPermutate = true, int neighboursLimit = int.MaxValue, Random? random = null)
   : base(world, constraints, shiftTimes, loss, random)
   {
     NeighboursLimit = neighboursLimit;

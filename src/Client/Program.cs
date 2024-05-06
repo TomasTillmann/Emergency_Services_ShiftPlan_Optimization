@@ -58,7 +58,7 @@ class Program
 
     IOptimizer optimizer;
     Simulation simulation;
-    ILoss loss;
+    IObjectiveFunction loss;
     List<IOptimizer> optimizers = new();
 
     IncidentsNormalizer normalizer = new(world, shiftTimes);
@@ -69,9 +69,7 @@ class Program
     loss = new StandardLoss(simulation, shiftTimes);
     visualizer.PlotGraph(loss, startWeights, incidents, _debug);
 
-    simulation = new(world);
-    loss = new StandardLoss(simulation, shiftTimes);
-    optimizer = new GeneticAlgorithmOptimizer(world, constraints, shiftTimes, loss, populationSize: 20, iterations: 20, mutationP: 0.01, random: random);
+    optimizer = new GeneticAlgorithmOptimizer(world, constraints, shiftTimes, lossCoeff: 0.01f, populationSize: 700, populations: 80, mutationP: 0.01, random: random);
     optimizer.StartWeights = startWeights;
     optimizer.Debug = _debug;
     optimizers.Add(optimizer);
@@ -125,9 +123,9 @@ class Program
     {
       _debug.WriteLine($"{opt.GetType().Name}: ");
       Stopwatch sw = Stopwatch.StartNew();
-      var optimal = opt.FindOptimal(incidents).First();
+      var optimals = opt.FindOptimal(incidents).ToList();
       _debug.WriteLine("Elapsed: " + sw.Elapsed);
-      visualizer.PlotGraph(loss, optimal, incidents);
+      optimals.ForEach(optimal => visualizer.PlotGraph(loss, optimal, incidents));
       break;
     }
 

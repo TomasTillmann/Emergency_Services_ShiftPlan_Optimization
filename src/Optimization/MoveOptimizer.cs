@@ -7,7 +7,7 @@ public abstract class MoveOptimizer : Optimizer
 {
   protected readonly List<Move> movesBuffer = new();
 
-  protected MoveOptimizer(World world, Constraints constraints, ShiftTimes shiftTimes, ILoss loss, Random? random = null)
+  protected MoveOptimizer(World world, Constraints constraints, ShiftTimes shiftTimes, IObjectiveFunction loss, Random? random = null)
   : base(world, constraints, shiftTimes, loss, random)
   {
   }

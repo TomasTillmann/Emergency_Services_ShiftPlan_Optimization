@@ -17,7 +17,7 @@ public class RandomSampleHillClimbOptimizer : Optimizer
       World world,
       Constraints constraints,
       ShiftTimes shiftTimes,
-      ILoss loss,
+      IObjectiveFunction loss,
       int samples,
       int iterations,
       bool continueIfStuck = false,
@@ -43,7 +43,7 @@ public class RandomSampleHillClimbOptimizer : Optimizer
     {
       _hillClimbOptimizer.StartWeights = Weights.GetUniformlyRandom(World, Constraints, ShiftTimes, _random);
       Weights optimal = _hillClimbOptimizer.FindOptimal(incidents).First();
-      double currentLoss = Loss.Get(optimal, incidents);
+      double currentLoss = ObjectiveFunction.Get(optimal, incidents);
 
       if (currentLoss < bestLoss)
       {
@@ -51,7 +51,7 @@ public class RandomSampleHillClimbOptimizer : Optimizer
         bestWeights = optimal.Copy();
       }
 
-      visualizer.PlotGraph(Loss, optimal, incidents, Debug);
+      visualizer.PlotGraph(ObjectiveFunction, optimal, incidents, Debug);
     }
 
     return new List<Weights> { bestWeights };

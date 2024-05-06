@@ -7,7 +7,7 @@ public class RandomWalkOptimizer : LocalSearchOptimizer
 {
   public int Iterations { get; set; }
 
-  public RandomWalkOptimizer(World world, Constraints constraints, ShiftTimes shiftTimes, ILoss loss, int iterations, bool shouldPermutate = true, int neighboursLimit = 1, Random? random = null)
+  public RandomWalkOptimizer(World world, Constraints constraints, ShiftTimes shiftTimes, IObjectiveFunction loss, int iterations, bool shouldPermutate = true, int neighboursLimit = 1, Random? random = null)
   : base(world, constraints, shiftTimes, loss, shouldPermutate, neighboursLimit, random)
   {
     Iterations = iterations;
@@ -30,7 +30,7 @@ public class RandomWalkOptimizer : LocalSearchOptimizer
       Move move = movesBuffer[_random.Next(0, movesBuffer.Count)];
       //Debug.WriteLine($"{move}");
       ModifyMakeMove(weights, move);
-      double currentLoss = Loss.Get(weights, incidents);
+      double currentLoss = ObjectiveFunction.Get(weights, incidents);
 
       if (currentLoss < bestLoss)
       {

@@ -3,7 +3,7 @@ using ESSP.DataModel;
 using Optimizing;
 using Simulating;
 
-public interface ILoss
+public interface IObjectiveFunction
 {
   /// <summary>
   /// Underlying simulation. 

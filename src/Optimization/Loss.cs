@@ -3,7 +3,7 @@ using ESSP.DataModel;
 using Optimizing;
 using Simulating;
 
-public abstract class Loss : ILoss
+public abstract class ObjectiveFunction : IObjectiveFunction
 {
   public Simulation Simulation { get; }
 
@@ -11,7 +11,7 @@ public abstract class Loss : ILoss
 
   protected double AvailableAmbulancesTotalCount { get; }
 
-  public Loss(Simulation simulation, ShiftTimes shiftTimes)
+  public ObjectiveFunction(Simulation simulation, ShiftTimes shiftTimes)
   {
     Simulation = simulation;
     MaxEmergencyServicePlanShiftDuration = simulation.World.AvailableMedicTeams.Length * shiftTimes.MaxDurationSec / 60;

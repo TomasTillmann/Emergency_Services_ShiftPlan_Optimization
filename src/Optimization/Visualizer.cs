@@ -77,7 +77,7 @@ public class Visualizer : IDisposable
     writer.Flush();
   }
 
-  public void PlotGraph(ILoss loss, Weights weights, ImmutableArray<Incident> incidents, TextWriter writer = null)
+  public void PlotGraph(IObjectiveFunction loss, Weights weights, ImmutableArray<Incident> incidents, TextWriter writer = null)
   {
     writer ??= _writer;
 

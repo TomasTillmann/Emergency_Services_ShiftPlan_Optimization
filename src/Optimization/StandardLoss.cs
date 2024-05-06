@@ -3,7 +3,7 @@ using ESSP.DataModel;
 using Optimizing;
 using Simulating;
 
-public class StandardLoss : Loss
+public class StandardLoss : ObjectiveFunction
 {
   private readonly double _maxEmergencyServicePlanShiftDuration;
   private readonly double _availableAmbulancesTotalCount;

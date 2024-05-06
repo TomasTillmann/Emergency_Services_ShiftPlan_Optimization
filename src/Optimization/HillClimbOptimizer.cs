@@ -14,7 +14,7 @@ public class HillClimbOptimizer : LocalSearchOptimizer
     World world,
     Constraints constraints,
     ShiftTimes shiftTimes,
-    ILoss loss,
+    IObjectiveFunction loss,
     bool continueIfStuck = false,
     bool shouldPermutate = true,
     int neighboursLimit = int.MaxValue,
@@ -34,7 +34,7 @@ public class HillClimbOptimizer : LocalSearchOptimizer
 
     Visualizer visualizer = new(Debug);
 
-    double currentBestLoss = Loss.Get(currentWeights, incidents);
+    double currentBestLoss = ObjectiveFunction.Get(currentWeights, incidents);
     double globalBestLoss = currentBestLoss;
 
     for (int step = 0; step < Steps; ++step)
@@ -56,7 +56,7 @@ public class HillClimbOptimizer : LocalSearchOptimizer
 
         ModifyMakeMove(currentWeights, move);
 
-        double neighbourLoss = Loss.Get(currentWeights, incidents);
+        double neighbourLoss = ObjectiveFunction.Get(currentWeights, incidents);
         //Debug.WriteLine($"--- {move}, {neighbourLoss}"); // SPAM
 
         if (neighbourLoss < currentBestLoss)

@@ -7,7 +7,7 @@ using ESSP.DataModel;
 
 public class DynamicProgrammingOptimizer : MoveOptimizer
 {
-  public DynamicProgrammingOptimizer(World world, Constraints constraints, ShiftTimes shiftTimes, ILoss loss, Random? random = null)
+  public DynamicProgrammingOptimizer(World world, Constraints constraints, ShiftTimes shiftTimes, IObjectiveFunction loss, Random? random = null)
   : base(world, constraints, shiftTimes, loss, random)
   {
   }
@@ -30,7 +30,7 @@ public class DynamicProgrammingOptimizer : MoveOptimizer
       Incident currentIncident = incidents[i];
       bestMoves.Clear();
 
-      double baseLoss = Loss.Get(optimal, currentIncidents);
+      double baseLoss = ObjectiveFunction.Get(optimal, currentIncidents);
       double bestLoss = baseLoss;
       Move? allocateAmbulance = null;
 
@@ -46,13 +46,13 @@ public class DynamicProgrammingOptimizer : MoveOptimizer
           {
             ModifyMakeMove(optimal, move.Value);
 
-            newLoss = Loss.Get(optimal, currentIncidents);
+            newLoss = ObjectiveFunction.Get(optimal, currentIncidents);
             if (newLoss < bestLoss)
             {
               bestMoves.Clear();
               bestMoves.Add(move.Value);
               bestLoss = newLoss;
-              lastSuccessRate = Loss.Simulation.SuccessRate;
+              lastSuccessRate = ObjectiveFunction.Simulation.SuccessRate;
             }
 
             ModifyUnmakeMove(optimal, move.Value);
@@ -68,13 +68,13 @@ public class DynamicProgrammingOptimizer : MoveOptimizer
             ModifyMakeMove(optimal, move.Value);
             optimal.MedicTeamAllocations[depotIndex, newTeamIndex] = GetLatestShortestShiftTimeContaining(currentIncident.OccurenceSec);
 
-            newLoss = Loss.Get(optimal, currentIncidents);
+            newLoss = ObjectiveFunction.Get(optimal, currentIncidents);
             if (newLoss < bestLoss)
             {
               bestMoves.Clear();
               bestMoves.Add(move.Value);
               bestLoss = newLoss;
-              lastSuccessRate = Loss.Simulation.SuccessRate;
+              lastSuccessRate = ObjectiveFunction.Simulation.SuccessRate;
             }
 
             // Allocate new ambulance
@@ -82,14 +82,14 @@ public class DynamicProgrammingOptimizer : MoveOptimizer
             {
               ModifyMakeMove(optimal, allocateAmbulance.Value);
 
-              newLoss = Loss.Get(optimal, currentIncidents);
+              newLoss = ObjectiveFunction.Get(optimal, currentIncidents);
               if (newLoss < bestLoss)
               {
                 bestMoves.Clear();
                 bestMoves.Add(move.Value);
                 bestMoves.Add(allocateAmbulance.Value);
                 bestLoss = newLoss;
-                lastSuccessRate = Loss.Simulation.SuccessRate;
+                lastSuccessRate = ObjectiveFunction.Simulation.SuccessRate;
               }
 
               ModifyUnmakeMove(optimal, allocateAmbulance.Value);

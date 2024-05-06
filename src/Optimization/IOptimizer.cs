@@ -23,14 +23,14 @@ public interface IOptimizer
   /// <summary>
   /// Loss function which is tried to be minimezed by the <see cref="Optimizer"/>
   /// </summary>
-  ILoss Loss { get; set; }
+  IObjectiveFunction ObjectiveFunction { get; set; }
 
   /// <summary>
   /// Tries to find the most optimal shift plans from starting <see cref="StartWeights"/>.
   /// You can initialize <see cref="StartWeights"/> before calling <see cref="FindOptimal(ImmutableArray{Incidents})"/>.
   /// <see cref="StartWeights"/> are initialized in <see cref="Optimizer"/> constructor by <see cref="Optimizer.InitWeights"/>.
   /// Note, that more <see cref="EmergencyServicePlan"/> can have the same, most optimal loss, that's why enumeration is returned.
-  /// The loss is calculated by provided <see cref="ILoss"/> implementation.
+  /// The loss is calculated by provided <see cref="IObjectiveFunction"/> implementation.
   /// </summary>
   IEnumerable<Weights> FindOptimal(ImmutableArray<Incident> incidents);
 }

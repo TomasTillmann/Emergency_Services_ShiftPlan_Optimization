@@ -54,7 +54,7 @@ public class SimulatedAnnealingOptimizer : LocalSearchOptimizer, IStepOptimizer
       World world,
       Constraints constraints,
       ShiftTimes shiftTimes,
-      ILoss loss,
+      IObjectiveFunction loss,
       double lowestTemperature = 10,
       double highestTemperature = 100,
       double temperatureReductionFactor = 0.9999,
@@ -86,7 +86,7 @@ public class SimulatedAnnealingOptimizer : LocalSearchOptimizer, IStepOptimizer
     _incidents = incidents;
     _globalBestWeights = StartWeights;
     _weights = StartWeights;
-    _globalBestLoss = Loss.Get(_globalBestWeights, incidents);
+    _globalBestLoss = ObjectiveFunction.Get(_globalBestWeights, incidents);
     _currentLoss = _globalBestLoss;
     _currentTemperature = HighestTemperature;
   }
@@ -142,7 +142,7 @@ public class SimulatedAnnealingOptimizer : LocalSearchOptimizer, IStepOptimizer
 
   private double GetLossInternal(Weights weights)
   {
-    return Loss.Get(weights, _incidents);
+    return ObjectiveFunction.Get(weights, _incidents);
   }
 
   private bool Accept(double difference, double temperature)

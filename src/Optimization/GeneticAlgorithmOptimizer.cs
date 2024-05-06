@@ -1,24 +1,38 @@
+// #define DEBUG
+#define STATS
+
 using System.Collections.Immutable;
 using ESSP.DataModel;
+using Simulating;
 
 namespace Optimizing;
 
 public class GeneticAlgorithmOptimizer : Optimizer
 {
   public int PopulationSize { get; set; }
-  public int Iterations { get; set; }
+  public int Populations { get; set; }
   public double MutationP { get; set; }
+  public float LossCoeff { get; set; }
 
-  public GeneticAlgorithmOptimizer(World world, Constraints constraints, ShiftTimes shiftTimes, ILoss loss, int populationSize, int iterations, double mutationP, Random? random = null)
-  : base(world, constraints, shiftTimes, loss, random)
+  /// Is the objective function.
+  /// Has to return nonnegative values (>= 0).
+  public IObjectiveFunction Fitness => ObjectiveFunction;
+
+  public GeneticAlgorithmOptimizer(World world, Constraints constraints, ShiftTimes shiftTimes, int populationSize, int populations, double mutationP, float lossCoeff, IObjectiveFunction fitness = null, Random? random = null)
+  : base(DoubleAmbulanceAndTeamsCapacity(world), constraints, shiftTimes, fitness ?? new GAStandardFitness(new Simulation(world), shiftTimes), random)
   {
     PopulationSize = populationSize;
-    Iterations = iterations;
+    Populations = populations;
     MutationP = mutationP;
+    LossCoeff = lossCoeff;
   }
 
+  //TODO: nahradit Math.Max ifem, pry by melo byt o dost rychlejsi pro doubly
   public override IEnumerable<Weights> FindOptimal(ImmutableArray<Incident> incidents)
   {
+    Weights optimalOverAll = default(Weights);
+    double optimalOverAllFitness = double.MinValue;
+
     Weights[] oldPopulation = new Weights[PopulationSize];
     Weights[] newPopulation = new Weights[PopulationSize];
     Span<double> fitness = stackalloc double[PopulationSize];
@@ -27,31 +41,64 @@ public class GeneticAlgorithmOptimizer : Optimizer
     PopulateRandomly(newPopulation);
 
     double fitnessSum;
-    for (int iteration = 0; iteration < Iterations; ++iteration)
+    for (int population = 0; population < Populations; ++population)
     {
+#if STATS
+      double maxFitness = double.MinValue;
+      double minFitness = double.MaxValue;
+      double averageFitness = 0;
+#endif
+
       fitnessSum = 0;
+
       for (int i = 0; i < PopulationSize; ++i)
       {
-        fitness[i] = -1 * Loss.Get(oldPopulation[i], incidents);
+        fitness[i] = Math.Max(0, Fitness.Get(oldPopulation[i], incidents) - LossCoeff * Penalty(oldPopulation[i]));
+        if (fitness[i] > optimalOverAllFitness)
+        {
+          optimalOverAllFitness = fitness[i];
+          optimalOverAll = oldPopulation[i].Copy();
+        }
+
+#if STATS
+        if (fitness[i] < minFitness)
+        {
+          minFitness = fitness[i];
+        }
+
+        if (fitness[i] > maxFitness)
+        {
+          maxFitness = fitness[i];
+        }
+#endif
+
         fitnessSum += fitness[i];
       }
 
-      Debug.WriteLine(string.Join(", ", fitness.ToArray().OrderByDescending(_ => _)));
+#if STATS
+      averageFitness = fitnessSum / PopulationSize;
+      //Debug.WriteLine(string.Join("\n", fitness.ToArray().OrderByDescending(_ => _)));
+      Debug.WriteLine($"Population: {population}, MaxFitness: {maxFitness}, MinFitness: {minFitness}, AverageFitness: {averageFitness}");
+      Debug.WriteLine(new string('=', 100));
+#endif
+
+#if DEBUG
+      fitness.ToArray().Select((Fitness, Index) => (Fitness, Index)).OrderByDescending(_ => _).ToList().ForEach(value =>
+      {
+        Debug.WriteLine(oldPopulation[value.Index]);
+        Debug.WriteLine($"(Index: {value.Index}; Fitness: {value.Fitness}; RawFitness: {Fitness.Get(oldPopulation[value.Index], incidents)}; Penalty: {LossCoeff * Penalty(oldPopulation[value.Index])}; RawPenalty: {Penalty(oldPopulation[value.Index])}; Feasible: {isFeasible(oldPopulation[value.Index])})\n");
+      });
+#endif
 
       for (int i = 0; i < PopulationSize - 1; i += 2)
       {
         int parent1 = Select(fitness, fitnessSum);
-        Debug.WriteLine($"Select parent1: {parent1}");
-        Debug.WriteLine($"Select parent1 fitness: {fitness[parent1]}");
+        //Debug.WriteLine($"Select parent1: {parent1}");
+        //Debug.WriteLine($"Select parent1 fitness: {fitness[parent1]}");
         int parent2 = Select(fitness, fitnessSum);
-        Debug.WriteLine($"Select parent2 fitness: {fitness[parent2]}");
+        //Debug.WriteLine($"Select parent2 fitness: {fitness[parent2]}");
 
-        Crossover(parent1, parent2, i, i + 1, oldPopulation, newPopulation, out bool isChild1Feasible, out bool isChild2Feasible);
-        if (!isChild1Feasible || !isChild2Feasible)
-        {
-          Debug.WriteLine("Infeasible");
-          continue;
-        }
+        Crossover(parent1, parent2, i, i + 1, oldPopulation, newPopulation);
 
         Mutation(i, MutationP, newPopulation);
         Mutation(i + 1, MutationP, newPopulation);
@@ -60,9 +107,19 @@ public class GeneticAlgorithmOptimizer : Optimizer
       Weights[] temp = oldPopulation;
       oldPopulation = newPopulation;
       newPopulation = temp;
+
+#if DEBUG
+      Debug.WriteLine("--------------------------------------------------");
+#endif
     }
 
-    return new List<Weights> { oldPopulation[fitness.ToArray().Select((_, Index) => (_, Index)).Max().Index] };
+    int optimalIndex = fitness.ToArray().Select((_, Index) => (_, Index)).Max().Index;
+
+#if STATS
+    Debug.WriteLine("Optimal fitness: " + fitness[optimalIndex]);
+#endif
+
+    return new List<Weights> { optimalOverAll, oldPopulation[optimalIndex] };
   }
 
   private void PopulateRandomly(Span<Weights> weights)
@@ -91,22 +148,20 @@ public class GeneticAlgorithmOptimizer : Optimizer
     return j;
   }
 
-  private void Crossover(int parent1, int parent2, int child1, int child2, Weights[] oldPopulation, Weights[] newPopulation, out bool isChild1Feasible, out bool isChild2Feasible)
+  private void Crossover(int parent1, int parent2, int child1, int child2, Weights[] oldPopulation, Weights[] newPopulation)
   {
-    // Sacrificing DRY for best performance
-
-    Debug.WriteLine("ENTRY CROSSOVER");
-
     int depotIndex = _random.Next(0, World.Depots.Length);
-    Debug.WriteLine($"depotIndex: {depotIndex}");
     int onDepotIndex = _random.Next(0, Constraints.MaxMedicTeamsOnDepotCount);
-    Debug.WriteLine($"onDepotIndex: {onDepotIndex}");
 
+#if DEBUG_CROSSOVER
+    Debug.WriteLine("ENTRY CROSSOVER");
+    Debug.WriteLine($"depotIndex: {depotIndex}");
+    Debug.WriteLine($"onDepotIndex: {onDepotIndex}");
     Debug.WriteLine("parent 1");
     Debug.WriteLine(oldPopulation[parent1]);
-
     Debug.WriteLine("parent 2");
     Debug.WriteLine(oldPopulation[parent2]);
+#endif
 
     newPopulation[child1].AllAllocatedMedicTeamsCount = 0;
     newPopulation[child2].AllAllocatedMedicTeamsCount = 0;
@@ -132,8 +187,10 @@ public class GeneticAlgorithmOptimizer : Optimizer
       newPopulation[child2].AllAllocatedAmbulancesCount += oldPopulation[parent2].AmbulancesPerDepotCount[i];
     }
 
-    //Debug.WriteLine("prvni pulka child1");
-    //Debug.WriteLine(newPopulation[child1]);
+#if DEBUG_CROSSOVER
+    Debug.WriteLine("prvni pulka child1");
+    Debug.WriteLine(newPopulation[child1]);
+#endif
 
     newPopulation[child1].AmbulancesPerDepotCount[depotIndex] = oldPopulation[parent1].AmbulancesPerDepotCount[depotIndex];
     newPopulation[child1].AllAllocatedAmbulancesCount += oldPopulation[parent1].AmbulancesPerDepotCount[depotIndex];
@@ -164,8 +221,10 @@ public class GeneticAlgorithmOptimizer : Optimizer
     newPopulation[child1].AllAllocatedMedicTeamsCount += newPopulation[child1].MedicTeamsPerDepotCount[depotIndex];
     newPopulation[child2].AllAllocatedMedicTeamsCount += newPopulation[child2].MedicTeamsPerDepotCount[depotIndex];
 
-    //Debug.WriteLine("depotIndex child1");
-    //Debug.WriteLine(newPopulation[child1]);
+#if DEBUG_CROSSOVER
+    Debug.WriteLine("depotIndex child1");
+    Debug.WriteLine(newPopulation[child1]);
+#endif
 
     for (int i = depotIndex + 1; i < World.Depots.Length; ++i)
     {
@@ -186,6 +245,7 @@ public class GeneticAlgorithmOptimizer : Optimizer
       newPopulation[child2].AllAllocatedMedicTeamsCount += oldPopulation[parent1].MedicTeamsPerDepotCount[i];
     }
 
+#if DEBUG_CROSSOVER
     Debug.WriteLine("child 1");
     Debug.WriteLine(newPopulation[child1]);
 
@@ -194,10 +254,7 @@ public class GeneticAlgorithmOptimizer : Optimizer
 
     Debug.WriteLine("EXIT CROSSOVER");
     Debug.Flush();
-
-    isChild1Feasible = newPopulation[child1].AllAllocatedAmbulancesCount < Constraints.AvailableAmbulancesCount && newPopulation[child1].AllAllocatedMedicTeamsCount < Constraints.AvailableMedicTeamsCount;
-    isChild2Feasible = newPopulation[child2].AllAllocatedAmbulancesCount < Constraints.AvailableAmbulancesCount && newPopulation[child2].AllAllocatedMedicTeamsCount < Constraints.AvailableMedicTeamsCount;
-
+#endif
   }
 
   /// Swaps all shifts on two randomly selected depots, including ambulances
@@ -205,9 +262,11 @@ public class GeneticAlgorithmOptimizer : Optimizer
   {
     if (_random.NextDouble() < mutationP)
     {
+#if DEBUG
       Debug.WriteLine("MUTATION!");
       Debug.WriteLine("Before mutation: ");
       Debug.WriteLine(newPopulation[index]);
+#endif
 
       int depot1 = _random.Next(0, World.Depots.Length);
       int depot2 = _random.Next(0, World.Depots.Length);
@@ -227,8 +286,44 @@ public class GeneticAlgorithmOptimizer : Optimizer
       newPopulation[index].AmbulancesPerDepotCount[depot1] = newPopulation[index].AmbulancesPerDepotCount[depot2];
       newPopulation[index].AmbulancesPerDepotCount[depot2] = ambulancesCount;
 
+#if DEBUG
       Debug.WriteLine("After mutation: ");
       Debug.WriteLine(newPopulation[index]);
+#endif
     }
+  }
+
+  private double Penalty(Weights weights)
+  {
+    if (isFeasible(weights)) return 0;
+
+    double medicTeamViolationSum = 0;
+    double ambulanceViolationSum = 0;
+
+    for (int depotIndex = 0; depotIndex < World.Depots.Length; ++depotIndex)
+    {
+      medicTeamViolationSum += Math.Max(0, weights.MedicTeamsPerDepotCount[depotIndex] - Constraints.MaxMedicTeamsOnDepotCount) * weights.MedicTeamsPerDepotCount[depotIndex];
+      ambulanceViolationSum += Math.Max(0, weights.AmbulancesPerDepotCount[depotIndex] - Constraints.MaxAmbulancesOnDepotCount) * weights.AmbulancesPerDepotCount[depotIndex];
+    }
+
+    return (medicTeamViolationSum / World.Depots.Length + ambulanceViolationSum / World.Depots.Length) / 2;
+  }
+
+  private bool isFeasible(Weights weights)
+  {
+    return weights.AllAllocatedAmbulancesCount < Constraints.AvailableAmbulancesCount && weights.AllAllocatedMedicTeamsCount < Constraints.AvailableMedicTeamsCount;
+  }
+
+  private static World DoubleAmbulanceAndTeamsCapacity(World world)
+  {
+    return new World()
+    {
+      Depots = world.Depots,
+      Hospitals = world.Hospitals,
+      DistanceCalculator = world.DistanceCalculator,
+      GoldenTimeSec = world.GoldenTimeSec,
+      AvailableMedicTeams = Enumerable.Range(0, 2 * world.AvailableMedicTeams.Length).Select(_ => new MedicTeam()).ToImmutableArray(),
+      AvailableAmbulances = Enumerable.Range(0, 2 * world.AvailableAmbulances.Length).Select(_ => new Ambulance()).ToImmutableArray(),
+    };
   }
 }

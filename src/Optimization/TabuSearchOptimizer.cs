@@ -20,7 +20,7 @@ public sealed class TabuSearchOptimizer : LocalSearchOptimizer
     World world,
     Constraints constraints,
     ShiftTimes shiftTimes,
-    ILoss loss,
+    IObjectiveFunction loss,
     int iterations = 50,
     int tabuSize = 50,
     bool shouldPermutate = true,
@@ -67,7 +67,7 @@ public sealed class TabuSearchOptimizer : LocalSearchOptimizer
 
         ModifyMakeMove(currentWeights, currentMove);
 
-        double neighbourLoss = Loss.Get(currentWeights, incidents);
+        double neighbourLoss = ObjectiveFunction.Get(currentWeights, incidents);
         // Debug.WriteLine($"Neighbour loss: {neighbourLoss}"); // SPAM
 
         if (neighbourLoss < currentBestLoss)

@@ -20,7 +20,7 @@ public abstract class Optimizer : IOptimizer
   public Constraints Constraints { get; }
 
   /// <inheritdoc/>
-  public ILoss Loss { get; set; }
+  public IObjectiveFunction ObjectiveFunction { get; set; }
 
   /// <inheritdoc/>
   public Weights StartWeights { get; set; }
@@ -28,15 +28,15 @@ public abstract class Optimizer : IOptimizer
   /// Random
   protected readonly Random _random;
 
-  public Optimizer(World world, Constraints constraints, ShiftTimes shiftTimes, ILoss loss, Random? random = null)
+  public Optimizer(World world, Constraints constraints, ShiftTimes shiftTimes, IObjectiveFunction objectiveFunction, Random? random = null)
   {
     _random = random ?? new Random();
     ShiftTimes = shiftTimes;
     World = world;
-    Loss = loss;
+    ObjectiveFunction = objectiveFunction;
     Constraints = constraints;
     InitWeights();
-    StartWeights.MapTo(Loss.Simulation.EmergencyServicePlan);
+    StartWeights.MapTo(ObjectiveFunction.Simulation.EmergencyServicePlan);
   }
 
   public abstract IEnumerable<Weights> FindOptimal(ImmutableArray<Incident> incidents);
