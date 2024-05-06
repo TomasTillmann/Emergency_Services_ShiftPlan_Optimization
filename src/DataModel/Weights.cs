@@ -85,8 +85,8 @@ public class Weights
         break;
       }
 
-      weights.AmbulancesPerDepotCount[i] = ambulancesOnDepotCount;
-      runningAvailableAmbulancesCount -= ambulancesOnDepotCount;
+      weights.AmbulancesPerDepotCount[i] = random.Next(0, ambulancesOnDepotCount);
+      runningAvailableAmbulancesCount -= weights.AmbulancesPerDepotCount[i];
     }
     weights.AllAllocatedAmbulancesCount = weights.AmbulancesPerDepotCount.Sum();
     //
@@ -183,6 +183,25 @@ public class Weights
       AmbulancesPerDepotCount = ambulancesPerDepotCount,
       AllAllocatedAmbulancesCount = this.AllAllocatedAmbulancesCount
     };
+  }
+
+  public override string ToString()
+  {
+    string str = "";
+    for (int i = 0; i < MedicTeamAllocations.GetLength(0); ++i)
+    {
+      for (int j = 0; j < MedicTeamAllocations.GetLength(1); ++j)
+      {
+        str += $"{MedicTeamAllocations[i, j]}, ";
+      }
+      str.Remove(str.Length - 2, 2);
+      str += "\n";
+    }
+    str += $"medic teams: {string.Join(", ", MedicTeamsPerDepotCount)}\n";
+    str += $"medic teams count: {AllAllocatedMedicTeamsCount}\n";
+    str += $"ambulances: {string.Join(", ", AmbulancesPerDepotCount)}\n";
+    str += $"ambulances count: {AllAllocatedAmbulancesCount}";
+    return str;
   }
 }
 

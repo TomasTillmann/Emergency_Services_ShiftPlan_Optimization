@@ -80,7 +80,7 @@ namespace ESSP.DataModel
 
     public override string ToString()
     {
-      return $"({StartSec}, {EndSec})";
+      return $"({StartSec}, {DurationSec})";
     }
   }
 }

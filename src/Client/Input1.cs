@@ -5,8 +5,8 @@ public class Input1 : IInputParametrization
 {
   private readonly Random _random;
   private readonly DataModelGenerator _dataGenerator = new();
-  private const int avaialbeMedicTeamsCount = 50;
-  private const int availableAmbulancesCount = 1000;
+  private const int avaialbeMedicTeamsCount = 20;
+  private const int availableAmbulancesCount = 40;
 
   public Input1(Random random = null)
   {
@@ -30,7 +30,7 @@ public class Input1 : IInputParametrization
     // World init
     World world = WorldMapper.MapBack(_dataGenerator.GenerateWorldModel(
       worldSize: new CoordinateModel { XMet = 50_000, YMet = 50_000 },
-      depotsCount: 10,
+      depotsCount: 5,
       hospitalsCount: 20,
       availableMedicTeamsCount: avaialbeMedicTeamsCount,
       availableAmbulancesCount: availableAmbulancesCount,
@@ -46,7 +46,7 @@ public class Input1 : IInputParametrization
     // Incidents init
     ImmutableArray<Incident> incidents = _dataGenerator.GenerateIncidentModels(
       worldSize: new CoordinateModel { XMet = 50_000, YMet = 50_000 },
-      incidentsCount: 100,
+      incidentsCount: 30,
       duration: 21.ToHours().ToSeconds(),
       onSceneDurationNormalExpected: 20.ToMinutes().ToSeconds(),
       onSceneDurationNormalStddev: 10.ToMinutes().ToSeconds(),
@@ -67,13 +67,13 @@ public class Input1 : IInputParametrization
       {
         0.ToHours().ToMinutes().ToSeconds().Value,
         //2.ToHours().ToMinutes().ToSeconds().Value,
-        //4.ToHours().ToMinutes().ToSeconds().Value,
+        4.ToHours().ToMinutes().ToSeconds().Value,
         // 6.ToHours().ToMinutes().ToSeconds().Value,
-        //8.ToHours().ToMinutes().ToSeconds().Value,
+        8.ToHours().ToMinutes().ToSeconds().Value,
         //10.ToHours().ToMinutes().ToSeconds().Value,
         12.ToHours().ToMinutes().ToSeconds().Value,
         //14.ToHours().ToMinutes().ToSeconds().Value,
-        //16.ToHours().ToMinutes().ToSeconds().Value,
+        16.ToHours().ToMinutes().ToSeconds().Value,
         //18.ToHours().ToMinutes().ToSeconds().Value,
         //20.ToHours().ToMinutes().ToSeconds().Value,
       },

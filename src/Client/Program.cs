@@ -70,15 +70,22 @@ class Program
     visualizer.PlotGraph(loss, startWeights, incidents, _debug);
 
     simulation = new(world);
+    loss = new StandardLoss(simulation, shiftTimes);
+    optimizer = new GeneticAlgorithmOptimizer(world, constraints, shiftTimes, loss, populationSize: 20, iterations: 20, mutationP: 0.01, random: random);
+    optimizer.StartWeights = startWeights;
+    optimizer.Debug = _debug;
+    optimizers.Add(optimizer);
+
+    simulation = new(world);
     loss = new SuccessRateLoss(simulation, shiftTimes);
     optimizer = new HillClimbOptimizer(world, constraints, shiftTimes, loss, iterations: 200, random: random);
     optimizer.StartWeights = startWeights;
     optimizer.Debug = _debug;
     optimizers.Add(optimizer);
 
-    FindMaxSuccessRateShiftPlan findMax = new(world, shiftTimes, constraints);
-    var o = findMax.FindOptimal(incidents).First();
-    visualizer.PlotGraph(loss, o, incidents);
+    // FindMaxSuccessRateShiftPlan findMax = new(world, shiftTimes, constraints);
+    // var o = findMax.FindOptimal(incidents).First();
+    // visualizer.PlotGraph(loss, o, incidents);
 
     simulation = new(world);
     loss = new SuccessRateLoss(simulation, shiftTimes);
