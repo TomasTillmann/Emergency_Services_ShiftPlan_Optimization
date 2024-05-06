@@ -6,19 +6,19 @@ namespace ESSP.DataModel;
 
 public partial class PlannableIncident
 {
-  public Incident Incident { get; private set; }
-  public int AmbulanceIndex { get; private set; }
-  public Hospital NearestHospital { get; private set; }
-  public Interval ToIncidentDrive { get; private set; }
-  public Interval OnSceneDuration { get; private set; }
-  public Interval ToHospitalDrive { get; private set; }
-  public Interval InHospitalDelivery { get; private set; }
-  public Interval ToDepotDrive { get; private set; }
+  public Incident Incident { get; set; }
+  public int AmbulanceIndex { get; set; }
+  public Hospital NearestHospital { get; set; }
+  public Interval ToIncidentDrive { get; set; }
+  public Interval OnSceneDuration { get; set; }
+  public Interval ToHospitalDrive { get; set; }
+  public Interval InHospitalDelivery { get; set; }
+  public Interval ToDepotDrive { get; set; }
 
   private PlannableIncident() { }
 
   // copy constructor
-  private PlannableIncident(PlannableIncident toCopy)
+  public PlannableIncident(PlannableIncident toCopy)
   {
     this.Incident = toCopy.Incident;
     this.NearestHospital = toCopy.NearestHospital;
@@ -28,6 +28,18 @@ public partial class PlannableIncident
     this.ToHospitalDrive = toCopy.ToHospitalDrive;
     this.InHospitalDelivery = toCopy.InHospitalDelivery;
     this.ToDepotDrive = toCopy.ToDepotDrive;
+  }
+
+  public void FillFrom(PlannableIncident source)
+  {
+    this.Incident = source.Incident;
+    this.NearestHospital = source.NearestHospital;
+    this.AmbulanceIndex = source.AmbulanceIndex;
+    this.ToIncidentDrive = source.ToIncidentDrive;
+    this.OnSceneDuration = source.OnSceneDuration;
+    this.ToHospitalDrive = source.ToHospitalDrive;
+    this.InHospitalDelivery = source.InHospitalDelivery;
+    this.ToDepotDrive = source.ToDepotDrive;
   }
 
   public Interval IncidentHandling => Interval.GetByStartAndEnd(ToIncidentDrive.StartSec, ToDepotDrive.StartSec);
@@ -44,18 +56,20 @@ public partial class PlannableIncident
 {
   public class Factory
   {
+    public PlannableIncident WorkingInstance { get; }
+
     private DistanceCalculator distanceCalculator;
     private ImmutableArray<Hospital> hospitals;
-
-    private PlannableIncident _instance;
 
     public Factory(DistanceCalculator distanceCalculator, ImmutableArray<Hospital> hospitals)
     {
       this.distanceCalculator = distanceCalculator;
       this.hospitals = hospitals;
 
-      _instance = new PlannableIncident();
+      WorkingInstance = new PlannableIncident();
     }
+
+    public static readonly PlannableIncident Empty = new PlannableIncident();
 
     /// Creates new instance of the shared instance.
     public PlannableIncident GetCopy(in Incident incident, MedicTeam shift)
@@ -70,25 +84,25 @@ public partial class PlannableIncident
     public PlannableIncident Get(in Incident incident, MedicTeam shift)
     {
       // by ref?
-      _instance.Incident = incident;
+      WorkingInstance.Incident = incident;
 
-      _instance.NearestHospital = distanceCalculator.GetNearestHospital(incident.Location);
+      WorkingInstance.NearestHospital = distanceCalculator.GetNearestHospital(incident.Location);
 
-      _instance.ToIncidentDrive = GetToIncidentDriveAndAmbIndex(incident.OccurenceSec, incident.Location, shift, out int ambIndex);
+      WorkingInstance.ToIncidentDrive = GetToIncidentDriveAndAmbIndex(incident.OccurenceSec, incident.Location, shift, out int ambIndex);
 
-      _instance.AmbulanceIndex = ambIndex;
+      WorkingInstance.AmbulanceIndex = ambIndex;
 
-      _instance.OnSceneDuration = Interval.GetByStartAndDuration(_instance.ToIncidentDrive.EndSec, incident.OnSceneDurationSec);
+      WorkingInstance.OnSceneDuration = Interval.GetByStartAndDuration(WorkingInstance.ToIncidentDrive.EndSec, incident.OnSceneDurationSec);
 
-      int toHospitalTravelDurationSec = distanceCalculator.GetTravelDurationSec(incident.Location, _instance.NearestHospital.Location);
-      _instance.ToHospitalDrive = Interval.GetByStartAndDuration(_instance.OnSceneDuration.EndSec, toHospitalTravelDurationSec);
+      int toHospitalTravelDurationSec = distanceCalculator.GetTravelDurationSec(incident.Location, WorkingInstance.NearestHospital.Location);
+      WorkingInstance.ToHospitalDrive = Interval.GetByStartAndDuration(WorkingInstance.OnSceneDuration.EndSec, toHospitalTravelDurationSec);
 
-      _instance.InHospitalDelivery = Interval.GetByStartAndDuration(_instance.ToHospitalDrive.EndSec, incident.InHospitalDeliverySec);
+      WorkingInstance.InHospitalDelivery = Interval.GetByStartAndDuration(WorkingInstance.ToHospitalDrive.EndSec, incident.InHospitalDeliverySec);
 
-      int toDepotDriveDurationSec = distanceCalculator.GetTravelDurationSec(_instance.NearestHospital.Location, shift.Depot.Location);
-      _instance.ToDepotDrive = Interval.GetByStartAndDuration(_instance.InHospitalDelivery.EndSec, toDepotDriveDurationSec);
+      int toDepotDriveDurationSec = distanceCalculator.GetTravelDurationSec(WorkingInstance.NearestHospital.Location, shift.Depot.Location);
+      WorkingInstance.ToDepotDrive = Interval.GetByStartAndDuration(WorkingInstance.InHospitalDelivery.EndSec, toDepotDriveDurationSec);
 
-      return _instance;
+      return WorkingInstance;
     }
 
     public Interval GetToIncidentDrive(int incidentOccurenceTimeSec, Coordinate incidentLocation, MedicTeam medicTeam)
@@ -133,7 +147,7 @@ public partial class PlannableIncident
         return;
       }
 
-      PlannableIncident currentlyHandlingIncident = medicTeam.GetCurrentlyHandlingIncident();
+      PlannableIncident currentlyHandlingIncident = medicTeam.LastPlannedIncident;
       Coordinate hospitalLocation = currentlyHandlingIncident.NearestHospital.Location;
 
       // Medic team will use the same ambulance.

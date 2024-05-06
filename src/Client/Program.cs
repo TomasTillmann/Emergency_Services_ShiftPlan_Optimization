@@ -69,7 +69,7 @@ class Program
     loss = new StandardLoss(simulation, shiftTimes);
     visualizer.PlotGraph(loss, startWeights, incidents, _debug);
 
-    optimizer = new GeneticAlgorithmOptimizer(world, constraints, shiftTimes, lossCoeff: 0.01f, populationSize: 700, populations: 80, mutationP: 0.01, random: random);
+    optimizer = new GeneticAlgorithmOptimizer(world, constraints, shiftTimes, lossCoeff: 0.01f, populationSize: 700, populations: 300, mutationP: 0.01, random: random);
     optimizer.StartWeights = startWeights;
     optimizer.Debug = _debug;
     optimizers.Add(optimizer);

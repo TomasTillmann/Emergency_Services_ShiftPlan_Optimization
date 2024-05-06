@@ -10,6 +10,8 @@ public sealed class Simulation
 
   public EmergencyServicePlan EmergencyServicePlan { get; }
 
+  public bool Info { get; set; }
+
   /// <summary>
   /// Total count of incidents the simulation was run on. 
   /// </summary>
@@ -28,14 +30,13 @@ public sealed class Simulation
 
   private readonly MedicTeamsEvaluator _medicTeamsEvaluator;
   private readonly PlannableIncident.Factory _plannableIncidentFactory;
-  private readonly bool _info;
 
   public Simulation(World world, bool info = false)
   {
     World = world;
     _plannableIncidentFactory = new PlannableIncident.Factory(world.DistanceCalculator, world.Hospitals);
     _medicTeamsEvaluator = new MedicTeamsEvaluator(world.DistanceCalculator, world.Hospitals, world.GoldenTimeSec);
-    _info = info;
+    Info = info;
 
     EmergencyServicePlan = new EmergencyServicePlan
     {
@@ -50,35 +51,20 @@ public sealed class Simulation
   /// </summary>
   public void Run(ReadOnlySpan<Incident> incidents)
   {
-    // Clear planned incidents from previous iterations.
-    for (int i = 0; i < EmergencyServicePlan.AllocatedMedicTeamsCount; ++i)
-    {
-      EmergencyServicePlan.AvailableMedicTeams[i].ClearPlannedIncidents();
-      EmergencyServicePlan.AvailableMedicTeams[i].TimeActiveSec = 0;
-    }
+    ResetState(incidents.Length);
 
-    // Set WhenFree to 0 seconds to all ambulances
-    for (int i = 0; i < EmergencyServicePlan.AllocatedAmbulancesCount; ++i)
-    {
-      EmergencyServicePlan.AvailableAmbulances[i].WhenFreeSec = 0;
-    }
-
-    if (_info)
-    {
-      UnhandledIncidents.Clear();
-    }
-
-    NotHandledIncidentsCount = 0;
-    TotalIncidentsCount = incidents.Length;
+    PlannableIncident plannableIncidentForBestShift;
+    Incident currentIncident;
+    MedicTeam bestMedicTeam;
+    MedicTeam medicTeam;
 
     for (int i = 0; i < incidents.Length; ++i)
     {
-      Incident currentIncident = incidents[i];
+      currentIncident = incidents[i];
 
       // Has to be assigned to something in order to compile, but it will be reassigned to first handling shift found.
       // If not, than the other loop won't happen, therefore it's value is irrelevant.
-      MedicTeam bestMedicTeam = default(MedicTeam);
-      MedicTeam medicTeam;
+      bestMedicTeam = default(MedicTeam);
 
       // Find handling medic team. 
       int findBetterFromIndex = int.MaxValue;
@@ -98,7 +84,7 @@ public sealed class Simulation
       if (findBetterFromIndex == int.MaxValue)
       {
         NotHandledIncidentsCount++;
-        if (_info) UnhandledIncidents.Add(i);
+        if (Info) UnhandledIncidents.Add(i);
         continue;
       }
 
@@ -112,8 +98,33 @@ public sealed class Simulation
         }
       }
 
-      //TODO: heap allocation all the time, this is bad.
-      bestMedicTeam.Plan(_plannableIncidentFactory.GetCopy(in currentIncident, bestMedicTeam));
+      plannableIncidentForBestShift = _plannableIncidentFactory.Get(in currentIncident, bestMedicTeam);
+      if (Info) bestMedicTeam.PlanAndAddToHistory(plannableIncidentForBestShift); else bestMedicTeam.PlanEfficient(plannableIncidentForBestShift);
     }
+  }
+
+  private void ResetState(int incidentsCount)
+  {
+    // Clear planned incidents and last planned incident from previous iterations.
+    for (int i = 0; i < EmergencyServicePlan.AllocatedMedicTeamsCount; ++i)
+    {
+      EmergencyServicePlan.AvailableMedicTeams[i].ClearPlannedIncidents();
+      EmergencyServicePlan.AvailableMedicTeams[i].ResetLastPlannedIncident();
+      EmergencyServicePlan.AvailableMedicTeams[i].TimeActiveSec = 0;
+    }
+
+    // Set WhenFree to 0 seconds to all ambulances
+    for (int i = 0; i < EmergencyServicePlan.AllocatedAmbulancesCount; ++i)
+    {
+      EmergencyServicePlan.AvailableAmbulances[i].WhenFreeSec = 0;
+    }
+
+    if (Info)
+    {
+      UnhandledIncidents.Clear();
+    }
+
+    NotHandledIncidentsCount = 0;
+    TotalIncidentsCount = incidentsCount;
   }
 }

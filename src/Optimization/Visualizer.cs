@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using ESSP.DataModel;
+using Simulating;
 
 namespace Optimizing;
 
@@ -80,6 +81,7 @@ public class Visualizer : IDisposable
   public void PlotGraph(IObjectiveFunction loss, Weights weights, ImmutableArray<Incident> incidents, TextWriter writer = null)
   {
     writer ??= _writer;
+    loss.Simulation.Info = true;
 
     weights.MapTo(loss.Simulation.EmergencyServicePlan);
     loss.Simulation.Run(incidents.AsSpan());
@@ -94,7 +96,8 @@ public class Visualizer : IDisposable
     writer.WriteLine($"cost: {loss.GetCost()}");
     writer.WriteLine($"effectivity: {loss.GetEffectivity()}");
     writer.WriteLine($"loss: {loss.GetLoss()}");
-
     writer.Flush();
+
+    loss.Simulation.Info = false;
   }
 }

@@ -18,7 +18,6 @@ public class MedicTeamsEvaluator
   public bool IsHandling(MedicTeam medicTeam, in Incident incident)
   {
     PlannableIncident plannableIncident = _plannableIncidentFactory.Get(incident, medicTeam);
-
     return IsHandling(medicTeam, plannableIncident);
   }
 

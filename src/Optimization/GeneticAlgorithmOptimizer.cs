@@ -1,5 +1,5 @@
 // #define DEBUG
-#define STATS
+//#define STATS
 
 using System.Collections.Immutable;
 using ESSP.DataModel;
@@ -19,7 +19,7 @@ public class GeneticAlgorithmOptimizer : Optimizer
   public IObjectiveFunction Fitness => ObjectiveFunction;
 
   public GeneticAlgorithmOptimizer(World world, Constraints constraints, ShiftTimes shiftTimes, int populationSize, int populations, double mutationP, float lossCoeff, IObjectiveFunction fitness = null, Random? random = null)
-  : base(DoubleAmbulanceAndTeamsCapacity(world), constraints, shiftTimes, fitness ?? new GAStandardFitness(new Simulation(world), shiftTimes), random)
+  : base(DoubleAmbulanceAndTeamsCapacity(world), constraints, shiftTimes, fitness ?? new GAStandardFitness(new Simulation(world, info: false), shiftTimes), random)
   {
     PopulationSize = populationSize;
     Populations = populations;
