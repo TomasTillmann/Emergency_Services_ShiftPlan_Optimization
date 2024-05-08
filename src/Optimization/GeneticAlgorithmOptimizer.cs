@@ -1,5 +1,6 @@
-// #define DEBUG
+// #define MY_DEBUG
 #define STATS
+//#define DEBUG_CROSSOVER
 
 using System.Collections.Immutable;
 using ESSP.DataModel;
@@ -14,22 +15,37 @@ public class GeneticAlgorithmOptimizer : Optimizer
   public double MutationP { get; set; }
   public float LossCoeff { get; set; }
 
+  public SelectionType SelectionTypeValue { get; set; }
+
   /// Is the objective function.
   /// Has to return nonnegative values (>= 0).
   public IObjectiveFunction Fitness => ObjectiveFunction;
 
-  private readonly MoveGenerator moveGenerator;
-  private readonly Move[] mutationMovesBuffer;
+  protected MoveGenerator moveGenerator { get; }
+  protected Move[] mutationMovesBuffer { get; }
 
-  public GeneticAlgorithmOptimizer(World world, Constraints constraints, ShiftTimes shiftTimes, int generationSize, int generations, double mutationP, float lossCoeff, IObjectiveFunction fitness = null, Random? random = null)
-  : base(DoubleAmbulanceAndTeamsCapacity(world), constraints, shiftTimes, fitness ?? new GAStandardFitness(new Simulation(world, info: false), shiftTimes), random)
+  private static World doubledWorld; //TODO:
+
+  public GeneticAlgorithmOptimizer(
+      World world,
+      Constraints constraints,
+      ShiftTimes shiftTimes,
+      int generationSize,
+      int generations,
+      double mutationP,
+      float lossCoeff,
+      GeneticAlgorithmOptimizer.SelectionType selectionType,
+      IObjectiveFunction fitness = null,
+      Random? random = null)
+  : base(DoubleAmbulanceAndTeamsCapacity(world), constraints, shiftTimes, fitness ?? new GAStandardFitness(new Simulation(doubledWorld, info: false), shiftTimes), random)
   {
-    GenerationSize = generationSize;
+    GenerationSize = (generationSize % 2) == 0 ? generationSize : generationSize + 1;
     Generations = generations;
     MutationP = mutationP;
     LossCoeff = lossCoeff;
+    SelectionTypeValue = selectionType;
 
-    moveGenerator = new MoveGenerator(null, null, null, null); //TODO: refactor move generator out of optimzer hieararchy
+    moveGenerator = new MoveGenerator(doubledWorld, constraints, shiftTimes, new GAStandardFitness(new Simulation(world), shiftTimes)); //TODO: refactor move generator out of optimzer hieararchy
     mutationMovesBuffer = new Move[Enum.GetValues(typeof(MoveType)).Length];
   }
 
@@ -59,7 +75,7 @@ public class GeneticAlgorithmOptimizer : Optimizer
 
       for (int i = 0; i < GenerationSize; ++i)
       {
-        fitness[i] = Math.Max(0, Fitness.Get(oldGeneration[i], incidents) - LossCoeff * Penalty(oldGeneration[i]));
+        fitness[i] = Math.Max(0, Scale(Fitness.Get(oldGeneration[i], incidents)) - LossCoeff * Penalty(oldGeneration[i]));
         if (fitness[i] > optimalOverAllFitness)
         {
           optimalOverAllFitness = fitness[i];
@@ -81,14 +97,15 @@ public class GeneticAlgorithmOptimizer : Optimizer
         fitnessSum += fitness[i];
       }
 
-#if STATS
       averageFitness = fitnessSum / GenerationSize;
+
+#if STATS
       //Debug.WriteLine(string.Join("\n", fitness.ToArray().OrderByDescending(_ => _)));
       Debug.WriteLine($"Generation: {generation}, MaxFitness: {maxFitness}, MinFitness: {minFitness}, AverageFitness: {averageFitness}");
-      Debug.WriteLine(new string('=', 100));
+      Debug.WriteLine(new string('=', 500));
 #endif
 
-#if DEBUG
+#if MY_DEBUG
       fitness.ToArray().Select((Fitness, Index) => (Fitness, Index)).OrderByDescending(_ => _).ToList().ForEach(value =>
       {
         Debug.WriteLine(oldGeneration[value.Index]);
@@ -96,22 +113,57 @@ public class GeneticAlgorithmOptimizer : Optimizer
       });
 #endif
 
-      for (int i = 0; i < GenerationSize - 1; i += 2)
+      switch (SelectionTypeValue)
       {
-        int parent1 = Select(fitness, fitnessSum);
-        int parent2 = Select(fitness, fitnessSum);
+        case SelectionType.StochasticSamplingWithReplacement:
+          {
+            for (int i = 0; i < GenerationSize - 1; i += 2)
+            {
+              int parent1 = Select_StochasticSamplingWithReplacement(fitness, fitnessSum);
+              int parent2 = Select_StochasticSamplingWithReplacement(fitness, fitnessSum);
 
-        Crossover(parent1, parent2, i, i + 1, oldGeneration, newGeneration);
+              Crossover(parent1, parent2, i, i + 1, oldGeneration, newGeneration);
 
-        Mutation(i, MutationP, newGeneration);
-        Mutation(i + 1, MutationP, newGeneration);
+              Mutation(i, MutationP, newGeneration);
+              Mutation(i + 1, MutationP, newGeneration);
+            }
+
+            break;
+          }
+
+        case SelectionType.RemainderStochasticSamplingWithoutReplacement:
+          {
+            MemoryExtensions.Sort(fitness, oldGeneration.AsSpan(), (x, y) => y.CompareTo(x));
+            Span<int> choices = stackalloc int[GenerationSize];
+
+            Preselect_RemainderStochasticSamplingWithoutReplacement(fitness, averageFitness, choices);
+
+            int nremain = GenerationSize - 1;
+            int i = 0;
+            while (nremain > 0)
+            {
+              int parent1 = Select_RemainderStochasticSamplingWithoutReplacement(choices, nremain--);
+              int parent2 = Select_RemainderStochasticSamplingWithoutReplacement(choices, nremain--);
+
+              Crossover(parent1, parent2, i, i + 1, oldGeneration, newGeneration);
+
+              Mutation(i, MutationP, newGeneration);
+              Mutation(i + 1, MutationP, newGeneration);
+              i += 2;
+            }
+
+            break;
+          }
+
+        default:
+          throw new ArgumentOutOfRangeException();
       }
 
       Weights[] temp = oldGeneration;
       oldGeneration = newGeneration;
       newGeneration = temp;
 
-#if DEBUG
+#if MY_DEBUG
       Debug.WriteLine("--------------------------------------------------");
 #endif
 
@@ -127,7 +179,7 @@ public class GeneticAlgorithmOptimizer : Optimizer
     return new List<Weights> { optimalOverAll, oldGeneration[optimalIndex] };
   }
 
-  private void PopulateRandomly(Span<Weights> weights)
+  protected void PopulateRandomly(Span<Weights> weights)
   {
     for (int i = 0; i < GenerationSize; ++i)
     {
@@ -137,8 +189,7 @@ public class GeneticAlgorithmOptimizer : Optimizer
     // Debug.WriteLine("-------------------------");
   }
 
-  // Wheel of fortune
-  private int Select(Span<double> fitness, double fitnessSum)
+  private int Select_StochasticSamplingWithReplacement(Span<double> fitness, double fitnessSum)
   {
     double partSum = 0;
     int j = 0;
@@ -151,6 +202,52 @@ public class GeneticAlgorithmOptimizer : Optimizer
     }
 
     return j;
+  }
+
+  private int Select_RemainderStochasticSamplingWithoutReplacement(Span<int> choices, int nremain)
+  {
+    int jpick = _random.Next(0, nremain);
+    int select = choices[jpick];
+    choices[jpick] = choices[nremain];
+    return select;
+  }
+
+  private void Preselect_RemainderStochasticSamplingWithoutReplacement(Span<double> fitness, double averageFitness, Span<int> choices)
+  {
+    Span<double> fractions = stackalloc double[GenerationSize];
+    int j = 0;
+    int k = 0;
+
+    while (j < GenerationSize && k < GenerationSize)
+    {
+      double expected = fitness[j] / averageFitness;
+      double jassign = Math.Truncate(expected);
+      fractions[j] = expected - jassign;
+
+      while (jassign > 0)
+      {
+        choices[k++] = j;
+        --jassign;
+      }
+
+      j += 1;
+    }
+
+    j = 0;
+    while (k < GenerationSize)
+    {
+      if (fractions[j] > 0)
+      {
+        if (_random.Next(0, 1) == 0)
+        {
+          choices[k] = j;
+          --fractions[j];
+          ++k;
+        }
+      }
+
+      j = (j + 1) % GenerationSize;
+    }
   }
 
   private void Crossover(int parent1, int parent2, int child1, int child2, Weights[] oldPopulation, Weights[] newPopulation)
@@ -191,11 +288,6 @@ public class GeneticAlgorithmOptimizer : Optimizer
       newPopulation[child2].AllAllocatedMedicTeamsCount += oldPopulation[parent2].MedicTeamsPerDepotCount[i];
       newPopulation[child2].AllAllocatedAmbulancesCount += oldPopulation[parent2].AmbulancesPerDepotCount[i];
     }
-
-#if DEBUG_CROSSOVER
-    Debug.WriteLine("prvni pulka child1");
-    Debug.WriteLine(newPopulation[child1]);
-#endif
 
     newPopulation[child1].AmbulancesPerDepotCount[depotIndex] = oldPopulation[parent1].AmbulancesPerDepotCount[depotIndex];
     newPopulation[child1].AllAllocatedAmbulancesCount += oldPopulation[parent1].AmbulancesPerDepotCount[depotIndex];
@@ -275,16 +367,28 @@ public class GeneticAlgorithmOptimizer : Optimizer
         if (_random.NextDouble() < mutationP)
         {
           length = moveGenerator.GetAllMedicTeamMoves(newPopulation[index], depotIndex, medicTeamIndex, mutationMovesBuffer);
-          if (length != 0) moveGenerator.ModifyMakeMove(newPopulation[index], mutationMovesBuffer[_random.Next(0, length)]);
+          if (length != 0)
+          {
+            moveGenerator.GetAllMedicTeamMoves(newPopulation[index], depotIndex, medicTeamIndex, mutationMovesBuffer);
+            moveGenerator.ModifyMakeMove(newPopulation[index], mutationMovesBuffer[_random.Next(0, length)]);
+          }
         }
       }
 
       if (_random.NextDouble() < mutationP)
       {
         length = moveGenerator.GetAllAmbulanceMoves(newPopulation[index], depotIndex, mutationMovesBuffer);
-        if (length != 0) moveGenerator.ModifyMakeMove(newPopulation[index], mutationMovesBuffer[_random.Next(0, length)]);
+        if (length != 0)
+        {
+          moveGenerator.ModifyMakeMove(newPopulation[index], mutationMovesBuffer[_random.Next(0, length)]);
+        }
       }
     }
+  }
+
+  private double Scale(double fitness)
+  {
+    return fitness;
   }
 
   private double Penalty(Weights weights)
@@ -310,14 +414,22 @@ public class GeneticAlgorithmOptimizer : Optimizer
 
   private static World DoubleAmbulanceAndTeamsCapacity(World world)
   {
-    return new World()
+    doubledWorld = new World()
     {
       Depots = world.Depots,
       Hospitals = world.Hospitals,
       DistanceCalculator = world.DistanceCalculator,
       GoldenTimeSec = world.GoldenTimeSec,
-      AvailableMedicTeams = Enumerable.Range(0, 2 * world.AvailableMedicTeams.Length).Select(_ => new MedicTeam()).ToImmutableArray(),
-      AvailableAmbulances = Enumerable.Range(0, 2 * world.AvailableAmbulances.Length).Select(_ => new Ambulance()).ToImmutableArray(),
+      AvailableMedicTeams = Enumerable.Repeat(new MedicTeam(), 2 * world.AvailableMedicTeams.Length).ToImmutableArray(),
+      AvailableAmbulances = Enumerable.Repeat(new Ambulance(), 2 * world.AvailableAmbulances.Length).ToImmutableArray(),
     };
+
+    return doubledWorld;
+  }
+
+  public enum SelectionType
+  {
+    StochasticSamplingWithReplacement,
+    RemainderStochasticSamplingWithoutReplacement
   }
 }

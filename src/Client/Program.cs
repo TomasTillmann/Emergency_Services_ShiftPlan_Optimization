@@ -69,6 +69,14 @@ class Program
     loss = new StandardLoss(simulation, shiftTimes);
     visualizer.PlotGraph(loss, startWeights, incidents, _debug);
 
+    optimizer = new GeneticAlgorithmOptimizer(
+        world, constraints, shiftTimes,
+        lossCoeff: 0.05f, generationSize: 300, generations: 200, mutationP: 0.001, selectionType: GeneticAlgorithmOptimizer.SelectionType.StochasticSamplingWithReplacement, random: random);
+
+    optimizer.StartWeights = startWeights;
+    optimizer.Debug = _debug;
+    optimizers.Add(optimizer);
+
     simulation = new(world);
     loss = new StandardLoss(simulation, shiftTimes);
     optimizer = new RandomSampleHillClimbOptimizer(world, constraints, shiftTimes, loss, neighboursLimit: 30, samples: 50, iterations: 90, random: random);
@@ -82,10 +90,6 @@ class Program
     optimizer.Debug = _debug;
     optimizers.Add(optimizer);
 
-    optimizer = new GeneticAlgorithmOptimizer(world, constraints, shiftTimes, lossCoeff: 0.01f, generationSize: 700, generations: 300, mutationP: 0.001, random: random);
-    optimizer.StartWeights = startWeights;
-    optimizer.Debug = _debug;
-    optimizers.Add(optimizer);
 
     // FindMaxSuccessRateShiftPlan findMax = new(world, shiftTimes, constraints);
     // var o = findMax.FindOptimal(incidents).First();

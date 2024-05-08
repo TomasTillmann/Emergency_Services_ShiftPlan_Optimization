@@ -70,7 +70,7 @@ public class Weights
         }
       }
     }
-    weights.AllAllocatedMedicTeamsCount = constraints.AvailableMedicTeamsCount - runningAvailableMedicTeamsCount;
+    weights.AllAllocatedMedicTeamsCount = weights.MedicTeamsPerDepotCount.Sum();
     //
 
     // amb allocations
