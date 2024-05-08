@@ -5,8 +5,8 @@ public class Input1 : IInputParametrization
 {
   private readonly Random _random;
   private readonly DataModelGenerator _dataGenerator = new();
-  private const int avaialbeMedicTeamsCount = 20;
-  private const int availableAmbulancesCount = 40;
+  private const int avaialbeMedicTeamsCount = 100;
+  private const int availableAmbulancesCount = 200;
 
   public Input1(Random random = null)
   {
@@ -30,7 +30,7 @@ public class Input1 : IInputParametrization
     // World init
     World world = WorldMapper.MapBack(_dataGenerator.GenerateWorldModel(
       worldSize: new CoordinateModel { XMet = 50_000, YMet = 50_000 },
-      depotsCount: 5,
+      depotsCount: 50,
       hospitalsCount: 20,
       availableMedicTeamsCount: avaialbeMedicTeamsCount,
       availableAmbulancesCount: availableAmbulancesCount,
@@ -46,7 +46,7 @@ public class Input1 : IInputParametrization
     // Incidents init
     ImmutableArray<Incident> incidents = _dataGenerator.GenerateIncidentModels(
       worldSize: new CoordinateModel { XMet = 50_000, YMet = 50_000 },
-      incidentsCount: 50,
+      incidentsCount: 300,
       duration: 21.ToHours().ToSeconds(),
       onSceneDurationNormalExpected: 20.ToMinutes().ToSeconds(),
       onSceneDurationNormalStddev: 10.ToMinutes().ToSeconds(),

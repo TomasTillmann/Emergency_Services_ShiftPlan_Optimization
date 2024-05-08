@@ -7,9 +7,16 @@ public abstract class MoveOptimizer : Optimizer
 {
   protected readonly List<Move> movesBuffer = new();
 
+  protected MoveType[] MedicTeamMoveTypes { get; }
+  protected MoveType[] AmbulanceMoveTypes { get; }
+  protected MoveType[] MoveTypes { get; }
+
   protected MoveOptimizer(World world, Constraints constraints, ShiftTimes shiftTimes, IObjectiveFunction loss, Random? random = null)
   : base(world, constraints, shiftTimes, loss, random)
   {
+    MoveTypes = (MoveType[])Enum.GetValues(typeof(MoveType));
+    MedicTeamMoveTypes = new MoveType[] { MoveType.ShiftLater, MoveType.ShiftLonger, MoveType.ShiftEarlier, MoveType.ShiftLater, MoveType.AllocateMedicTeam, MoveType.DeallocateMedicTeam };
+    AmbulanceMoveTypes = new MoveType[] { MoveType.AllocateAmbulance, MoveType.DeallocateAmbulance };
   }
 
   /// <summary>
@@ -142,6 +149,42 @@ public abstract class MoveOptimizer : Optimizer
       default:
         throw new ArgumentOutOfRangeException();
     }
+  }
+
+  public int GetAllMoves(Weights weights, int depotIndex, int medicTeamOnDepotIndex, Move[] movesBuffer)
+  {
+    int length = GetAllMedicTeamMoves(weights, depotIndex, medicTeamOnDepotIndex, movesBuffer);
+    length += GetAllAmbulanceMoves(weights, depotIndex, movesBuffer);
+    return length;
+
+  }
+
+  public int GetAllMedicTeamMoves(Weights weights, int depotIndex, int medicTeamOnDepotIndex, Move[] movesBuffer)
+  {
+    int length = 0;
+    for (int moveTypeIndex = 0; moveTypeIndex < MedicTeamMoveTypes.Length; ++moveTypeIndex)
+    {
+      if (TryGenerateMove(weights, depotIndex, medicTeamOnDepotIndex, MedicTeamMoveTypes[moveTypeIndex], out Move? move))
+      {
+        movesBuffer[length++] = move.Value;
+      }
+    }
+
+    return length;
+  }
+
+  public int GetAllAmbulanceMoves(Weights weights, int depotIndex, Move[] movesBuffer)
+  {
+    int length = 0;
+    for (int moveTypeIndex = 0; moveTypeIndex < AmbulanceMoveTypes.Length; ++moveTypeIndex)
+    {
+      if (TryGenerateMove(weights, depotIndex, -1, AmbulanceMoveTypes[moveTypeIndex], out Move? move))
+      {
+        movesBuffer[length++] = move.Value;
+      }
+    }
+
+    return length;
   }
 
   /// <summary>
