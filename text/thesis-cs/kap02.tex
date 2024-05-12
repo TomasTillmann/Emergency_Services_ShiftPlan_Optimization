@@ -1,13 +1,29 @@
 \chapter{Řešení optimalizační úlohy}
 
+Z minulé kapitoly již víme, že nelze vyzkoušet všechny plány a nalézt tak nejkvalitnější, protože velikost $P_C$ je příliš velká.
+Víceúčelová funkce $q$ není lineární a není ani derivovatelná, jelikož interně spouští $S_I$, simulaci plánu na množině $I$.
+Nesplňuje tak předpoklady pro použití metod prvního ani druhého řádu.
+Optimalizační úlohu nelze vyjádřit ve tvaru soustav lineárních rovností a nerovností, takže ani jakékoliv techniky ze světa linéárního programování nám nejsou k dispozici.
+Jediné co máme k dispozici jsou hodnoty účelove funkce $q$ v bodech $p$.
+Pokud nebudeme schopni nalézt rekurzivní vztah, který budeme schopni pomocí memoizace vyřešit v pseudo polynomiálním čase pomocí dynamického programování, tak nejsem schopni
+s jistotou nalézt optimální řešení a budeme se muset uchýlit k heuristickým přístupům.
+Řešení přes dynamické programování podrobně popisuji (\textbf{odkaz}).
+V práci se především věnuji metaheuristickým prohledávacím metodám, %TODO pak tady více rozved
+jak metodám prohledávajících prostor lokálně, jako tabu prohledávání až po populační metody, jako genetické algoritmy.
+
 \section{Prostor plánů pohotovostních služeb}
 
-\section{Náhodný výběr plánu}
+\section{Dynamické programování}
+
+\section{Náhodná procházka}
 
 \section{Hladové hledání nejbližšího lokálního minima}
 
 \section{Tabu hledání}
 
 \section{Simulované žíhání}
+
+\section{Genetické algoritmy}
+
 
 % další metody sem

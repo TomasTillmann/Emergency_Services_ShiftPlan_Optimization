@@ -1,198 +1,287 @@
 \chapter{Převedení na optimalizační úlohu}
 
-\section{Popis problému}
-
-Pohotovostní služba vlastní pohotovostní vozidla, rozmístěná na výjezdových stanicích umístěných na území, které pohotovostní služba pokrývá.
-Na každé výjezdové stanici působí několik záchranářu. Ti jsou v případě pohotovosti připraveni obsloužit vozidlo na výjezdové stanici a vyjet na místo incidentu.
-Na výjezd je potřeba více záchranářu. Vždy je nutný řidič a kvalifikovaný lekář. Často je však i potřeba pomocné záchranáře.
-Toto seskupení považujeme za tým záchranářů.
-Tým záchranářů společně se záchraným vozidlem považujeme za záchranou jednotku.
-Plán pohotovostní služby je alokace záchranných vozidel a týmů záchranářů na konkrétní výjezdové stanice a přiřazení pracovní služby každému týmu záchranářů v rámci jednoho dne.
-\\\\
-Pohotovostní plány mají různou kvalitu. Kvalita plánu se odvíjí od počtu incidentů, které byli úspěšně odbaveny a celkových vynaložených nákladů.
-Incident je úspěšně odbaven, pokud v čase incidentu je k dispozici záchranná jednotka potřebná pro odbavení incidentu a zároveň jednotka dorazila včas na místo incidentu.
-Pokud v čase incidentu neexistuje záchranná jednotka splňující tyto podmínky, tak incident považujeme za neúspěšně odbaven.
-S roustoucím počtem úspěšně odbavených plánu roste i kvalita plánu.
-Vynaložená cena se odvíjí od počtu záchranných vozidel aktivně naalokovaných zácrahnných vozidel a týmu. Tým s přiřazenou delší pracovní směnou je dražší.
-Cena plánu bychom rádi minimalizovali, ne však na úkor úspěšnosti odbavení incidentů nebo efektivity plánu.
-\\\\
-Kvalita pohotovostního plánu se tedy odvíjí od počtu úspěšně odbavených incidentů a celkové ceny plánu.
-Přirozeně vyvstává otázka, jakým způsobem najít ten nejkvalitnější plán, za účelem dosáhnutí co největší úspěšnosti za co nejméně zbytečně vynaložených zdrojů? 
-Pro odpověď je první nutno problém formalizovat.
-
-\clearpage
-
 \section{Formalizace problému}
 
-Mějme množinu všech dovolených plánů pohotovostních služeb $P$ a libovolnou množinu incidentů $I \sim \mathcal{I}$, kde $\mathcal{I}$ je distribuce incidentů. 
-Definujme funkci určující kvalitu plánu $q_I\colon P \rightarrow \mathbb{R}$ pro $I$.
-Chceme najít takové $p* \in P$, pro které platí:
-
-$$
-q_I(p*) \geq q_I(p), \forall p \in P
-$$
-.
+Ústředním problémem pohotovostních služeb je umět naplánovat týmy záchranářů a záchranná vozidla na výjezdové stanice tak, aby úspěšně obsloužili co největší počet incidentů,
+za co nejméně zbytečně vynaložených nákladů.
+Našim cílem je vymyslet metody jak být schopný taková optimální naplánovaní nalézt.
+Z toho důvodu je v první řadě potřeba si problém zformalizovat a jasně si tak vymezit, jaký konkrétní problém řešíme.
 \\
 \\
-Chceme najít plán $p$ pro který nabývá funkce $q_I$ globální maximum. Tak zjistíme plán s nejvyšší kvalitou.
-Takových $p$ může být několik a ideálně je chceme najít všechny.
-V první řadě je potřeba vhodně nadefinovat plán a účelovou funkci. 
-Účelovou funkci podrobně popíšeme v %TODO odkaz na kapitolu nějak%
-\textbf{odkaz}.
-Nyní si rozmysleme, jak nadefinujeme plán.
-Plán je alokace týmů záchranářu a záchranných vozidel na jednotlivé výjezdové stanice, kde týmy záchranářů jsou k dispozici v určitý čas v rámci jednoho dne.
-Můžeme na to nahlížet jako na přiřazení časových intervalů, směn, na výjezdové stanice, kde by každý interval odpovídal jednomu týmu záchranářů a na přiřazení záchranných vozidel,
-které budou na výjezdových stanicích pro záchranáře k dispozici.
-Nechť $V$ je množina výjezdových stanic, $D \subseteq (\mathbb{R^+}, \mathbb{R^+})$ množina možných časových intervalů.
-Například, $(8, 17) \in D$, značí směnu od 8 hodin do 17 hodin.
-Dále nechť $Z$ množina týmu, které nám jsou k dispozici a $A$ množina záchranných vozidel, které nám jsou k dispozici. Definujme
+Pohotovostní služba má k dispozici týmy záchranářů $Z$, pohotovostní vozidla $A$ a výjezdové stanice $V$.
+Tým záchranářů $z \in Z$ je na výjezdové stanici $v \in V$ k dispozici v rámci svoji přiřazené pracovní směny $d \in D$,
+kde $D \subseteq (\mathbb{N}_0, \mathbb{N}_0)$ jsou všechny možné pracovní směny dané pohotovostní službou.
+Směna $d \in D$ je tak dvojice $d = (d_1, d_2)$, kde $d_1$ značí začátek a $d_2$ délku trvání pracovní směny v sekundách.
+\\
+\\
+Plán pohotovostní služby $p \in P$ je přiřazení záchranných vozidel $a \in A$ a týmů záchranářů $z \in Z$ na konkrétní výjezdové stanice $v \in V$
+a přiřazení pracovní směny $d \in D$ každému týmu záchranářů $z \in Z$ v rámci jednoho dne, kde $P$ je množina všech plánů pohotovostní služby.
+Tato přiřazení popíšeme funkcemi, 
 
 \begin{align}
-p_D \colon Z &\rightarrow D \\
-p_V \colon Z &\rightarrow V \\
-p_A \colon A &\rightarrow V 
+  p_D \colon Z &\rightarrow D \\
+  p_Z \colon Z &\rightarrow V \cup \{ v_{\emptyset} \} \\
+  p_A \colon A &\rightarrow V \cup \{ v_{\emptyset} \}
 \end{align}
 .
 \\
 \\
-Plán pohotovostní služby pak je trojice
+Plán pohotovostní služby pak je trojice,
 
 \begin{align}
-p = (p_D, p_V, p_A) \in P
+  p = (p_D, p_Z, p_A) \in P
 \end{align}
 .
 \\
 \\
-Všimněme si, že s takovou definicí můžeme na optimalizační problém nahlížet jako na tři podoptimalizační úlohy.
-První, optimálně namapovat týmy záchranářu na výjezdové stanice, druhý, optimálně každému týmu přiřadit směnu a třetí, optimálně alokovat záchranná vozidla na jednotlivé výjezdové stanice.
-Může se stát, že některé týmy nebudeme chtít vůbec naalokovat, například z důvodu zvýšení efektivity plánu, pak je odebereme z $Z$. To stejné platí pro záchranná vozidla, odebereme z $A$.
+Pohotovostní služba dále definuje omezení $C = \{ C_Z, C_A \}$, kde $C_Z$ je maximální dovolený počet $z \in Z$ na libovolné $v \in V$
+a $C_A$ je maximální dovolený počet $a \in A$ na libovolné $v \in V$.
+Nechť pak $P_C \subseteq P$ množina plánů splňující omezující podmínky $C$, tedy
+
+\begin{align}
+  p_C = (p_{D_C}, p_{Z_C}, p_{A_C}) \in P_C
+\end{align}
+
+\clearpage
+
+, kde
+
+\begin{align}
+  p_{D_C} \colon Z &\rightarrow D \\ 
+  p_{Z_C} \colon Z &\rightarrow V \cup \{ v_{\emptyset} \},     \hspace{50pt} \text{splňující $C_Z$} \\
+  p_{A_C} \colon A &\rightarrow V \cup \{ v_{\emptyset} \},     \hspace{50pt} \text{splňující $C_A$}
+\end{align}
+.
 \\
 \\
-Definujme navíc povolené plány $P_C \subseteq P$, kde $C$ jsou omezující podmínky. Pokud $p \in P$ splňuje omezující podmínky $C$, pak $p \in P_C$. 
-Omezujícími podmínkamí může být celkový dostupný počet týmu záchranářu nebo záchranných vozidel. Případně maximální počet týmu nebo záchranných vozidel, které je možné naalokovat na výjezdovou stanici.
+Pokud $z \in Z$ nebo $a \in A$ nemá mít přiřazenou žádnou výjezdovou stanici, tak $p_{Z}(z) = v_{\emptyset}, p_{A}(a) =  v_{\emptyset}$
+a stejně tak pro $p_{Z_C}(z) = v_{\emptyset}$ a $p_{A_C}(a) = v_{\emptyset}$.
+\\
+\\
+Problém, který v této práci řešíme, je nalézt $p_C \in P_C$, takové, že úspěšně odbaví co největší počet incidentů za co nejmenší cenu plánu.
+Co je úspěšně odbavený incident a jakým způsobem zjistíme kolik incidentů plán úspěšně odbaví je detailně popisováno v kapitole Simulace plánu pohotovnostní služby (odkaz).
+Jak zjistíme cenu plánu je popsáno (odkaz).
+Formalizace optimalizační úlohy je popsána (odkaz).
 
-\section{Simulace}
+\section{Simulace plánu pohotovostní služby}
 
-Momentálně máme popsanou optimalizační úlohu, kterou řešíme. Ještě nám ale chybí jedna velmi podstatná část.
-Konkrétní způsob, definice účelové funkce $q_I$, kterým zjistíme kvalitu libovolného plánu pohotovostní služby.
-Jak již bylo zmíněno, ta by se měla co nejvíce odrážet z úspěšnosti odbavených incidentů a ceny za náklady.
-Je velmi důležité, aby $q_I$ ohodnocovalo plány co nejdůvěryhodněji a aby hodnocení kvality plánu podle $q_I$ co nejvíce odpovídalo kvalitě plánu v reálném světě na reálných datech.
-Pokud by $q_I$ neohodnocovalo plány důvěryhodně, pak by plán s nejvyšší kvalitou podle $q_I$ nemusel být vůbec výhodným a kvalitním pro reálné využití.
-To by znamenalo, že nejkvalitnější nalezené plány pohotovostních služeb by nebyli nijak zajímavé a navrhnutá řešení v této práci by neměla žádnou hodnotu pro praktické využití.
-Aby $q_I$ splňoval tyto požadavky, navrhuji pro daný plán simulovat, jak by obstál v reálné situaci.
-Simulace je probraná do hloubky v kapitole \textbf{odkaz}. %TODO 
-Pokud simulace bude důvěrně napodobovat průběh plánu jak by plán obstál v reálném světě, pak $q_I$ používající simulaci
-bude odpovídat nejvěrohodněji reálné situaci a tedy bude ohodnocená kvalita plánu nejdůvěrnější.
+\subsection{Proč simulace?}
+
+Našim cílem je umět nalézt nejoptimálnější plán pohotovostní služby.
+Ten určujeme podle co největšího počtu úspěšně odbavených incidentů a ceny plánu.
+Z toho důvodu jsme si formálně nadefinovali protředky, které má pohotovostní služba k dispozici a co je plán pohotovostní služby.
+Nyní potřebujeme způsob, jakým zjistíme počet úspěšně odbavených incidentů $S_{pI}$ pohotovostního plánu $p$ na množine incidentů $I$.
+Pro zjištění $S_{pI}$ spustíme simulaci $S$ pohotovostního plánu $p$ na množině $I$.
+Následně formálně popíšeme jaký typ simulace a jaká pravidla chodu simulace se rozhodneme použít. %TODO odkazy
+\\
+\\
+Je velmi důležité, aby počet úspěšně odbavených incidentů $S_{pI}$ získaných simulací co nejvíce odpovídal počtu úspěšně odbavených incidentů,
+kdyby byl použit $p$ v reálném světě a v průběhu dne by se přesně děli incidenty $I$.
+Není lepší způsob jak získat co nejdůvěryhodnější $S_{pI}$ než spustit simulaci, která bude co nejvíce odpovídat chování plánu v reálném světě.
+\\
+\\
 Přístup použití simulace má ještě jednu podstatnou výhodu.
 Různé pohotovostní služby mohou používat různé způsoby a pravidla, například pro výběr záchranné jednotky pro odbavení incidentu co právě nastal, nebo do jaké nemocnice incident odbavit.
-Tato pravidla můžou být příliš složitá, aby je bylo možné výstižně zachytit jinými způsoby, jako například pouze matematickými nerovnostmi, jak je zvykem pro lineární programování.
-V mnou implementované simulaci jsou použité pravidla vybrané na základě konzultace se společností, která se danou problematikou zabývá přes 25 let a sami podobná pravidla používají pro plánovaní sanitek
-u několika jejich klientů ve Spojených státech.
-Není však problém naimplementovat pravidla zcela jiná, komplikovanější nebo klidně i stochastická.
-Použití simulace přináší příjemnou flexibilitu a zároveň lze díky ní nejlépe popsat jak konkrétně má plán pohotovostní služby v konkrétních situacích reagovat.
-Síla a flexibilita kterou simulace přináší se bohužel musí někde kompenzovat.
-Tím jsou výpočetní náročnost simulace a poměrně značné omezení použitelných technik obecně využívané pro řešení optimalizačních problémů.
+Tato pravidla můžou být příliš složitá, aby je bylo možné výstižně zachytit jinými způsoby, jako například pouze matematickými rovnostmi a nerovnostmi, jak je zvykem pro lineární programování.
+Simulace tak nabízí vysokou flexibilitu.
+%TODO, odkaz na linearni programovani kde vice popisu%
 \\
 \\
-Jedná se o deterministickou diskrétní simulaci, kde událost je nastání incidentu $I_i \in I$ v čase $T_i \in T$ a stav simulace $S$
-jsou stavy záchranných vozidel $S_A$ a stavy týmů záchranářů $S_Z$.
-Simulace si první setřídí sadu incidentů podle časů nastání $T$.
-Následně se simulace pohybuje po těchto časech od nejdřívějšího až po poslední incident podle $T_i$.
-V každém kroku simulace $i$, kterých je celkem $|T|$, si simulace aktualizuje stavy $S_A$ a $S_Z$.
-V každém kroku deterministicky vybere $z_i \in Z$ a pro něj $a_i \in A$, který obslouží $I_i$. 
-Po doběhnutí simulace jsou k dispozici statistiky, jako procento úspěšně odbavených incidentů.
-Statistiky a cenu plánu pak může vhodně použít $q$ pro vypočítání celkové kvality plánu.
+Avšak podstatnou nevýhodou simulace je její výpočetní náročnost a poměrně značné omezení použitelných technik obecně využívané pro řešení optimalizačních problémů. %TODO odkaz na optimalizacni ulohu.
+
+\subsection{Definice diskrétní simulace}
+
+\textit{Simulace} je imitace operací nějakého procesu nebo systému z reálného světa v průběhu časového úseku. (Discrete event simulation system simulation) %TODO cituj.
+\textit{Systém simulace} je chápan jako dobře definovaná kolekce objektů a interakcí mezi nimi. (cituj ) % https://books.google.cz/books?hl=en&lr=&id=3seWwhxuGhsC&oi=fnd&pg=PA1&dq=discrete+event+simulation+model&ots=L3EkFOZNPK&sig=XrvmwmLnN7SLY0vLla_9yt5-C9Y&redir_esc=y#v=onepage&q=discrete%20event%20simulation%20model&f=false
+% strana 2
+Simulace si držuje \textit{stav systému}. Ten definuje jak se má simulace chovat.
+Systém simulace se může měnit průběhem simulace nebo při nastání \textit{události}.
+\\
+\\
+Simulace obecně dělíme na \textit{spojité} a \textit{diskrétní}.
+V \textit{spojité simulaci} se změny systému dějí kontinuálně v průběhu běhu simulace, nejčastěji podle soustavy diferenciálních rovnic.
+V \textit{diskrétní simulaci} se změny sytému dějí v diskrétních časoých úsecích, nejčastěji v čase nastání nějaké \textit{události}.
+Klasický způsob jak diskrétní simulace probíhá je následovný.
+Simulace odbavuje údalosti v pořadí nastání v čase.
+Při inicializaci si naplánuje nějaké údalosti.
+Při odbavování události aktualizuje stav systému podle předchozího stavu systému a aktuálně odbavované události. Zároveň si simulace náplanuje další události. 
+Simulace skončí jakmile nejsou žádné další události k odbavení.
+\\
+\\
+Dále dělíme simulace na \textit{deterministcké} a \textit{stochastické}.
+V \textit{deterministické simulaci} jsme schopni z aktuálního stavu systému a údalosti deterministicky určit nadcházející stav systému.
+V \textit{stochastické simulaci} nejsme schopni z aktuálního stavu systému a údalosti deterministicky určit nadcházející stav systému.
+Většinou proto, že při výběru nadhcázejícího stavu figuruje element náhody.
 
 \clearpage
 
-\begin{algorithmic}[1]  % [1] způsobí, že číslujeme kroky algoritmu
-\Function{Simulation}{$I$}
-	\State $I \gets \mbox{Setřídí incidenty podle času nastání}$
-	\State $\text{SuccessRate} \gets 100\%$
-	\State $S_A \gets \mbox{Inicializuje}$
-	\State $S_Z \gets \mbox{Inicializuje}$
-  \State $T$ \gets 0
-  \For{$I_i \in I,~ i \in \{0, 1, \dots , |I|\}$}
-    \State $T \gets \mbox{Čas nastání $I_i$}$
-    \State $z \gets \mbox{GetBestTeam($I_i$)}$
-    \If{\mbox{Neexistuje tým který by úspěšně odbavil $I_i$}}
-      \State $\text{SuccessRate} \gets \mbox{Sniž}$
-      \State \textbf{continue}
-    \EndIf
-    \State Naplánuj($z$, $I_i$)
-    \State $S_A \gets \mbox{Update}$
-    \State $S_Z \gets \mbox{Update}$
-  \EndFor
-  \State \Return SuccessRate
-\EndFunction
-\end{algorithmic}
+\subsection{Popis simulace plánu pohotovostní služby}
 
+Jedná se o deterministickou diskrétní simulaci $S \colon (p_C, I) \rightarrow \mathbb{N}_0$, kde vstupem je plán $p_C \in P_C$ a množina incidentů $I$.
+Simulace vrátí počet úspěšně odbavených incidentů $S_c \colon 0 \leq S_c \leq |I|$.
+Událost je nastání incidentu $i \in I$ v čase $T_I(i)$, kde $T_I \colon I \rightarrow \mathbb{N}_0$, určuje čas nastání incidentu.
+Stav systému simulace $S$ je množina $S_S = \{ S_A, S_Z \}$, kde $S_A$ je stav záchranných vozidel $A$ a $S_Z$ je stav týmů záchranářů $Z$. 
+
+\begin{algorithm}
+  \begin{algorithmic}[1]  % [1] způsobí, že číslujeme kroky algoritmu
+  \Function{Simulation}{$p_C, I$}
+    \State $S_c \gets 0$
+    \State $T$ \gets 0
+    \State $I' \gets \mbox{Setřídí $I$ podle času nastání}$
+    \State $S_A \gets \mbox{Inicializuje podle $p_C$}$
+    \State $S_Z \gets \mbox{Inicializuje podle $p_C$}$
+    \For{$i_k \in I',~ k \in \{1, 2, \dots , |I|\}$}
+      \State $T \gets \mbox{Čas nastání $i_k$}$
+      \State $z_k \gets \mbox{GetBestTeam($i_k, S_A, S_Z, T$)}$
+      \If{$z_k \neq \emptyset$}
+        \State $S_c \gets S_c + 1$
+        \State $a_k \gets \mbox{GetBestAmbulance($z_k, T$)}$
+        \State Naplánuj($z_k, a_k, i_k$)
+        \State $S_A \gets \mbox{Update($S_A, i_k$)}$
+        \State $S_Z \gets \mbox{Update($S_Z, i_k$)}$
+      \EndIf
+    \EndFor
+    \State \Return $S_c$
+  \EndFunction
+  \end{algorithmic}
+\end{algorithm}
 \vspace*{25px}
 
-Funkce GetBestTeam první nalezne množinu všech týmů záchranářů $Z'$, kteří jsou schopni $I_i$ obsloužit.
-Tým záchranářu je schopen obsloužit $I_i$ pokud:
-
-\begin{enumerate}
-  \item Je alokován a má přiřazenou směnu. Pokud tým záchranářu není alokován na žádnou výjezdovou stanici a nemá přiřazenou směnu, tak samozřejmě není schopen obsloužit $I_i$.
-  \item Tým je schopen dorazit na místo incidentu do požadované doby. Ať už přímo z výjezdové stanice, nebo při vrácení se po vyřízení incidentu zpět na výjezdovou stanici. 
-    V prvním případě tým potřebuje mít na výjezdové stanici k dispozi volné záchranné vozidlo. V druhém případě už záchranné vozidlo k dispozici má.
-  \item Týmu nekončí směna dřive, než je očekávaný konec celkové doby vyřízení incidentu.
-\end{enumerate}
-
-Následně vybere nejvhodnější tým záchranářu podle pravidel:
-
-\begin{enumerate}
-  \item Upřednostni tým, který je na výjezdové stanici před týmem, který ukončuje vyřízení jednoho z předchozích incidentů. 
-  \item Upřednostni tým, který na místo incidentu dorazí dříve. 
-  \item Upřednostni tým, který již obsloužil méně incidentů a je tedy méně vyčerpaný.
-\end{enumerate}
+Průběh simulace je následovný. 
+První simulace položí $S_c$ a $T$ rovno nule.
+Následně si setřídí sadu incidentů podle časů nastání a incicializuje si stavy $S_A$ a $S_Z$ podle plánu $p_C$.
+Dále simulace odbavuje události, takže se pohybuje po těchto časech od nejdřívějšího až po poslední incident.
+V každém kroku simulace $k \in \{ 1, 2, \dots , |I|\}$ se první pokusí deterministicky nalézt nejvhodnější $z_k \in Z$, který obslouží $i_k$. 
+Pokud takový $z_k$ neexistuje, tak pokračuje v odbavování dalších incidentů.
+Pokud existuje, zvýší počet odbavených incidentů o jedna, nalezne pro $z_k$ nejvhodnější $a_k$, $i_k$ naplánuje na $z_k$ spolu s $a_k$ a aktualizuje stav systému $S_A$ a $S_Z$.
+Simulace doběhne jakmile nejsou žádné další události k odbavení, takže jakmile projde všechny incidenty, to je po $|I|$ krocích, a vrátí $S_c$.
+\\
+\\
+Nyní si ukažme, jakým způsobem je nalezen nejvhodnější tým záchranářů $z_k$ pro obsloužení $i_k$. K tomu si potřebujeme definovat co znamená,
+že tým záchranářů je schopen úspěšně odbavit incident a jakým způsobem pak vybere ze všech takových týmu ten nejvhodnější.
 
 \clearpage
 
-Na nejvhodnější nalezený tým záchranářů $z$ naplánujeme $I_i$. Pro to je potřeba vypočítat očekávaný příjezd záchranné jednotky, dobu strávenou na místě incidentu, očekávaný příjezd
-do nejbližší nemocnice, dobu strávenou v nemocnici a následně očekávaný příjezd zpět na výjezdovou stanici.
-Během jízdy z nemocnice zpět na výjezdovou stanici může dojít k naplánování záchranné jednotky na nový incident, pokud bude podle pravidel vybrán jako nejvhodnější.
+\begin{definice}
+  Tým záchranářů $z \in Z$ je schopen úspěšně odbavit incident $i \in I$ právě tehdy když:
+
+  \begin{enumerate}
+    \item
+      Je alokován a má přiřazenou směnu. Pokud tým záchranářu není alokován na žádnou výjezdovou stanici nebo nemá přiřazenou směnu, tak samozřejmě není schopen obsloužit $i$.
+      Formálně, $p_{Z_C} \neq 0 \land p_{D_C} \neq (d_1, d_2) \in D, d_2 = 0$.
+
+    \item
+      Tým je schopen dorazit na místo incidentu do požadované doby.
+      Ať už přímo z výjezdové stanice, nebo při vrácení se po vyřízení incidentu zpět na výjezdovou stanici. 
+      V prvním případě tým potřebuje mít na výjezdové stanici k dispozi volné záchranné vozidlo. V druhém případě už záchranné vozidlo k dispozici má.
+
+    \item
+      Týmu nekončí směna dříve, než je očekávaný konec celkové doby vyřízení incidentu.
+  \end{enumerate}
+\end{definice}
+
+
+\begin{definice}
+  Nejvhodnější tým záchranářů $z_k \in Z_k$, kde $Z_k \subseteq Z$ jsou všechny týmy záchranářů schopny úspěšně odbavit incident $i_k \in I$ je tým,
+  který je nejlepší podle následujícíh kritérií v daném pořadí:
+
+  \begin{enumerate}
+    \item Upřednostni tým, který je na výjezdové stanici před týmem, který ukončuje vyřízení jednoho z předchozích incidentů. 
+    \item Upřednostni tým, který na místo incidentu dorazí dříve. 
+    \item Upřednostni tým, který již obsloužil méně incidentů a je tedy méně vyčerpaný.
+  \end{enumerate}
+\end{definice}
+
+Funkce \textbf{GetBestTeam} vrací tým záchranářu $z_k$ z týmů záchranářů $Z_k$, kteří jsou schopni úspěšně odbavit incident $i_k$, podle (Definice 1)
+, kde $z_k$ je nejvhodnější pro obsloužení incidentu $i_k$ ze $Z_k$ podle definice 2. %TODO odkaz
+Funkce \textbf{GetBestAmbulance} vybere záchranné vozidlo, které je na stejné výjezdové stanici jako $z_k$ a časově je nejdříve k dispozici.
+%TODO jak odkazat do kodu?
 \\
 \\
 Pravidla jsou navrhnuta tak, aby práce obsluhování incidentů byla rozmístěna rovnoměrně přes všechny týmy, ale aby zároveň byli incidenty obslouženy nejrychleji jak je možné.
 Třetí pravidlo pro výběr nejvhodnějšího týmu zaručuje rovnoměrnost práce a druhé co nejrychlejší obsloužení incidentu.
 Pravidla také počítají s možným zpožděním a raději upřednostní tým, který je aktuálně k dispozici, než tým, který ještě dokončuje jiný incident, ale mohl by i na místě incidentu
 být dříve, pokud by neměl zpoždění. Příkladem je první pravidlo pro výběr nejvhodnějšího týmu.
+\\
+\\
+V naší simulaci jsou použitá pravidla vybraná na základě konzultace se společností, která se danou problematikou zabývá přes 25 let a sami podobná pravidla používají pro plánovaní sanitek
+u několika jejich klientů ve Spojených státech.
+Není však problém naimplementovat pravidla zcela jiná, jednodušší, komplikovanější nebo klidně i stochastická.
 
-\section{Účelová funkce}
+\section{Optimalizační úloha}
 
-Od účelove funkce $q_I$ vyžadujeme aby maximalizovala počet odbavených incidentů a minimializovala celkovou cenu plánu pro množinu incidentů $I$.
-\\
-\\
-Mějme povolený plán $p \in P'$. Nechť $s_{pI} = S_I(p)$ úspěšnost odbavení, to je počet odbavených incidentů v poměru počtu všech incidentů,
-a $c_{pI} = C(p)$ poměr ceny $p$ ku maximální možné ceně $p$, kde $S_s$ funkce využívající simulaci $S$.
-Všimněme si, že maximalizování počtu odbavených incidentů je konfliktní s minimalizováním celkové ceny plánu.
-Nejen z tohoto důvodu je žádoucí si pořídit způsob, kterým budeme schopní určit, kterou podoptimalizaci má $q_I$ preferovat.
-Zároveň je užitečné mít takovou možnost, protože nám bude dávat větší kontrolu nad řízením optimalizace.
-Pro tento účel si pořídíme vlastní váhy $\alpha, \beta \in [0, 1]$.
-\\
-\\
-Nyní je potřeba $s_{pI}, c_{pI}$ spolu s váhami $\alpha, \beta$ zkombinovat do jedné hodnoty, kterou budeme chtít maximalizovat.
-Definujme účelovou funkci $q_I$:
+\subsection{Popis}
 
-$$
-  q_I(p) = \alpha \cdot s_{pI} - \beta \cdot e_{pI}
-$$
-.
+\begin{definice}[Optimalizační úloha]
+  \begin{align}
+    \max_{x} q(x), \hspace{50pt} x \in \mathcal{X},
+  \end{align}
+\end{definice}
+
+kde $\mathcal{X}$ je prostor všech možných konfigurací a my chceme nalézt konfiguraci $x^* \in \mathcal{X}$, kde $q(x^*)$ je globální maximum $q$.
+Obecně takových $x^*$ může být více. 
+Funkce $q$ je účelová funkce, a její návrh zásadně ovlivní jaké $x^*$ je optimální. 
 \\
 \\
-Jak vidíme, ve skutečnosti se jedná o víceúčelovou funkci.
-Víceúčelová funkce $q_I$ nabývá vyšších hodnot při vyšší úspěšnosti odbavených incidentů a nižši cenně plánu.
-Nižší pak v opačném případě, přesně jak jsme požadovali.
-Navíc, díky váhám $\alpha, \beta$ můžeme snadno upřednostit jaké aspekty jsou pro nás při optimalizaci důležitější.
+V našem případě je prostor konfigurací prostor možných plánů $P_C$.
+Díky simulaci $S$ jsme pro $p_C$ schopni zjistit počet úspěšně odbavených incientů $S_pI$, potřebujeme dodefinovat cenu plánu.
+
+\begin{definice}[Cena plánu]
+  Cena plánu $G \colon P_C \rightarrow \mathbb{R}$,
+
+  \begin{align}
+    G(p_C) = \sum_{(d_1, d_2) = p_{D_C}(z), z \in Z} d_2 / 60 + |p_{A_C}(a) \neq v_{\emptyset}|
+  \end{align}
+  .
+  \\
+  \\
+  Cena plánu je součet všech dob trvání směn přiřazených záchranným týmům v minutách a počtu naalokovaných záchranných vozidel.
+\end{definice}
+
+Již z úvodu víme, že chceme nalézt takový plán $p_C \in P_C$, který úspěšně obslouží co nejvíce incidentů za co nejmenší cenu plánu.
+Chceme tedy $p_C$, pro které platí
+
+\begin{align}
+  &\max_{p_C} S(p_C, I), \hspace{50pt} &p_C &\in P_C, I \\ 
+  &\min_{p_C} G(p_C), \hspace{50pt}    &p_C &\in P_C.
+\end{align}
 \\
 \\
-Je jasné, že $q_I$ nabývá globální maximum při 100\% odbavení incidentů a plánu s nulovou cenou.
-Také je zřejmé, že takový plán nemůže existovat, minimálně kvůli požadavku na nulovou cenu, ale taky nemusí být pro konkrétní sadu incidentů 100\% odbavení možné.
-Nesmíme zapomenout, že $s_{pI}$, klíčovou statistiku pro zjištění kvality plánu,
-získáme prostřednictvím simulace $S_I$, funkci parametrizovanou $p \in P_C$ a zafixovanou množinou incidentů $I$.
-I když se tedy na první pohled může zdát účelová funkce jednoduchá, není možné nalézt globalní maximum přímým výpočtem.
-Jednoduše proto, že funkce $S_I$ nemá žádný matematický předpis.
+jednu funkci maximalizovat a jednu minimalizovat je značně nepraktické a ani neodpovída tvaru definice optimalizační úlohy.
+Rádi bychom měli pouze jednu účelovou funkci, kterou budeme maximalizovat nebo minimalizovat.
+
+\begin{definice}
+  \begin{align}
+    \max_{p_C} q(p_C), \hspace{50pt} p_C \in P_C,
+  \end{align}
+  \\
+\end{definice}
+
+Návrhu takové účelové funkce se budeme věnovat v další kapitole. %TODO odkaz.
+
+\subsection{Návrh účelové funkce}
+
+Díky možnosti spuštění simulace $S$ pohotovostního plánu $p_C$ pro množinu incidentů $I$ jsme schopni získat důležitou statistiku, a to počet úspěšně odbavených incidentů $S(p_C, I)$,
+které důvěrně odpovídají reálnému fungování plánu. Zároveň jsme si v předchozí kapitole %TODO odkaz
+nadefinovali cenu plánu $G(p_C)$. V této kapitole se budeme věnovat návrhu účelové funkce, která bude vhodně používat $S(p_C, I)$ a $G(p_C)$.
+
+\begin{definice}[Účelová funkce]
+Nechť účelová funkce $q_I \colon P_C \rightarrow \mathbb{R}$, která ohodnotí $p \in P_C$ pro danou množinu incidentů $I$,
+  \begin{align}
+    q_I(p) = \alpha \cdot S'(p, I) - (1 - \alpha) \cdot G'(p), \hspace{50pt} \alpha \in \mathbb{R}, p \in P_C
+  \end{align}
+\\
+  , kde funkce $S'$ a $G'$ jsou pouze přeškálováním $S$ a $G$ do intervalu $[0, 1]$ vydělením maximálníma hodnotama které mohou $S$ a $G$ nabývat,
+  \begin{align}
+    S'(p, I) &= S(p_C) / |I| \\
+    G'(p) &= G(p_C) / (|Z| \cdot \max_{d_2} (d_1, d_2) \in D + |A|)
+  \end{align}
+  .
+\end{definice}
+
+Účelovou funkci $q_I$ jsme nadefinovali tak, aby nabývala vyšších hodnot při vyšší úspěšnosti odbavených incidentů a nižších hodnot při nižší cenně plánu, a naopak.
+To znamená, že pro plány $p$ s vyšším počtem odbavených incientů a nižší cenou bude $q_I(p)$ vyšší, což je přesně námi požadované chování účelové funkce.
+Zároveň díky parametru $\alpha \in \mathbb{R}$ můžeme snadno upřednostit buď $S(p, I)$ nebo $G(p)$.
 
 \section{Klasifikace optimalizační úlohy}
 
@@ -283,24 +372,16 @@ Zároveň pokud $s'_{max}$ maximem $P'_{max} \subseteq P_{max}$, nemůžeme nikd
 Čili $P_{max}$ je nejmenší možná množina kterou musíme proiterovat pro nalezení plánu s nejvyšší úspěšností s jistotou.
 Z toho plyne, že nelze získat ani maximální kvalitu plánu, takže kvality plánu můžeme porovnávat pouze mezi sebou, nikoliv jak blízko jsou nejlepší možné kvalitě.
 
-\section{Metody řešení}
+DDDDDDDDDDdddd
+Definujme počet úspěšně odbavených incidentů, $S_c(p, I)$.
+Definujme $S_s(p, I)$ jako procento úspěšně odbavených incidentů, tedy
 
-Z minulé kapitoly již víme, že nelze vyzkoušet všechny plány a nalézt tak nejkvalitnější, protože velikost $P_C$ je příliš velká.
-Víceúčelová funkce $q$ není lineární a není ani derivovatelná, jelikož interně spouští $S_I$, simulaci plánu na množině $I$.
-Nesplňuje tak předpoklady pro použití metod prvního ani druhého řádu.
-Optimalizační úlohu nelze vyjádřit ve tvaru soustav lineárních rovností a nerovností, takže ani jakékoliv techniky ze světa linéárního programování nám nejsou k dispozici.
-Jediné co máme k dispozici jsou hodnoty účelove funkce $q$ v bodech $p$.
-Pokud nebudeme schopni nalézt rekurzivní vztah, který budeme schopni pomocí memoizace vyřešit v pseudo polynomiálním čase pomocí dynamického programování, tak nejsem schopni
-s jistotou nalézt optimální řešení a budeme se muset uchýlit k heuristickým přístupům.
-Řešení přes dynamické programování podrobně popisuji (\textbf{odkaz}).
-V práci se především věnuji metaheuristickým prohledávacím metodám, %TODO pak tady více rozved
-jak metodám prohledávajících prostor lokálně, jako tabu prohledávání až po populační metody, jako genetické algoritmy.
-
-
-Omezme se na $P' \subset P_C$, která je rozumně velká. Například ne exponenciálně.
-Nechť $p'_{max} \in P'$ s maximální kvalitou pro $I$.
-Pak jistě může existovat $p_{max} \in P \setminus P' \colon S_{I}(p_{max}) > S_{I}(p'_{max})$.
+\begin{align}
+  S_s(p, I) = \frac{S_c(p, I)}{|I|}.
+\end{align}
+.
 \\
 \\
-
+Celkové vynaložené náklady vyjádříme cenou plánu.
+Nechť 
 
