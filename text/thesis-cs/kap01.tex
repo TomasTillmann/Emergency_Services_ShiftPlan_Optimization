@@ -22,38 +22,60 @@ Tato přiřazení popíšeme funkcemi,
   \begin{align}
     p_Z \colon Z &\rightarrow V \cup \{ v_{\emptyset} \}                   \hspace{65pt} \text{přiřazení týmů na stanice} \\
     p_A \colon A &\rightarrow V \cup \{ v_{\emptyset} \}                   \hspace{65pt} \text{přiřazení vozidel na stanice} \\ 
-    p_{D_{1}} \colon Z &\rightarrow D_{1} \cup \{ d_{\emptyset} \}         \hspace{60pt} \text{přiřazení začátku směn týmům} \\
-    p_{D_{2}} \colon Z &\rightarrow D_{2} \cup \{ d_{\emptyset} \}         \hspace{60pt} \text{přiřazení délky směn týmům}
+    p_{D_{1}} \colon Z &\rightarrow D_{1} \cup \{ 0 \}         \hspace{60pt} \text{přiřazení začátku směn týmům} \\
+    p_{D_{2}} \colon Z &\rightarrow D_{2} \cup \{ 0 \}         \hspace{60pt} \text{přiřazení délky směn týmům}
   \end{align}
   \\
   Pokud $z \in Z$ nemá mít přiřazenou žádnou výjezdovou stanici,
-  tak $p_{Z}(z) = v_{\emptyset}, p_{D_{1}} = d_{\emptyset}, p_{D_{2}} = d_{\emptyset}$.
+  tak $p_{Z}(z) = v_{\emptyset}$, $p_{D_{1}}(z) = 0$, $p_{D_{2}}(z) = 0$.
   Pokud $a \in A$ nemá mít přiřazenou žádnou výjezdovou stanici, tak $p_{A}(a) = a_{\emptyset}$.
 \end{definice}
 
-\clearpage
-
 \begin{definice}[Plán pohotovostní služby]
-  Nechť vektory, $Z^{p}_z \in V^{Z_n}, A^{p} \in V^{A_n}, Z^{p}_{D_1} \in D_{1}^{Z_n}, Z^{p}_{D_2} \in {D_2}^{Z_n}$, kde
-  \begin{align}
-    {Z^{p}_z}_{(i)} &= p_Z(z), \hspace{40pt} &1 \leq i \leq Z_n \\
-    A^{p}_{(i)} &= p_A(a), \hspace{40pt} &1 \leq i \leq A_n \\
-    {Z^{p}_{D_1}}_{(i)} &= p_{D_1}(z), \hspace{40pt} &1 \leq i \leq Z_n \\
-    {Z^{p}_{D_2}}_{(i)} &= p_{D_2}(z), \hspace{40pt} &1 \leq i \leq Z_n,
-  \end{align}
-  \\
-  pak plán pohotovostní služby je čtveřice $p = (Z^{p}_z, A^{p}, Z^{p}_{D_1}, Z^{p}_{D_2}) \in P$, kde $P$ je prostor plánů pohotovostních služeb.
+  Nechť $p_Z, p_A, p_{D_{1}}, p_{D_{2}}$ přiřazovací funkce.
+  Pak plán pohotovostní služby je čtveřice $p = (p_Z, p_A, p_{D_{1}}, p_{D_{2}}) \in P$, kde $P$ je množina všech plánů pohotovostních služeb.
   \\
 \end{definice}
 
-Plán pohotovostní služby je jen zakódování \textit{přiřazovacích funkcí} %TODO odkaz?
-do čtveřice vektorů.
-\\
-\\
-Pohotovostní služba dále definuje omezení $C = \{ C_Z, C_A \}$, kde $C_Z$ je maximální dovolený počet $z \in Z$ na libovolné $v \in V$
-a $C_A$ je maximální dovolený počet $a \in A$ na libovolné $v \in V$.
+\begin{definice}[Omezení pohotovostního plánu]
+  Nechť $c_z, c_a \in \mathbb{N}^{V_n}$ vektory, reprezentující
 
+  \begin{align}
+    &{c_z}_{(i)} \hspace{20pt} \text{maximální počet záchranných týmů na výjezdové stanici $v_i \in V$}, \\ 
+    &{c_a}_{(i)} \hspace{20pt} \text{maximální počet záchranných vozidel na výjezdové stanici $v_i \in V$}
+  \end{align}
+  , kde $1 \leq i \leq V_n$.
+  \\
+  \\
+  Nechť $C = \{ C_Z, C_A \}$, kde $C_Z \colon P \rightarrow \{ 0, 1 \}$, $C_A \colon P \rightarrow \{ 0, 1 \}$, definované
 
+  \begin{align}
+    C_Z(p) = 1 &\iff |\{ z \in Z \mid p_Z(z) = v_i \}| \leq {c_z}_{(i)}, \hspace{20pt} \text{jinak 0}, \\
+    C_A(p) = 1 &\iff |\{ a \in A \mid p_A(a) = v_i \}| \leq {c_a}_{(i)}, \hspace{20pt} \text{jinak 0}
+  \end{align}
+  , $\forall i \colon 1 \leq i \leq V_n$, $p \in P$.
+  \\
+\end{definice}
+
+Ne všechny možné pohotovostní plány jsou pro nás zajímavé.
+Pohotovostní služba definuje maximální počty týmů záchranářů a záchranných vozidel povolených na jednotlivých výjezdových stanicích.
+Každá výjezdová stanice má nějakou maximální kapacitu.
+
+\begin{definice}[Plán pohotovostní služby splňující omezující podmínky $C$]
+  Řekneme, že plán $p \in P$ splňuje omezující podmníky $C$, Pokud
+  \begin{align}
+    C_Z(p) = 1 \land C_A(p) = 1
+  \end{align}
+  .
+\end{definice}
+
+\begin{definice}[Množina plánů splňujících omezující podmínky $C$]
+  Množina plánů splňující omezující podmínky $P_C \subseteq P$ definujme jako
+  \begin{align}
+    P_C = \{ p \mid \text{$p \in P$ splňuje omezující podmínky $C$} \}
+  \end{align}
+  \\
+\end{definice}
 
 Problém, který v této práci řešíme, je nalézt $p_C \in P_C$, takové, že úspěšně odbaví co největší počet incidentů za co nejmenší cenu plánu.
 Co je úspěšně odbavený incident a jakým způsobem zjistíme kolik incidentů plán úspěšně odbaví je detailně popisováno v kapitole Simulace plánu pohotovnostní služby (odkaz).
@@ -86,7 +108,7 @@ Simulace tak nabízí vysokou flexibilitu.
 \\
 Avšak podstatnou nevýhodou simulace je její výpočetní náročnost a poměrně značné omezení použitelných technik obecně využívané pro řešení optimalizačních problémů. %TODO odkaz na optimalizacni ulohu.
 
-\subsection{Definice diskrétní simulace}
+\subsection{Definice deterministické diskrétní simulace}
 
 \textit{Simulace} je imitace operací nějakého procesu nebo systému z reálného světa v průběhu časového úseku. (Discrete event simulation system simulation) %TODO cituj.
 \textit{Systém simulace} je chápan jako dobře definovaná kolekce objektů a interakcí mezi nimi. (cituj ) % https://books.google.cz/books?hl=en&lr=&id=3seWwhxuGhsC&oi=fnd&pg=PA1&dq=discrete+event+simulation+model&ots=L3EkFOZNPK&sig=XrvmwmLnN7SLY0vLla_9yt5-C9Y&redir_esc=y#v=onepage&q=discrete%20event%20simulation%20model&f=false
@@ -166,7 +188,6 @@ Nyní si ukažme, jakým způsobem je nalezen nejvhodnější tým záchranář�
   \begin{enumerate}
     \item
       Je alokován a má přiřazenou směnu. Pokud tým záchranářu není alokován na žádnou výjezdovou stanici nebo nemá přiřazenou směnu, tak samozřejmě není schopen obsloužit $i$.
-      Formálně, $p_{Z_C} \neq 0 \land p_{D_C} \neq (d_1, d_2) \in D, d_2 = 0$.
 
     \item
       Tým je schopen dorazit na místo incidentu do požadované doby.
@@ -206,49 +227,67 @@ V naší simulaci jsou použitá pravidla vybraná na základě konzultace se sp
 u několika jejich klientů ve Spojených státech.
 Není však problém naimplementovat pravidla zcela jiná, jednodušší, komplikovanější nebo klidně i stochastická.
 
-\section{Převedení problému na optimalizační úlohu s více účelovými funkcemi}
+\section{Převedení problému na optimalizační úlohu s více účelovými funkcemi s omezujícími podmínkami}
 
-\begin{definice}[Optimalizační úloha s jednou účelovou funkcí]
+\begin{definice}[Optimalizační úloha s jednou účelovou funkcí a s omezujícími podmínkami]
   \begin{align}
     \max_{x} q(x), \hspace{50pt} x \in \mathcal{X},
   \end{align}
-  \\
-  kde $\mathcal{X}$ je prostor všech možných konfigurací.
-\end{definice}
-
-Za \textit{řešení} optimalizační úlohy se považuje optimální konfigurace $x^* \in \mathcal{X}$, kde $q(x^*)$ je globální maximum $q$.
-Funkce $q$ je účelová funkce, a její návrh zásadně ovlivní jaké $x^*$ je optimální. 
-\\
-\begin{definice}[Optimalizační úloha s více účelovými funkcemi]
   \begin{align}
-    \max_{x} q(x), \hspace{50pt} &x \in \mathcal{X}, \\
-                                 &q(x) = [q_1(x), q_2(x), \dots q_{m}(x)], q_i \in \mathcal{Q}, \\
-                                 &0 \leq i \leq m, m = |\mathcal{Q}| 
+    \text{kde platí:} \hspace{10pt} h_i(x) &= 0, \hspace{20pt} &\forall i \in \{ 1, \dots, l \} \\
+                     g_i(x) &\leq 0, \hspace{20pt} &\forall i \in \{ 1, \dots, k \}
   \end{align}
   \\
-  kde $\mathcal{X}$ je prostor všech možných konfigurací a $\mathcal{Q}$ je vektor účelových funkcí, které chceme maximalizovat.
-  Funkci $q(x)$ maximalizujeme po složkách.
-  Bez újmy na obecnosti můžeme účelové funkce maximalizovat, protože
+  kde $\mathcal{X}$ je množina všech možných konfigurací.
+  Nechť $\mathcal{X}'$ množina všech konfigurací splňující omezující podmínky $h_i$ a $g_i$.
+  \\
+  \\
+  Bez újmy na obecnosti můžeme účelovou funkci maximalizovat, protože
   \begin{align}
     \min_{x} q(x) \equiv \max_{x} -q(x)
   \end{align}
+  \\
+\end{definice}
+
+\begin{definice}[Řešení optimalizační úlohy s jednou účelovou funkcí  a s omezujícími podmínkami]
+  Za \textit{řešení} optimalizační úlohy se považuje optimální konfigurace $x^* \in \mathcal{X}'$,
+  kde $q(x^*)$ je globální maximum $q$ na definičním oboru $\mathcal{X}'$.
+  \\
+  \\
+  Funkce $q$ je účelová funkce, a její návrh zásadně ovlivní, jaké $x^*$ je řešením.
+\end{definice}
+
+\begin{definice}[Optimalizační úloha s více účelovými funkcemi a s omezujícími podmínkami]
+  \begin{align}
+    \max_{x \in \mathcal{X}} q(x), \hspace{50pt} &q(x) = [q_1(x), q_2(x), \dots q_{m}(x)], q_i \in \mathcal{Q}, \\
+                                                 &0 \leq i \leq m, m = |\mathcal{Q}| 
+  \end{align}
+  \begin{align}
+    \text{kde platí:} \hspace{50pt} h_i(x) &= 0, \hspace{20pt} &\forall i \in \{ 1, \dots, l \} \\
+                     g_i(x) &\leq 0, \hspace{20pt} &\forall i \in \{ 1, \dots, k \}
+  \end{align}
+  \\
+  a kde $\mathcal{X}$ je prostor všech možných konfigurací, $h_i$ a $g_i$ jsou omezující podmínky,
+  $\mathcal{X}'$ množina všech konfigurací splňující omezující podmínky $h_i$ a $g_i$
+  a $\mathcal{Q}$ je vektor účelových funkcí, které chceme maximalizovat.
+  Funkci $q(x)$ maximalizujeme po složkách.
   .
 \end{definice}
 
 Z definice je optimální konfigurací $x^* \in \mathcal{X}$ takzvaný \textit{utopia point} $y^{utopia}$.
 To je konfigurace, která nabývá optima pro každou jednotlivou účelovou funkci.
 Zřejmě $y^{utopia}$ nemusí existovat, protože často maximalizování $q_i \in \mathcal{Q}$ může minimalizovat $q_j \in \mathcal{Q}, q_i \neq q_j$.
-Jak optima, která alespoň existují, hledat pro optimalizační úlohu s více účelovými funkcemi je probíráno (odkaz). %TODO ODKAZ.
+Jak optima, která alespoň existují, hledat pro optimalizační úlohu s více účelovými funkcemi nebo jak více účelových funkcí převést na jednu účelovou funkci je probíráno (odkaz). %TODO ODKAZ.
 \\
 \\
-Již z úvodu víme, že chceme nalézt takový plán $p_C \in P_C$, který úspěšně odbaví co nejvíce incidentů za co nejmenší cenu plánu.
-Díky simulaci $S$ jsme pro $p_C$ schopni zjistit počet úspěšně odbavených incientů $S_{pI}$, potřebujeme ještě dodefinovat cenu plánu.
+Již z úvodu víme, že chceme nalézt takový plán $p \in P_C$, který úspěšně odbaví co nejvíce incidentů z dané množiny incidentů $I$ za co nejmenší cenu plánu.
+Díky simulaci $S$ jsme pro $p$ schopni zjistit počet úspěšně odbavených incientů $S(p, I)$, potřebujeme ještě dodefinovat cenu plánu.
 \\
 \begin{definice}[Cena plánu]
-  Cena plánu $G \colon P_C \rightarrow \mathbb{R}$,
+  Cena plánu $G \colon P \rightarrow \mathbb{R}$,
 
   \begin{align}
-    G(p_C) = \sum_{(d_1, d_2) = p_{D_C}(z), z \in Z} d_2 / 60 + |p_{A_C}(a) \neq v_{\emptyset}|
+    G(p) = \sum_{d_2 = p_{D_2}(z), z \in Z} d_2 / 60 + |p_{A}(a) \neq v_{\emptyset}|
   \end{align}
   .
   \\
@@ -260,10 +299,10 @@ Nadefinujme optimalizační úlohu nalezení optimálního plánu pohotovostní 
 \\
 \begin{definice}[Optimalizační úloha nalezení optimálního plánu pohotovostní služby jako optimalizační úloha s více účelovými funkcemi]
   \begin{align}
-    \max_{p} q(p), \hspace{50pt} p \in P_C, q(p) = [S(p, I), -G(p)]
+    \max_{p \in P_C} q(p), \hspace{50pt} q(p) = [S(p, I), -G(p)]
   \end{align}
   \\
-  kde $P_C$ je množina všech povolných plánu pohotovostní služby podle omezení $C$ a $I$ je daná množina incidentů.
+  kde $P_C$ je množina všech povolných plánu pohotovostní služby splňující omezení $C$ a $I$ je daná množina incidentů.
 \end{definice}
 
 Problém nalezení optimálního plánu pohotovostní služby jsme klasifikovali jako optimalizační úlohu s více účelovými funkcemi.
@@ -408,15 +447,17 @@ Vážená suma účelových funkcí $q_{\alpha}$ spolu s váženou exponenciáln
 
 \begin{definice}[Optimalizační úloha nalezení optimálního plánu pohotovostní služby jako optimalizační úloha s jednou účelovou funkcí]
   \begin{align}
-    \max_{p} q(p), \hspace{50pt} p \in P_C, q \in Q 
+    \max_{p \in P_C} q(p), \hspace{50pt} q \in Q 
   \end{align}
   \\
-  kde $P_C$ je množina všech povolných plánu pohotovostní služby podle omezení $C$, $I$ je daná množina incidentů a $Q = \{ q_{\alpha}, q_{\alpha p}\}$ množina preferovaných účelových funkcí.
+  kde $P_C$ je množina všech povolných plánu pohotovostní služby splňující omezení $C$, $I$ je daná množina incidentů a $Q = \{ q_{\alpha}, q_{\alpha p}\}$ množina preferovaných účelových funkcí.
 \end{definice}
 
 \section{Klasifikace optimalizační úlohy}
 
-
+V předchozí kapitole jsme si formálně popsali optimalizační úlohu, kterou řešíme a klasifikovali jsme ji jako optimalizační úlohu s více účelovými funkcemi a s omezujícími podmínkami.
+V této kapitole klasifikujeme o jakou optimalizační úlohu se jedná zkoumáním víceúčelové funkce a množiny plánů.
+Zklasifikováním optimalizační úlohy budeme moct použít metodiky, které se standardně pro řešení takových úloh využívají. 
 
 Jedná se o diskrétní kombinatorickou optimalizaci s omezujícími podmínkami $C$, kde víceúčelová funkce $q_I$ pro výpočet kvality plánu používá úspěšnost
 odbavení incidentů $s_pI$ a cenu $c_pI$ plánu, pronásobené váhami $\alpha, \beta \in [0, 1]$,

@@ -504,6 +504,14 @@ INPUT ./kap01.tex
 INPUT /home/tom/.texlive2022/texmf-var/luatex-cache/generic/fonts/otl/lmroman12-italic.luc
 INPUT /home/tom/.texlive2022/texmf-var/luatex-cache/generic/fonts/otl/lmroman8-italic.luc
 INPUT /home/tom/.texlive2022/texmf-var/luatex-cache/generic/fonts/otl/lmroman7-italic.luc
+INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/lm/rm-lmr5.tfm
+INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/lm/lmmi5.tfm
+INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/lm/lmsy5.tfm
+INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/amsfonts/symbols/msam5.tfm
+INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/amsfonts/symbols/msbm5.tfm
+INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/lm/rm-lmbx5.tfm
+INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/lm/lmmib5.tfm
+INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/lm/lmbsy5.tfm
 INPUT /home/tom/.texlive2022/texmf-var/luatex-cache/generic/fonts/otl/lmroman10-regular.luc
 INPUT /home/tom/.texlive2022/texmf-var/luatex-cache/generic/fonts/otl/lmromancaps10-regular.luc
 INPUT /home/tom/.texlive2022/texmf-var/luatex-cache/generic/fonts/otl/lmroman8-regular.luc
