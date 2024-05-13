@@ -4,6 +4,7 @@
 
 Ústředním problémem pohotovostních služeb je umět naplánovat týmy záchranářů a záchranná vozidla na výjezdové stanice tak, aby úspěšně obsloužili co největší počet incidentů,
 za co nejméně zbytečně vynaložených nákladů.
+Pro pohotovostní službu je hlavní vytvořit takový plán, který úspěšně odbaví co nejvíce incidentů, a až pak se zabývá minimalizováním nákladů.
 Našim cílem je vymyslet metody jak být schopný taková optimální naplánovaní nalézt.
 Z toho důvodu je v první řadě potřeba si problém zformalizovat a jasně si tak vymezit, jaký konkrétní problém řešíme.
 \\
@@ -209,9 +210,7 @@ V naší simulaci jsou použitá pravidla vybraná na základě konzultace se sp
 u několika jejich klientů ve Spojených státech.
 Není však problém naimplementovat pravidla zcela jiná, jednodušší, komplikovanější nebo klidně i stochastická.
 
-\section{Optimalizační úloha}
-
-\subsection{Popis problému jako optimalizační úloha s více účelovými funkcemi}
+\section{Převedení problému na optimalizační úlohu s více účelovými funkcemi}
 
 \begin{definice}[Optimalizační úloha s jednou účelovou funkcí]
   \begin{align}
@@ -226,10 +225,13 @@ Funkce $q$ je účelová funkce, a její návrh zásadně ovlivní jaké $x^*$ j
 \\
 \begin{definice}[Optimalizační úloha s více účelovými funkcemi]
   \begin{align}
-    \max_{x} q(x), \hspace{50pt} x \in \mathcal{X}, q \in \mathcal{Q}
+    \max_{x} q(x), \hspace{50pt} &x \in \mathcal{X}, \\
+                                 &q(x) = [q_1(x), q_2(x), \dots q_{m}(x)], q_i \in \mathcal{Q}, \\
+                                 &0 \leq i \leq m, m = |\mathcal{Q}| 
   \end{align}
   \\
-  kde $\mathcal{X}$ je prostor všech možných konfigurací a $\mathcal{Q}$ je množina účelových funkcí, které chceme maximalizovat.
+  kde $\mathcal{X}$ je prostor všech možných konfigurací a $\mathcal{Q}$ je vektor účelových funkcí, které chceme maximalizovat.
+  Funkci $q(x)$ maximalizujeme po složkách.
   Bez újmy na obecnosti můžeme účelové funkce maximalizovat, protože
   \begin{align}
     \min_{x} q(x) \equiv \max_{x} -q(x)
@@ -237,8 +239,10 @@ Funkce $q$ je účelová funkce, a její návrh zásadně ovlivní jaké $x^*$ j
   .
 \end{definice}
 
-Z definice není vůbec jasné, jaká konfigurace $x^* \in \mathcal{X}$ je řešením optimalizační úlohy s více účelovými funkcemi.
-Zřejmě maximalizování $q_1 \in \mathcal{Q}$ může minimalizovat $q_2 \in \mathcal{Q}, q_2 \neq q_1$. Tímto se zabýváme (ODKAZ).
+Z definice je optimální konfigurací $x^* \in \mathcal{X}$ takzvaný \textit{utopia point} $y^{utopia}$.
+To je konfigurace, která nabývá optima pro každou jednotlivou účelovou funkci.
+Zřejmě $y^{utopia}$ nemusí existovat, protože často maximalizování $q_i \in \mathcal{Q}$ může minimalizovat $q_j \in \mathcal{Q}, q_i \neq q_j$.
+Jak optima, která alespoň existují, hledat pro optimalizační úlohu s více účelovými funkcemi je probíráno (odkaz). %TODO ODKAZ.
 \\
 \\
 Již z úvodu víme, že chceme nalézt takový plán $p_C \in P_C$, který úspěšně odbaví co nejvíce incidentů za co nejmenší cenu plánu.
@@ -260,51 +264,160 @@ Nadefinujme optimalizační úlohu nalezení optimálního plánu pohotovostní 
 \\
 \begin{definice}[Optimalizační úloha nalezení optimálního plánu pohotovostní služby jako optimalizační úloha s více účelovými funkcemi]
   \begin{align}
-    &\max_{p_C} S(p_C, I), \hspace{50pt} &p_C &\in P_C \\ 
-    &\max_{p_C} -G(p_C), \hspace{50pt}    &p_C &\in P_C,
+    \max_{p} q(p), \hspace{50pt} p \in P_C, q(p) = [S(p, I), -G(p)]
   \end{align}
   \\
   kde $P_C$ je množina všech povolných plánu pohotovostní služby podle omezení $C$ a $I$ je daná množina incidentů.
 \end{definice}
 
-\subsection{Převod na optimalizační úlohu s jednou účelovou funkcí}
+Problém nalezení optimálního plánu pohotovostní služby jsme klasifikovali jako optimalizační úlohu s více účelovými funkcemi.
+Účelové funkce jsou počet úspěšně odbavených incidentů $S(p, I)$ a záporná cena plánu pohotovostní služby $G(p)$.
+Všimněmě si, že maximalizování $S$ bude velmi pravděpodobně vést k maximalizování $G$, tedy k minimalizování $-G$.
+Plány úspěšně odbavující incidenty zřejmě budou používát více záchranných týmu s delšími směnami a více záchranných vozidel, takže budou dražší.
 
-\subsection{Návrh účelové funkce}
+\section{Metody pro řešení optimalizačního problému s více účelovými funkcemi}
 
-Díky možnosti spuštění simulace $S$ pohotovostního plánu $p_C$ pro množinu incidentů $I$ jsme schopni získat důležitou statistiku, a to počet úspěšně odbavených incidentů $S(p_C, I)$,
-které důvěrně odpovídají reálnému fungování plánu. Zároveň jsme si v předchozí kapitole %TODO odkaz
-nadefinovali cenu plánu $G(p_C)$. V této kapitole se budeme věnovat návrhu účelové funkce, která bude vhodně používat $S(p_C, I)$ a $G(p_C)$.
-\\
-\\
-Existuje několik způsobů, jak převést optimalizační úlohu s více účelovými funkcemi
+Klasifikovali jsme problém nalezení optimálního plánu pohotovostní služby jako optimalizační úlohu s více účelovými funkcemi.
+Zároveň účelové funkce jsou protichůdné. Maximalizováním $S$ minimalizujeme $-G$ a naopak.
+Optimalizační úlohy s více účelovými funkcemi, mezi kterými je potřeba nalézt kompromis pro nalezení optima, jsou velmi časté,
+a proto existuje několik metod, které se v takovém případě používají.
+Většina metod převede víceúčelovou funkci na jednu účelovou funkci.
+Vybrané metody si ukážeme a rozmyslíme si, které budeme preferovat. 
 
-\begin{definice}[Účelová funkce]
-Nechť účelová funkce $q_I \colon P_C \rightarrow \mathbb{R}$, která ohodnotí $p \in P_C$ pro danou množinu incidentů $I$,
+\subsection{Omezující metoda}
+
+\begin{definice}
+  Omezující metoda omezí všechny až na jednu účelovou funkci. Bez újmy na obecnosti vyberme $q_1$:
+  \begin{align*}
+    \max_{x \in \mathcal{X}} q_1(x)
+  \end{align*}
+
   \begin{align}
-    q_I(p) = \alpha \cdot S(p, I) - (1 - \alpha) \cdot G(p), \hspace{50pt} \alpha \in [0, 1], p \in P_C
+    \text{kde platí: } q_2(x) \leq c_2, q_3(x) \leq c_3, \dots, q_m(x) \leq c_m,
   \end{align}
-  .
+  pro $c \in \mathbb{R}^m$.
+  \\
 \end{definice}
 
-Účelovou funkci $q_I$ jsme nadefinovali tak, aby nabývala vyšších hodnot při vyšší úspěšnosti odbavených incidentů a nižších hodnot při nižší cenně plánu, a naopak.
-To znamená, že pro plány $p$ s vyšším počtem odbavených incientů a nižší cenou bude $q_I(p)$ vyšší
-a pro plány s nižším počtem úspěšně odbavených incidentů a vyšší cenou bude $q_I(p)$ nižší.
-\\
-\\
-Zároveň díky parametru $\alpha \in [0, 1]$ můžeme snadno upřednostit buď $S(p, I)$ nebo $G(p)$.
-Pro vyšší hodnoty $\alpha$ bude $q_I$ upřednostňovat $S(p, I)$ nad $G(p)$ a pro nižší naopak.
-Pro naše účely nastavíme $\alpha$ blíž 1, například $0.99$, protože vždy chceme upřednostnit plány, které úspěšně odbavý co nejvíce incidentů, a až pak nás bude zajímat cena plánu. 
-\\
-\\
-S definicí účelové funkce můžeme nadefinovat optimalizační úlohu, kterou budeme řešit.
+%TODO nevim co tu napsat vubec
 
-\begin{definice}[Optimalizační úloha]
+\subsection{Vážená suma účelových funkcí}
+
+Jedná se o způsob převedení víceúčelové funkce pouze na jednu účelovou funkci pomocí sumy účelových funkcí pronásobené váhami.
+
+\begin{definice}[Vážená suma účelových funkcí]
   \begin{align}
-    \max_{p_C} q_I(p_C), \hspace{50pt} p_C \in P_C,
+    q'(x) = w^T q(x),
   \end{align}
+  kde $w \in \mathbb{R}^m$ je vektor vah.
+  \\
 \end{definice}
 
-Plán $p^* \in P_C$, kde $q_I(p^*)$ je globálním maximem je náš hledaný optimální plán.
+Vzhledem k tomu, že chceme jistě upřednostňovat $S(p, I)$ nad $G(p)$, vážená suma účelových funkcí, tak patří mezi preferované metody.
+
+\begin{definice}[Vážená suma účelových funkcí optimalizace pohotovostního plánu]
+  \begin{align}
+    q_{\alpha}(p) = \alpha \cdot S(p, I) - (1 - \alpha) \cdot G(p), \hspace{50pt} \alpha \in [0, 1], p \in P_C
+  \end{align}
+  \\
+\end{definice}
+
+Parametr $\alpha$ bychom tak preferovali blíže jedné, pro upřednostnění $S_{pI}$ a pro upřednostnění $G(p)$ blíže nule.
+
+\subsection{Goal programming}
+
+Jedná se o způsob převedení víceúčelové funkce pouze na jednu účelovou funkci minimalizováním vzdálenosti od nějaké ideální hodnoty - cíle. 
+
+\begin{definice}[Účelová funkce měřící vzdálenost od cíle]
+  \begin{align}
+    \min_{x \in \mathcal{X}} \| q(x) - y^{goal} \|, \hspace{50pt} y^{goal} \in \mathbb{R}
+  \end{align}
+  \\
+\end{definice}
+
+Standardně $y^{goal} = y^{utopia}$.
+Pro pohotovostní plány $y^{utopia} = [1, 0]$, úspěšné odbavení všech incidentů za nulovou cenu.
+Samozřejmě $y^{utopia}$ v $P_C$ nemůže existovat.
+Nulovou cenu má pouze plán, kde není naalokován žádný tým záchranářů ani záchranné vozidlo a takový plán nemůže úspěšně obsloužit žádný incident. 
+Můžeme však měřit, jak blízko $p$ k $y^{utopia}$ je.
+
+\begin{definice}[Goal programming pro optimalizaci pohotovostního plánu]
+  \begin{align}
+    q^{goal}(p) = \| [1 - S(p, I), G(p)] \|
+  \end{align}
+  \\
+\end{definice}
+
+Nevýhodou tohoto přístupu je neschopnost určit kterou účelovou funkci je důležitější optimalizovat.
+
+\subsection{Vážená exponenciální suma účelových funkcí}
+
+\begin{definice}[Vážená exponenciální suma účelových funkcí]
+  \begin{align}
+    q(x) = \sum_{i=1}^{m} w_i (q_i(x) - y_i^{goal})^p,
+  \end{align}
+  kde $w \in \mathbb{R}^m, p \in \mathbb{R}$.
+  \\
+\end{definice}
+
+Jedná se o kombinaci goal programming a vážené sumy účelových funkcí.
+Váhami $w$ jsme schopni určit, kterou účelovou funkci je pro nás důležitější optimalizovat. Pro pohotovostní plány:
+
+\begin{definice}[Vážená exponenciální suma účelových funkcí pro pohotovostní plány]
+  \begin{align}
+    q(x)_{\alpha p} = (1 - \alpha \cdot S(p, I))^p + ((1 - \alpha) \cdot G(p))^p,
+  \end{align}
+  \\
+\end{definice}
+
+Stejně jako (odkaz) jsme díky parametru $\alpha$ schopni upřednostit maximalizování $S(p, I)$ nad $-G(p)$.
+
+\subsection{Paretova optimalita}
+
+\begin{definice}[Dominance]
+  Konfigurace $x \in \mathcal{X}$ dominuje $x' \in \mathcal{X}$, právě tedhy když
+  \begin{align}
+    q_i(x') \leq q_i(x) \land q_j(x') < q_j(x)
+  \end{align}
+  \\
+$\forall i \in \{ 1, \dots, m \}, \exists j \in \{ 1, \dots, m \}$.
+\\
+\end{definice}
+
+\begin{definice}[Pareto optimální]
+  Konfigurace $x$ je pareto optimální, právě tehdy když, neexistuje $x'$, které by dominovalo $x$.
+  \\
+\end{definice}
+
+\begin{definice}[Paretova hranice]
+  Jsou všechny konfigurace $x$, které jsou Pareto optimální.
+  \\
+\end{definice}
+
+Optimální plán pohotovostní služby podle paretovy optimality by pak byl libovolný plán na Paretově hranici.
+Přístup Paretovy optimality je vhodný, pokud zlepšení v jedné účelové funkci vede k zhoršení v ostatních a není jasné, jakou účelovou funkci upřednostit.
+My ale víme, jakou účelovou funkci chceme upřednostnit.
+Také si všimněme, že přístup Paretovy optimality nepřevádí víceúčelovou funkci na jednu účelovou funkci,
+nýbrž definuje optimální konfiguraci při více účelových funkcích. 
+Z těchto důvodu přístup Paretovy optimality pro nás nebude příliš zajímavý.
+Věnujeme se mu pouze v kapitole o genetickách algoritmech (odkaz), protože je vhodná při použití populačních metod.
+
+\section{Převedení problému na optimalizační úlohu s jednou účelovou funkcí}
+
+V předchozí kapitole jsme si ukázali několik přístupů, které vhodně převedou víceúčelovou funkci na jednu účelovou funkci.
+Pohotovostní služby chtějí vždy upřednostňovat maximalizování $S(p, I)$ nad minimalizováním $G(p)$,
+z toho důvodu je pro nás velmi žádoucí, abychom byli schopni pro účelovou funkci určit, zda chceme a jak moc upřednostit maximalizování $S(p, I)$ nebo $-G(p)$.
+Upřednostníme pak maximalizování $S(p, I)$.
+Vážená exponenciální suma účelových funkcí spolu s váženou sumou účelových funkcí tak patří mezi preferované způsoby návrhu jedné účelové funkce.
+
+\begin{definice}[Optimalizační úloha nalezení optimálního plánu pohotovostní služby jako optimalizační úloha s jednou účelovou funkcí]
+  \begin{align}
+    \max_{p} q(p), \hspace{50pt} p \in P_C, q \in Q 
+  \end{align}
+  \\
+  kde $P_C$ je množina všech povolných plánu pohotovostní služby podle omezení $C$, $I$ je daná množina incidentů a $Q = \{ q_{\alpha}, q_{\alpha p}\}$ množina vhodných účelových funkcí.
+\end{definice}
+
 
 \section{Klasifikace optimalizační úlohy}
 

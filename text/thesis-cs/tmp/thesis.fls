@@ -514,6 +514,8 @@ INPUT /home/tom/.texlive2022/texmf-var/luatex-cache/generic/fonts/otl/lmroman6-r
 INPUT /home/tom/.texlive2022/texmf-var/luatex-cache/generic/fonts/otl/lmroman12-italic.luc
 INPUT /home/tom/.texlive2022/texmf-var/luatex-cache/generic/fonts/otl/lmroman10-regular.luc
 INPUT /home/tom/.texlive2022/texmf-var/luatex-cache/generic/fonts/otl/lmromancaps10-regular.luc
+INPUT /home/tom/.texlive2022/texmf-var/luatex-cache/generic/fonts/otl/lmroman8-italic.luc
+INPUT /home/tom/.texlive2022/texmf-var/luatex-cache/generic/fonts/otl/lmroman7-italic.luc
 OUTPUT tmp/kap02.aux
 INPUT ./kap02.tex
 INPUT ./kap02.tex

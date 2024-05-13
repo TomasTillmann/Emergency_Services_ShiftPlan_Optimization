@@ -1,9 +1,9 @@
 [0] Config.pm:306> INFO - This is Biber 2.18
-[1] Config.pm:309> INFO - Logfile is 'tmp/thesis.blg'
-[151] biber:340> INFO - === Mon May 13, 2024, 09:41:17
-[176] Biber.pm:418> INFO - Reading 'tmp/thesis.bcf'
-[292] Biber.pm:978> INFO - Found 0 citekeys in bib section 0
-[317] bbl.pm:654> INFO - Writing 'tmp/thesis.bbl' with encoding 'UTF-8'
-[317] bbl.pm:757> INFO - Output to tmp/thesis.bbl
-[317] Biber.pm:130> WARN - The file 'tmp/thesis.bcf' does not contain any citations!
-[317] Biber.pm:132> INFO - WARNINGS: 1
+[0] Config.pm:309> INFO - Logfile is 'tmp/thesis.blg'
+[101] biber:340> INFO - === Mon May 13, 2024, 12:55:18
+[120] Biber.pm:418> INFO - Reading 'tmp/thesis.bcf'
+[205] Biber.pm:978> INFO - Found 0 citekeys in bib section 0
+[222] bbl.pm:654> INFO - Writing 'tmp/thesis.bbl' with encoding 'UTF-8'
+[222] bbl.pm:757> INFO - Output to tmp/thesis.bbl
+[222] Biber.pm:130> WARN - The file 'tmp/thesis.bcf' does not contain any citations!
+[222] Biber.pm:132> INFO - WARNINGS: 1
