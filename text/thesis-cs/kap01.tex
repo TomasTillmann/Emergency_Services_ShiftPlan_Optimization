@@ -4,61 +4,57 @@
 
 Ústředním problémem pohotovostních služeb je umět naplánovat týmy záchranářů a záchranná vozidla na výjezdové stanice tak, aby úspěšně obsloužili co největší počet incidentů,
 za co nejméně zbytečně vynaložených nákladů.
-Pro pohotovostní službu je hlavní vytvořit takový plán, který úspěšně odbaví co nejvíce incidentů, a až pak se zabývá minimalizováním nákladů.
 Našim cílem je vymyslet metody jak být schopný taková optimální naplánovaní nalézt.
 Z toho důvodu je v první řadě potřeba si problém zformalizovat a jasně si tak vymezit, jaký konkrétní problém řešíme.
 \\
 \\
-Pohotovostní služba má k dispozici týmy záchranářů $Z$, pohotovostní vozidla $A$ a výjezdové stanice $V$.
-Tým záchranářů $z \in Z$ je na výjezdové stanici $v \in V$ k dispozici v rámci svoji přiřazené pracovní směny $d \in D$,
-kde $D \subseteq (\mathbb{N}_0, \mathbb{N}_0)$ jsou všechny možné pracovní směny dané pohotovostní službou.
-Směna $d \in D$ je tak dvojice $d = (d_1, d_2)$, kde $d_1$ značí začátek a $d_2$ délku trvání pracovní směny v sekundách.
+Pohotovostní služba má k dispozici týmy záchranářů $Z = \{ z_1, z_2, \dots, z_{Z_n} \}$, pohotovostní vozidla $A = \{ a_1, a_2, \dots\ a_{A_n} \}$ a výjezdové stanice $V = \{ v_1, v_2, \dots, v_{V_n} \}$.
+Pohotovostní služba definuje pracovní směny týmů záchranářů $D = D_{1} \times D_{2}$, 
+kde $D_{1} \in \mathbb{N}_0$ množina začátků a $D_{2} \in \mathbb{N}_0$ množina délek směn v sekundách.
+Směna $d \in D$ je tak dvojice $d = (d_1, d_2)$, kde $d_{1} \in D_{1}$ značí začátek a $d_{2} \in D_{2}$ délku trvání pracovní směny v sekundách.
 \\
 \\
-Plán pohotovostní služby $p \in P$ je přiřazení záchranných vozidel $a \in A$ a týmů záchranářů $z \in Z$ na konkrétní výjezdové stanice $v \in V$
-a přiřazení pracovní směny $d \in D$ každému týmu záchranářů $z \in Z$ v rámci jednoho dne, kde $P$ je množina všech plánů pohotovostní služby.
+Neformálně je plán pohotovostní služby přiřazení týmů záchranářů $z \in Z$ a záchranných vozidel $a \in A$ na konkrétní výjezdové stanice $v \in V$
+a přiřazení pracovní směny $d \in D$ každému týmu záchranářů $z \in Z$ v rámci jednoho dne.
 Tato přiřazení popíšeme funkcemi, 
 
-\begin{align}
-  p_D \colon Z &\rightarrow D \\
-  p_Z \colon Z &\rightarrow V \cup \{ v_{\emptyset} \} \\
-  p_A \colon A &\rightarrow V \cup \{ v_{\emptyset} \}
-\end{align}
-.
-\\
-\\
-Plán pohotovostní služby pak je trojice,
+\begin{definice}[Přiřazovací funkce]
+  \begin{align}
+    p_Z \colon Z &\rightarrow V \cup \{ v_{\emptyset} \}                   \hspace{65pt} \text{přiřazení týmů na stanice} \\
+    p_A \colon A &\rightarrow V \cup \{ v_{\emptyset} \}                   \hspace{65pt} \text{přiřazení vozidel na stanice} \\ 
+    p_{D_{1}} \colon Z &\rightarrow D_{1} \cup \{ d_{\emptyset} \}         \hspace{60pt} \text{přiřazení začátku směn týmům} \\
+    p_{D_{2}} \colon Z &\rightarrow D_{2} \cup \{ d_{\emptyset} \}         \hspace{60pt} \text{přiřazení délky směn týmům}
+  \end{align}
+  \\
+  Pokud $z \in Z$ nemá mít přiřazenou žádnou výjezdovou stanici,
+  tak $p_{Z}(z) = v_{\emptyset}, p_{D_{1}} = d_{\emptyset}, p_{D_{2}} = d_{\emptyset}$.
+  Pokud $a \in A$ nemá mít přiřazenou žádnou výjezdovou stanici, tak $p_{A}(a) = a_{\emptyset}$.
+\end{definice}
 
-\begin{align}
-  p = (p_D, p_Z, p_A) \in P
-\end{align}
-.
+\clearpage
+
+\begin{definice}[Plán pohotovostní služby]
+  Nechť vektory, $Z^{p}_z \in V^{Z_n}, A^{p} \in V^{A_n}, Z^{p}_{D_1} \in D_{1}^{Z_n}, Z^{p}_{D_2} \in {D_2}^{Z_n}$, kde
+  \begin{align}
+    {Z^{p}_z}_{(i)} &= p_Z(z), \hspace{40pt} &1 \leq i \leq Z_n \\
+    A^{p}_{(i)} &= p_A(a), \hspace{40pt} &1 \leq i \leq A_n \\
+    {Z^{p}_{D_1}}_{(i)} &= p_{D_1}(z), \hspace{40pt} &1 \leq i \leq Z_n \\
+    {Z^{p}_{D_2}}_{(i)} &= p_{D_2}(z), \hspace{40pt} &1 \leq i \leq Z_n,
+  \end{align}
+  \\
+  pak plán pohotovostní služby je čtveřice $p = (Z^{p}_z, A^{p}, Z^{p}_{D_1}, Z^{p}_{D_2}) \in P$, kde $P$ je prostor plánů pohotovostních služeb.
+  \\
+\end{definice}
+
+Plán pohotovostní služby je jen zakódování \textit{přiřazovacích funkcí} %TODO odkaz?
+do čtveřice vektorů.
 \\
 \\
 Pohotovostní služba dále definuje omezení $C = \{ C_Z, C_A \}$, kde $C_Z$ je maximální dovolený počet $z \in Z$ na libovolné $v \in V$
 a $C_A$ je maximální dovolený počet $a \in A$ na libovolné $v \in V$.
-Nechť pak $P_C \subseteq P$ množina plánů splňující omezující podmínky $C$, tedy
 
-\begin{align}
-  p_C = (p_{D_C}, p_{Z_C}, p_{A_C}) \in P_C
-\end{align}
 
-\clearpage
 
-, kde
-
-\begin{align}
-  p_{D_C} \colon Z &\rightarrow D \\ 
-  p_{Z_C} \colon Z &\rightarrow V \cup \{ v_{\emptyset} \},     \hspace{50pt} \text{splňující $C_Z$} \\
-  p_{A_C} \colon A &\rightarrow V \cup \{ v_{\emptyset} \},     \hspace{50pt} \text{splňující $C_A$}
-\end{align}
-.
-\\
-\\
-Pokud $z \in Z$ nebo $a \in A$ nemá mít přiřazenou žádnou výjezdovou stanici, tak $p_{Z}(z) = v_{\emptyset}, p_{A}(a) =  v_{\emptyset}$
-a stejně tak pro $p_{Z_C}(z) = v_{\emptyset}$ a $p_{A_C}(a) = v_{\emptyset}$.
-\\
-\\
 Problém, který v této práci řešíme, je nalézt $p_C \in P_C$, takové, že úspěšně odbaví co největší počet incidentů za co nejmenší cenu plánu.
 Co je úspěšně odbavený incident a jakým způsobem zjistíme kolik incidentů plán úspěšně odbaví je detailně popisováno v kapitole Simulace plánu pohotovnostní služby (odkaz).
 Jak zjistíme cenu plánu je popsáno (odkaz).
@@ -408,18 +404,19 @@ V předchozí kapitole jsme si ukázali několik přístupů, které vhodně př
 Pohotovostní služby chtějí vždy upřednostňovat maximalizování $S(p, I)$ nad minimalizováním $G(p)$,
 z toho důvodu je pro nás velmi žádoucí, abychom byli schopni pro účelovou funkci určit, zda chceme a jak moc upřednostit maximalizování $S(p, I)$ nebo $-G(p)$.
 Upřednostníme pak maximalizování $S(p, I)$.
-Vážená exponenciální suma účelových funkcí spolu s váženou sumou účelových funkcí tak patří mezi preferované způsoby návrhu jedné účelové funkce.
+Vážená suma účelových funkcí $q_{\alpha}$ spolu s váženou exponenciální sumou účelových $q_{\alpha p}$ funkcí tak patří mezi preferované způsoby návrhu jedné účelové funkce.
 
 \begin{definice}[Optimalizační úloha nalezení optimálního plánu pohotovostní služby jako optimalizační úloha s jednou účelovou funkcí]
   \begin{align}
     \max_{p} q(p), \hspace{50pt} p \in P_C, q \in Q 
   \end{align}
   \\
-  kde $P_C$ je množina všech povolných plánu pohotovostní služby podle omezení $C$, $I$ je daná množina incidentů a $Q = \{ q_{\alpha}, q_{\alpha p}\}$ množina vhodných účelových funkcí.
+  kde $P_C$ je množina všech povolných plánu pohotovostní služby podle omezení $C$, $I$ je daná množina incidentů a $Q = \{ q_{\alpha}, q_{\alpha p}\}$ množina preferovaných účelových funkcí.
 \end{definice}
 
-
 \section{Klasifikace optimalizační úlohy}
+
+
 
 Jedná se o diskrétní kombinatorickou optimalizaci s omezujícími podmínkami $C$, kde víceúčelová funkce $q_I$ pro výpočet kvality plánu používá úspěšnost
 odbavení incidentů $s_pI$ a cenu $c_pI$ plánu, pronásobené váhami $\alpha, \beta \in [0, 1]$,
