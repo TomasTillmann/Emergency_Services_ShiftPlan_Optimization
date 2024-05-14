@@ -514,6 +514,9 @@ INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/lm/lmmib5.tfm
 INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/lm/lmbsy5.tfm
 INPUT /home/tom/.texlive2022/texmf-var/luatex-cache/generic/fonts/otl/lmroman10-regular.luc
 INPUT /home/tom/.texlive2022/texmf-var/luatex-cache/generic/fonts/otl/lmromancaps10-regular.luc
+INPUT /home/tom/.texlive2022/texmf-var/luatex-cache/generic/fonts/otl/lmroman10-bold.luc
+INPUT /home/tom/.texlive2022/texmf-var/luatex-cache/generic/fonts/otl/lmroman8-regular.luc
+INPUT /home/tom/.texlive2022/texmf-var/luatex-cache/generic/fonts/otl/lmroman6-regular.luc
 OUTPUT tmp/kap02.aux
 INPUT ./kap02.tex
 INPUT ./kap02.tex
