@@ -299,7 +299,7 @@ Díky simulaci $s$ jsme pro $p$ schopni zjistit počet úspěšně odbavených i
 Je příjemnější pracovat s účelovými funkcemi, které jsou přeškálované do intervalu $\langle 0, 1 \rangle$.
 Proto účelové funkce $s$ a $u$ přeškálujeme:
 
-\begin{definice}[Přeškálování simulace $s$ do intervalu $\langle 0, 1 \rangle$ ]
+\begin{definice}[Přeškálování simulace $s$ do intervalu $\langle 0, 1 \rangle$ ] \label{df:simulaceSkal}
   Definujme $s'$ jako přeškálování $s$ do intervalu $\langle 0, 1 \rangle$.
   \begin{align*}
     s'(p, I) = s(p, I) / |I|,
@@ -307,7 +307,7 @@ Proto účelové funkce $s$ a $u$ přeškálujeme:
   \\
 \end{definice}
 
-\begin{definice}[Přeškálování ceny $u$ do intervalu $\langle 0, 1 \rangle$ ]
+\begin{definice}[Přeškálování ceny $u$ do intervalu $\langle 0, 1 \rangle$ ] \label{df:cenaPlanuSkal}
   Definujme $u'$ jako přeškálování $u$ do intervalu $\langle 0, 1 \rangle$.
   \begin{align*}
     u'(p) = u(p) / K,
@@ -329,7 +329,8 @@ Nadefinujme \textit{optimalizační úlohu nalezení optimálního plánu pohoto
     \max_{p \in P_C} q(p), \hspace{50pt} q(p) = [s'(p, I), -u'(p)]
   \end{align*}
   \\
-  kde $P_C$ je množina všech povolných plánu pohotovostní služby splňující omezení $C$ a $I$ je daná množina incidentů.
+  kde $P_C$ je množina všech povolných plánu pohotovostní služby splňující omezení $C$, $I$ je daná množina incidentů
+  a kde $u'$ a $s'$ jsou účelové funkce \ref{df:simulaceSkal} \ref{df:cenaPlanuSkal}.
 \end{definice}
 
 Problém nalezení optimálního plánu pohotovostní služby jsme definovali jako optimalizační úlohu s více účelovými funkcemi \ref{df:optUloha2ucObecne}.
@@ -385,10 +386,10 @@ Jedná se o způsob převedení víceúčelové funkce pouze na jednu účelovou
 \end{definice}
 
 Standardně $y^{goal} = y^{utopia}$ (\cite{AlgOptBook} str. 219).
-Pro pohotovostní plány $y^{utopia} = \langle 1, 0 \rangle$, úspěšné odbavení všech incidentů za nulovou cenu.
-Samozřejmě $p$, pro které $q(p) = y^{utopia}$ v $P_C$ nemůže existovat.
+Pro pohotovostní plány $q(p^{utopia}) = \langle 1, 0 \rangle$, úspěšné odbavení všech incidentů za nulovou cenu.
+Samozřejmě $p^{utopia} \not \in P_C$.
 Nulovou cenu má pouze plán, kde není naalokován žádný tým záchranářů ani záchranné vozidlo a takový plán nemůže úspěšně obsloužit žádný incident. 
-Můžeme však měřit, jak blízko $q(p)$ k $y^{utopia}$ je.
+Můžeme však měřit, jak blízko $q(p)$ k $q(p^{utopia})$ je.
 
 \begin{definice}[Goal programming pro optimalizaci pohotovostního plánu]
   \begin{align*}
@@ -440,7 +441,7 @@ váženou exponenciální sumou účelových funkcí $q_{\alpha p}$ \ref{df:vaze
   \end{align*}
   \\
   kde $P_C$ je množina všech povolných plánu pohotovostní služby splňující omezení $C$, $I$ je daná množina incidentů
-  a $Q_I = \{ q_{\alpha}, q_{\alpha p}\}$ množina preferovaných účelových funkcí.
+  a $Q_I = \{ q_{\alpha}, q_{\alpha p}\}$ množina preferovaných účelových funkcí \ref{df:vazenaSumaPohotovost} \ref{df:vazenaSumaExpPohotovost}.
 \end{definice}
 
 \section{Klasifikace optimalizační úlohy}
