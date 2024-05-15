@@ -532,6 +532,7 @@ INPUT ./zaver.tex
 OUTPUT tmp/literatura.aux
 INPUT ./literatura.tex
 INPUT ./literatura.tex
+INPUT /home/tom/.texlive2022/texmf-var/luatex-cache/generic/fonts/otl/lmmono12-regular.luc
 INPUT tmp/thesis.lof
 INPUT tmp/thesis.lof
 OUTPUT tmp/thesis.lof

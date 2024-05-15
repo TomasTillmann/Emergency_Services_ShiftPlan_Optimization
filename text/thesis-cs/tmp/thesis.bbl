@@ -151,13 +151,49 @@
       \strng{authorbibnamehash}{57207615f5af7d86245a7ccb091a52bf}
       \strng{authornamehash}{57207615f5af7d86245a7ccb091a52bf}
       \strng{authorfullhash}{57207615f5af7d86245a7ccb091a52bf}
-      \field{sortinit}{1}
-      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{isbn}{3662585669}
       \field{title}{Combinatorial optimization: Theory and Algorithms}
       \field{year}{2013}
+    \endentry
+    \entry{cohen2020solving}{misc}{}
+      \name{author}{3}{}{%
+        {{hash=f502b5a4ec3e171cee0cdf3dc82a1256}{%
+           family={Cohen},
+           familyi={C\bibinitperiod},
+           given={Michael\bibnamedelima B.},
+           giveni={M\bibinitperiod\bibinitdelim B\bibinitperiod}}}%
+        {{hash=30150e84c87cbb9a8a6682b2ea5c800c}{%
+           family={Lee},
+           familyi={L\bibinitperiod},
+           given={Yin\bibnamedelima Tat},
+           giveni={Y\bibinitperiod\bibinitdelim T\bibinitperiod}}}%
+        {{hash=04d07d54d268f89c0e192345e9b152ba}{%
+           family={Song},
+           familyi={S\bibinitperiod},
+           given={Zhao},
+           giveni={Z\bibinitperiod}}}%
+      }
+      \strng{namehash}{d0da48b9db645b197cb167ecba91200a}
+      \strng{fullhash}{4028124b187c6acd59daecee17d1f9f5}
+      \strng{bibnamehash}{4028124b187c6acd59daecee17d1f9f5}
+      \strng{authorbibnamehash}{4028124b187c6acd59daecee17d1f9f5}
+      \strng{authornamehash}{d0da48b9db645b197cb167ecba91200a}
+      \strng{authorfullhash}{4028124b187c6acd59daecee17d1f9f5}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{eprintclass}{cs.DS}
+      \field{eprinttype}{arXiv}
+      \field{title}{Solving Linear Programs in the Current Matrix Multiplication Time}
+      \field{year}{2020}
+      \verb{eprint}
+      \verb 1810.07896
+      \endverb
     \endentry
   \enddatalist
 \endrefsection

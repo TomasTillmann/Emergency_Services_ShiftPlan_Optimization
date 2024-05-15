@@ -236,21 +236,15 @@ V naší simulaci jsou použitá pravidla vybraná na základě konzultace se sp
 u několika jejich klientů ve Spojených státech.
 Není však problém naimplementovat pravidla zcela jiná, jednodušší, komplikovanější nebo klidně i stochastická.
 
-\section{Převedení problému na optimalizační úlohu s více účelovými funkcemi s omezujícími podmínkami}
+\section{Převedení problému na optimalizační úlohu s více účelovými funkcemi s omezujícími podmínkami}\label{kap:optUloha2uc}
 
-\begin{definice}[Optimalizační úloha s jednou účelovou funkcí a s omezujícími podmínkami (\citet{AlgOptBook}, str. 169)]
+\begin{definice}[Optimalizační úloha s jednou účelovou funkcí (\citet{AlgOptBook}, str. 5)]\label{df:optUloha1ucObecne}
   \begin{align*}
     \max_{x} q(x), \hspace{50pt} x \in \mathcal{X},
   \end{align*}
-  \begin{align*}
-    \text{kde platí:} \hspace{10pt} h_i(x) &= 0, \hspace{20pt} &\forall i \in \{ 1, \dots, l \} \\
-                     g_i(x) &\leq 0, \hspace{20pt} &\forall i \in \{ 1, \dots, k \}
-  \end{align*}
   \\
-  kde $\mathcal{X}$ je množina všech možných konfigurací a $q$ je účelová funkce.
+  kde $\mathcal{X}$ je množina všech možných konfigurací a $q \colon \mathcal{X} \rightarrow \mathbb{R}$ je účelová funkce.
   Návrh účelové funkce zásadně ovlivní, jaké $x^*$ je řešením.
-  Nechť $\mathcal{X}'$ množina všech konfigurací splňující omezující podmínky $h_i$ a $g_i$,
-  $\mathcal{X}' = \{ x \mid h_i(x) = 0 \land g_i(x) \leq 0, x \in \mathcal{X} \}$.
   \\
   \\
   Bez újmy na obecnosti můžeme účelovou funkci maximalizovat, protože
@@ -260,93 +254,99 @@ Není však problém naimplementovat pravidla zcela jiná, jednodušší, kompli
   \\
 \end{definice}
 
-\begin{definice}[Řešení optimalizační úlohy s jednou účelovou funkcí  a s omezujícími podmínkami]
-  Za \textit{řešení} optimalizační úlohy se považuje optimální konfigurace $x^* \in \mathcal{X}'$,
-  kde $q(x^*)$ je globální maximum $q$ na definičním oboru $\mathcal{X}'$.
+\begin{definice}[Řešení optimalizační úlohy s jednou účelovou funkcí]
+  Za \textit{řešení} optimalizační úlohy se považuje optimální konfigurace $x^* \in \mathcal{X}$,
+  kde $q(x^*)$ je globální maximum $q$.
   \\
 \end{definice}
 
-\begin{definice}[Optimalizační úloha s více účelovými funkcemi a s omezujícími podmínkami]
+\begin{definice}[Optimalizační úloha s více účelovými funkcemi]\label{df:optUloha2ucObecne}
   \begin{align*}
     \max_{x \in \mathcal{X}} q(x), \hspace{50pt} &q(x) = [q_1(x), q_2(x), \dots q_{m}(x)], q_i \in \mathcal{Q}, \\
                                                  &0 \leq i \leq m, m = |\mathcal{Q}| 
   \end{align*}
-  \begin{align*}
-    \text{kde platí:} \hspace{50pt} h_i(x) &= 0, \hspace{20pt} &\forall i \in \{ 1, \dots, l \} \\
-                     g_i(x) &\leq 0, \hspace{20pt} &\forall i \in \{ 1, \dots, k \}
-  \end{align*}
   \\
-  a kde $\mathcal{X}$ je množina všech možných konfigurací, $h_i$ a $g_i$ jsou omezující podmínky,
-  $\mathcal{X}'$ množina všech konfigurací splňující omezující podmínky $h_i$ a $g_i$
-  a $\mathcal{Q}$ je vektor účelových funkcí, které chceme maximalizovat.
+  , kde $\mathcal{X}$ je množina všech možných konfigurací a $\mathcal{Q}$ je vektor účelových funkcí, které chceme maximalizovat.
   Víceúčelovou funkci $q(x)$ maximalizujeme po složkách.
-  .
 \end{definice}
 
-Z definice je optimální konfigurací $x^* \in \mathcal{X}$ takzvaný \textit{utopia point} $y^{utopia}$ (\citet{AlgOptBook}, str. 214).
-To je konfigurace, která nabývá optima pro každou jednotlivou účelovou funkci.
+\begin{definice}[Řešení optimalizační úlohy s více účelovými funkcemi]
+  Z definice \ref{df:optUloha2ucObecne} je řešením optimalizační úlohy s více učelovými funkcemi 
+  $x^* \in \mathcal{X}$ takzvaný \textit{utopia point} $y^{utopia}$ (\citet{AlgOptBook}, str. 214).
+  To je konfigurace, která nabývá optima pro každou jednotlivou účelovou funkci.
+\end{definice}
+
 Zřejmě $y^{utopia}$ nemusí existovat, protože často maximalizování $q_i \in \mathcal{Q}$ může minimalizovat $q_j \in \mathcal{Q}, q_i \neq q_j$.
-Jak optima, která alespoň existují, hledat pro optimalizační úlohu s více účelovými funkcemi
-nebo jak více účelových funkcí převést na jednu účelovou funkci je probíráno v kapitole \ref{kap:metodyProReseniOptSViceUcel}.
+V nadcházející kapitole \ref{kap:metodyProReseniOptSViceUcel} si ukážeme jak se otimalizace takového typu řeší, nebo jak se dají převést na 
+optimalizaci s jednou účelovou funkcí \ref{df:optUloha1ucObecne}.
 \\
 \\
 Již z úvodu víme, že chceme nalézt takový plán $p \in P_C$, který úspěšně odbaví co nejvíce incidentů z dané množiny incidentů $I$ za co nejmenší cenu plánu.
 Díky simulaci $s$ jsme pro $p$ schopni zjistit počet úspěšně odbavených incientů $s(p, I)$, potřebujeme ještě dodefinovat cenu plánu.
 \\
-\begin{definice}[Cena plánu]\label{df:cenaPlanu}
+\begin{definice}[Cena plánu $u$]\label{df:cenaPlanu}
   Cena plánu $u \colon P \rightarrow \mathbb{R}$,
 
   \begin{align*}
-    u(p) = \sum_{d_2 = p_{D_2}(z), z \in Z} d_2 / 60 + |p_{A}(a) \neq v_{\emptyset}|
+    u(p) = \sum_{d_2 = p_{D_2}(z), z \in Z} d_2 + |p_{A}(a) \neq v_{\emptyset}|.
   \end{align*}
-  .
   \\
   \\
-  Cena plánu je součet všech dob trvání směn přiřazených záchranným týmům v minutách a počtu naalokovaných záchranných vozidel.
+  Cena plánu je součet všech dob trvání směn přiřazených záchranným týmům v sekundách a počtu naalokovaných záchranných vozidel.
+  \\
+\end{definice}
+
+Je příjemnější pracovat s účelovými funkcemi, které jsou přeškálované do intervalu $\langle 0, 1 \rangle$.
+Proto účelové funkce $s$ a $u$ přeškálujeme:
+
+\begin{definice}[Přeškálování simulace $s$ do intervalu $\langle 0, 1 \rangle$ ]
+  Definujme $s'$ jako přeškálování $s$ do intervalu $\langle 0, 1 \rangle$.
+  \begin{align*}
+    s'(p, I) = s(p, I) / |I|,
+  \end{align*}
+  \\
+\end{definice}
+
+\begin{definice}[Přeškálování ceny $u$ do intervalu $\langle 0, 1 \rangle$ ]
+  Definujme $u'$ jako přeškálování $u$ do intervalu $\langle 0, 1 \rangle$.
+  \begin{align*}
+    u'(p) = u(p) / K,
+  \end{align*}
+  \\
+  kde $K$ je maximální možná cena plánu,
+  \begin{align*}
+    K = Z_n \cdot \max_{d_2} d_2 \in D_2 + A_n,
+  \end{align*}
+  \\
+  naalokování nejdelší směny na všechny týmy záchranářů a naalokování všech záchranných vozidel.
+  \\
 \end{definice}
 
 Nadefinujme \textit{optimalizační úlohu nalezení optimálního plánu pohotovostní služby}, jako
 \\
-\begin{definice}[Optimalizační úloha nalezení optimálního plánu pohotovostní služby jako optimalizační úloha s více účelovými funkcemi]
+\begin{definice}[Optimalizační úloha nalezení optimálního plánu pohotovostní služby jako optimalizační úloha s více účelovými funkcemi]\label{df:optUloha2uc}
   \begin{align*}
-    \max_{p \in P_C} q(p), \hspace{50pt} q(p) = [s(p, I), -u(p)]
+    \max_{p \in P_C} q(p), \hspace{50pt} q(p) = [s'(p, I), -u'(p)]
   \end{align*}
   \\
   kde $P_C$ je množina všech povolných plánu pohotovostní služby splňující omezení $C$ a $I$ je daná množina incidentů.
 \end{definice}
 
-Problém nalezení optimálního plánu pohotovostní služby jsme klasifikovali jako optimalizační úlohu s více účelovými funkcemi.
-Účelové funkce jsou počet úspěšně odbavených incidentů $s(p, I)$ a záporná cena plánu pohotovostní služby $u(p)$.
-Všimněmě si, že maximalizování $s$ bude velmi pravděpodobně vést k maximalizování $u$, tedy k minimalizování $-u$.
+Problém nalezení optimálního plánu pohotovostní služby jsme definovali jako optimalizační úlohu s více účelovými funkcemi \ref{df:optUloha2ucObecne}.
+\\
+\\
+Účelové funkce jsou přeškálování počtu úspěšně odbavených incidentů $s'$ a přeškálování záporné ceny plánu pohotovostní služby $u'(p)$, $p \in P_C$.
+Všimněmě si, že maximalizování $s'$ bude velmi pravděpodobně vést k maximalizování $u'$, tedy k minimalizování $-u'$.
 Plány úspěšně odbavující incidenty zřejmě budou používát více záchranných týmu s delšími směnami a více záchranných vozidel, takže budou dražší.
-
-\clearpage
 
 \section{Metody pro řešení optimalizačního problému s více účelovými funkcemi}\label{kap:metodyProReseniOptSViceUcel}
 
-Klasifikovali jsme problém nalezení optimálního plánu pohotovostní služby jako optimalizační úlohu s více účelovými funkcemi.
-Zároveň účelové funkce jsou protichůdné. Maximalizováním $s$ minimalizujeme $-u$ a naopak.
+Klasifikovali jsme problém nalezení optimálního plánu pohotovostní služby jako optimalizační úlohu s více účelovými funkcemi \ref{df:optUloha2uc}.
+Zároveň jsme pozorovali, že maximalizováním $s'$ minimalizujeme $-u'$ a naopak.
 Optimalizační úlohy s více účelovými funkcemi, mezi kterými je potřeba nalézt kompromis pro nalezení optima, jsou velmi časté,
 a proto existuje několik metod, které se v takovém případě používají.
 Většina metod převede víceúčelovou funkci na jednu účelovou funkci.
 Vybrané metody si ukážeme a rozmyslíme si, které budeme preferovat. 
-
-\subsection{Omezující metoda}
-
-\begin{definice}
-  Omezující metoda omezí všechny až na jednu účelovou funkci. Bez újmy na obecnosti vyberme $q_1$:
-  \begin{align*}
-    \max_{x \in \mathcal{X}} q_1(x)
-  \end{align*}
-
-  \begin{align*}
-    \text{kde platí: } q_2(x) \leq c_2, q_3(x) \leq c_3, \dots, q_m(x) \leq c_m,
-  \end{align*}
-  pro $c \in \mathbb{R}^m$.
-  \\
-\end{definice}
-
-%TODO nevim co tu napsat vubec
 
 \subsection{Vážená suma účelových funkcí}\label{kap:vazenaSumaUcelF}
 
@@ -360,17 +360,18 @@ Jedná se o způsob převedení víceúčelové funkce pouze na jednu účelovou
   \\
 \end{definice}
 
-Vzhledem k tomu, že chceme jistě upřednostňovat $s(p, I)$ nad $u(p)$, vážená suma účelových funkcí, tak patří mezi preferované metody.
+Vzhledem k tomu, že chceme jistě upřednostňovat $s'$ nad $u'$, vážená suma účelových funkcí, tak patří mezi preferované metody.
 
-\begin{definice}[Vážená suma účelových funkcí optimalizace pohotovostního plánu]
+\begin{definice}[Vážená suma účelových funkcí optimalizace pohotovostního plánu]\label{df:vazenaSumaPohotovost}
   \begin{align*}
-    q_{\alpha}(p) = \alpha \cdot s(p, I) - (1 - \alpha) \cdot u(p), \hspace{50pt} \alpha \in [0, 1], p \in P_C
+    q_{\alpha}(p) = \alpha \cdot s'(p, I) - (1 - \alpha) \cdot u'(p), \hspace{50pt} \alpha \in [0, 1], p \in P_C,
   \end{align*}
-  , pro danou množinu incidentů $I$.
+  \\
+  pro danou množinu incidentů $I$.
   \\
 \end{definice}
 
-Parametr $\alpha$ bychom tak preferovali blíže jedné, pro upřednostnění $s(p, I)$ a pro upřednostnění $u(p)$ blíže nule.
+Parametr $\alpha$ bychom tak preferovali blíže jedné, pro upřednostnění $s'$ a pro upřednostnění $u'$ blíže nule.
 
 \subsection{Goal programming}\label{kap:goalP}
 
@@ -383,17 +384,17 @@ Jedná se o způsob převedení víceúčelové funkce pouze na jednu účelovou
   \\
 \end{definice}
 
-Standardně $y^{goal} = y^{utopia}$.
-Pro pohotovostní plány $y^{utopia} = [1, 0]$, úspěšné odbavení všech incidentů za nulovou cenu.
-Samozřejmě $y^{utopia}$ v $P_C$ nemůže existovat.
+Standardně $y^{goal} = y^{utopia}$ (\cite{AlgOptBook} str. 219).
+Pro pohotovostní plány $y^{utopia} = \langle 1, 0 \rangle$, úspěšné odbavení všech incidentů za nulovou cenu.
+Samozřejmě $p$, pro které $q(p) = y^{utopia}$ v $P_C$ nemůže existovat.
 Nulovou cenu má pouze plán, kde není naalokován žádný tým záchranářů ani záchranné vozidlo a takový plán nemůže úspěšně obsloužit žádný incident. 
-Můžeme však měřit, jak blízko $p$ k $y^{utopia}$ je.
+Můžeme však měřit, jak blízko $q(p)$ k $y^{utopia}$ je.
 
 \begin{definice}[Goal programming pro optimalizaci pohotovostního plánu]
   \begin{align*}
-    q^{goal}(p) = \| [1 - S(p, I), G(p)] \|
+    q^{goal}(p) = \| [1 - s'(p, I), u'(p)] \|,
   \end{align*}
-  , pro danou množinu incidentů $I$.
+  pro danou množinu incidentů $I$.
   \\
 \end{definice}
 
@@ -403,64 +404,35 @@ Nevýhodou tohoto přístupu je neschopnost určit kterou účelovou funkci je d
 
 \begin{definice}[Vážená exponenciální suma účelových funkcí (\citet{AlgOptBook}, str. 219)]
   \begin{align*}
-    q(x) = \sum_{i=1}^{m} w_i (q_i(x) - y_i^{goal})^p,
+    q(x) = \sum_{i=1}^{m} w_i (q_i(x) - y_i^{goal})^\varphi,
   \end{align*}
-  kde $w \in \mathbb{R}^m, p \in \mathbb{R}$.
+  kde $w \in \mathbb{R}^m, \varphi \in \mathbb{R}$.
   \\
 \end{definice}
 
 Jedná se o kombinaci goal programming \ref{kap:goalP} a vážené sumy účelových funkcí \ref{kap:vazenaSumaUcelF}.
 Váhami $w$ jsme schopni určit, kterou účelovou funkci je pro nás důležitější optimalizovat. Pro pohotovostní plány:
 
-\begin{definice}[Vážená exponenciální suma účelových funkcí pro pohotovostní plány]
+\begin{definice}[Vážená exponenciální suma účelových funkcí pro pohotovostní plány]\label{df:vazenaSumaExpPohotovost}
   \begin{align*}
-    q_{\alpha p}(p) = (1 - \alpha \cdot s(p, I))^p + ((1 - \alpha) \cdot u(p))^p,
+    q_{\alpha \varphi}(p) = (1 - \alpha \cdot s'(p, I))^\varphi + ((1 - \alpha) \cdot u'(p))^\varphi, \hspace{50pt} p \in P_C,
   \end{align*}
-  , pro danou množinu incidentů $I$.
+  pro danou množinu incidentů $I$.
   \\ 
 \end{definice}
 
-Stejně jako u vážené sumy účelových funkcí jsme díky parametru $\alpha$ schopni upřednostit maximalizování $s(p, I)$ nad $-u(p)$.
+Stejně jako u vážené sumy účelových funkcí jsme díky parametru $\alpha$ schopni upřednostit maximalizování $s'$ nad $-u'$.
 
-\subsection{Paretova optimalita}
+\section{Převedení problému na optimalizační úlohu s jednou účelovou funkcí}\label{kap:opt1Uc}
 
-\begin{definice}[Dominance]
-  Konfigurace $x \in \mathcal{X}$ dominuje $x' \in \mathcal{X}$, právě tedhy když
-  \begin{align*}
-    q_i(x') \leq q_i(x) \land q_j(x') < q_j(x)
-  \end{align*}
-  \\
-$\forall i \in \{ 1, \dots, m \}, \exists j \in \{ 1, \dots, m \}$.
-\\
-\end{definice}
-
-\begin{definice}[Pareto optimální]
-  Konfigurace $x$ je pareto optimální, právě tehdy když, neexistuje $x'$, které by dominovalo $x$.
-  \\
-\end{definice}
-
-\begin{definice}[Paretova hranice]
-  Jsou všechny konfigurace $x$, které jsou Pareto optimální.
-  \\
-\end{definice}
-
-Optimální plán pohotovostní služby podle paretovy optimality by pak byl libovolný plán na Paretově hranici.
-Přístup Paretovy optimality je vhodný, pokud zlepšení v jedné účelové funkci vede k zhoršení v ostatních a není jasné, jakou účelovou funkci upřednostit.
-My ale víme, jakou účelovou funkci chceme upřednostnit.
-Také si všimněme, že přístup Paretovy optimality nepřevádí víceúčelovou funkci na jednu účelovou funkci,
-nýbrž definuje optimální konfiguraci při více účelových funkcích. 
-Z těchto důvodu přístup Paretovy optimality pro nás nebude příliš zajímavý.
-Věnujeme se mu pouze v kapitole o genetickách algoritmech (odkaz), protože je vhodná při použití populačních metod.
-
-\section{Převedení problému na optimalizační úlohu s jednou účelovou funkcí}
-
-V předchozí kapitole jsme si ukázali několik přístupů, které vhodně převedou víceúčelovou funkci na jednu účelovou funkci.
-Pohotovostní služby chtějí vždy upřednostňovat maximalizování $s(p, I)$ nad minimalizováním $u(p)$,
-z toho důvodu je pro nás velmi žádoucí, abychom byli schopni pro účelovou funkci určit, zda chceme a jak moc upřednostit maximalizování $s(p, I)$ nebo $-u(p)$.
-Upřednostníme pak maximalizování $s(p, I)$.
+V předchozí kapitole \ref{kap:metodyProReseniOptSViceUcel} jsme si ukázali několik přístupů, které vhodně převedou víceúčelovou funkci na jednu účelovou funkci.
+Pohotovostní služby chtějí vždy upřednostňovat maximalizování $s'$ nad minimalizováním $u'$,
+z toho důvodu je pro nás velmi žádoucí, abychom byli schopni pro účelovou funkci určit, zda chceme a jak moc upřednostit maximalizování $s'$ nebo $-u'$.
+Upřednostníme pak maximalizování $s'$.
 \\
 \\
-Vážená suma účelových funkcí $q_{\alpha}$ spolu s váženou exponenciální sumou účelových $q_{\alpha p}$ funkcí tak patří mezi preferované způsoby návrhu jedné účelové funkce.
+Vážená suma účelových funkcí $q_{\alpha}$ \ref{df:vazenaSumaPohotovost} spolu s
+váženou exponenciální sumou účelových funkcí $q_{\alpha p}$ \ref{df:vazenaSumaExpPohotovost} tak patří mezi preferované způsoby návrhu jedné účelové funkce.
 
 \begin{definice}[Optimalizační úloha nalezení optimálního plánu pohotovostní služby jako optimalizační úloha s jednou účelovou funkcí]\label{df:optUloha1uc}
   \begin{align*}
@@ -473,9 +445,12 @@ Vážená suma účelových funkcí $q_{\alpha}$ spolu s váženou exponenciáln
 
 \section{Klasifikace optimalizační úlohy}
 
-V předchozí kapitole jsme si formálně popsali optimalizační úlohu, kterou řešíme a klasifikovali jsme ji jako optimalizační úlohu s více účelovými funkcemi a s omezujícími podmínkami.
+V kapitole \ref{kap:optUloha2uc} jsme definovali problém nalezení optimálního plánu jako optimalizační úlohu s více účelovými funkcemi \ref{df:optUloha2uc}.
+Zároveň se nám v předchozí kapitole \ref{kap:opt1Uc} podařilo definici \ref{df:optUloha2uc} převést na optimalizační úlohu s jednou účelovou funkcí \ref{df:optUloha1uc},
+pomocí metod diskutovaných v kapitole \ref{kap:metodyProReseniOptSViceUcel}.
 V této kapitole klasifikujeme o jakou optimalizační úlohu se jedná zkoumáním víceúčelové funkce a množiny plánů.
 Zklasifikováním optimalizační úlohy budeme moct použít metodiky, které se standardně pro řešení takových úloh využívají. 
+Podrobněji jsou diskutovány v kapitole \ref{chap:reseniOptUloh}.
 
 \subsection{Analýza množiny plánů pohotovostních služeb}\label{kap:analP}
 
@@ -626,57 +601,19 @@ Jaké implikace má velikost $P_C$ na zvolené metody řešení popisuje věta \
   \\
   \\
   Argumentů pro nederivovatelnost je více, například $s$ nemá žádný matematický předpis.
+  \\
 \end{dukaz}
 
-Víceúčelové funkce $q_{\alpha}, q_{\alpha p} \in Q_I$ které budeme maximalizovat jsou jen jednoduchou kombinací původních účelových funkcí $s$ a $u$.
-Tím pádem i $q \in Q_I$ není spojitá a není derivovatelná, jako přímý důsledek věty \ref{veta:vlastnostiSim}. 
-\\
-\\
-Vybíráme optimální konfigurace z diskrétně konečně mnoho objektů, a to sice přiřazení $p_Z$, $p_A$, $p_{D_{1}}$, $p_{D_{2}}$.
-Jedná se tak o \textit{diskrétní} nebo taky \textit{kombinatorickou} optimalizaci.
-To je takový druh optimalizace, kdy se snažíme nalézt optimální konfiguraci z diskrétně mnoho možností.
-Spadají zde jak NP problémy, jako například problém obchodního cestujícího nebo problém batohu tak i problémy z P, jako minimální kostry nebo maximální tok v síti \cite{CO}.
-\\
-\\
-\textit{Spojitá} optimalizace je typ optimalizace, kde prohledávané konfigurace jsou spojité.
-Účelová funkce $q$ pak může být spojitá, což je žádoucí, protože pak může mít první a druhou derivaci.
-Ty se velmi hodí pro nalezení globálního optima $q$, protože se pro nalezení optima mohou použít metody prvního (\citet{AlgOptBook}, str. 69) a druhého řádu (\citet{AlgOptBook} str. 87).
-\\
-\\
-Kombinatorická optimalizace nemůže mít účelovou funkci derivovatelnou, takže metod prvního a druhého řádu využívat, a proto pro nás tyto metody nejsou zajímavé.
-Účinnou metodou nalezení optima v kombinatorické optimalizci je lineární programování \cite{LP}.
-
-\begin{definice}[Formulace problému pro lineární programování (\citet{AlgOptBook}, str. 189)]
-  \begin{align*}
-    \max_{x \in \mathcal{X}} c^T x
-  \end{align*}
+\begin{veta}[Vlastnosti účelových funkcí $Q_I$]\label{veta:nespANedevQ}
+  Účelové funkce $q \in Q_I$ nejsou spojité a derivovatelné.
+\end{veta}
+\begin{dukaz}
+  Víceúčelové funkce $q \in Q_I$ které budeme maximalizovat jsou jen jednoduchou kombinací původních účelových funkcí $s$ a $u$.
+  Tím pádem i $q \in Q_I$ není spojitá a není derivovatelná, jako přímý důsledek věty \ref{veta:vlastnostiSim}. 
   \\
-  , kde $x$ splňuje
+\end{dukaz}
 
-  \begin{align*}
-    &{w^1}^T_i x \leq b_i, \hspace{50pt} i \in \{ 1, 2, \dots \} \\
-    &{w^2}^T_j x \geq b_j, \hspace{50pt} j \in \{ 1, 2, \dots \} \\
-    &{w^3}^T_k x = b_k,    \hspace{50pt} k \in \{ 1, 2, \dots \}
-  \end{align*}
-  \\
-\end{definice}
-
-Náš problém ale nelze vyjádřit v takovém tvaru, především z důvodu navrhnutí účelové funkce.
-Účelová funkce $q \in Q_I$ je složením se simulací $s$. Simulace $s$ nemá žádný matematický předpis.
-Použití simulace je pro nás ale žádoucí, důvody proč jsou diskutovány v kapitole \ref{kap:procSimulace}.
-\\
-\\
-Zjistili jsem, že jelikož používáme simulaci $s$, tak nemůžeme použít spoustu standardních optimalizačních metod.
-Na účelovou funkci můžeme pouze nahlížet jako na černou skříňku, která nám pro konkrétní plán vrátí jeho ohodnocení. 
-To je veškerá informace, se kterou můžeme pracovat.
-
-\clearpage
-
-\subsection{Analýza optimalizační úlohy}
-
-V kapitole \ref{kap:analP} jsme přesně spočítali velikost $P$ a $P_C$ a zároveň jsme je odhadli asymptoticky.
-V kapitole \ref{kap:analVicF} jsme si ukázali základní vlastnosti účelové funkce $q \in Q_I$.
-V této kapitoly dáme tyto poznatky dohromady a zformulejeme N2CO.
+\subsection{Naivní řešení}\label{kap:naivniRes}
 
 \begin{definice}[Naivní řešení]\label{df:naivniRes}
   Naivní řešení problému nalezení optimálního plánu pohotovostní služby znamená vyhodnocení $q \in Q_I$ ve všech bodech $p \in P_C$,
@@ -727,6 +664,69 @@ V této kapitoly dáme tyto poznatky dohromady a zformulejeme N2CO.
   \end{align*}
   \\
   z věty \ref{veta:asymptotP}. Z toho již plyne složitost naivního řešení z věty.
+  \\
 \end{dukaz}
 
+Naivní řešení běží v exponenciálním čase, protože prostor plánů $P_C$ je exponenciálně velký, takže už i samotný průchod běží v exponenciálním čase.
+Chtěli bychom nalézt způsob, který nalezneme optimum ideálně v polynomiálním čase, nebo alespoň ne v exponenciálním čase.
+
+\subsection{Analýza optimalizační úlohy}
+
+V kapitole \ref{kap:analP} jsme přesně spočítali velikost $P$ a $P_C$ a zároveň jsme je odhadli asymptoticky.
+V kapitole \ref{kap:analVicF} jsme si ukázali základní vlastnosti účelové funkce $q \in Q_I$.
+V předchozí kapitole \ref{kap:naivniRes} jsme si ukázali, že nemůžeme úlohu vyřešit jednoduše naivním řešením v polynomiálním čase.
+V této kapitoly dáme tyto poznatky dohromady a zklasifikujeme tak řešenou optimalizační úlohu, za účelem nalezení nejvhodnějších metod pro řešení.
+\\
+\\
+Vybíráme optimální konfigurace z diskrétně konečně mnoho objektů, a to sice přiřazení $p_Z$, $p_A$, $p_{D_{1}}$, $p_{D_{2}}$.
+Jedná se tak o \textit{diskrétní} nebo taky \textit{kombinatorickou} optimalizaci.
+To je takový druh optimalizace, kdy se snažíme nalézt optimální konfiguraci z diskrétně mnoho možností.
+Spadají zde jak \textbf{NP} problémy, jako například problém obchodního cestujícího nebo problém batohu, tak i problémy z \textbf{P}, jako minimální kostry nebo maximální tok v síti \cite{CO}.
+\\
+\\
+\textit{Spojitá} optimalizace je typ optimalizace, kde prohledávané konfigurace jsou spojité.
+Účelová funkce $q$ pak může být navhrnuta jako spojitá funkce s první a ideálně i druhou derivací v každém bodě.
+Ty se velmi hodí pro nalezení globálního optima $q$, protože se pro nalezení optima mohou použít metody prvního (\citet{AlgOptBook}, str. 69) a druhého řádu (\citet{AlgOptBook} str. 87).
+\\
+\\
+Z věty \ref{veta:nespANedevQ} víme, že $q \in Q_I$ není spojitá ani derivovatelná, takže metod prvního a druhého řádu nemůže využívat, a proto pro nás tyto metody nejsou zajímavé.
+\\
+\\
+Podívejme se na jinou metodu nalezení optima v kombinatorické optimalizci, sice lineární programování \cite{LP}.
+Problém formulovaný jako lineární program lze vyřešit v polynomiálním čase \citet{cohen2020solving}.
+
+\begin{definice}[Formulace problému pro lineární programování (\citet{AlgOptBook}, str. 189)]
+  \begin{align*}
+    \max_{x \in \mathcal{X}} c^T x
+  \end{align*}
+  \\
+  , kde $x$ splňuje
+
+  \begin{align*}
+    &{w^1}^T_i x \leq b_i, \hspace{50pt} i \in \{ 1, 2, \dots \} \\
+    &{w^2}^T_j x \geq b_j, \hspace{50pt} j \in \{ 1, 2, \dots \} \\
+    &{w^3}^T_k x = b_k,    \hspace{50pt} k \in \{ 1, 2, \dots \}
+  \end{align*}
+  \\
+\end{definice}
+
+Náš problém ale nelze vyjádřit v takovém tvaru, především z důvodu navrhnutí účelové funkce.
+Účelová funkce $q \in Q_I$ je složením se simulací $s$. Simulace $s$ nemá žádný matematický předpis.
+Použití simulace je pro nás ale žádoucí, důvody proč jsou diskutovány v kapitole \ref{kap:procSimulace}.
+
+\begin{veta}\label{veta:nejde}
+  Nalezení optimální pohotovostní plánu nelze vyřešit v polynomiálním čase.
+\end{veta}
+\begin{dukaz}
+  Nejsme schopni proiterovat množinu $P_C$, protože je exponenciálně velká a zároveň kvůli použití simulace jako část účelové funkce nemůžeme použít metody,
+  které umí vyřešit kombinatorickou optimalizaci v polynomiálním čase.
+  Můžeme na účelovou funkci pouze nahlížet jako na černou skříňku, která nám pro konkrétní plán vrátí jeho ohodnocení. 
+  To je veškerá informace, se kterou můžeme pracovat.
+\end{dukaz}
+
+Jako důsledek věty \ref{veta:nejde} můžeme zvolit dva přístupy pro nalezení optimálního plánu pohotovostní služby. 
+První, pokusit se nalézt optimální plán $p^* \in P_C$ v horším, než polynomiálním čase. Tento přístup je diskutován v kapitole \ref{kap:dynamicProgram}.
+Druhou, pokusit se nalézt \textit{dostatečně optimální plán} pomocí \textit{metaheuristického prohledávání prostoru plánů} $P_C$.
+Dostatečně optimální plán nelze dobře definovat bez znalosti $p^*$, proto metaheuristické metody budou považovat za dostatečné optimální plán doposud nejlepší nalezený plán.
+Metaheuristické prohledávání je více rozebíráno v kapitole \ref{kap:metaheur}.
 
