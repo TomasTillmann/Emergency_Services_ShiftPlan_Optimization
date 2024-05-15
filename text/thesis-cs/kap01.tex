@@ -95,7 +95,7 @@ Ten určujeme podle počtu úspěšně odbavených incidentů a ceny plánu.
 Z toho důvodu jsme si formálně nadefinovali protředky, které má pohotovostní služba k dispozici a co je plán pohotovostní služby.
 Nyní navrhneme způsob, jakým zjistíme počet úspěšně odbavených incidentů $s_{pI}$ pohotovostního plánu $p$ na množine incidentů $I$.
 Pro zjištění $s_{pI}$ spustíme simulaci $s$ pohotovostního plánu $p$ na dané množině $I$.
-Následně formálně popíšeme simulaci \ref{definiceSimulace} a jaká pravidla chodu simulace se rozhodneme použít  \ref{df:simulacePravidla1}, \ref{df:simulacePravidla2}.
+Následně formálně popíšeme simulaci \ref{kap:definiceSimulace} a jaká pravidla chodu simulace se rozhodneme použít  \ref{df:simulacePravidla1}, \ref{df:simulacePravidla2}.
 \\
 \\
 Je velmi důležité, aby počet úspěšně odbavených incidentů $s_{pI}$ získaných simulací co nejvíce odpovídal počtu úspěšně odbavených incidentů,
@@ -136,7 +136,7 @@ V \textit{stochastické simulaci} nejsme schopni z aktuálního stavu systému a
 Většinou proto, že při výběru nadhcázejícího stavu figuruje element náhody.
 \cite{SimulaceBook}
 
-\subsection{Popis simulace plánu pohotovostní služby}\label{definiceSimulace}
+\subsection{Popis simulace plánu pohotovostní služby}\label{kap:definiceSimulace}
 
 Definujme \textit{simulaci pohotovostního plánu} $p \in P_C$ na množině incidentů $I$ jako deterministickou diskrétní simulaci
 $s \colon (p_C, I) \rightarrow \mathbb{N}_0$, kde vstupem je plán $p_C \in P_C$ a danou množina incidentů $I$.
@@ -468,7 +468,7 @@ Vážená suma účelových funkcí $q_{\alpha}$ spolu s váženou exponenciáln
   \end{align*}
   \\
   kde $P_C$ je množina všech povolných plánu pohotovostní služby splňující omezení $C$, $I$ je daná množina incidentů
-  a $Q_I = \{ q_{\alpha}, q_{\alpha p}\}$ množina preferovaných účelových funkcí,
+  a $Q_I = \{ q_{\alpha}, q_{\alpha p}\}$ množina preferovaných účelových funkcí.
 \end{definice}
 
 \section{Klasifikace optimalizační úlohy}
@@ -477,13 +477,12 @@ V předchozí kapitole jsme si formálně popsali optimalizační úlohu, kterou
 V této kapitole klasifikujeme o jakou optimalizační úlohu se jedná zkoumáním víceúčelové funkce a množiny plánů.
 Zklasifikováním optimalizační úlohy budeme moct použít metodiky, které se standardně pro řešení takových úloh využívají. 
 
-\subsection{Množina plánů pohotovostních služeb}
+\subsection{Analýza množiny plánů pohotovostních služeb}\label{kap:analP}
 
 Spočítejme velikost množiny plánů pohotovostních služeb $P$ a $P_C$.
 Znát velikosti těchto množin, je klíčové pro navrhování metod pro nalezení optima.
 To hlavně platí pro $P_C$, jelikož námi hledané optimum právě $P_C$ náleží.
-Pokud by velikost $P_C$ byla \textit{polynomiální}, nebo alespoň ne \textit{exponenciální},
-mohli bychom se například pokusit o nalezení optima přeiterováním všech plánů $p \in P_C$.
+Jaké implikace má velikost $P_C$ na zvolené metody řešení popisuje věta \ref{veta:slozitostNaivRes}.
 
 \begin{lemma}[Počet uspořádaných $r$-tic posčítajících se na $m$, (\citet{Diskretka}, str. 61)]\label{lemma:pocetRtic}
   Počet uspořádaných $r$-tic nezáporných celých čísel posčítajících se na $m$ a záleží na pořadí sčítanců je roven: 
@@ -493,7 +492,7 @@ mohli bychom se například pokusit o nalezení optima přeiterováním všech p
   \\
 \end{lemma}
 
-\begin{veta}[Velikost plánů pohotovostních služeb]\label{veta:velikostP}
+\begin{veta}[Velikost množiny plánů pohotovostních služeb]\label{veta:velikostP}
   Velikost plánu pohotovostní služby $P$ je rovna:
   \begin{align*}
     \sum_{i = 0}^{Z_n} {D_n}^{\binom{Z_n - i + V_n - 1}{V_n - 1}} \cdot \sum_{i = 0}^{A_n} {\binom{A_n - i + V_n - 1}{V_n - 1}}
@@ -527,7 +526,7 @@ mohli bychom se například pokusit o nalezení optima přeiterováním všech p
 
 \end{dukaz}
 
-\begin{veta}[Velikost plánů pohotovostních služeb splňující omezení $C$]
+\begin{veta}[Velikost množiny plánů pohotovostních služeb splňující omezení $C$]
   Velikost plánu pohotovostní služby $P_C$ splňující omezení $C$ je rovna:
   \begin{align*}
     \sum_{i=0}^{Z^c_n}{{D_n}^{\binom{Z^c_n - i + V_n - 1}{V_n - 1}}} \cdot \sum_{i = 0}^{A^c_n}\binom{A^c_n - i + V_n - 1}{V_n - 1},
@@ -560,7 +559,7 @@ mohli bychom se například pokusit o nalezení optima přeiterováním všech p
   \\
 \end{lemma}
 
-\begin{veta}[Asymptotický odhad velikosti plánů pohotovostních služeb]\label{veta:asymptotP}
+\begin{veta}[Asymptotický odhad velikosti množiny plánů pohotovostních služeb]\label{veta:asymptotP}
   Nechť $P$ množina plánu pohotovostních služeb. Pak 
 
   \begin{align*}
@@ -594,7 +593,7 @@ mohli bychom se například pokusit o nalezení optima přeiterováním všech p
   .
 \end{dukaz}
 
-\begin{veta}[Asymptotický odhad velikosti plánů pohotovostních služeb splňující omezující podmínky]
+\begin{veta}[Asymptotický odhad velikosti množiny plánů pohotovostních služeb splňující omezující podmínky]
   Nechť $P_C$ množina plánu pohotovostních služeb splňující omezující podmínky $C$. Pak 
 
   \begin{align*}
@@ -613,11 +612,7 @@ mohli bychom se například pokusit o nalezení optima přeiterováním všech p
   \\
 \end{dukaz}
 
-Velikost množiny $P_C$ je exponenciálně velká vůči velikosti záchranných týmů a vozidel a výjezdových stanic.
-Jen proiterování přes $P_C$ by trvalo exponenciálně dlouho. 
-Z toho plyne, že nemůžeme proiterovat přes všechny $p \in P_C$, držet si dosavadní maximum $q(p)$ a tak nalézt $p^*$, pro které $q(p^*)$ je globálním maximem. 
-
-\subsection{Víceúčelová funkce}
+\subsection{Analýza víceúčelové funkce}\label{kap:analVicF}
 
 \begin{veta}[Vlastnosti účelové funkce $s$]\label{veta:vlastnostiSim}
   Účelová funkce $s$ není spojitá a derivovatelná.
@@ -633,8 +628,8 @@ Z toho plyne, že nemůžeme proiterovat přes všechny $p \in P_C$, držet si d
   Argumentů pro nederivovatelnost je více, například $s$ nemá žádný matematický předpis.
 \end{dukaz}
 
-Víceúčelové funkce $q_{\alpha}, q_{\alpha p} \in Q$ které budeme maximalizovat jsou jen jednoduchou kombinací původních účelových funkcí $s$ a $u$.
-Tím pádem i $q \in Q$ není spojitá a není derivovatelná, jako přímý důsledek věty \ref{veta:vlastnostiSim}. 
+Víceúčelové funkce $q_{\alpha}, q_{\alpha p} \in Q_I$ které budeme maximalizovat jsou jen jednoduchou kombinací původních účelových funkcí $s$ a $u$.
+Tím pádem i $q \in Q_I$ není spojitá a není derivovatelná, jako přímý důsledek věty \ref{veta:vlastnostiSim}. 
 \\
 \\
 Vybíráme optimální konfigurace z diskrétně konečně mnoho objektů, a to sice přiřazení $p_Z$, $p_A$, $p_{D_{1}}$, $p_{D_{2}}$.
@@ -667,11 +662,71 @@ Kombinatorická optimalizace nemůže mít účelovou funkci derivovatelnou, tak
 \end{definice}
 
 Náš problém ale nelze vyjádřit v takovém tvaru, především z důvodu navrhnutí účelové funkce.
-Účelová funkce $q \in Q$ je složením se simulací $s$. Simulace $s$ nemá žádný matematický předpis.
-Použití simulace je pro nás ale žádoucí, důvody jsou diskutovány v kapitole \ref{kap:procSimulace}.
+Účelová funkce $q \in Q_I$ je složením se simulací $s$. Simulace $s$ nemá žádný matematický předpis.
+Použití simulace je pro nás ale žádoucí, důvody proč jsou diskutovány v kapitole \ref{kap:procSimulace}.
 \\
 \\
 Zjistili jsem, že jelikož používáme simulaci $s$, tak nemůžeme použít spoustu standardních optimalizačních metod.
 Na účelovou funkci můžeme pouze nahlížet jako na černou skříňku, která nám pro konkrétní plán vrátí jeho ohodnocení. 
 To je veškerá informace, se kterou můžeme pracovat.
+
+\clearpage
+
+\subsection{Analýza optimalizační úlohy}
+
+V kapitole \ref{kap:analP} jsme přesně spočítali velikost $P$ a $P_C$ a zároveň jsme je odhadli asymptoticky.
+V kapitole \ref{kap:analVicF} jsme si ukázali základní vlastnosti účelové funkce $q \in Q_I$.
+V této kapitoly dáme tyto poznatky dohromady a zformulejeme N2CO.
+
+\begin{definice}[Naivní řešení]\label{df:naivniRes}
+  Naivní řešení problému nalezení optimálního plánu pohotovostní služby znamená vyhodnocení $q \in Q_I$ ve všech bodech $p \in P_C$,
+  kde si v průběhu vyhodnocování držíme $p^* \in P_C$ doposud s maximální hodnotou $q(p^*)$.
+  \\
+  \\
+  Po vyhodnocení ve všech bodech $p$, tak $p^*$ bude optimem, protože $q(p^*) \geq p, \forall p \in P_C$.
+\end{definice}
+
+\begin{veta}[Složitost naivního řešení]\label{veta:slozitostNaivRes}
+  Složitost naivního řešení je
+
+  \begin{align*}
+    \Theta((A_n + Z_n |I|) \cdot {D_n}^{2^{Z^c_n + V_n}} \cdot 2^{A^c_n + V_n})
+  \end{align*}
+  , kde $\Theta (A_n + Z_n |I|)$ je složitost vyhodnocení $q \in Q_I$.
+  \\
+\end{veta}
+\begin{dukaz}
+  Z definice naivního řešení \ref{df:naivniRes} potřebujeme vyhodnotit $q$ ve všech bodech $p \in P_C$.
+  Účelová funkce $q$ je konstantní kombinací funkcí simulace $s$ a ceny plánu $u$. Složitost vyhodnocení $u$ je
+
+  \begin{align*}
+    \Theta (Z_n + A_n).
+  \end{align*}
+  \\
+  To plyne přímo z definice $u$ \ref{df:cenaPlanu}. Složitost vyhodnocení $s$ je
+
+  \begin{align*}
+    \Theta (Z_n \cdot |I|).
+  \end{align*}
+  \\
+  Z definice $s$ \ref{kap:definiceSimulace} nahlédneme, že potřebujeme pro každý incident, těch je $|I|$, nalézt nejvhodnější tým záchranářů.
+  Nejvhodnější tým záchranářů nalezneme pro $i \in I$ v čase $Z_n$, protože potřebujeme všechny týmy proiterovat a práce na jeden tým už je konstantní.
+  \\
+  \\
+  Vyhodnocení účelové funkce $q$ má pak složitost
+
+  \begin{align*}
+    \Theta (Z_n + A_n + Z_n \cdot |I|) = \Theta (A_n + Z_n \cdot |I|).
+  \end{align*}
+  \\
+  Potřebujeme vyhodnotit $q$ pro každý plán $p \in P_C$.
+  Asymptotický odhad velikosti množiny $P_C$ je 
+
+  \begin{align*}
+    \Theta ({D_n}^{2^{Z^c_n + V_n}} \cdot 2^{A^c_n + V_n}),
+  \end{align*}
+  \\
+  z věty \ref{veta:asymptotP}. Z toho již plyne složitost naivního řešení z věty.
+\end{dukaz}
+
 
