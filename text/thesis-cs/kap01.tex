@@ -2,7 +2,7 @@
 
 \section{Formalizace problému}
 
-Ústředním problémem pohotovostních služeb je umět naplánovat týmy záchranářů a záchranná vozidla na výjezdové stanice tak, aby úspěšně odbavili co největší počet incidentů,
+Ústředním problémem pohotovostních služeb je umět naplánovat týmy záchranářů a záchranná vozidla na výjezdové stanice tak, aby efektivně odbavili co největší počet incidentů,
 za co nejméně zbytečně vynaložených nákladů, v rámci jednoho dne.
 Naším cílem je vymyslet metody, jak být schopný taková optimální naplánovaní nalézt.
 Z toho důvodu je v první řadě potřeba si problém zformalizovat a jasně si tak vymezit, jaký konkrétní problém řešíme.
@@ -140,14 +140,49 @@ Většinou proto, že při výběru nadhcázejícího stavu figuruje element ná
 
 Definujme \textit{simulaci pohotovostního plánu} $p \in P_C$ na množině incidentů $I$ jako deterministickou diskrétní simulaci
 $s \colon (p_C, I) \rightarrow \mathbb{N}_0$, kde vstupem je plán $p_C \in P_C$ a danou množina incidentů $I$.
-Simulace vrátí počet úspěšně odbavených incidentů $s_{pI} \colon 0 \leq s_{pI} \leq |I|$.
-Událost je nastání incidentu $i \in I$ v čase $T_I(i)$, kde $T_I \colon I \rightarrow \mathbb{N}_0$, určuje čas nastání incidentu.
-Stav systému simulace $s$ je množina $S = \{ S_A, S_Z \}$, kde $S_A$ je stav záchranných vozidel $A$ a $S_Z$ je stav týmů záchranářů $Z$. 
+Simulace vrátí množinu statistik $S_{pI}$:
+
+\begin{definice}[Statistiky simulace]\label{df:statsSimul}
+  Nechť $S_{pI}$ množina statistik simulace $s$, spuštěná na plánu $p \in P_C$ a dané množině incidentů $I$.
+  Statistiky $S_{pI}$ obsahují počet úspěšně odbavených incidentů:
+
+  \begin{align*}
+    &s^{c}_{pI} \in S_{pI} \colon 0 \leq s^{c}_{pI} \leq |I|
+  \end{align*}
+
+  a celkovou dobu plánu stráveného v terénu:
+
+  \begin{align*}
+    &s^{t}_{pI} \in S_{pI} \colon 0 \leq s^{t}_{pI} \leq \sum_{z \in Z, p_Z(z) \neq v_{\emptyset}}{p_{D_2}(z)}
+  \end{align*}
+  \\ 
+  , $p_Z, p_{D_2} \in p$. Za jako čas strávený v terénu pro tým záchranářů považujeme celkový čas strávený mimo výjezdovou stanici.
+  Takže čas strávený cestováním k incidentu, odbvováním incidentu na místě odehrání, čas strávený cestováním do nemocnice a čas strávený cestováním zpět na výjezdovou stanici.
+  \\
+\end{definice}
+
+Pro snažší práci se statistikami v nadcházejícím textu definujme statistiky $s^c_{pI}$ a $s^t_{pI}$ jako funkce. 
+
+\begin{definice}[Statistiky simulace jako funkce]
+  Nechť $S_{pI}$ množina statistik simulace $s$, spuštěná na plánu $p \in P_C$ a dané množině incidentů $I$.
+  Pak
+  \begin{align*}
+    s_c(p) = s^c_{pI} \in S_{pI}, \\
+    s_t(p) = s^t_{pI} \in S_{pI},
+  \end{align*}
+  \\
+  pro danou množinu incidentů $I$. Množina incidentů bude pro obě statistiky chápana jako vždy stejná, pokud nespecifikujeme jinak.
+\end{definice}
+
+\textit{Událost} je nastání incidentu $i \in I$ v čase $T_I(i)$, kde $T_I \colon I \rightarrow \mathbb{N}_0$, určuje čas nastání incidentu.
+\textit{Stav systému} simulace $s$ je množina $S = \{ S_A, S_Z \}$, kde $S_A$ je stav záchranných vozidel $A$ a $S_Z$ je stav týmů záchranářů $Z$. 
+
+\clearpage 
 
 \begin{algorithm}
   \begin{algorithmic}[1]  % [1] způsobí, že číslujeme kroky algoritmu
   \Function{Simulation}{$p_C, I$}
-    \State $s_{pI} \gets 0$
+    \State $s^{c}_{pI} \gets 0$
     \State $T$ \gets 0
     \State $I' \gets \mbox{Setřídí $I$ podle času nastání, pomocí $T_I$}$
     \State $S_A \gets \mbox{Inicializuje podle $p_C$}$
@@ -156,24 +191,25 @@ Stav systému simulace $s$ je množina $S = \{ S_A, S_Z \}$, kde $S_A$ je stav z
       \State $T \gets \mbox{Čas nastání $i_k$, $T_I(i_k)$}$
       \State $z_k \gets \mbox{GetBestTeam($i_k, S_A, S_Z, T$)}$
       \If{$z_k \neq \emptyset$}
-        \State $s_{pI} \gets s_{pI} + 1$
+        \State $s^{c}_{pI} \gets s^{c}_{pI} + 1$
         \State $a_k \gets \mbox{GetBestAmbulance($z_k, T$)}$
         \State Plan($z_k, a_k, i_k$)
-        \State $S_A \gets \mbox{Update($S_A, i_k$)}$
-        \State $S_Z \gets \mbox{Update($S_Z, i_k$)}$
+        \State $S_A \gets \mbox{UpdateState($S_A, i_k$)}$
+        \State $S_Z \gets \mbox{UpdateState($S_Z, i_k$)}$
       \EndIf
     \EndFor
-    \State \Return $s_{pI}$
+    \State $s^t_{pI}$ \gets \mbox{GetTimeWorking($S_Z$)}
+    \State \Return $s_{c}$, $s^t_{pI}$
   \EndFunction
   \end{algorithmic}
   \caption{}
   \label{simulaceAlgo}
 \end{algorithm}
 
-\vspace*{15px}
+\vspace*{20px}
 
 Průběh simulace je následovný. 
-Na řádcích 2 až 6 simulace \ref{simulaceAlgo} položí $s_{pI}$ a $T$ rovno nule, setřídí si sadu incidentů podle časů nastání
+Na řádcích 2 až 6 simulace \ref{simulaceAlgo} položí $s^{c}_{pI}$ a $T$ rovno nule, setřídí si sadu incidentů podle časů nastání
 a incicializuje si stavy $S_A$ a $S_Z$ podle plánu $p_C$.
 \\
 \\
@@ -183,14 +219,17 @@ pomocí funkce $\textit{GetBestTeam}$ \ref{df:getBestTeam}, na řádku 12.
 Pokud takový $z_k$ neexistuje, tak pokračuje v odbavování dalších incidentů.
 \\
 \\
-Pokud existuje, na řádcích 11 až 15 zvýší počet odbavených incidentů $s_{pI}$ o jedna,
+Pokud existuje, na řádcích 11 až 15 zvýší počet odbavených incidentů $s^c_{pI}$ o jedna,
 deterministicky nalezne pro $z_k$ nejvhodnější $a_k$, pomocí funkce \textit{GetBestAmbulance} \ref{df:getBestAmbulance},
 $i_k$ naplánuje na $z_k$ spolu s $a_k$ funkcí \textit{Plan} a aktualizuje stav systému $S_A$ a $S_Z$.
-Simulace doběhne jakmile nejsou žádné další události k odbavení, takže jakmile projde všechny incidenty, to je po $|I|$ krocích, a vrátí $s_{pI}$.
+Simulace doběhne jakmile nejsou žádné další události k odbavení, takže jakmile projde všechny incidenty, to je po $|I|$ krocích
+Simulace vrátí statistiky \ref{df:statsSimul} $S_{pI}$.
 \\
 \\
 Nyní si ukažme, jakým způsobem je nalezen nejvhodnější tým záchranářů $z_k$ pro obsloužení $i_k$ a nejvhodnější vozidlo pro $z_k$.
 K tomu si potřebujeme definovat co znamená, že tým záchranářů je schopen úspěšně odbavit incident a jakým způsobem pak vybere ze všech takových týmu ten nejvhodnější.
+
+\clearpage 
 
 \begin{definice}\label{df:simulacePravidla1}
   Tým záchranářů $z \in Z$ je schopen úspěšně odbavit incident $i \in I$ právě tehdy když:
@@ -281,8 +320,8 @@ V nadcházející kapitole \ref{kap:metodyProReseniOptSViceUcel} si ukážeme ja
 optimalizaci s jednou účelovou funkcí \ref{df:optUloha1ucObecne}.
 \\
 \\
-Již z úvodu víme, že chceme nalézt takový plán $p \in P_C$, který úspěšně odbaví co nejvíce incidentů z dané množiny incidentů $I$ za co nejmenší cenu plánu.
-Díky simulaci $s$ jsme pro $p$ schopni zjistit počet úspěšně odbavených incientů $s(p, I)$, potřebujeme ještě dodefinovat cenu plánu.
+Již z úvodu víme, že chceme nalézt takový plán $p \in P_C$, který efektivně odbaví co nejvíce incidentů z dané množiny incidentů $I$ za co nejmenší cenu plánu.
+Díky simulaci $s$ jsme pro $p$ schopni zjistit počet úspěšně odbavených incientů $s_c(p)$, potřebujeme ještě dodefinovat cenu plánu.
 \\
 \begin{definice}[Cena plánu $u$]\label{df:cenaPlanu}
   Cena plánu $u \colon P \rightarrow \mathbb{R}$,
@@ -299,15 +338,15 @@ Díky simulaci $s$ jsme pro $p$ schopni zjistit počet úspěšně odbavených i
 Je příjemnější pracovat s účelovými funkcemi, které jsou přeškálované do intervalu $\langle 0, 1 \rangle$.
 Proto účelové funkce $s$ a $u$ přeškálujeme:
 
-\begin{definice}[Přeškálování simulace $s$ do intervalu $\langle 0, 1 \rangle$ ] \label{df:simulaceSkal}
-  Definujme $s'$ jako přeškálování $s$ do intervalu $\langle 0, 1 \rangle$.
+\begin{definice}[Přeškálování $s_c$ do intervalu $\langle 0, 1 \rangle$ ] \label{df:simulaceSkal}
+  Definujme $s'_c$ jako přeškálování $s_c$ do intervalu $\langle 0, 1 \rangle$.
   \begin{align*}
-    s'(p, I) = s(p, I) / |I|,
+    s'_c(p) = s_c(p) / |I|,
   \end{align*}
   \\
 \end{definice}
 
-\begin{definice}[Přeškálování ceny $u$ do intervalu $\langle 0, 1 \rangle$ ] \label{df:cenaPlanuSkal}
+\begin{definice}[Přeškálování $u$ do intervalu $\langle 0, 1 \rangle$ ] \label{df:cenaPlanuSkal}
   Definujme $u'$ jako přeškálování $u$ do intervalu $\langle 0, 1 \rangle$.
   \begin{align*}
     u'(p) = u(p) / K,
@@ -326,11 +365,11 @@ Nadefinujme \textit{optimalizační úlohu nalezení optimálního plánu pohoto
 \\
 \begin{definice}[Optimalizační úloha nalezení optimálního plánu pohotovostní služby jako optimalizační úloha s více účelovými funkcemi]\label{df:optUloha2uc}
   \begin{align*}
-    \max_{p \in P_C} q(p), \hspace{50pt} q(p) = [s'(p, I), -u'(p)]
+    \max_{p \in P_C} q(p), \hspace{50pt} q(p) = [s'(p), -u'(p)]
   \end{align*}
   \\
-  kde $P_C$ je množina všech povolných plánu pohotovostní služby splňující omezení $C$, $I$ je daná množina incidentů
-  a kde $u'$ a $s'$ jsou účelové funkce \ref{df:simulaceSkal} \ref{df:cenaPlanuSkal}.
+  kde $P_C$ je množina všech povolných plánu pohotovostní služby splňující omezení $C$
+  a kde $u'$ a $s'$ jsou účelové funkce \ref{df:simulaceSkal} \ref{df:cenaPlanuSkal} pro množinu incidentů $I$.
 \end{definice}
 
 Problém nalezení optimálního plánu pohotovostní služby jsme definovali jako optimalizační úlohu s více účelovými funkcemi \ref{df:optUloha2ucObecne}.
@@ -339,6 +378,26 @@ Problém nalezení optimálního plánu pohotovostní služby jsme definovali ja
 Účelové funkce jsou přeškálování počtu úspěšně odbavených incidentů $s'$ a přeškálování záporné ceny plánu pohotovostní služby $u'(p)$, $p \in P_C$.
 Všimněmě si, že maximalizování $s'$ bude velmi pravděpodobně vést k maximalizování $u'$, tedy k minimalizování $-u'$.
 Plány úspěšně odbavující incidenty zřejmě budou používát více záchranných týmu s delšími směnami a více záchranných vozidel, takže budou dražší.
+\\
+\\
+Nadefinovali jsme účelové funkce a optimalizační úlohu nalezení optimálního pohotovostního plánu.
+Už nám jen chybí způsob měření efektivity plánu.
+
+\begin{definice}[Efektivita plánu]
+  Efektivita $e \colon P_C \rightarrow \langle 0, 1 \rangle$ plánu $p$ je výjádřena poměrem celkové doby strávených v terénu ku součtu délek pracovních směn, jednotlivými týmy záchrnářů:
+
+  \begin{align*}
+    e(p) = 1 - \frac{s_t(p)}{\sum_{z \in Z, p_Z(z) \neq v_{\emptyset}} p_{D_2}(z)},
+  \end{align*}
+  \\
+  kde $s_t \in S_{pI}$.
+  \\
+\end{definice}
+
+Efektivita plánu je důležitá metrika, která porovná $p_1, p_2 \in P_C, p_1 \neq p_2$, pro které platí $s_c(p_1) = s_c(p_2)$ a $u(p_1) = u(p_2)$.
+
+\begin{definice}
+\end{definice}
 
 \section{Metody pro řešení optimalizačního problému s více účelovými funkcemi}\label{kap:metodyProReseniOptSViceUcel}
 
@@ -365,7 +424,7 @@ Vzhledem k tomu, že chceme jistě upřednostňovat $s'$ nad $u'$, vážená sum
 
 \begin{definice}[Vážená suma účelových funkcí optimalizace pohotovostního plánu]\label{df:vazenaSumaPohotovost}
   \begin{align*}
-    q_{\alpha}(p) = \alpha \cdot s'(p, I) - (1 - \alpha) \cdot u'(p), \hspace{50pt} \alpha \in [0, 1], p \in P_C,
+    q_{\alpha}(p) = \alpha \cdot s'(p) - (1 - \alpha) \cdot u'(p), \hspace{50pt} \alpha \in [0, 1], p \in P_C,
   \end{align*}
   \\
   pro danou množinu incidentů $I$.
@@ -393,7 +452,7 @@ Můžeme však měřit, jak blízko $q(p)$ k $q(p^{utopia})$ je.
 
 \begin{definice}[Goal programming pro optimalizaci pohotovostního plánu]
   \begin{align*}
-    q^{goal}(p) = \| [1 - s'(p, I), u'(p)] \|,
+    q^{goal}(p) = \| [1 - s'(p), u'(p)] \|,
   \end{align*}
   pro danou množinu incidentů $I$.
   \\
@@ -416,7 +475,7 @@ Váhami $w$ jsme schopni určit, kterou účelovou funkci je pro nás důležit�
 
 \begin{definice}[Vážená exponenciální suma účelových funkcí pro pohotovostní plány]\label{df:vazenaSumaExpPohotovost}
   \begin{align*}
-    q_{\alpha \varphi}(p) = (1 - \alpha \cdot s'(p, I))^\varphi + ((1 - \alpha) \cdot u'(p))^\varphi, \hspace{50pt} p \in P_C,
+    q_{\alpha \varphi}(p) = (1 - \alpha \cdot s'(p))^\varphi + ((1 - \alpha) \cdot u'(p))^\varphi, \hspace{50pt} p \in P_C,
   \end{align*}
   pro danou množinu incidentů $I$.
   \\ 
@@ -440,8 +499,8 @@ váženou exponenciální sumou účelových funkcí $q_{\alpha p}$ \ref{df:vaze
     \max_{p \in P_C} q(p), \hspace{50pt} q \in Q_I
   \end{align*}
   \\
-  kde $P_C$ je množina všech povolných plánu pohotovostní služby splňující omezení $C$, $I$ je daná množina incidentů
-  a $Q_I = \{ q_{\alpha}, q_{\alpha p}\}$ množina preferovaných účelových funkcí \ref{df:vazenaSumaPohotovost} \ref{df:vazenaSumaExpPohotovost}.
+  kde $P_C$ je množina všech povolných plánu pohotovostní služby splňující omezení $C$
+  a $Q_I = \{ q_{\alpha}, q_{\alpha p}\}$ množina preferovaných účelových funkcí pro množinu incidentů $I$ \ref{df:vazenaSumaPohotovost} \ref{df:vazenaSumaExpPohotovost}.
 \end{definice}
 
 \section{Klasifikace optimalizační úlohy}

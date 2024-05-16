@@ -5,112 +5,90 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using ESSP.DataModel;
 
-public class DynamicProgrammingOptimizer : MoveOptimizer
+public class DynamicProgrammingOptimizer : LocalSearchOptimizer
 {
-  public DynamicProgrammingOptimizer(World world, Constraints constraints, ShiftTimes shiftTimes, IObjectiveFunction loss, Random? random = null)
-  : base(world, constraints, shiftTimes, loss, random)
-  {
-  }
+  public DynamicProgrammingOptimizer(World world, Constraints constraints, ShiftTimes shiftTimes, IObjectiveFunction loss, bool shouldPermutate = true, int neighboursLimit = int.MaxValue, Random? random = null)
+  : base(world, constraints, shiftTimes, loss, shouldPermutate, neighboursLimit, random) { }
 
   public override IEnumerable<Weights> FindOptimal(ImmutableArray<Incident> incidents)
   {
     ReadOnlySpan<Incident> allIncidents = incidents.AsSpan();
+    Debug.WriteLine(string.Join(", ", World.Depots));
 
     // need empty weights - empty shift plan
     StartWeights = new Weights(World.Depots.Length, Constraints.MaxMedicTeamsOnDepotCount);
+    //Debug.WriteLine(StartWeights);
     Weights optimal = StartWeights;
-
-    double lastSuccessRate = 0;
-    double currentSuccessRate;
     List<Move> bestMoves = new();
 
     for (int i = 1; i < incidents.Length; ++i)
     {
       ReadOnlySpan<Incident> currentIncidents = allIncidents.Slice(0, i);
-      Incident currentIncident = incidents[i];
-      bestMoves.Clear();
+      Debug.WriteLine($"currIncident: {currentIncidents[i - 1]}");
+      double bestLoss = ObjectiveFunction.Get(optimal, currentIncidents);
+      Debug.WriteLine($"baseLoss: {bestLoss}");
+      double currentLoss;
 
-      double baseLoss = ObjectiveFunction.Get(optimal, currentIncidents);
-      double bestLoss = baseLoss;
+      Move? bestMove = null;
       Move? allocateAmbulance = null;
 
-      Move? move;
-      double newLoss;
-
-      for (int depotIndex = 0; depotIndex < World.Depots.Length; ++depotIndex)
+      GetMovesToNeighbours(optimal);
+      for (int j = 0; j < movesBuffer.Count; ++j)
       {
-        // Make longer
-        for (int teamIndex = 0; teamIndex < optimal.MedicTeamsPerDepotCount[depotIndex]; ++teamIndex)
-        {
-          if (TryGenerateMove(optimal, depotIndex, teamIndex, MoveType.ShiftLonger, out move))
-          {
-            ModifyMakeMove(optimal, move.Value);
+        Move currentMove = movesBuffer[j];
+        //Debug.WriteLine($"currentMove: {currentMove}");
 
-            newLoss = ObjectiveFunction.Get(optimal, currentIncidents);
-            if (newLoss < bestLoss)
+        if (currentMove.MoveType == MoveType.AllocateAmbulance)
+        {
+          continue;
+        }
+
+        ModifyMakeMove(optimal, currentMove);
+        currentLoss = ObjectiveFunction.Get(optimal, currentIncidents);
+        //Debug.WriteLine($"currentLoss: {currentLoss}");
+
+        if (currentLoss < bestLoss)
+        {
+          bestLoss = currentLoss;
+          bestMove = currentMove;
+          allocateAmbulance = null;
+        }
+
+        if (currentMove.MoveType == MoveType.AllocateMedicTeam)
+        {
+          if (TryGenerateMove(optimal, currentMove.DepotIndex, -1, MoveType.AllocateAmbulance, out Move? ambulanceMove))
+          {
+            ModifyMakeMove(optimal, ambulanceMove.Value);
+            currentLoss = ObjectiveFunction.Get(optimal, currentIncidents);
+
+            if (currentLoss < bestLoss)
             {
-              bestMoves.Clear();
-              bestMoves.Add(move.Value);
-              bestLoss = newLoss;
-              lastSuccessRate = ObjectiveFunction.Simulation.SuccessRate;
+              bestLoss = currentLoss;
+              bestMove = currentMove;
+              allocateAmbulance = ambulanceMove;
             }
 
-            ModifyUnmakeMove(optimal, move.Value);
+            ModifyUnmakeMove(optimal, ambulanceMove.Value);
           }
         }
 
-        // Allocate new team 
-        int newTeamIndex = optimal.MedicTeamsPerDepotCount[depotIndex];
-        if (newTeamIndex != Constraints.MaxMedicTeamsOnDepotCount)
+        ModifyUnmakeMove(optimal, currentMove);
+      }
+
+      if (bestMove != null)
+      {
+        Debug.WriteLine($"bestMove: {bestMove}");
+        ModifyMakeMove(optimal, bestMove.Value);
+        if (allocateAmbulance != null)
         {
-          if (TryGenerateMove(optimal, depotIndex, newTeamIndex, MoveType.AllocateMedicTeam, out move))
-          {
-            ModifyMakeMove(optimal, move.Value);
-            optimal.MedicTeamAllocations[depotIndex, newTeamIndex] = GetLatestShortestShiftTimeContaining(currentIncident.OccurenceSec);
-
-            newLoss = ObjectiveFunction.Get(optimal, currentIncidents);
-            if (newLoss < bestLoss)
-            {
-              bestMoves.Clear();
-              bestMoves.Add(move.Value);
-              bestLoss = newLoss;
-              lastSuccessRate = ObjectiveFunction.Simulation.SuccessRate;
-            }
-
-            // Allocate new ambulance
-            if (TryGenerateMove(optimal, depotIndex, -1, MoveType.AllocateAmbulance, out allocateAmbulance))
-            {
-              ModifyMakeMove(optimal, allocateAmbulance.Value);
-
-              newLoss = ObjectiveFunction.Get(optimal, currentIncidents);
-              if (newLoss < bestLoss)
-              {
-                bestMoves.Clear();
-                bestMoves.Add(move.Value);
-                bestMoves.Add(allocateAmbulance.Value);
-                bestLoss = newLoss;
-                lastSuccessRate = ObjectiveFunction.Simulation.SuccessRate;
-              }
-
-              ModifyUnmakeMove(optimal, allocateAmbulance.Value);
-            }
-
-            // Don't have to unmake the starting time sec to 0, unnecessary 
-            ModifyUnmakeMove(optimal, move.Value);
-          }
+          Debug.WriteLine($"allocate amb: {allocateAmbulance.Value}");
+          ModifyMakeMove(optimal, allocateAmbulance.Value);
         }
       }
 
-      // CurrentIncident is outlier incident, simply cannot be handled no matter what.
-      if (bestLoss > baseLoss)
-      {
-        continue;
-      }
+      Debug.WriteLine($"plan so far: \n {optimal}");
 
-      for (int m = 0; m < bestMoves.Count; ++m)
-      {
-        ModifyMakeMove(optimal, bestMoves[m]);
-      }
+      Debug.WriteLine("===");
     }
 
     return new List<Weights>() { optimal };

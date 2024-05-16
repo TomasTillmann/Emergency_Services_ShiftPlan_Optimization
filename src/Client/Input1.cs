@@ -34,7 +34,7 @@ public class Input1 : IInputParametrization
       hospitalsCount: 20,
       availableMedicTeamsCount: avaialbeMedicTeamsCount,
       availableAmbulancesCount: availableAmbulancesCount,
-      goldenTimeSec: 20.ToMinutes().ToSeconds().Value,
+      goldenTimeSec: 200.ToMinutes().ToSeconds().Value,
       random: _random
     ));
 

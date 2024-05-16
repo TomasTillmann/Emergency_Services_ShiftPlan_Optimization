@@ -195,6 +195,62 @@
       \verb 1810.07896
       \endverb
     \endentry
+    \entry{dynamic}{book}{}
+      \name{author}{1}{}{%
+        {{hash=7bb51e859e70aaedef4ed1f3bb67779b}{%
+           family={Bellman},
+           familyi={B\bibinitperiod},
+           given={Richard},
+           giveni={R\bibinitperiod}}}%
+      }
+      \list{location}{1}{%
+        {Princeton, US}%
+      }
+      \list{publisher}{1}{%
+        {Princeton University Press}%
+      }
+      \strng{namehash}{7bb51e859e70aaedef4ed1f3bb67779b}
+      \strng{fullhash}{7bb51e859e70aaedef4ed1f3bb67779b}
+      \strng{bibnamehash}{7bb51e859e70aaedef4ed1f3bb67779b}
+      \strng{authorbibnamehash}{7bb51e859e70aaedef4ed1f3bb67779b}
+      \strng{authornamehash}{7bb51e859e70aaedef4ed1f3bb67779b}
+      \strng{authorfullhash}{7bb51e859e70aaedef4ed1f3bb67779b}
+      \field{sortinit}{3}
+      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{isbn}{978-0691079516}
+      \field{title}{Dynamické programování}
+      \field{year}{2010}
+    \endentry
+    \entry{mares}{book}{}
+      \name{author}{1}{}{%
+        {{hash=18cfa0c17f1b9afae4f192b880a96855}{%
+           family={Martin\bibnamedelima Mareš},
+           familyi={M\bibinitperiod\bibinitdelim M\bibinitperiod},
+           given={Tomáš\bibnamedelima Valla},
+           giveni={T\bibinitperiod\bibinitdelim V\bibinitperiod}}}%
+      }
+      \list{location}{1}{%
+        {Prague}%
+      }
+      \list{publisher}{1}{%
+        {CZ.NIC}%
+      }
+      \strng{namehash}{18cfa0c17f1b9afae4f192b880a96855}
+      \strng{fullhash}{18cfa0c17f1b9afae4f192b880a96855}
+      \strng{bibnamehash}{18cfa0c17f1b9afae4f192b880a96855}
+      \strng{authorbibnamehash}{18cfa0c17f1b9afae4f192b880a96855}
+      \strng{authornamehash}{18cfa0c17f1b9afae4f192b880a96855}
+      \strng{authorfullhash}{18cfa0c17f1b9afae4f192b880a96855}
+      \field{sortinit}{3}
+      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{isbn}{978-80-88168-19-5}
+      \field{title}{Průvodce labyrintem algoritmů}
+      \field{year}{2017}
+    \endentry
   \enddatalist
 \endrefsection
 \endinput

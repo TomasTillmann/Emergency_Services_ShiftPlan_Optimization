@@ -9,5 +9,10 @@ public class Depot
   public int Index { get; init; }
   public Coordinate Location { get; init; }
   public List<Ambulance> Ambulances { get; init; }
+
+  public override string ToString()
+  {
+    return $"{Index}: {Location}";
+  }
 }
 

@@ -67,7 +67,14 @@ class Program
 
     simulation = new(world);
     loss = new StandardLoss(simulation, shiftTimes);
-    visualizer.PlotGraph(loss, startWeights, incidents, _debug);
+    // visualizer.PlotGraph(loss, startWeights, incidents, _debug);
+
+    simulation = new(world);
+    loss = new StandardLoss(simulation, shiftTimes, alpha: 0.9, beta: 0.1);
+    optimizer = new DynamicProgrammingOptimizer(world, constraints, shiftTimes, loss, random: random);
+    optimizer.StartWeights = startWeights;
+    optimizer.Debug = _debug;
+    optimizers.Add(optimizer);
 
     optimizer = new GeneticAlgorithmOptimizer(world, constraints, shiftTimes, lossCoeff: 0.01f, populationSize: 700, populations: 80, mutationP: 0.01, random: random);
     optimizer.StartWeights = startWeights;
@@ -103,13 +110,6 @@ class Program
     simulation = new(world);
     loss = new StandardLoss(simulation, shiftTimes);
     optimizer = new TabuSearchOptimizer(world, constraints, shiftTimes, loss, tabuSize: 300, iterations: 200, random: random);
-    optimizer.StartWeights = startWeights;
-    optimizer.Debug = _debug;
-    optimizers.Add(optimizer);
-
-    simulation = new(world);
-    loss = new StandardLoss(simulation, shiftTimes);
-    optimizer = new DynamicProgrammingOptimizer(world, constraints, shiftTimes, loss, random: random);
     optimizer.StartWeights = startWeights;
     optimizer.Debug = _debug;
     optimizers.Add(optimizer);
