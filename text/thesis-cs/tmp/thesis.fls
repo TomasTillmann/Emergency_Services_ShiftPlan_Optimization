@@ -520,12 +520,6 @@ INPUT /home/tom/.texlive2022/texmf-var/luatex-cache/generic/fonts/otl/lmroman6-r
 OUTPUT tmp/kap02.aux
 INPUT ./kap02.tex
 INPUT ./kap02.tex
-INPUT ./img/bak_dp_protipriklad1.pdf
-INPUT ./img/bak_dp_protipriklad1.pdf
-INPUT ./img/bak_dp_protipriklad1.pdf
-INPUT ./img/bak_dp_protipriklad2.pdf
-INPUT ./img/bak_dp_protipriklad2.pdf
-INPUT ./img/bak_dp_protipriklad2.pdf
 OUTPUT tmp/kap03.aux
 INPUT ./kap03.tex
 INPUT ./kap03.tex

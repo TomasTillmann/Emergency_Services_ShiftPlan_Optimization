@@ -9,8 +9,7 @@ definovaného \textit{Bellmanovou rovností}, řeší větší podúlohy efektiv
 Průběžnému ukládání výsledků podúloh se říká \textit{memoizace}.
 Díky této memoizaci dynamické programování neprohledává prostor řešení duplicitně, a tak je často velmi efektivní metodou pro řešení optimalizačních úloh (\citet{dynamic}).
 Triviálním příkladem využití dynamického programování je výpočet $n$-tého \textit{Fibbonaciho čísla}. (\citet{mares}, kap. 12).
-\\
-\\
+
 Pro nás zajímavějším příkladem využití dynamického programování je řešení úlohy kombinatorické optimalizace \textit{Problému batohu}.
 
 \begin{definice}[Problém batohu]
@@ -30,8 +29,7 @@ Pro nás zajímavějším příkladem využití dynamického programování je �
 Existuje $2^n$ možností, které předměty vložíme do batohu. Naivní řešení prohledání všech možností tak běží v čase $\mathcal{O} (2^n)$.
 Avšak pomocí dynamického programování lze vyřešit problém batohu v \textit{pseudopolynomiálním} čase $\mathcal{O}(nc)$,
 což pro velká $n$ a konstatní $c$ je až exponenciálním zlepšením.
-\\
-\\
+
 Bellmanovy rovnice vyjadřující rekurzivní vztahy vypadají následovně,
 
 \begin{definice}[Rekurzivní vztah pro problém batohu]\label{rov:KPrekurz}
@@ -70,31 +68,6 @@ nebo předmět při výběru nepoužijeme, takže aktuální optimální výběr
 
 Algoritmus \ref{KP} vrací sumu hodnot optimálních předmětů přidaných do batohu.
 Jaké konkrétní předměty přispěly do sumy lze snado zjistit zpětným následováním rekurzivního vztahu \ref{rov:KPrekurz}.
-\\
-\\
+
 Rádi bychom našli nějaký rekurzivní vztah v problému hledání optimálního plánu.
-
-Avšak ukáže se, že takový rekurzivní vztah neexistuje.
-Ze znalosti optimálního plánu podproblému obecně nelze zjistit optimální plán aktuálního problému.
-Ukážeme si na konkrétním příkladu. 
-
-\begin{figure}[h]
-\includegraphics[width=0.4 \textwidth]{img/bak_dp_protipriklad1}
-\caption{Tři výjezdové stanice, hnědé kruhy a tři modré incidenty, modré kruhy. Incidenty jsou očíslované podle času nastání.}
-\label{obr:protipriklad1}
-\end{figure}
-
-\clearpage
-
-Nechť incidenty $i_1$, $i_2$, $i_3$ podle obrázku \ref{obr:protipriklad1} v časech nastání $t_1$, $t_2$, $t_3$.
-Řekněme, že optimální plán pohotovostní služby $p_1$ pro tento případ je alokace tří týmů záchranářů se směnami $d_1$, $d_2$, $d_3$ a záchranných vozidel, každý na jednu stanici.
-Tým záchranářů $Z_A, p_Z(Z_A) = A$, odbaví incident $i_1$, $Z_B$ odbaví $i_3$ a $Z_C$ odbaví $i_2$.
-Další incident, který nastane je $i_4$.
-
-\begin{figure}[h]
-\includegraphics[width=0.4 \textwidth]{img/bak_dp_protipriklad2}
-\caption{Nastal nový incident.}
-\label{obr:protipriklad2}
-\end{figure}
-
 
