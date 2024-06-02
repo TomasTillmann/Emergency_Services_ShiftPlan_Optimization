@@ -265,9 +265,14 @@ K tomu si potřebujeme definovat co znamená, že tým záchranářů je schopen
   \end{enumerate}
 \end{definice}
 
-Funkce \textit{GetBestTeam}\label{df:getBestTeam} vrací tým záchranářu $z_k$ z týmů záchranářů $Z_k$, kteří jsou schopni úspěšně odbavit incident $i_k$, podle pravidel \ref{df:simulacePravidla1}
+\begin{definice}[GetBestTeam]\label{df:getBestTeam}
+Funkce \textit{GetBestTeam} vrací tým záchranářu $z_k$ z týmů záchranářů $Z_k$, kteří jsou schopni úspěšně odbavit incident $i_k$, podle pravidel \ref{df:simulacePravidla1}
 , kde $z_k$ je nejvhodnější pro obsloužení incidentu $i_k$ ze $Z_k$ podle pravidel \ref{df:simulacePravidla2}. 
+\end{definice}
+
+\begin{definice}[GetBestTeam]
 Funkce \textit{GetBestAmbulance}\label{df:getBestAmbulance} vybere záchranné vozidlo, které je na stejné výjezdové stanici jako $z_k$ a časově je nejdříve k dispozici.
+\end{definice}
 
 Pravidla jsou navrhnuta tak, aby práce obsluhování incidentů byla rozmístěna rovnoměrně přes všechny týmy, ale aby zároveň byly incidenty obslouženy nejrychleji jak je možné.
 Třetí pravidlo pro výběr nejvhodnějšího týmu zaručuje rovnoměrnost práce a druhé co nejrychlejší obsloužení incidentu.
@@ -499,18 +504,11 @@ Efektivita plánu $e(p) \in \langle 0, 1 \rangle$ je důležitá statistika, dí
   \begin{align*}
     s_t(p_1) > s_t(p_2).
   \end{align*}
-
-  Zaveďmě jako relaci částečné uspořádání na $P_C$, $(<_e, P_C)$, kde $p_1, p_2 \in P_C$ jsou neporovnatelné právě když, $q(p_1) \neq q(p_2)$ a
-  porovnatelné v opačném případě, a to podle jejich efektivity.
 \end{definice}
 
-\begin{definice}[Optimální plány pohotovostní služby]
-  Nechť $P^* \subset P_C$ množina optimálních pohotovostních plánu. Námi hledané optimální plány pak budou ty s nejvyšší efektivitou z $P^*$, měřené podle \ref{df:porPlanuEf}.
-  Tedy maximální prvky $(<_e, P^*)$.
+\begin{definice}[Optimální plány pohotovostní služby s nejvyšší efektivitou]
+  Nechť $P^* \subset P_C$ množina optimálních pohotovostních plánu. Námi hledané optimální plány pak budou ty s nejvyšší efektivitou z $P^*$, srovnávané podle \ref{df:porPlanuEf}.
 \end{definice}
-
-Za optimální plány pohotovostní služby tak považujeme optimální plány s největší efektivitou.
-Přičemž optimální plány nalezneme jako řešení optimalizační úlohy s jednou účelovou funkcí \ref{df:optUloha1uc}.
 
 \section{Analýza optimalizační úlohy}
 
@@ -725,7 +723,6 @@ V této kapitoly dáme tyto poznatky dohromady a zklasifikujeme tak řešenou op
 Vybíráme optimální konfigurace z diskrétně konečně mnoho objektů, a to sice přiřazení $p_Z$, $p_A$, $p_{D_{1}}$, $p_{D_{2}}$.
 Jedná se tak o \textit{diskrétní} nebo taky \textit{kombinatorickou} optimalizaci.
 To je takový druh optimalizace, kdy se snažíme nalézt optimální konfiguraci z diskrétně mnoho možností.
-Spadají zde jak \textbf{NP} problémy, jako například problém obchodního cestujícího nebo problém batohu, tak i problémy z \textbf{P}, jako minimální kostry nebo maximální tok v síti \cite{CO}.
 
 \textit{Spojitá} optimalizace je typ optimalizace, kde prohledávané konfigurace jsou spojité.
 Účelová funkce $q$ pak může být navhrnuta jako spojitá funkce s první a ideálně i druhou derivací v každém bodě.
@@ -740,9 +737,8 @@ Problém formulovaný jako lineární program lze vyřešit v polynomiálním č
   \begin{align*}
     \max_{x \in \mathcal{X}} c^T x,
   \end{align*}
-  \\
-  kde $x$ splňuje
 
+  kde $x$ splňuje
   \begin{align*}
     &{w^1}^T_i x \leq b_i, \hspace{50pt} i \in \{ 1, 2, \dots \} \\
     &{w^2}^T_j x \geq b_j, \hspace{50pt} j \in \{ 1, 2, \dots \} \\
@@ -755,4 +751,103 @@ Náš problém ale nelze vyjádřit v takovém tvaru, především z důvodu nav
 Použití simulace tak nevylučuje jenom lineární programování, ale obecně všechny metody, kde je potřeba optimalizační úlohu vyjádřit jako
 soustavu rovnic nebo nerovnic, které ani nemusí být lineární.
 Použití simulace je pro nás ale žádoucí, důvody proč jsou diskutovány v kapitole \ref{kap:procSimulace}.
+
+Chtěli bychom problém nalezení optimálního plánu klasifikovat, do jakých tříd složitosti náleží.
+První si ujasníme definice tříd složitosti a následně uvážíme problém \ref{df:Q} podobný problému nalezení optimálního plánu pohotovostní služby,
+pro který budeme schopni nalézt třídy složitosti, do kterých náleží.
+
+\begin{definice}[Problém náleží třídě NP]\label{df:NP}
+  Nechť problém $K$ a algoritmus $A$ řešící $K$.
+  Problém $K$ náleží třídě NP právě tehdy, když jsme v polynomiálním čase schopni ověřit
+  $A(x) = K(x)$, pro všechny vstupy $x$, kde $A(x)$ a $P(x)$ značí řešení problému.
+\end{definice}
+
+Jinými slovy, jsme schopni v polynomiálním čase ověřit, že pokud nějaký algoritmus $A$ tvrdí, že $A(x) = K(x)$, tak je to pravda či nikoliv, přes všechny vstupy $x$.
+Dále definujme co znamená, že problém je NP-úplný a nebo NP-těžký.
+
+\begin{definice}[Problém je NP-úplný]\label{df:NPup}
+  Problém $K$ je NP-úplný právě tehdy, když $K$ náleží třídě NP a zároveň každý NP-úplný problém je na něj převoditelný.
+\end{definice}
+
+\begin{definice}[Problém je NP-těžký]\label{df:NPhard}
+  Problém $K$ je NP-těžký právě tehdy, když každý NP-úplný problém je na něj převoditelný.
+\end{definice}
+
+\begin{definice}[Optimalizační úloha s černou skříňkou $Q$]\label{df:Q}
+  Nechť $\mathcal{X} \colon |\mathcal{X}| = 2^n$ množina všech možných konfigurací a $q \colon X \rightarrow \{ 1, 2, \dots, n \}, n \in \mathbb{N}$.
+  Jako optimalizační úlohu s černou skříňkou rozumíme optimalizační úlohu
+
+  \begin{align*}
+    \max_{x} q(x), \hspace{50pt} x \in \mathcal{X},
+  \end{align*}
+
+  kde neznáme předpis $q$, tudíž pro $\forall x \in \mathcal{X}$ jsme schopni zjistit $q(x)$ jedině vyhodnocením $q$ v $x$.
+  Vyhodnocení $q$ v bodě $x$ je polynomiální vůči $n$. Označme problém optimalizační úlohy s černou skříňkou $Q$.
+\end{definice}
+
+\begin{definice}[Rozhodovací problém černé skříňky $R$]\label{df:R}
+  Nechť $\mathcal{X} \colon |\mathcal{X}| = 2^n$ množina všech možných konfigurací a $q \colon X \rightarrow \{ 1, 2, \dots, n \}, n \in \mathbb{N}$, kde neznáme předpis $q$.
+  Jako rozhodovací problém černé skříňky rozumíme problém, zda pro nějaké $k \in \{ 1, 2, \dots, n \}$ existuje $x \in \mathcal{X}$ takové,
+  že $q(x) = k$.
+  Vyhodnocení $q$ v bodě $x$ je polynomiální vůči $n$.
+  Označme rozhodovací problém černé skříňky $R$.
+\end{definice}
+
+\begin{veta}[Rozhodovací problém černé skříňky je NP-úplný]\label{veta:R_NPup}
+  Problém $R$ je NP-úplný.
+\end{veta}
+
+\begin{dukaz}
+  Zaprvé dokážeme, že problém $R$ náleží třídě NP.
+  Řekněme, že nějaký algoritmus $A$ tvrdí, že $x \in \mathcal{X}$ je řešením problému $R$.
+  Vyhodnocením $q$ v $x$ ověříme, jestli $q(x) = k$, tedy $A(x) = N(x)$.
+  Vyhodnocení $q$ trvá polynomiálně dlouho vůči $n$, takže $R$ náleží NP.
+
+  Zadruhé ukážeme převod problému \textit{SAT} na $R$, $\text{\textit{SAT}} \rightarrow R$.
+  Problém \textit{SAT} je NP-úplný. Převodem tak dokážeme, že problém $R$ je alespoň tak těžký, jako problém \textit{SAT}, takže je alespoň NP-úplný.
+  Nechť klauzule v konjuktivním normálním tvaru $\phi$ problému \textit{SAT} o $n$ literálech.
+  Nechť
+
+  \begin{align*}
+    \mathcal{X} = \text{množina všech možných ohodnocení \phi, množina všech řetězců: }\{ 0, 1 \}^n.
+  \end{align*}
+
+  Funkci $q$ definujme $q(x) = \phi(x)$.
+  Hledané $k$ tak bude 1, splění formule.
+  Takže $x \in \mathcal{X}$ takové, že $q(x) = 1$, z definice $q$ platí $\phi(x) = 1$,
+  hledané splnitelné ohodnocení formule $\phi$.
+  Sestrojili jsme tak převod mezi problémem \textit{SAT} a problémem $R$. 
+
+  Ukázali jsme, že problém $R$ náleží třídě NP a zároveň jsme sestrojili převod NP-úplného problému na problém $R$.
+  Jelikož jsou všechny NP-úplné problémy navzájem převoditelné, tak i problém $R$ je NP-úplný.
+\end{dukaz}
+
+\begin{veta}[Optimalizační úloha s černou skříňkou je NP-těžký problém]\label{veta:cernaSkrinkaNP}
+  Problém $Q$ je NP-těžký problém.
+\end{veta}
+
+\begin{dukaz}
+  Víme, že problém $R$ je NP-úplný \ref{veta:R_NPup}. Nyní dokážeme, že problém $Q$ je NP-těžký.
+  První sestrojíme převod mezi problémy $R$ a $Q$, $R \rightarrow Q$, a tím ukážeme, že $Q$ je alespoň tak těžký jak $R$.
+  Zadruhé ukážeme, že problém $Q$ není NP-úplný.
+  Z prvního a druhého a z algoritmické rozhodnutelnosti problému $Q$ plyne, že problém $Q$ je NP-těžký.
+
+  Zaprvé, nechť rozhodovací problém černé skříňky $R$, kde nás zajímá, zda existuje $x$ pro které $q(x) = k$. 
+  Uvažme $m = \{ k_0, k_1, \dots , k\}, k_0 < k_1 < \dots < k$.
+  Nechť optimalizační problém s černou skříňkou $Q$, kde hledáme optimální $x^*$ takové, že $q'(x^*) = k'$, kde $k' \geq q'(y), \forall y \in \mathcal{X}$.
+  Definujme $q'(x) \colon \mathcal{X} \rightarrow m$.
+  Pokud $q(x^*) = k$, pak existuje $x$ takové, že $q(x) = k$, a to například právě $x^*$.
+  Pokud $q(x^*) = l$, pak neexistuje $x$ takové, že $q(x) = k$, protože $l < k$ a zároveň $x^*$ je optimální.
+  Tím jsme sestrojili převod $R \rightarrow Q$.
+
+  Zadruhé ukažme, že problém $Q$ není NP-úplný.
+  Nechť algoritmus $A$ řešící problém $Q$.
+  Nechť $x^*$ optimální podle $A$. Jak ověříme, že $x^*$ je skutečně optimální, tedy $Q(x) = x^*$?
+  Z definice nesmí existovat $x' \colon q(x') > q(x^*)$.
+  Abychom ověřili, že takové $x'$ skutečně neexistuje, musíme projít všechna $x \in \mathcal{X}$ a ověřit, že $q(x) \leq q(x^*)$.
+  Jenže $|\mathcal{X}| = 2^n$, průchod trvá $2^n$, čili ne polynomiálně vůči $n$.
+
+  Na optimalizační problém s černou skříňkou $Q$ jsme převedli NP-úplný rozhodovací problém černé skříňky $R$ a zároveň
+  problém $Q$ není NP-úplný. Problém $Q$ je ale algoritmicky rozhodnutelný, například vyhodnocením $q$ v každém bodě, takže problém $Q$ je NP-těžký.
+\end{dukaz}
 
