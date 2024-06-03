@@ -131,34 +131,6 @@
       \field{title}{Kapitoly z diskrétní matematiky}
       \field{year}{2002}
     \endentry
-    \entry{CO}{book}{}
-      \name{author}{1}{}{%
-        {{hash=57207615f5af7d86245a7ccb091a52bf}{%
-           family={Bernhard\bibnamedelima Korte},
-           familyi={B\bibinitperiod\bibinitdelim K\bibinitperiod},
-           given={Jens\bibnamedelima Vygen},
-           giveni={J\bibinitperiod\bibinitdelim V\bibinitperiod}}}%
-      }
-      \list{location}{1}{%
-        {Berlin}%
-      }
-      \list{publisher}{1}{%
-        {Springer Science \& Business Media}%
-      }
-      \strng{namehash}{57207615f5af7d86245a7ccb091a52bf}
-      \strng{fullhash}{57207615f5af7d86245a7ccb091a52bf}
-      \strng{bibnamehash}{57207615f5af7d86245a7ccb091a52bf}
-      \strng{authorbibnamehash}{57207615f5af7d86245a7ccb091a52bf}
-      \strng{authornamehash}{57207615f5af7d86245a7ccb091a52bf}
-      \strng{authorfullhash}{57207615f5af7d86245a7ccb091a52bf}
-      \field{sortinit}{2}
-      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{isbn}{3662585669}
-      \field{title}{Combinatorial optimization: Theory and Algorithms}
-      \field{year}{2013}
-    \endentry
     \entry{cohen2020solving}{misc}{}
       \name{author}{3}{}{%
         {{hash=f502b5a4ec3e171cee0cdf3dc82a1256}{%
@@ -215,8 +187,8 @@
       \strng{authorbibnamehash}{7bb51e859e70aaedef4ed1f3bb67779b}
       \strng{authornamehash}{7bb51e859e70aaedef4ed1f3bb67779b}
       \strng{authorfullhash}{7bb51e859e70aaedef4ed1f3bb67779b}
-      \field{sortinit}{3}
-      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{isbn}{978-0691079516}

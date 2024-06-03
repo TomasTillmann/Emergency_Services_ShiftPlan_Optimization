@@ -46,7 +46,7 @@ umíme v konstantím čase zjistit optimální výběr předmětů pro aktuáln�
 Buď předmět $i$ použijeme při výběru, a tak aktuální optimální výběr je roven $m_{i - 1, c' - w_i} + p_i$,
 nebo předmět při výběru nepoužijeme, takže aktuální optimální výběr je optimální výběr podproblému, $m_{i - 1, c'}$. 
 
-\begin{algorithm}
+\begin{algorithm}[h]
   \begin{algorithmic}[1]
   \Function{KnapsackProblem}{$n$, $c$, $p_i$, $w_i$, $1 \leq i \leq n$}
     \State $m_{i, j}$ \gets 0, $0 \leq i \leq n$, $0 \leq j \leq c$
@@ -62,7 +62,7 @@ nebo předmět při výběru nepoužijeme, takže aktuální optimální výběr
     \State \Return $m_{n,c}$
   \EndFunction
   \end{algorithmic}
-  \caption{}
+  \caption{Problém batohu}
   \label{KP}
 \end{algorithm}
 
@@ -70,4 +70,113 @@ Algoritmus \ref{KP} vrací sumu hodnot optimálních předmětů přidaných do 
 Jaké konkrétní předměty přispěly do sumy lze snado zjistit zpětným následováním rekurzivního vztahu \ref{rov:KPrekurz}.
 
 Rádi bychom našli nějaký podobný rekurzivní vztah v problému hledání optimálního plánu.
+Nalezením rekurzivních vztahů by pak simulace $s$ nebyla černou skříňkou a byla by splněna nutná podmínka \ref{veta:simulaceJakoCernaSkrinka} pro šanci na polynomiální řešení.
 
+Nechť množina incidentů $I = \{ i_1, \dots , i_n \}$, kde $\forall j, k \in \{ 1, \dots n\} \colon T_I(i_j) \leq T_I(i_k)$, čili incidenty jsou seřazené podle času nastání.
+Definujme množiny incidentů $I_1, I_2, \dots , I_n$, kde $\forall k \in \{ 1, \dots, n \} \colon I_k = \{ i_1, \dots, i_k \}$.
+Incidenty $I_k$ jsou tak incidenty $I_{k-1}$ po odebrání incidentu $i_k$, který se odehrál jako poslední.
+Nechť $p_{k-1} \in P_C$ libovolný optimální plán na množině incidentů $I_{k-1}$.
+Nadále budeme zkoumat otázku, zda jsme schopni ze znalosti $p_{k-1}$ nalézt optimální plán $p_k$ na množině incidentů $I_k$.
+V první řadě si potřebujeme nadefinovat jak obecně z nějakého plánu $p_1$ získat plán $p_2$. 
+
+\begin{definice}[Tah]\label{df:tah}
+  Nadefinujme tah jako funkci $T \colon P_C \rightarrow P_C$.
+  Nadefinujme tahy
+  \begin{enumerate}
+    \item
+      Alokace týmu na výjezdovou stanici.
+
+    \item
+      Alokace týmu a alokace záchranného vozidla na stejnou výjezdovou stanici.
+
+    \item
+      Prodloužení doby trvání směny již naalokovaného týmu záchranářu. 
+  \end{enumerate}
+
+  Formálně, tah alokace týmu $z'$ na výjezdovou stanici je funkce $M_{z'} : p \rightarrow p'$, kde
+  \begin{align*}
+    p_Z'(z) &=
+      \begin{cases}
+        v \neq v_{\emptyset} & \text{pro tým $z' \in Z \colon p_Z(z') = v_{\emptyset}, v \in V$}, \\
+        p_Z(z) & \text{pro $\forall z \in Z \setminus \{ z' \}$},
+      \end{cases}
+      \\
+    p_D'(z) &=
+      \begin{cases}
+        (d_1, d_2) \in D \colon d_2 - d_1 > 0 & \text{pro $z'$}, \\
+        p_D(z) & \text{pro $\forall z \in Z \setminus \{ z' \}$},
+      \end{cases}
+      \\
+    p_A'(a) &= p_A(a), \forall a \in A,
+  \end{align*}
+
+  pro $p_Z, p_D, p_A \in p$ a $p_Z', p_D', p_A' \in p'$, kde $p, p' \in P_C$ a $M_{z'}(p) = p'$.
+
+  Tah alokace týmu $z'$ a záchranného vozidla $a'$ na výjezdovou stanici je funkce $M_{z'a'} : p \rightarrow p'$, kde
+  \begin{align*}
+    p_Z'(z) &= p_Z^T(z) \in T_{z'}(p), \forall z \in Z,
+    \\
+    p_D'(z) &= p_D^T(z) \in T_{z'}(p), \forall z \in Z,
+    \\
+    p_A'(a) &=
+    \begin{cases}
+      p_Z'(z) & \text{pro záchranné vozidlo $a' \in A \colon p_A(a') = v_{\emptyset}, v \in V$.}, \\
+      p_A(a) & \text{pro $\forall a \in A \setminus \{ a' \}$},
+    \end{cases}
+  \end{align*}
+
+  pro $p_Z, p_D, p_A \in p$ a $p_Z', p_D', p_A' \in p'$, kde $p, p' \in P_C$ a $M_{z'a'}(p) = p'$.
+
+  Tah prodloužení směny týmu $z'$ je funkce $M_{z'd} : p \rightarrow p'$, kde
+  \begin{align*}
+    p_Z'(z) &= p_Z(z), \forall z \in Z \\
+    p_D'(z) &=
+      \begin{cases}
+        (d'_1, d'_2) \in D \colon d'_2 > d_2 \land d'_1 = d_1  & \text{pro $z'$, kde $(d_1, d_2) = p_{D}(z)$} \\
+        p_D(z) & \text{pro $\forall z \in Z \setminus \{ z' \}$},
+      \end{cases}
+      \\
+    p_A'(a) &= p_A(a), \forall a \in A,
+  \end{align*}
+
+  pro $p_Z, p_D, p_A \in p$ a $p_Z', p_D', p_A' \in p'$, kde $p, p' \in P_C$ a $M_{z'd}(p) = p'$.
+
+\end{definice}
+
+%  \begin{table}[h]
+%    \begin{tabularx}{0.4\textwidth} { 
+%      | >{\centering\arraybackslash}c 
+%      | >{\centering\arraybackslash}X 
+%      | >{\centering\arraybackslash}X | }
+%    \hline
+%    & $p_Z$ & $p_D$ \\
+%    \hline
+%      $z_1$  & $v_1$  & $(d_1, d_2)$  \\
+%      $z_2$  & $v_0$  & $(0, 0)$  \\
+%    \hline
+%    \end{tabularx}
+%    \quad
+%    \begin{tabularx}{0.2\textwidth} { 
+%      | >{\centering\arraybackslash}c 
+%      | >{\centering\arraybackslash}X | }
+%    \hline
+%    & $p_A$ \\
+%    \hline
+%    $a_1$  & $v_1$ \\
+%    $a_2$  & $v_0$ \\
+%    \hline
+%    \end{tabularx}
+%
+%    \caption{Optimální plán $p_{2}^*$}\label{tab:optPodplanNeniOptPlan}
+%
+%  \end{table}
+
+
+
+
+
+
+
+
+
+% \section{Heuristické přístupy}\label{kap:heur}

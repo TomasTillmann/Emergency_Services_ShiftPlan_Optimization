@@ -21,16 +21,21 @@ a přiřazení pracovní směny $d \in D$ každému týmu záchranářů $z \in 
 Tato přiřazení popíšeme \textit{přiřazovacími funkcemi}:
 
 \begin{definice}[Přiřazovací funkce]
-  \begin{align*}
-    p_Z \colon Z &\rightarrow V \cup \{ v_{\emptyset} \}                   \hspace{63pt} \text{přiřazení týmů na stanice}, \\
-    p_A \colon A &\rightarrow V \cup \{ v_{\emptyset} \}                   \hspace{63pt} \text{přiřazení vozidel na stanice}, \\ 
-    p_{D_{1}} \colon Z &\rightarrow D_{1} \cup \{ 0 \}         \hspace{60pt} \text{přiřazení začátku směn týmům}, \\
-    p_{D_{2}} \colon Z &\rightarrow D_{2} \cup \{ 0 \}         \hspace{60pt} \text{přiřazení délky směn týmům}.
-  \end{align*}
+  \begin{alignat*}{2}
+    p_Z \colon Z &\rightarrow V \cup \{ v_{\emptyset} \} \quad && \hspace{30pt} \text{přiřazení týmů na stanice}, \\
+    p_A \colon A &\rightarrow V \cup \{ v_{\emptyset} \} \quad && \hspace{30pt} \text{přiřazení vozidel na stanice}, \\ 
+    p_{D} \colon Z &\rightarrow D                        \quad && \hspace{30pt} \text{přiřazení směn týmům}. \\
+  \end{alignat*}
 
-  Pokud $z \in Z$ nemá mít přiřazenou žádnou výjezdovou stanici,
-  tak $p_{Z}(z) = v_{\emptyset}$, $p_{D_{1}}(z) = 0$ a $p_{D_{2}}(z) = 0$.
-  Pokud $a \in A$ nemá mít přiřazenou žádnou výjezdovou stanici, tak $p_{A}(a) = a_{\emptyset}$.
+  Tým $z \in Z$ nemá přiřazenou žádnou výjezdovou stanici právě tehdy, když
+  $p_{Z}(z) = v_{\emptyset}$ a $p_{D}(z) = (d_1, d_2) \colon d_2 - d_1 = 0$.
+  Záchranné vozidlo $a \in A$ nemá mít přiřazenou žádnou výjezdovou stanici, právě tehdy, když $p_{A}(a) = a_{\emptyset}$.
+
+  Pro pohodlnost zaveďme 
+  \begin{align*}
+    & p_{D_1}(z) \colon p_D(z) = (d_1, d_2) \Leftrightarrow p_{D_1}(z) = d_1, \\
+    & p_{D_2}(z) \colon  p_D(z) = (d_1, d_2) \Leftrightarrow p_{D_2}(z) = d_2.
+  \end{align*}
 \end{definice}
 
 \begin{definice}[Plán pohotovostní služby]
@@ -139,7 +144,7 @@ Většinou proto, že při výběru nadhcázejícího stavu figuruje element ná
 \textit{Událost} je nastání incidentu $i \in I$ v čase $T_I(i)$, kde $T_I \colon I \rightarrow \mathbb{N}_0$, určuje čas nastání incidentu.
 \textit{Stav systému} simulace $s$ je množina $S = \{ S_A, S_Z \}$, kde $S_A$ je stav záchranných vozidel $A$ a $S_Z$ je stav týmů záchranářů $Z$. 
 
-\begin{algorithm}
+\begin{algorithm}[h]
   \begin{algorithmic}[1]
   \Function{Simulation}{$p_C, I$}
     \State $s^{c}_{pI} \gets 0$
@@ -162,7 +167,7 @@ Většinou proto, že při výběru nadhcázejícího stavu figuruje element ná
     \State \Return $s_{c}$, $s^t_{pI}$
   \EndFunction
   \end{algorithmic}
-  \caption{}
+  \caption{Simulace plánu pohotovostní služby $p_C$ na množině incidentů $I$}
   \label{simulaceAlgo}
 \end{algorithm}
 
@@ -759,11 +764,11 @@ pro který budeme schopni nalézt třídy složitosti, do kterých náleží.
 \begin{definice}[Problém náleží třídě NP]\label{df:NP}
   Nechť problém $K$ a algoritmus $A$ řešící $K$.
   Problém $K$ náleží třídě NP právě tehdy, když jsme v polynomiálním čase schopni ověřit
-  $A(x) = K(x)$, pro všechny vstupy $x$, kde $A(x)$ a $P(x)$ značí řešení problému.
+  $A(y) = K(y)$, kde $A(y)$ a $P(y)$ značí řešení problému libovolného vstupu $y$.
 \end{definice}
 
-Jinými slovy, jsme schopni v polynomiálním čase ověřit, že pokud nějaký algoritmus $A$ tvrdí, že $A(x) = K(x)$, tak je to pravda či nikoliv, přes všechny vstupy $x$.
-Dále definujme co znamená, že problém je NP-úplný a nebo NP-těžký.
+Jinými slovy, jsme schopni v polynomiálním čase ověřit, že pokud nějaký algoritmus $A$ tvrdí, že $A(y) = K(y)$, tak je to pravda či nikoliv.
+Dále definujme co znamená, že problém je NP-úplný a problém je NP-těžký.
 
 \begin{definice}[Problém je NP-úplný]\label{df:NPup}
   Problém $K$ je NP-úplný právě tehdy, když $K$ náleží třídě NP a zároveň každý NP-úplný problém je na něj převoditelný.
@@ -774,23 +779,35 @@ Dále definujme co znamená, že problém je NP-úplný a nebo NP-těžký.
 \end{definice}
 
 \begin{definice}[Optimalizační úloha s černou skříňkou $Q$]\label{df:Q}
-  Nechť $\mathcal{X} \colon |\mathcal{X}| = 2^n$ množina všech možných konfigurací a $q \colon X \rightarrow \{ 1, 2, \dots, n \}, n \in \mathbb{N}$.
+  Nechť $\mathcal{X} \colon |\mathcal{X}| \in \Theta(2^n)$ množina všech možných konfigurací a $q \colon X \rightarrow \{ 1, 2, \dots, n \}, n \in \mathbb{N}$.
   Jako optimalizační úlohu s černou skříňkou rozumíme optimalizační úlohu
 
   \begin{align*}
     \max_{x} q(x), \hspace{50pt} x \in \mathcal{X},
   \end{align*}
 
-  kde neznáme předpis $q$, tudíž pro $\forall x \in \mathcal{X}$ jsme schopni zjistit $q(x)$ jedině vyhodnocením $q$ v $x$.
-  Vyhodnocení $q$ v bodě $x$ je polynomiální vůči $n$. Označme problém optimalizační úlohy s černou skříňkou $Q$.
+  kde $\forall x_1, x_2 \in \mathcal{X}$ jsme schopni zjistit zda platí $q(x_1) \leq q(x_2)$ jedině vyhodnocením $q$ v $x_1$,
+  $q$ v $x_2$ a následným porovnáním vyhodnocených hodnot, $q(x_1) \leq q(x_2)$.
+  Vyhodnocení $q$ může být nejhůř polynomiální vůči oboru hodnot $q$.
+  Takové funkci $q$ budeme říkat černá skříňka.
+
+  Označme problém optimalizační úlohy s černou skříňkou $Q$.
+  Odpověď $Q(y)$ je rovna optimu $x^*$, pro libovolný vstup problému $y$.
 \end{definice}
 
 \begin{definice}[Rozhodovací problém černé skříňky $R$]\label{df:R}
-  Nechť $\mathcal{X} \colon |\mathcal{X}| = 2^n$ množina všech možných konfigurací a $q \colon X \rightarrow \{ 1, 2, \dots, n \}, n \in \mathbb{N}$, kde neznáme předpis $q$.
-  Jako rozhodovací problém černé skříňky rozumíme problém, zda pro nějaké $k \in \{ 1, 2, \dots, n \}$ existuje $x \in \mathcal{X}$ takové,
-  že $q(x) = k$.
-  Vyhodnocení $q$ v bodě $x$ je polynomiální vůči $n$.
+  Nechť $\mathcal{X} \colon |\mathcal{X}| \in \Theta(2^n)$ množina všech možných konfigurací a $q \colon X \rightarrow \{ 1, 2, \dots, n \}, n \in \mathbb{N}$,
+  kde $q$ je černá skříňka.
+  Jako rozhodovací problém černé skříňky rozumíme otázku, zda
+
+  \begin{align*}
+    \exists x \in \mathcal{X} \colon q(x) = k, \hspace{50pt} x \in \mathcal{X},
+  \end{align*}
+
+  kde $k \in \{ 1, 2, \dots, n \}$.
+
   Označme rozhodovací problém černé skříňky $R$.
+  Pokud existuje, $R(y) = 1$, jinak $R(y) = 0$, pro libovolný vstup problému $y$. 
 \end{definice}
 
 \begin{veta}[Rozhodovací problém černé skříňky je NP-úplný]\label{veta:R_NPup}
@@ -801,22 +818,21 @@ Dále definujme co znamená, že problém je NP-úplný a nebo NP-těžký.
   Zaprvé dokážeme, že problém $R$ náleží třídě NP.
   Řekněme, že nějaký algoritmus $A$ tvrdí, že $x \in \mathcal{X}$ je řešením problému $R$.
   Vyhodnocením $q$ v $x$ ověříme, jestli $q(x) = k$, tedy $A(x) = N(x)$.
-  Vyhodnocení $q$ trvá polynomiálně dlouho vůči $n$, takže $R$ náleží NP.
+  Vyhodnocení $q$ trvá nejhůře polynomiálně dlouho vůči $n$, takže $R$ náleží NP.
 
-  Zadruhé ukážeme převod problému \textit{SAT} na $R$, $\text{\textit{SAT}} \rightarrow R$.
+  Zadruhé ukážeme převod problému \textit{SAT} na $R$: $\text{\textit{SAT}} \rightarrow R$.
   Problém \textit{SAT} je NP-úplný. Převodem tak dokážeme, že problém $R$ je alespoň tak těžký, jako problém \textit{SAT}, takže je alespoň NP-úplný.
-  Nechť klauzule v konjuktivním normálním tvaru $\phi$ problému \textit{SAT} o $n$ literálech.
-  Nechť
 
-  \begin{align*}
-    \mathcal{X} = \text{množina všech možných ohodnocení \phi, množina všech řetězců: }\{ 0, 1 \}^n.
-  \end{align*}
+  Nechť klauzule v konjuktivním normálním tvaru $\phi$ problému \textit{SAT} o $n$ literálech.
+  Nechť $\mathcal{X} = \text{množina všech možných ohodnocení \phi}$.
 
   Funkci $q$ definujme $q(x) = \phi(x)$.
   Hledané $k$ tak bude 1, splění formule.
-  Takže $x \in \mathcal{X}$ takové, že $q(x) = 1$, z definice $q$ platí $\phi(x) = 1$,
-  hledané splnitelné ohodnocení formule $\phi$.
-  Sestrojili jsme tak převod mezi problémem \textit{SAT} a problémem $R$. 
+  Takto definovaná funkce $q$ je černá skříňka, protože pro libovolné ohodnocení $x_1,x_2 \in \mathcal{X}$ musíme $\phi$ vyhodnotit, abychom zjistili ohodnocení $\phi$.
+  Nejsme schopni na základě $q(x_1)$ určit ohodnocení $q(x_2)$, pro libovolné ohodnocení $x_1, x_2 \in \mathcal{X}$, takže ani $q(x_1) \leq q(x_2)$.
+
+  Takže $x \in \mathcal{X}$ takové, že $q(x) = \phi(x) = 1$, je
+  hledané splnitelné ohodnocení formule $\phi$ a sestrojili jsme tak převod mezi problémem \textit{SAT} a problémem $R$. 
 
   Ukázali jsme, že problém $R$ náleží třídě NP a zároveň jsme sestrojili převod NP-úplného problému na problém $R$.
   Jelikož jsou všechny NP-úplné problémy navzájem převoditelné, tak i problém $R$ je NP-úplný.
@@ -828,16 +844,24 @@ Dále definujme co znamená, že problém je NP-úplný a nebo NP-těžký.
 
 \begin{dukaz}
   Víme, že problém $R$ je NP-úplný \ref{veta:R_NPup}. Nyní dokážeme, že problém $Q$ je NP-těžký.
-  První sestrojíme převod mezi problémy $R$ a $Q$, $R \rightarrow Q$, a tím ukážeme, že $Q$ je alespoň tak těžký jak $R$.
+  První sestrojíme převod mezi problémy $R$ a $Q$: $R \rightarrow Q$, a tím ukážeme, že $Q$ je alespoň tak těžký jak $R$.
   Zadruhé ukážeme, že problém $Q$ není NP-úplný.
-  Z prvního a druhého a z algoritmické rozhodnutelnosti problému $Q$ plyne, že problém $Q$ je NP-těžký.
+  Z obojího plyne, že problém $Q$ je NP-těžký, podle definice NP-těžkosti.
 
-  Zaprvé, nechť rozhodovací problém černé skříňky $R$, kde nás zajímá, zda existuje $x$ pro které $q(x) = k$. 
-  Uvažme $m = \{ k_0, k_1, \dots , k\}, k_0 < k_1 < \dots < k$.
-  Nechť optimalizační problém s černou skříňkou $Q$, kde hledáme optimální $x^*$ takové, že $q'(x^*) = k'$, kde $k' \geq q'(y), \forall y \in \mathcal{X}$.
-  Definujme $q'(x) \colon \mathcal{X} \rightarrow m$.
-  Pokud $q(x^*) = k$, pak existuje $x$ takové, že $q(x) = k$, a to například právě $x^*$.
-  Pokud $q(x^*) = l$, pak neexistuje $x$ takové, že $q(x) = k$, protože $l < k$ a zároveň $x^*$ je optimální.
+  Nechť rozhodovací problém černé skříňky $R$, kde nás zajímá, zda existuje $x$ pro které $q(x) = k, k \in \{ 1, \dots, n\}$. 
+  Nechť optimalizační problém s černou skříňkou $Q$, kde z definice hledáme optimum $x^*$ černé skříňky $q'$.
+  Definujme $q'(x) = $
+
+  \[
+  \begin{cases}
+    q(x), & \text{je-li $q(x) \leq k$},\\
+    k - 1, & \text{jinak}.
+  \end{cases}
+  \]
+
+  Pokud $q'(x^*) = k$, pak existuje $x$ takové, že $q(x) = k$, a to například právě optimum $x^*$.
+  Pokud $q'(x^*) = l, l \neq k$, pak neexistuje $x$ takové, že $q(x) = k$, protože $l < k$ a zároveň $x^*$ je optimální.
+  Takže pro nalezené optimum $x^*$ platí $q'(x^*) = k$ právě tehdy, když existuje $x \in \mathcal{X}$ takové, že $q(x) = k$.
   Tím jsme sestrojili převod $R \rightarrow Q$.
 
   Zadruhé ukažme, že problém $Q$ není NP-úplný.
@@ -845,9 +869,40 @@ Dále definujme co znamená, že problém je NP-úplný a nebo NP-těžký.
   Nechť $x^*$ optimální podle $A$. Jak ověříme, že $x^*$ je skutečně optimální, tedy $Q(x) = x^*$?
   Z definice nesmí existovat $x' \colon q(x') > q(x^*)$.
   Abychom ověřili, že takové $x'$ skutečně neexistuje, musíme projít všechna $x \in \mathcal{X}$ a ověřit, že $q(x) \leq q(x^*)$.
-  Jenže $|\mathcal{X}| = 2^n$, průchod trvá $2^n$, čili ne polynomiálně vůči $n$.
+  Jiným způsobem, než průchodem $\mathcal{X}$ nemůžeme zjistit, protože $q$ je černá skříňka.
+  Jenže $|\mathcal{X}| = 2^n$, průchod trvá $2^n$, čili hůře než polynomiálně vůči $n$.
 
   Na optimalizační problém s černou skříňkou $Q$ jsme převedli NP-úplný rozhodovací problém černé skříňky $R$ a zároveň
-  problém $Q$ není NP-úplný. Problém $Q$ je ale algoritmicky rozhodnutelný, například vyhodnocením $q$ v každém bodě, takže problém $Q$ je NP-těžký.
+  problém $Q$ není NP-úplný, takže problém $Q$ je NP-těžký.
 \end{dukaz}
+
+Pojďme si propojit optimalizační problém s černou skříňkou \ref{df:Q} s problémem optimalizace plánu pohotovostních služeb.
+
+Optimalizační úloha nalezení optimálního plánu pohotovostní služby používá účelovou funkci $q \in Q_I$.
+Účelová funkce $q$ je složením se simulací $s$.
+Její předpis je dán průběhem simulace a vyhodnocení $s(p, I)$ závisí na průběhu simulace pohotovostního plánu na množině incidentů.
+Simulace je velmi komplikovaná a i když v podstatě známe její předpis \ref{simulaceAlgo},
+tak nalézt nějaké vztahy, díky kterým budeme schopni ze znalosti $s(p_1)$ zjistit $s(p_1) \leq s(p_2)$ pro $\forall p_1, p_2 \in P_C \colon p_1 \neq p_2$ není vůbec snadné.
+Dává tak smysl na simulaci nahlížet jako na černou skíňku.
+
+\begin{veta}[Simulace jako černá skříňka]\label{veta:simulaceJakoCernaSkrinka}
+  Nechť optimalizační úloha plánu pohotovostní služby $O$ používající účelovou funkci $q$, kde $q$ je složením se simulací $s$.
+  Pokud předpokládáme, že $s$ je černá skříňka, pak $O$ je NP-těžká úloha.
+\end{veta}
+
+\begin{dukaz}
+  Na úlohu $O$ se můžeme dívat jako na konkrétní instanci problému $Q$.
+  Účelovou funkci $Q$ zvolíme jako $q \in Q_I$, využívající simulaci, množinu $\mathcal{X}$ zvolíme jako $P_C$.
+  Z věty \ref{veta:asymptotP} velikost $P_C$ je exponenciálně závislá na oboru hodnot $q$ a z předpokladu je černou skříňkou. 
+  Podle věty \ref{veta:cernaSkrinkaNP} je problém $Q$ NP-těžký, úlohu $O$ jsme zformuvali jako problém $Q$, takže i $O$ je NP-těžké.
+\end{dukaz}
+
+Důsledek věty je, že pokud bychom chtěli úlohu $O$ vyřešit v polynomiálním čase,
+tak na simulaci nesmíme nahlížet jako na černou skříňku.
+Budeme minimálně potřebovat umět nalézt nějaké vztahy mezi $p_1, p_2 \in P_C$, díky kterým budeme schopni zjistit $q(p_1) \leq q(p_2)$
+a najít pomocí těchto vztahů optimální plán, aniž bychom museli $q$ vyhodnotit přes celý její definiční obor.
+Jedná se ale pouze o nutnou podmínku, nikoliv postačující. Čili pokud nalezneme nějaké vztahy mezi $p_1, p_2$ a nebudeme na simulaci nahlížet jako na černou skříňku,
+neznamená to, že je nutně úloha optimálních plánů pohotovostních služeb řešitelná v polynomiálním čase.
+O nalezení takových vztahů se pokusíme v kapitole \ref{kap:dynamicProgram}. Metody, které na účelovou funkci pohlíží jako na černou skříňku zkoumáme v kapitole \ref{kap:heur}.
+
 
