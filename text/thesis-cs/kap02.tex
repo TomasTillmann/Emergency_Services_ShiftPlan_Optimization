@@ -72,28 +72,83 @@ Jaké konkrétní předměty přispěly do sumy lze snado zjistit zpětným nás
 Rádi bychom našli nějaký podobný rekurzivní vztah v problému hledání optimálního plánu.
 Nalezením rekurzivních vztahů by pak simulace $s$ nebyla černou skříňkou a byla by splněna nutná podmínka \ref{veta:simulaceJakoCernaSkrinka} pro šanci na polynomiální řešení.
 
-Nechť množina incidentů $I = \{ i_1, \dots , i_n \}$, kde $\forall j, k \in \{ 1, \dots n\} \colon T_I(i_j) \leq T_I(i_k)$, čili incidenty jsou seřazené podle času nastání.
-Definujme množiny incidentů $I_1, I_2, \dots , I_n$, kde $\forall k \in \{ 1, \dots, n \} \colon I_k = \{ i_1, \dots, i_k \}$.
-Incidenty $I_k$ jsou tak incidenty $I_{k-1}$ po odebrání incidentu $i_k$, který se odehrál jako poslední.
-Nechť $p_{k-1} \in P_C$ libovolný optimální plán na množině incidentů $I_{k-1}$.
-Nadále budeme zkoumat otázku, zda jsme schopni ze znalosti $p_{k-1}$ nalézt optimální plán $p_k$ na množině incidentů $I_k$.
-V první řadě si potřebujeme nadefinovat jak obecně z nějakého plánu $p_1$ získat plán $p_2$. 
+\section{Prohledávání prostoru plánů tahy}
 
+Nechť množina incidentů 
+\begin{equation}
+  I = \{ i_1, \dots , i_n \} \text{, kde } \forall j, k \in \{ 1, \dots n\} \colon T_I(i_j) \leq T_I(i_k),
+\end{equation}
+čili incidenty jsou seřazené podle času nastání.
+
+Definujme množiny incidentů
+\begin{equation}\label{df:INC}
+  I_1, I_2, \dots, I_n \text{, kde } \forall k \in \{ 1, \dots, n \} \colon I_k = \{ i_1, \dots, i_k \}.
+\end{equation}
+
+Incidenty $I_k$ jsou tak incidenty $I_{k-1}$ po odebrání incidentu $i_k$, který se odehrál jako poslední.
+
+Nechť množiny optimálních plánů
+\begin{alignat}{2}
+  & P^*_{1}, P^*_2, \dots, P^*_{n} \subset P_C \quad && \hspace{15pt} \text{optimální plány na množinách incidentů $I_{1}, I_2, \dots, I_n$.}
+\end{alignat}
+
+Nadále budeme zkoumat otázku, zda jsme schopni ze znalosti $p^*_{k-1} \in P^*_{k-1}$ nalézt optimální plán $p^*_k \in P^*_k$ na množině incidentů $I_k$, pro nějaká $k \in \{ 1, \dots, n \}$.
+V první řadě si potřebujeme nadefinovat jak obecně z nějakého plánu $p_1$ získat plán $p_2$. 
 \begin{definice}[Tah]\label{df:tah}
   Nadefinujme tah jako funkci $T \colon P_C \rightarrow P_C$.
-  Nadefinujme tahy
+\end{definice}
+
+\begin{definice}[Inverzní tah]\label{df:tah}
+  Nechť tah $T$. Inverzní tah $T^{-1}$ k tahu $T$ je tah, pro který platí
+
+  \begin{align*}
+    T(p) = p' \Leftrightarrow T^{-1}(p') = p.
+  \end{align*}
+\end{definice}
+
+
+Inverzní tah obecně nemusí existovat. Ukažme si, jaké podmínky musí platit, aby existoval.
+
+\begin{veta}[Podmínka existence inverzního tahu]\label{veta:inverzNutnost}
+  Inverzní tah $T^{-1}$ k tahu $T$ existuje, pokud $\forall p_1, p_2 \in P_C \colon T(p_1) = T(p_2) \implies p_1 = p_2$.
+  Čili tah $T$ je prostá funkce.
+
+\end{veta}
+\begin{dukaz}
+  Inverzní tah $T^{-1}$ zkonstruujeme.
+  Z předpokladu věty víme, že neexistuje plán $p'$ takový, že $T(p_1) = T(p_2) = p'$ pro různá $p_1, p_2 \in P_C$. 
+  Proto můžeme inverzní tah definovat jako
+
+  \begin{alignat*}{2}
+    & T^{-1}(p') = p, \quad && \hspace{10pt} \text{takové, že $T(p) = p'$}.
+  \end{alignat*}
+\end{dukaz}
+
+Tahy budeme používát pro převádění jednoho plánu na druhý nějakou posloupností tahů a budou se hodit pro hledání vztahů mezi plány.
+
+\begin{definice}[Posloupnost tahů]
+  Posloupností tahů velikosti $n$ rozumíme posloupnost tahů $T_1, T_2, \dots, T_n$.
+  Řekneme, že z plánu $p$ získáme plán $p'$ posloupností tahů $T_1, T_2, \dots, T_n$,
+  pokud $(T_1 \circ T_2 \circ \dots \circ T_n)(p) = p'$, kde symbol $\circ$ značí binární operaci skládání funkcí,
+  kde se první vyhodnotí levá funkce a pak pravá.
+\end{definice}
+
+Ukažme si příklady nějakých tahů.
+
+\begin{definice}[Kanonické tahy]
+  Kanonickými tahy rozumíme tahy
   \begin{enumerate}
     \item
       Alokace týmu na výjezdovou stanici.
 
     \item
-      Alokace týmu a alokace záchranného vozidla na stejnou výjezdovou stanici.
+      Alokace záchranného vozidla na výjezdovou stanici.
 
     \item
       Prodloužení doby trvání směny již naalokovaného týmu záchranářu. 
   \end{enumerate}
 
-  Formálně, tah alokace týmu $z'$ na výjezdovou stanici je funkce $M_{z'} : p \rightarrow p'$, kde
+  Formálně, kanonický tah alokace týmu $z'$ na výjezdovou stanici je funkce $M_{z'} : p \rightarrow p'$, kde
   \begin{align*}
     p_Z'(z) &=
       \begin{cases}
@@ -112,11 +167,11 @@ V první řadě si potřebujeme nadefinovat jak obecně z nějakého plánu $p_1
 
   pro $p_Z, p_D, p_A \in p$ a $p_Z', p_D', p_A' \in p'$, kde $p, p' \in P_C$ a $M_{z'}(p) = p'$.
 
-  Tah alokace týmu $z'$ a záchranného vozidla $a'$ na výjezdovou stanici je funkce $M_{z'a'} : p \rightarrow p'$, kde
+  Kanonický tah alokace týmu $z'$ na výjezdovou stanici je funkce $M_{a'} : p \rightarrow p'$, kde
   \begin{align*}
-    p_Z'(z) &= p_Z^T(z) \in T_{z'}(p), \forall z \in Z,
+    p_Z'(z) &= p_Z(z), \forall z \in Z,
     \\
-    p_D'(z) &= p_D^T(z) \in T_{z'}(p), \forall z \in Z,
+    p_D'(z) &= p_D(z), \forall z \in Z,
     \\
     p_A'(a) &=
     \begin{cases}
@@ -127,7 +182,7 @@ V první řadě si potřebujeme nadefinovat jak obecně z nějakého plánu $p_1
 
   pro $p_Z, p_D, p_A \in p$ a $p_Z', p_D', p_A' \in p'$, kde $p, p' \in P_C$ a $M_{z'a'}(p) = p'$.
 
-  Tah prodloužení směny týmu $z'$ je funkce $M_{z'd} : p \rightarrow p'$, kde
+  Kanonický tah prodloužení směny týmu $z'$ je funkce $M_{z'd} : p \rightarrow p'$, kde
   \begin{align*}
     p_Z'(z) &= p_Z(z), \forall z \in Z \\
     p_D'(z) &=
@@ -140,8 +195,94 @@ V první řadě si potřebujeme nadefinovat jak obecně z nějakého plánu $p_1
   \end{align*}
 
   pro $p_Z, p_D, p_A \in p$ a $p_Z', p_D', p_A' \in p'$, kde $p, p' \in P_C$ a $M_{z'd}(p) = p'$.
-
 \end{definice}
+
+Vidíme, že popsat tah formálně je komplikované a pro naše účely zbytečné.
+Proto dále budeme tahy definovat slovně, ale zároveň tak, aby nedocházelo k nejasnostem.
+
+\begin{veta}[Vztah mezi plány a kanonickými tahy]\label{veta:vztahMeziPlanyAKan}
+  Každý plán $p \in P_C$ lze získat z prázdného plánu $p_0$ nějakou posloupností kanonických tahů.
+  Prázdným plánem $p_0$ rozumíme plán, který nemá naalokován žádný tým ani vozidlo, čili $z \in Z, a \in A \colon p_Z(z) = p_A(a) = v_{\emptyset}$.
+\end{veta}
+\begin{dukaz}
+  Nechť libovolný plán $p \in P_C$.
+  Vystačíme si pouze s tahy alokace týmu a alokace záchranného vozidla.
+  Pro $\forall z_i \in Z$ zkonstruujeme tah $T_i$ tak, že bude tým alokovat podle $p_Z(z_i)$.
+  Stejně tak postupujme pro záchranná vozidla, zkonstruujme tah $U_i$ tak, že pro $\forall a_i \in A$ bude vozidlo alokovat podle $p_A(a_i)$.
+  Nechť $T$ libovolná permutace posloupnosti tahů $T_i$ a $A_j$, $i \in \{ 1, \dots , Z_n\}, j \in \{ 1, \dots , A_n \}$.
+  Pak $T(p_0) = p$.
+\end{dukaz}
+
+Vystačili jsme si pouze s tahy alokací týmu a vozidla.
+Tah prodloužení směny jsme pro vyjádření libovolného plánu nepotřebovali.
+To proto, že posloupnost tahů alokace týmu $z$ a následně prodloužení jeho směny je stejný tah, jako rovnou naalokování týmu $z$ s již prodlouženou směnou.
+Závádění tahu prodloužení směny ale má svůj význam, více v (TODO).
+
+\begin{veta}[Inverzní kanonické tahy]
+  Nechť kanonické tahy alokování týmu $z$ tah $T_1$, alokování vozidla $a$ tah $T_2$ a prodloužení směny $z$ o $d$ tah $T_3$.
+  Inverzní tahy k nim existují a jsou:
+
+  \begin{enumerate}
+    \item
+      dealokování týmu $z$ tah $T_1^{-1}$,
+
+    \item
+      dealokování vozidla $a$ tah $T_2^{-1}$,
+
+    \item
+      zkrácení směny $z$ o $d$ tah $T_3^{-1}$.
+  \end{enumerate}
+\end{veta}
+\begin{dukaz}
+  První ukažme, že kanonické tahy splňují nutné podmínky pro existenci inverzního tahu \ref{veta:inverzNutnost}.
+
+  Pro $T_1, T_2, T_3$ platí, že pokud se $T_i(p_1) = T_i(p_2)$, tak se muselo jednat o stejné plány už před provedením tahu a o různé, pokud $T_i(p_1) \neq T_i(p_2)$.
+  Pro $T_1$ je dealokování týmu přesná konstrukce inverzního tahu z důkazu existence inverzní funkce \ref{veta:inverzNutnost}.
+  Stejně tak pro $T_2$ a $T_3$.
+
+  Inverzní tahy k $T_1, T_2$ a $T_3$ existují a jedná se právě o $T_1^{-1}, T_2^{-1}, T_3^{-1}$.
+\end{dukaz}
+
+Tah je prostředek pro převádění mezi plány.
+Tahy umíme provádět opakovaně a zároveň $\forall p \in P_C$ existuje posloupnost kannonických tahů $T = T_1 \circ \dots \circ T_n$ taková, že $T(p_0) = p$ \ref{veta:vztahMeziPlanyAKan},
+jinými slovy, existují tahy takové, že každý $p \in P_C$ je z $p_0$ nějakou jejich posloupností \textit{dosažitelný}.
+
+\begin{definice}[Dosažitelnost tahy]
+  Nechť tahy $T_i$.
+  Plán $p_2$ je dosažitelný tahy $T_i$ z plánu $p_1$, pokud existuje posloupnost tahů $T$ taková, že $T(p_1) = p_2$.
+\end{definice}
+
+Pomocí tahů můžeme $P_C$ \textit{prohledávat}.
+Pokud optimální plán $p^* \in P_C$ je nějakými tahy $T_i$ dosažitelný, pak ho můžeme prohledáváním nalézt.
+Pomocí tahů můžeme $P_C$ prohledávat sofistikovaněji, než je jenom všechny procházet, jak jsme dělali v naivním řešení \ref{df:naivniRes}.
+Některé plány totiž ani nemá smysl prohledávat, jako například plány, které naalokují záchranáře tak nešikovně, že neodbavují úspěšně žádný incident.
+Taková naalokování jenom přispívají do ceny plánu, ale nijak do počtu úspěšně odbavených incidentů.
+Jaké plány má smysl procházet?
+
+\begin{definice}[Plán optimální v ceně]\label{veta:planOptVCene}
+  Nechť $I$ množina incidentů a $p \in P_C$.
+  Řekneme, že plán $p$ je optimální v ceně právě tehdy, když úspěšně odbaví všechny incidenty, $s_c(p, I) = |I|$ a zároveň
+  pro plán $p'$ vzniklý z $p$ provedením libovolného inverzního kanonického tahu platí: $s_c(p', I) < |I|$.
+\end{definice}
+
+\begin{veta}[Optimální plán je optimální v ceně]
+  Nechť libovolný optimální plán $p^* \in P_C$ při účelové funkci $q \in Q_I$ pro danou množinu incidentů $I$, pro který platí $s_c(p, I) = |I|$.
+  Pak $p^*$ je optimální v ceně.
+\end{veta}
+\begin{dukaz}
+  Pro spor předpokládejme, že $p^*$ není optimální v ceně, takže existuje $T^{-1}$ inverzní kanonický tah takový, že $p'^* = T^{-1}(p^*) \colon s_c(p'^*) = |I|$.
+  Při dealokaci týmu, dealokaci vozidla i při zkracování směny snižujeme cenu plánu. To plyne přímo z definice ceny plány \ref{df:cenaPlanu}.
+  Tudiž libovolný inverzní kanonický tah vždy sníží cenu plánu. 
+  Plán $p'^*$ by tak byl plán s nižší cenou než $p^*$, ale zároveň by odbavoval stejný počet incidentů.
+  Vzhledem k návrhu $q \in Q_I$ \ref{kap:opt1Uc}, by pak $p'^*$ musel být optimální, což je spor.
+\end{dukaz}
+
+\begin{definice}[Optimální tahy]
+  Nechť množiny incidentů $I_1, \dots, I_n$ podle definice \ref{df:INC}.
+  Nechť množiny $P_{k}$ všechny optimální plány v ceně na incidentech $I_k$, $\forall k \in \{ 1, \dots, n \}$.
+  Definujme optimální tahy $T^*_{k-1}$ jako takové tahy, že $ P_k = \{ T^*(p) \mid \forall p \in P_{k-1}, \forall T^* \in T^*_{k-1} \}$, $\forall k \in \{ 2, \dots, n \}$.
+\end{definice}
+
 
 %  \begin{table}[h]
 %    \begin{tabularx}{0.4\textwidth} { 
@@ -173,10 +314,20 @@ V první řadě si potřebujeme nadefinovat jak obecně z nějakého plánu $p_1
 
 
 
-
-
-
-
+%  Kanonický tah alokace týmu $z'$ a záchranného vozidla $a'$ na výjezdovou stanici je funkce $M_{z'a'} : p \rightarrow p'$, kde
+%  \begin{align*}
+%    p_Z'(z) &= p_Z^T(z) \in T_{z'}(p), \forall z \in Z,
+%    \\
+%    p_D'(z) &= p_D^T(z) \in T_{z'}(p), \forall z \in Z,
+%    \\
+%    p_A'(a) &=
+%    \begin{cases}
+%      p_Z'(z) & \text{pro záchranné vozidlo $a' \in A \colon p_A(a') = v_{\emptyset}, v \in V$.}, \\
+%      p_A(a) & \text{pro $\forall a \in A \setminus \{ a' \}$},
+%    \end{cases}
+%  \end{align*}
+%
+%  pro $p_Z, p_D, p_A \in p$ a $p_Z', p_D', p_A' \in p'$, kde $p, p' \in P_C$ a $M_{z'a'}(p) = p'$.
 
 
 % \section{Heuristické přístupy}\label{kap:heur}
