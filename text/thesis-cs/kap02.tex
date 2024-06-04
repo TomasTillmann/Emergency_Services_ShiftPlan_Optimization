@@ -238,9 +238,9 @@ Proto dále budeme tahy definovat slovně, ale zároveň tak, aby nedocházelo k
 Vystačili jsme si pouze s tahy alokací týmu a vozidla.
 Tah prodloužení směny jsme pro vyjádření libovolného plánu nepotřebovali.
 To proto, že posloupnost tahů alokace týmu $z$ a následně prodloužení jeho směny je stejný tah, jako rovnou naalokování týmu $z$ s již prodlouženou směnou.
-Závádění tahu prodloužení směny ale má svůj význam, více v (TODO).
+Závádění tahu prodloužení směny ale má svůj význam \ref{veta:konkrOptTahy}.
 
-\begin{veta}[Inverzní kanonické tahy]
+\begin{veta}[Inverzní kanonické tahy]\label{veta:invKanTahy}
   Nechť kanonické tahy alokování týmu $z$ tah $T_1$, alokování vozidla $a$ tah $T_2$ a prodloužení směny $z$ o $d$ tah $T_3$.
   Inverzní tahy k nim existují a jsou:
 
@@ -315,9 +315,20 @@ Jaké plány má smysl procházet?
   Vzhledem k návrhu $q \in Q_I$ \ref{kap:opt1Uc}, by pak $p'^*$ musel být optimální, což je spor s optimalitou $p^*$.
 \end{dukaz}
 
+\begin{veta}\label{veta:kazdyInvSnizujeCenu}
+  Každý inverzní kanonický tah kromě identity snižuje cenu.
+  Stejně tak každé snížení ceny plánu lze docílit nějakým inverzním kanonickým tahem kromě identity.
+\end{veta}
+\begin{dukaz}
+  První plyne přímo z konstrukce inverzních kanonických tahů \ref{veta:invKanTahy} a z definice ceny plánu \ref{df:cenaPlanu}.
+
+  Druhé, snížení ceny plánu lze docílit jedině dealokací nějakého týmu nebo vozidla, nebo zkrácením směny nějakému týmu.
+  Z toho a definice ceny plánu \ref{df:cenaPlanu} máme dokázano.
+\end{dukaz}
+
 \begin{veta}[Vztah optimálního plánu v ceně na $I_{k}$ ku optimálnímu plánu v ceně na $I_{k-1}$]\label{veta:vztahOptim}
   Nechť množiny incidentů $I_1, \dots, I_n$ podle definice \ref{df:INC}.
-  Nechť množiny $P_{k}$ všechny optimální plány v ceně na incidentech $I_k$, $\forall k \in \{ 1, \dots, n \}$.
+  Nechť množina $P_{k}$ všechny optimální plány v ceně na incidentech $I_k$, $\forall k \in \{ 1, \dots, n \}$.
   Nechť $p_k \in P_k$ libovolný optimální plán v ceně na $I_k$.
 
   Pak existuje optimální plán v ceně $p_{k-1} \in P_{k-1}$ na $I_{k-1}$, který získáme nějakým inverzním kanonickým tahem $T^{-1}_1$ a případně dealokací záchranného vozidla $T^{-1}_2$ z $p$,
@@ -351,9 +362,11 @@ Jaké plány má smysl procházet?
   pro které $s_c(T^{-1}_1(p_{k}), I_{k-1}) = k-1$ a $u(p_{k-1})$ je nejmenší.
   Důsledkem věty \ref{veta:pocetKanTahu} je takových dvojic konečně mnoho.
 
-  Tak platí, že $p_{k-1} = T^{-1}_1(T^{-1}_2(p_{k})) \colon s_c(p_{k-1}, I_{k-1}) = k-1$ a zároveň neexistuje inverzní kanonický tah kromě identity,
-  po jehož provedení na $p_{k-1}$ by odbavoval stejný počet incidentů. To plyne z výběru $T^{-1}_1$ a $T^{-1}_2$ takových, že $p_{k-1}$ je nejlevnější.
-  Z toho důvodu je $p_{k-1}$ také optimální v ceně.
+  Tak platí, že $p_{k-1} = T^{-1}_1(T^{-1}_2(p_{k})) \colon s_c(p_{k-1}, I_{k-1}) = k-1$ a jeho cena je nejmenší možná.
+  Z výběru $T^{-1}_1$ a $T^{-1}_2$ takových, že $p_{k-1}$ je nejlevnější a z věty \ref{veta:kazdyInvSnizujeCenu} plyne,
+  že neexistuje inverzní kanonický tah různý od identity,
+  po jehož provedení na $p_{k-1}$ by odbavoval stejný počet incidentů. 
+  Z toho důvodu je $p_{k-1}$ také optimální v ceně a $p_{k-1} = T^{-1}_1(T^{-1}_2(p_{k}))$.
 \end{dukaz}
 
 \begin{veta}[Dosažitelnost plánu optimálního v ceně z prázdného plánu]\label{veta:dosOptZPrazdnehoPlanu}
@@ -371,7 +384,7 @@ Jaké plány má smysl procházet?
   Tento vztah platí pro $\forall k \in \{ 1, \dots, n \}$, takže indukcí sestrojíme $T = T_1, \circ \dots \circ T_k$ takové, že $p_k = T(p_0)$ pro všechna $k$.
 \end{dukaz}
 
-\begin{veta}\label{veta:optJeDosaz}
+\begin{veta}[Dosažitelnost optimálního plánu z prázdného plánu]\label{veta:optJeDosaz}
   Nechť optimální plán $p^*$ úspěšně odbavuje všechny incidenty $I$.
   Pak je $p^*$ dosažitelný z $p_0$ nějakou posloupností $k$-optimálních tahů, $k \in \{ 1, \dots, |I| \}$.
 \end{veta}
@@ -383,6 +396,43 @@ Jaké plány má smysl procházet?
 
 Věta \ref{veta:optJeDosaz} nám dává návod pro prohledávání plánu z $p_0$ po vrstvách $P_0 = \{ p_0\}, P_1, \dots, P_{|I|}$, 
 kde z vrstvy $P_k$ vrstvu $P_{k+1}$ zkonstruujeme provedením všech $k$-optimálních tahů.
+Jak ale nalezneme $k$-optimální tahy ze znalosti $P_k$?.
+
+\begin{veta}\label{veta:konkrOptTahy}
+  Nechť množiny incidentů $I_1, \dots, I_n$ podle definice \ref{df:INC}.
+  Nechť množiny $P_{k}$ všechny optimální plány v ceně na incidentech $I_k$, $\forall k \in \{ 1, \dots, n \}$.
+
+  Pak tahy 
+  \begin{alignat*}{2}
+    & T^*_k = \bigcup_{\forall p_{k-1} \in P_{k-1}} T_k = \min_{T^* \in T'} \{ u(T^*(p_{k-1}), I_k) \}, \quad && T' = \{ T \mid s_c(T(p_{k-1}), I_k) = k \},
+  \end{alignat*}
+
+  kde $T$ je kanonický tah, jsou $k$-optimální tahy.
+  Tahy $T^*_k$ jsou nejlevnější alokace týmu, prodloužení směny a případně naalokování vozidla takové,
+  že $T^* \in T^*_k \colon s_c(T^*(p_{k-1}), I_k) = k$ pro nějaký $p_{k-1} \in P_{k-1}$.
+\end{veta}
+\begin{dukaz}
+  Nechť $p_{k-1} \in P_{k-1}$ a příslušný $T_k$. První ukažme, že $P^*_k = \{ T(p_{k-1}) \mid \forall T \in T_k \} \subseteq P_k$.
+  Pro spor předpokládejme, že $\exists p \in P^*_k \colon p \not \in P_k$.
+  Plán $p$ není optimální v ceně na $I_k$, takže existuje inverzní kanonický tah $U$ jiný než identita takový, že $s_c(U(p), I_k) = s_c(p, I_k) = k$.
+  Z věty \ref{veta:kazdyInvSnizujeCenu} víme, že každý inverzní kanonický tah kromě identity snižuje cenu, takže zároveň platí: $u(U(p)) < p$.
+  To je ale spor s konstrukcí $p$, ten vznikl nejlevnějším kanonickým tahem takovým, že odbavuje $k$ incidentů.
+  Sjednocením přes všechny $p_{k-1}$ dostaneme 
+  \begin{equation*}
+    \bigcup_{\forall p_{k-1} \in P_{k-1}} \{ T(p_{k-1}) \mid \forall T \in T_k \} \subseteq P_k.
+  \end{equation*}
+
+  Ukažme obrácenou inkluzi. Z věty \ref{veta:vztahOptim} víme, že pro každý $p_k \in P_k$ existuje $p_{k-1} \in P_{k-1}$ a optimální tah $T^*$ takový,
+  že $T^*(p_{k-1}) = p_k$. Chceme ukázat, že $T^* \in T^*_k$.
+  Pro spor předpokládejme, že $T^* \not \in T^*_k$, tudiž $T^*$ není nejlevnější kanonický tah, kde platí $s_c(T^*(p_{k-1}), I_k) = k$.
+  Musí tak platit, že $T^*(p_{k-1})$ může být levnější a zároveň odbavovat stejný počet incidentů $k$. 
+  Z toho a z věty \ref{veta:kazdyInvSnizujeCenu} víme, že v takovém případě existuje inverzní kanonický tah $U$ různý od identity: $s_c(U(T^*(p_{k-1}))) = s_c(T^*(p_{k-1}))$,
+  což je spor s optimalitou v ceně $p_k$.
+
+  Každý $p_k \in P_k$ je dosažitelný z $p_{k-1}$ nějakým tahem z $T^*_k$, tím jsme dokázali druhou inkluzi.
+\end{dukaz}
+
+Ukažme si algoritmus, který bude prohledávat prostor plánu po vrstvách $P_k$ tahy $T^*_k$.
 
 \begin{algorithm}[h]
   \begin{algorithmic}[1]
@@ -390,7 +440,7 @@ kde z vrstvy $P_k$ vrstvu $P_{k+1}$ zkonstruujeme provedením všech $k$-optimá
     \If{$k = h$}
       \State \Return $\{ p \}$
     \EndIf
-    \State $T^*_k = \min_{T^* \in T'} \{ u(T^*(p), I_k) \}, T' = \{ s_c(T(p), I_k) = k\}, \text{$T$ je kanonický tah}$
+    \State $T^*_k$ \gets $k$-optimální tahy podle \ref{veta:konkrOptTahy}
     \State $P^*$ \gets $\emptyset$
     \For{$T^* \in T^*_k$}
       \State $p'$ \gets $T^*(p)$
@@ -404,30 +454,28 @@ kde z vrstvy $P_k$ vrstvu $P_{k+1}$ zkonstruujeme provedením všech $k$-optimá
     \State \Return $P^*$
   \EndFunction
   \end{algorithmic}
-  \caption{Prohledávání prostoru plánu rekurzivně přes $k$-optimální tahy}
+  \caption{Algoritmus rekurzivního prohledávání prostoru plánů $k$-optimálními}
   \label{alg:rekProhPlanu}
 \end{algorithm}
 
-Pro zjištění všech optimálních plánu $P^*$ na množině incidentů $I$ algoritmus \ref{alg:rekProhPlanu} zavoláme $P^* = $ OptimalMovesSearch($p_0$, $I_1$, $|I|$).
+Pro zjištění všech optimálních plánu $P^*$ na množině incidentů $I$ algoritmus \ref{alg:rekProhPlanu} zavoláme: $P^* = $ OptimalMovesSearch($p_0$, $I_1$, $|I|$).
 
 \begin{veta}
-  Algoritmus rekurzivního prohledávání prostoru plánů \ref{alg:rekProhPlanu} je korektní a úplný.
+  Algoritmus rekurzivního prohledávání prostoru plánů $k$-optimálními tahy \ref{alg:rekProhPlanu} je korektní a úplný.
 \end{veta}
 \begin{dukaz}
-  V kroku 5 vytvoříme všechny $k$-optimální tahy $T^*_k$.
-  Algoritmus rekurzivně prohledává každou posloupnost $k$-optimálních tahů $T^*_1, \dots, T^*_{|I|}$.
-  Z toho důvodu a z dosažitelnosti \ref{veta:optJeDosaz} prohledáme i cestu tvořící libovolný optimální plán $p^* = (T^*_1 \circ \dots \circ T^*_{|I|})(p_0)$.
+  V kroku 5 konstruujeme $T^*_k$ podle \ref{veta:konkrOptTahy}, o nich víme že se jedná o $k$-optimální tahy.
+  Algoritmus tudiž rekurzivně prohledává každou posloupnost $k$-optimálních tahů $T^*_1, \dots, T^*_{|I|}$.
+  Z toho důvodu a z dosažitelnosti \ref{veta:optJeDosaz} prohledá i cestu tvořící libovolný optimální plán $p^* = (T^*_1 \circ \dots \circ T^*_{|I|})(p_0)$.
   Takže algoritmus je úplný.
 
   Ze všech zkonstruovaných plánů v krocích 10 až 14 vybíráme ty s nejnižší cenou.
   Z úplnosti žádný nevynecháme, takže algoritmus je korektní.
 \end{dukaz}
 
-
-\begin{veta}
-  Nechť $p \in P_C$ libovolný plán odbavující všechny incdenty $I$, pak existuje posloupnost inverzních kanonických tahů taková, že $p$ je optimální v ceně na $I$.
-\end{veta}
-
+\begin{definice}[Strom optimálních tahů]
+  Strom optimálních tahů rozumíme strom rekurze algoritmu prohledávání prostoru plánů $k$-optimálními tahy \ref{alg:rekProhPlanu}.
+\end{definice}
 
 %  Uvažme tým $z_k$, který úspěšně odbavil $i_k$. Pokud $z_k$ v průběhu simulace neodbavuje žádné jiné incidenty,
 %  pak jeho dealokováním vznikne levnější plán, který odbavuje stejný počet incidentů. Tah $T^{-1}_1$ tak bude dealokace $z_k$.
