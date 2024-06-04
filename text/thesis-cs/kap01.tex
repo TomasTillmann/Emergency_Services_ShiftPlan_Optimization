@@ -368,7 +368,7 @@ Proto účelové funkce $s_c$ a $u$ přeškálujeme:
 \end{definice}
 
 Množinu incidentů $I$ budeme považovat za pevně zvolenou a bude nás hlavně zajímat změna účelové funkce v závislosti na pohotovostním plánu.
-Budeme proto psát ekvivalentně $s'(p)$ a $u'(p)$ a předpokládat $I$ jako stejnou a pevně zvolenou, pokud nebude řečeno jinak. 
+Budeme proto psát ekvivalentně $s'_c(p)$ a $u'(p)$ a předpokládat $I$ jako stejnou a pevně zvolenou, pokud nebude řečeno jinak. 
 
 \begin{definice}[Optimalizační úloha nalezení optimálního plánu pohotovostní služby jako optimalizační úloha s více účelovými funkcemi]\label{df:optUloha2uc}
   \begin{align*}
@@ -376,23 +376,53 @@ Budeme proto psát ekvivalentně $s'(p)$ a $u'(p)$ a předpokládat $I$ jako ste
   \end{align*}
 
   kde $P_C$ je množina všech povolených plánu pohotovostní služby splňující omezení $C$
-  , $u'$ a $s'$ jsou účelové funkce \ref{df:simulaceSkal} \ref{df:cenaPlanuSkal} a $I$ je daná množina incidentů.
+  , $u'$ a $s'_c$ jsou účelové funkce \ref{df:simulaceSkal} \ref{df:cenaPlanuSkal} a $I$ je daná množina incidentů.
   Množinu incidentů $I$ budeme považovat za pevně zvolenou, čili ji neuvažujeme jako vstupní parametr $q$, pokud nebude řečeno jinak.
 \end{definice}
 
 Problém nalezení optimálního plánu pohotovostní služby jsme definovali jako optimalizační úlohu s více účelovými funkcemi \ref{df:optUloha2ucObecne}.
 
-Účelové funkce jsou přeškálování počtu úspěšně odbavených incidentů $s'(p)$ a přeškálování záporné ceny plánu pohotovostní služby $u'(p)$, $p \in P_C$.
-Všimněmě si, že maximalizování $s'$ bude velmi pravděpodobně vést k maximalizování $u'$, tedy k minimalizování $-u'$.
+Účelové funkce jsou přeškálování počtu úspěšně odbavených incidentů $s'_c(p)$ a přeškálování záporné ceny plánu pohotovostní služby $u'(p)$, $p \in P_C$.
+Všimněmě si, že maximalizování $s'_c$ bude velmi pravděpodobně vést k maximalizování $u'$, tedy k minimalizování $-u'$.
 Plány úspěšně odbavující incidenty zřejmě budou používát více záchranných týmu s delšími směnami a více záchranných vozidel, takže budou dražší.
 
 \section{Metody pro řešení optimalizačního problému s více účelovými funkcemi}\label{kap:metodyProReseniOptSViceUcel}
 
 Klasifikovali jsme problém nalezení optimálního plánu pohotovostní služby jako optimalizační úlohu s více účelovými funkcemi \ref{df:optUloha2uc}.
-Zároveň jsme pozorovali, že maximalizováním $s'$ minimalizujeme $-u'$ a naopak.
+Zároveň jsme pozorovali, že maximalizováním $s'_c$ minimalizujeme $-u'$ a naopak.
 Optimalizační úlohy s více účelovými funkcemi, mezi kterými je potřeba nalézt kompromis pro nalezení optima, jsou velmi časté,
 a proto existuje několik metod, které vhodně převedou více účelových funkcí na jednu účelovou funkci.
 Vybrané metody si ukážeme a rozmyslíme si, které budeme používat.
+
+\subsection{Lexikografické porovnání}
+
+Jedná se o způsob převedení víceúčelové funkce pouze na jednu účelovou funkci, kde konfigurace porovnáváme lexikograficky podle nějaké permutace jednotlivých účelových funkcí,
+která určuje jejich prioritu nad ostatními.
+
+\begin{definice}[Účelová funkce $q'$ porovnávájící $x \in \mathcal{X}$ lexikograficky podle permutace $\pi \in S_m$]
+  \begin{align*}
+    q'(x_1) < q'(x_2) \Leftrightarrow \bigvee_{k=1}^m \left ( \left ( \bigwedge_{i=1}^{k-1} q_{\pi(i)}(x_1) = q_{\pi(i)}(x_2) \right ) \land q_{\pi(k)}(x_1) < q_{\pi(k)}(x_2) \right )
+  \end{align*}
+  a 
+  \begin{align*}
+    q'(x_1) = q'(x_2) \Leftrightarrow q_{\pi(i)}(x_1) = q_{\pi(i)}(x_2), \forall i \in \{ 1, \dots, m \}.
+  \end{align*}
+\end{definice}
+
+Jedná se tedy o optimalizaci po jednotlivých účelových funkcích podle určené priority. 
+Není obecně vhodné, protože neumí nalézt kompromis mezi jednotlivými účelovými funkcemi.
+
+\begin{definice}[Lexikografické porovnávání optimalizace pohotovostního plánu]\label{df:lexPorovnaniPohotovost}
+  \begin{align*}
+    q^{\text{Lex}}(p_1) < q^{\text{Lex}}(p_2) \Leftrightarrow ( s'_c(p_1) < s'_c(p_2)) \lor (s'_c(p_1) = s'_c(p_2) \land u'(p_1) < u'(p_2))
+  \end{align*}
+  a 
+  \begin{align*}
+    q^{\text{Lex}}(p_1) = q^{\text{Lex}}(p_2) \Leftrightarrow s'_c(p_1) = s'_c(p_2) \land u'(p_1) = u'(p_2).
+  \end{align*}
+\end{definice}
+
+Pokud za účelovou funkci zvolíme $q^{\text{Lex}}$, tak optimální plán bude takový, že odbaví co nejvíce incidentů je možné, a z nich budou optimální ty nejlevnější plány.
 
 \subsection{Vážená suma účelových funkcí}\label{kap:vazenaSumaUcelF}
 
@@ -473,8 +503,8 @@ Pohotovostní služby chtějí vždy upřednostňovat maximalizování $s'$ nad 
 z toho důvodu je pro nás velmi žádoucí, abychom byli schopni pro účelovou funkci určit, zda chceme a jak moc upřednostit maximalizování $s'$ nebo $-u'$.
 Upřednostníme pak maximalizování $s'$.
 
-Vážená suma účelových funkcí $q_{\alpha}$ \ref{df:vazenaSumaPohotovost} spolu s
-váženou exponenciální sumou účelových funkcí $q_{\alpha p}$ \ref{df:vazenaSumaExpPohotovost} tak patří mezi preferované způsoby návrhu jedné účelové funkce.
+Lexikografické porovnání $q^{\text{Lex}}$ \ref{df:lexPorovnaniPohotovost}, vážená suma účelových funkcí $q_{\alpha}$ \ref{df:vazenaSumaPohotovost} a
+vážená exponenciální suma účelových funkcí $q_{\alpha p}$ \ref{df:vazenaSumaExpPohotovost} tak patří mezi preferované způsoby návrhu jedné účelové funkce.
 
 \begin{definice}[Optimalizační úloha nalezení optimálního plánu pohotovostní služby jako optimalizační úloha s jednou účelovou funkcí]\label{df:optUloha1uc}
   \begin{align*}
