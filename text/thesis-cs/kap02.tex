@@ -88,16 +88,6 @@ Nalezením rekurzivních vztahů by pak simulace $s$ nebyla černou skříňkou 
   Incidenty $I_k$ jsou tak incidenty $I_{k-1}$ po odebrání incidentu $i_k$, který se odehrál jako poslední.
 \end{definice}
 
-\begin{definice}[Množiny optimálních plánů]
-  Nechť množiny optimálních plánů
-  \begin{alignat}{2}
-    & P^*_0, P^*_1, \dots, P^*_{n} \subset P_C \quad && \hspace{15pt} \text{optimální plány na množinách incidentů $I_0, I_1, \dots, I_n$.}
-  \end{alignat}
-  Optimální plány $P_0$ pro prázdnou množinu incidentů obsahují prázdný plán $p_0$, neobsahující alokace žádných týmů ani vozidel.
-\end{definice}
-
-Nadále budeme zkoumat otázku, zda jsme schopni ze znalosti $p^*_{k-1} \in P^*_{k-1}$ nalézt optimální plán $p^*_k \in P^*_k$ na množině incidentů $I_k$, pro nějaká $k \in \{ 1, \dots, n \}$.
-V první řadě si potřebujeme nadefinovat jak obecně z nějakého plánu $p_1$ získat plán $p_2$. 
 \begin{definice}[Tah]\label{df:tah}
   Nadefinujme tah jako funkci $T \colon P_C \rightarrow P_C$.
   Pokud $p' = T(p)$, řekneme, že jsme plán $p'$ získali z $p$ tahem $T$.
@@ -231,24 +221,6 @@ Například, pokud bychom plánu chtěli alokovat tým, ale už nejsou žádné 
   Řekneme, že tah $T$ lze provést na plánu $p \in P_C$, pokud $T(p)$ je definováno.
 \end{definice}
 
-\begin{veta}[Vyjádření plánu kanonickými tahy]\label{veta:vztahMeziPlanyAKan}
-  Každý plán $p \in P_C$ lze získat z prázdného plánu $p_0$ nějakou posloupností kanonických tahů.
-  Prázdným plánem $p_0$ rozumíme plán, který nemá naalokován žádný tým ani vozidlo, čili $z \in Z, a \in A, p_Z, p_A \in p_0 \colon p_Z(z) = p_A(a) = v_{\emptyset}$.
-\end{veta}
-\begin{dukaz}
-  Nechť libovolný plán $p \in P_C$.
-  Vystačíme si pouze s tahy alokace týmu a alokace záchranného vozidla.
-  Pro $\forall z_i \in Z$ zkonstruujeme tah $T_i$ tak, že bude tým alokovat podle $p_Z(z_i), p_Z \in p$.
-  Stejně tak postupujme pro záchranná vozidla, zkonstruujme tah $U_i$ tak, že pro $\forall a_i \in A$ bude vozidlo alokovat podle $p_A(a_i), p_A \in p$.
-  Nechť $T$ libovolná posloupnost tahů $T_i$ a $A_j$, $i \in \{ 1, \dots , Z_n\}, j \in \{ 1, \dots , A_n \}$.
-  Pak $T(p_0) = p$.
-\end{dukaz}
-
-Vystačili jsme si pouze s tahy alokací týmu a vozidla.
-Tah prodloužení směny jsme pro vyjádření libovolného plánu nepotřebovali.
-To proto, že posloupnost tahů alokace týmu $z$ a následně prodloužení jeho směny je stejný tah, jako rovnou naalokování týmu $z$ s již prodlouženou směnou.
-Závádění tahu prodloužení směny ale má svůj význam \ref{veta:konkrOptTahy}.
-
 \begin{veta}[Inverzní kanonické tahy]\label{veta:invKanTahy}
   Nechť kanonické tahy alokování týmu $z$ tah $T_1$, alokování vozidla $a$ tah $T_2$ a prodloužení směny $z$ o $d$ tah $T_3$.
   Inverzní tahy k nim existují a jsou:
@@ -271,8 +243,8 @@ Závádění tahu prodloužení směny ale má svůj význam \ref{veta:konkrOptT
   První ukažme, že kanonické tahy splňují nutné podmínky pro existenci inverzního tahu \ref{veta:inverzNutnost}.
   Pro identitu platí triviálně.
 
-  Pro $T_1, T_2, T_3$ platí, že pokud se $T_i(p_1) = T_i(p_2)$, tak se muselo jednat o stejné plány už před provedením tahu a o různé, pokud $T_i(p_1) \neq T_i(p_2)$.
-  Pro $T_1$ je dealokování týmu přesná konstrukce inverzního tahu z důkazu existence inverzní funkce \ref{veta:inverzNutnost}.
+  Pro $T_1, T_2, T_3$ platí, že pokud $T_i(p_1) = T_i(p_2)$, tak se muselo jednat o stejné plány už před provedením tahu a o různé, pokud $T_i(p_1) \neq T_i(p_2)$.
+  Pro $T_1$ je dealokování týmu přesná konstrukce inverzního tahu z důkazu věty \ref{veta:inverzNutnost}.
   Stejně tak pro $T_2$ a $T_3$.
 
   Inverzní tahy k $T_1, T_2$ a $T_3$ existují a jedná se právě o $T_1^{-1}, T_2^{-1}, T_3^{-1}$.
@@ -294,24 +266,9 @@ Závádění tahu prodloužení směny ale má svůj význam \ref{veta:konkrOptT
   To jsou přesně inverzní kanonické tahy.
 \end{dukaz}
 
-\begin{veta}[Počet všech kanonických tahů]\label{veta:pocetKanTahu}
-  Nechť $T$ množina všech kanonických tahů. Pak $|T| \leq (Z_n + A_n) \cdot V_n + Z_n + 1$.
-\end{veta}
-\begin{dukaz}
-  Kanonické tahy jsou alokace týmu, prodloužení směny týmu, naalokování záchranného vozidla a identita.
-  Každý tým, těch je celkově $Z_n$, můžeme naalokovat nejvýše na každou výjezdovou stanici, těch je $V_n$, pro libovolný plán $p \in P_C$.
-  Pro naalokování vozidel platí také, akorát jich je $A_n$.
-  Prodloužit směny můžeme nanejvýš všem již naalokovaným týmům, těch je nanejvýš $Z_n$.
-  Tah identita je jen jeden.
-\end{dukaz}
-
-Tah je prostředek pro převádění mezi plány.
-Tahy umíme provádět opakovaně a zároveň $\forall p \in P_C$ existuje posloupnost kannonických tahů $T = T_1 \circ \dots \circ T_n$ taková, že $T(p_0) = p$ \ref{veta:vztahMeziPlanyAKan},
-jinými slovy, existují tahy takové, že každý $p \in P_C$ je z $p_0$ nějakou jejich posloupností \textit{dosažitelný}.
-
 \begin{definice}[Dosažitelnost tahy]
-  Nechť tahy $T_i$.
-  Plán $p_2$ je dosažitelný tahy $T_i$ z plánu $p_1$, pokud existuje posloupnost tahů $T$ taková, že $T(p_1) = p_2$.
+  Nechť množina tahů $T$.
+  Plán $p_2$ je dosažitelný tahy $T$ z plánu $p_1$, pokud existuje posloupnost tahů $T_1 \in T, \dots, T_n \in T$ taková, že $(T_1 \circ \dots \circ T_n)(p_1) = p_2$.
 \end{definice}
 
 Pomocí tahů můžeme $P_C$ \textit{prohledávat}.
@@ -489,11 +446,14 @@ abychom při prohledání všech dosažitelných plánu libovolnou posloupností
     \State $T^*_k$ \gets optimální tahy \ref{df:optimalniTahy}
     \State $P^*$ \gets $\emptyset$
     \For{$T^* \in T^*_k$}
-      \State $p'$ \gets $T^*(p)$
-      \State $P'^*$ \gets \text{OptimalMovesSearch($p'$, $I_{k+1}$, $h$)}
-      \If{$u(p) = u(p'), p' \in P'^*$}
+      \State $P'^*$ \gets \text{OptimalMovesSearch($T^*(p)$, $I_{k+1}$, $h$)}
+      \State $p^*$ \gets libovolný z $P^*$
+      \State $p'^*$ \gets libovolný z $P'^*$
+      \If{$P^* = \emptyset$}
+        \State $P^*$ \gets $P'^*$ 
+      \ElsIf{$q^{\text{Lex}}(p^*) = q^{\text{Lex}}(p'^*)$}
         \State $P^*$ sjednoť s $P'^*$
-      \ElsIf{$u(p') < u(p), p' \in P'^*$}
+      \ElsIf{$q^{\text{Lex}}(p^*) < q^{\text{Lex}}(p'^*)$}
         \State $P^*$ nahraď $P'^*$
       \EndIf
     \EndFor
@@ -506,98 +466,33 @@ abychom při prohledání všech dosažitelných plánu libovolnou posloupností
 
 Pro zjištění všech optimálních plánu $P^*$ na množině incidentů $I$ algoritmus \ref{alg:rekProhPlanu} zavoláme: $P^* = $ OptimalMovesSearch($p_0$, $I_1$, $|I|$).
 
-\begin{veta}\label{veta:algoritmusPredpoklady}
-  Za předpokladu, že optimální plán $p^*$ odbaví všechny incidenty $I$ a použijeme účelovou funkci $q^{\text{Lex}}$ \ref{df:lexPorovnaniPohotovost},
-  je algoritmus rekurzivního prohledávání prostoru plánů $k$-optimálními tahy \ref{alg:rekProhPlanu} korektní a úplný.
+\begin{veta}[Korektnost a úplnost algoritmu \ref{alg:rekProhPlanu}]\label{}
+  Algoritmus rekurzivního prohledávání prostoru plánů optimálními tahy \ref{alg:rekProhPlanu} nalezne všechny optimální plány $P^* \in P_C$ při účelové funkci $q^{\text{Lex}}$.
 \end{veta}
 \begin{dukaz}
-  V kroku 5 konstruujeme $T^*_k$ podle \ref{veta:konkrOptTahy}, o nich víme že se jedná o $k$-optimální tahy.
-  Algoritmus tudiž rekurzivně prohledává každou posloupnost $k$-optimálních tahů $T^*_1, \dots, T^*_{|I|}$.
-  Z toho důvodu a z dosažitelnosti \ref{veta:optJeDosaz} prohledá i cestu tvořící libovolný optimální plán $p^* = (T^*_1 \circ \dots \circ T^*_{|I|})(p_0)$ odbavující všechny incidenty $I$.
+  Z věty \ref{veta:dosazitelnostOptimalnimiTahy} víme, že $p^*$ je dosažitelný nějakou posloupností optimálních tahů. 
+  V algoritmu v kroku 5 množina $T^*_k$ obsahuje všechny optimální tahy, které lze provést na plánu $p$ na množině $I_k$.
+  V kroku 8 se rekurzivně zavoláme na každý $T^*(p), T^* \in T^*_k$.
+  Algoritmus tudiž prohledá každou posloupnost optimálních tahů, takže určitě i všechny takové, kterými se získá libovolný optimální plán $p \in P^*$ \ref{veta:dosazitelnostOptimalnimiTahy}.
   Algoritmus je úplný.
 
-  Ze všech zkonstruovaných plánů v krocích 10 až 14 vybíráme ty s nejnižší cenou.
-  Z úplnosti žádný nevynecháme, takže nalezne plány optimální v ceně $P_{|I|}$ na $I$.
-  Pro
-  \begin{alignat*}
-    \forall p^* \in P_{|I|} \colon q^{\text{Lex}}(p^*) \geq q^{\text{Lex}}(p), \quad && p \in P_C
-  \end{alignat*}
-  z definice $q^{\text{Lex}}$. Algoritmus je korektní.
+  V krocích 11--17 z plánů, které se vrátí rekurzí vybíráme pouze ty optimální vůči $q^{\text{Lex}}$.
+  Vybíráme tak ze všech plánů, které jsou dosažitelné nějakou posloupností optimálních tahů ty optimální.
+  Algoritmus je korektní.
 \end{dukaz}
 
 \begin{definice}[Strom optimálních tahů]
-  Strom optimálních tahů rozumíme strom rekurze algoritmu prohledávání prostoru plánů $k$-optimálními tahy \ref{alg:rekProhPlanu}.
-\end{definice}
-
-\begin{veta}\label{veta:cestaAoptimum}
-  Spusťme algoritmus \ref{alg:rekProhPlanu} na množině plánů, kde optimální plány při $q^{\text{Lex}}$ odbavují všechny incidenty.
-  Libovolná cesta z kořene do listu stromu optimálních tahů v hloubce $|I|$ , odpovídá nějakému optimálnímu řešení.
-  Z úplnosti algoritmu \ref{veta:algoritmusPredpoklady} i každé optimální řešení odpovídá nějaké takové cestě.
-\end{veta}
-\begin{dukaz}
-\end{dukaz}
-
-Předpoklad, že za účelovou funkci použijeme $q^{\text{Lex}}$ není problém, protože patří mezi preferované účelové funkce, více probráno v sekci \ref{kap:opt1Uc}.
-Avšak předpoklad, že optimální plán umí odbavit všechny incidenty je dost silný.
-Jednoduše takovou podmínku nelze ověřit a rádi bychom uměli najít optimální plány i takové, které neumí odbavit všechny incidenty.
-Ukažme si, jak se prohledávání plánů $k$-optimálními tahy \ref{alg:rekProhPlanu} bude chovat, pokud je optimální plán nebude umět všechny odbavit.
-
-Nechť množina incidentů $I$ taková, že optimální plán $p^*$ splňuje $s_c(p^*, I) \neq |I|$ při účelové funkci $q^{\text{Lex}}$.
-Z toho plyne, že neexistuje žádný plán, který by uměl odbavit všechny incidenty.
-Spusťme algoritmus \ref{alg:rekProhPlanu} pro množinu $I$.
-Analyzujme chod algoritmu \ref{alg:rekProhPlanu}, jak prochází \textit{stromem optimálních tahů}.
-
-Z věty \ref{veta:cestaAoptimum} víme, že pokud optimální plány při $q^{\text{Lex}}$ odbavují všechny incidenty, libovolná 
-cesta z kořene do listu v hloubce velikosti množiny incidentů odpovídá nějakému optimálnímu řešení.
-Pro list v menší hloubce $k$ cesta odpovídá plánu, pro který je množina $k$-optimálních tahů prázdná.
-Neproběhne cyklus na řádcích 7 až 15 \ref{alg:rekProhPlanu}, a rekurze se tím předčasně ukončí.
-Pokud algoritmus \ref{alg:rekProhPlanu} spustíme na $I$, tak nebude existovat žádná cesta z kořene do listu v hloubce $|I|$, protože se rekurze předčasně ukončí pro každý plán,
-protože neexistuje žádný, který by uměl odbavit všechny.
-
-Algoritmus tudiž vrátí plány, které odbaví prvních nejvíce $k$ incidentů.
-Mezi tyto plány ale $p^*$ obecně nepatří, například co když $p^*$ prvních $k$ plánu neodbavuje a odbavuje všechny $|I| - k > k$ plánů. 
-Takové plány algoritmus vůbec \ref{alg:rekProhPlanu} neprohledal.
-
-Upravme algoritmus \ref{alg:rekProhPlanu}, že $T^*_k$ nebude nikdy prázdná množina a bude vždy obsahovat alespoň tah identita. 
-Rekurze se nikdy neukončí předčasně, a pokud pro žádné $P_{k+1}$ nepůjde odbavit všechny incidenty $I_{k+1}$, tak incident $i_{k+1}$ \uv{přeskočíme} a budeme pokračovat ve výpočtu.
-
-\begin{definice}[Upravené prohledávání stromu optimálních tahů]\label{df:upravenyAlg}
-  V algoritmu \ref{df:rekProhPlanu} v kroku 5 bude množina $T^*_k$ obsahovat vždy alespoň kanonický tah identita.
-\end{definice}
-
-\begin{definice}
-  Nechť $I$ množina incidentů a $p \in P_C$.
-  Řekneme, že plán $p$ je $k$-optimální v ceně na $I$ právě tehdy, když úspěšně odbaví $k$ incidentů, $s_c(p, I_k) = k$ a zároveň
-  pro plán $p'$ vzniklý z $p$ provedením libovolného inverzního kanonického tahu kromě tahu identita platí: $s_c(p', I) < |I|$.
+  Strom optimálních tahů rozumíme strom rekurze algoritmu prohledávání prostoru plánů optimálními tahy \ref{alg:rekProhPlanu}.
 \end{definice}
 
 \begin{veta}
-  Nechť množiny incidentů $I_1, \dots, I_n$ podle definice \ref{df:INC}.
-  Nechť množiny $P_{k}$ všechny $l$-optimální plány v ceně na incidentech $I_k$, $\forall k \in \{ 1, \dots, n \}, l \leq k$.
-  Nechť $p_k \in P_k$ libovolný $k$-optimální plán v ceně na $I_k$.
-
-  Pak existuje $p_{k-1}$ $(k-1)$-optimální plán v ceně na $I_{k-1}$ takový, že $T(p_{k-1}) = p_k$ pro nějaký $(k-1)$-optimální tah $T$. 
 \end{veta}
 \begin{dukaz}
-  Tah $T$ zkonstruujeme identickým způsobem jako v důkazu věty \ref{veta:vztahOptim}. Vždy existuje, nejhůře $T$ bude identita z věty \ref{veta:OmeneIncidentech}.
 \end{dukaz}
 
-\begin{veta}[Dosažitelnost $k$-optimálního plánu v ceně z prázdného plánu]\label{veta:dosOptZPrazdnehoPlanu}
-  Nechť množiny incidentů $I_1, \dots, I_n$ podle definice \ref{df:INC}.
-  Nechť množiny $P_{k}$ všechny $l$-optimální plány v ceně na incidentech $I_k$, $\forall k \in \{ 1, \dots, n \}, l \leq k$.
-  Nechť $p_k \in P_k$ libovolný $k$-optimální plán v ceně na $I_k$.
-
-  Pak $p_k$ je dosažitelný z $p_0$ nějakou posloupností tahů $T_1 \in T^*_1, T_2 \in T^*_2, \dots, T_k \in T^*_k$, kde $T^*_l$ jsou $l$-optimální tahy, $\forall l \in \{ 1, \dots, k-1 \}$.
+\begin{veta}[Velikost stromu optimálních tahů]
 \end{veta}
 \begin{dukaz}
-  Důkaz totožný větě \ref{veta:dosOptZPrazdnehoPlanu}.
-\end{dukaz}
 
-\begin{veta}
-  Upravený algoritmus \ref{alg:rekProhPlanu} podle \ref{df:upravenyAlg} nalezne všechny $k$-optimální plány v ceně, kde $k = s_c(p^*, I)$,
-  pro optimální plán $p^*$ při účelové funkci $q^{\text{Lex}}$.
-\end{veta}
-\begin{dukaz}
-  Totožné jako výše.
 \end{dukaz}
 
