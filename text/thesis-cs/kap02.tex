@@ -224,6 +224,13 @@ Ukažme si příklady nějakých tahů.
 Vidíme, že popsat tah formálně je komplikované a pro naše účely zbytečné.
 Proto dále budeme tahy definovat slovně, ale zároveň tak, aby nedocházelo k nejasnostem.
 
+Můžou existovat plány $p \in P_C$, na kterých nějaký tah nelze provést, čili $T(p)$ je nedefinované.
+Například, pokud bychom plánu chtěli alokovat tým, ale už nejsou žádné k dispozici, nebo už není volná žádná výjezdová stanice podle omezení $C$.
+
+\begin{definice}[Tah lze provést na plánu]
+  Řekneme, že tah $T$ lze provést na plánu $p \in P_C$, pokud $T(p)$ je definováno.
+\end{definice}
+
 \begin{veta}[Vyjádření plánu kanonickými tahy]\label{veta:vztahMeziPlanyAKan}
   Každý plán $p \in P_C$ lze získat z prázdného plánu $p_0$ nějakou posloupností kanonických tahů.
   Prázdným plánem $p_0$ rozumíme plán, který nemá naalokován žádný tým ani vozidlo, čili $z \in Z, a \in A, p_Z, p_A \in p_0 \colon p_Z(z) = p_A(a) = v_{\emptyset}$.
@@ -279,7 +286,7 @@ Závádění tahu prodloužení směny ale má svůj význam \ref{veta:konkrOptT
   Plyne přímo z konstrukce inverzních kanonických tahů \ref{veta:invKanTahy} a z definice ceny plánu \ref{df:cenaPlanu}.
 \end{dukaz}
 
-\begin{veta}
+\begin{veta}\label{veta:kazdeSnizeniCenyJeInv}
   Každé snížení ceny plánu lze docílit nějakou posloupností inverzních kanonických tahů.
 \end{veta}
 \begin{dukaz}
@@ -323,6 +330,28 @@ Dále budeme zkoumat, jaké plány má smysl prohledávat.
   \end{equation*}
 \end{definice}
 
+\begin{definice}[Tah minimální alokace týmu]
+Tahem \textit{minimální alokace týmu} na plánu $p \in P_C$, rozumíme tah $T$, alokace týmu $z$ a případně alokace vozidla tak, že $s_c(T(p), I) = s_c(p, I) + 1$ a $T(p)$ je optimální v ceně.
+\end{definice}
+
+\begin{definice}[Tah minimální prodloužení směny týmu]
+Tahem \textit{minimální prodloužení směny týmu} na plánu $p \in P_C$, rozumíme tah $T$, prodloužení směny týmu $z$ a případně alokace vozidla tak, že $s_c(T(p), I) = s_c(p, I) + 1$ a $T(p)$ je optimální v ceně.
+\end{definice}
+
+\begin{definice}[Optimální tahy]\label{df:optimalniTahy}
+  Nechť plán $p \in P_C$ a množina incidentů $I$.
+  Optimálními tahy $T^*$ plánu $p$ rozumíme množinu tahů:
+  \begin{enumerate}
+  \item
+    tah minimální alokace týmu,
+  \item
+    tah minimální prodloužení směny týmu,
+  \item
+    tah identita,
+  \end{enumerate}
+  které lze na plánu $p$ provést.
+\end{definice}
+
 \begin{veta}[O optimálních tazích]\label{veta:optimalniTahy}
   Nechť množiny incidentů $I_0, \dots, I_n$ podle definice \ref{df:INC}.
   Nechť plán optimální v ceně $p_k \in P_C \colon s_c(p_k, I_k) = r$.
@@ -330,12 +359,10 @@ Dále budeme zkoumat, jaké plány má smysl prohledávat.
   \begin{equation*}
     p_{k-1} \in P_C \colon s_c(p_{k-1}, I_{k-1}) = r \lor s_c(p_{k-1}, I_{k-1}) = r - 1
   \end{equation*}
-  a tah $T = T_1 \circ T_2$ takový, že
+  a optimální tah $T$ takový, že
   \begin{equation*}
     T(p_{k-1}) = p_k,
   \end{equation*}
-  kde $T_1$ a $T_2$ jsou kanonické tahy, pro $\forall k \in \{ 1, \dots, n \}$.
-  Takové tahy $T$ budeme nadále nazývat jako optimální tahy.
 \end{veta}
 \begin{dukaz}
   Nechť $i_1, \dots, i_k$ incidenty $I_k$ a $i'_1, \dots, i'_r$ incidenty, které odbaví $p_k$.
@@ -364,7 +391,11 @@ Dále budeme zkoumat, jaké plány má smysl prohledávat.
 
   V druhém případě, je poslední incident $i_k = i'_r$ plánem $p_k$ odbaven.
   Z toho důvodu $p_k$ na množině inidentů $I_{k-1}$ odbavuje incidenty $i'_1, \dots, i'_{r-1}$, o jeden méně -- opět, simulace incidenty prochází postupně \ref{simulaceAlgo}.
-  Platí tak, že $s_c(p_k, I_{k-1}) = r - 1$. Plán $p_k$ však nemusí být optimální v ceně. Uvažme tým záchranářů $z$, který odbavoval incident $i_k$.
+  Platí tak, že $s_c(p_k, I_{k-1}) = r - 1$. Plán $p_k$ však nemusí být optimální v ceně.
+  Z věty \ref{veta:kazdeSnizeniCenyJeInv} víme, že snížení ceny lze docílit nějakou posloupností inverzních kanonických tahů.
+  Chceme ukázat, že v tomhle případě stačí pouze dva, abychom z nich mohli zkonstruovat optimální tah.
+
+  Uvažme tým záchranářů $z$, který odbavoval incident $i_k$.
   Pro tým $z$ pak pro spuštění simulace na plánu $p_k$ na množině incidentů $I_{k-1}$ platí:
 
   \begin{enumerate}
@@ -380,7 +411,9 @@ Dále budeme zkoumat, jaké plány má smysl prohledávat.
       Aby $i_k$ úspěšně odbavil, může mít delší směnu, než by měl, pro odbavení $I_z$.
   \end{enumerate}
 
-  V druhém případě se směna obecně nemusí vždy zkracovat.
+  V druhém případě se směna obecně nemusí vždy zkracovat a pokud ano, je nutné ji zkrátit tak, aby už nešla zkrátit více,
+  ale zároveň musí být stále odbavovány všechny incidenty $I_z$.
+  Takovému zkrácení budeme říkat \textit{maximální zkrácení}.
   V obou případech ještě může být zbytečně naalokováno vozidlo, které $z$ používal pro odbavení $i_k$.
 
   Z pozorování plyne, že vždy existuje dvojice inverzních kanonických tahů $T_1^{-1}$ a $T_1^{-1}$, kde pro jejich složení $T^{-1} = T_1^{-1} \circ T_1^{-1}$,
@@ -390,41 +423,62 @@ Dále budeme zkoumat, jaké plány má smysl prohledávat.
   \item
     dealokace týmu a dealokace vozidla, 
   \item
-    zkrácení týmu a dealokace vozidla,
+    maximální zkrácení směny týmu a dealokace vozidla,
   \item
     dealokace týmu a identita,
   \item
-    zkrácení týmu a identita,
+    maximální zkrácení směny týmu a identita,
   \item
     identita a identita.
   \end{enumerate}
-
   Ukázali jsme existenci $T^{-1}$ v obou případech. Z definice inverzního kanonického tahu:
   \begin{equation*}
     T = T_1 \circ T_2 \colon p_k = T(p_{k-1}), 
   \end{equation*}
   pro $T_1$ a $T_2$ inverzní tahy k $T_1^{-1}$ a $T_1^{-1}$.
+  Možnými tahy $T$ tak jsou:
+  \begin{enumerate}
+  \item
+    alokace týmu a alokace vozidla, 
+  \item
+    minimální prodloužení týmu a alokace vozidla,
+  \item
+    alokace týmu a identita,
+  \item
+    minimální prodloužení směny týmu a identita,
+  \item
+    identita a identita.
+  \end{enumerate}
+
+  Zároveň tah alokace týmu je vždy minimální alokace týmu, jinak by $p_k$ nebyl optimální v ceně.
+  Tahy $T$ jsou optimální tahy.
 \end{dukaz}
 
-\begin{veta}[O dosažitelnosti optimálního plánu optimálními tahy]
+\begin{veta}[O dosažitelnosti optimálního plánu optimálními tahy]\label{veta:dosazitelnostOptimalnimiTahy}
   Optimální plán $p^* \in P_C$ na množině incidentů $I$ při účelové funkci $p^{\text{Lex}}$ je z $p_0$ dosažitelný nějakou posloupností optimálních tahů $T_1 \circ \dots T_{|I|-1}$.
 \end{veta}
 \begin{dukaz}
   Nechť $n = |I|$.
   Plán $p^*$ je optimální a odbavuje $r = s_c(p^*, I)$ incidentů.
-  Existuje pro něj podle věty \ref{veta:optimalniTahy} tah $T_{n-1}$ a plán $p_{n-1}$ takové, že
+  Existují pro něj podle věty \ref{veta:optimalniTahy} optimální tah $T_{n-1}$ a plán $p_{n-1}$ takové, že
   \begin{equation*}
-    p^* = T(p_{n-1})
+    p_n = T_{n-1}(p_{n-1})
   \end{equation*}
-  a $p_{n-1}$ odbavuje stejně nebo o jeden méně incidentů na $I_{n-1}$, než $r$.
-  Opět z věty \ref{veta:optPlanOptVCene} pro něj existuje $p_{n-2}, T_{n-2} \colon p_{n-1} = T_{n-2}(p_{n-2})$.
+  a $p_{n-1}$ odbavuje stejně nebo o jeden méně incidentů na $I_{n-1}$ než $r$.
+  Opět z věty \ref{veta:optimalniTahy} pro něj existují $p_{n-2}, T_{n-2} \colon p_{n-1} = T_{n-2}(p_{n-2})$.
 
   Takovou konstrukcí sestrojíme $p_{k}, T_{k}, \forall k \in \{ 0, \dots, n-1 \}$. 
-  Plán $p_0$ je přitom prázdný plán a tahy $T_k$ jsou optimální tahy, takže se jedná o hledanou posloupnost takovou, že
+  Plán $p_0$ je z věty \ref{veta:optimalniTahy} plán na prázdné množině odbavující buď jeden nebo nula incidentů, optimální v ceně.
+  Pro prázdnou množinu incidentů jakýkoliv jiný plán než prázdný plán $p_0$ není optimální v ceně.
+  Tudiž plán $p_0$ je prázdný plán.
+  Tahy $T_k$ jsou optimální tahy, takže se jedná o hledanou posloupnost takovou, že
   \begin{equation*}
     p^* = (T_0 \circ T_1 \circ \dots \circ T_{n-1})(p_0).
   \end{equation*}
 \end{dukaz}
+
+Věta \ref{veta:dosazitelnostOptimalnimiTahy} nám dává návod, jak plány $P_C$ z $p_0$ prohledávat optimálními tahy $T_1 \in T^*_1, \dots , T_{|I| - 1} \in T^*_{|I|-1}$,
+abychom při prohledání všech dosažitelných plánu libovolnou posloupností optimálních tahů nalezli všechny optimální plány při účelové funkci $q^{\text{Lex}}$ na libovolné možině incidentů.
 
 \begin{algorithm}[h]
   \begin{algorithmic}[1]
@@ -432,7 +486,7 @@ Dále budeme zkoumat, jaké plány má smysl prohledávat.
     \If{$k = h$}
       \State \Return $\{ p \}$
     \EndIf
-    \State $T^*_k$ \gets $k$-optimální tahy podle \ref{veta:konkrOptTahy}
+    \State $T^*_k$ \gets optimální tahy \ref{df:optimalniTahy}
     \State $P^*$ \gets $\emptyset$
     \For{$T^* \in T^*_k$}
       \State $p'$ \gets $T^*(p)$
@@ -446,7 +500,7 @@ Dále budeme zkoumat, jaké plány má smysl prohledávat.
     \State \Return $P^*$
   \EndFunction
   \end{algorithmic}
-  \caption{Algoritmus rekurzivního prohledávání prostoru plánů $k$-optimálními}
+  \caption{Rekurzivní prohledávání prostoru plánů optimálními tahy}
   \label{alg:rekProhPlanu}
 \end{algorithm}
 
