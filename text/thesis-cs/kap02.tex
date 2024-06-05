@@ -323,30 +323,6 @@ Dále budeme zkoumat, jaké plány má smysl prohledávat.
   \end{equation*}
 \end{definice}
 
-\begin{definice}[$r$-optimální plán na množině incidentů]\label{veta:planOptVCene}
-  Nechť plán $p \in P_C$ a $p^*$ optimální plán při účelové funkci $q^{\text{Lex}}$ \ref{df:lexPorovnaniPohotovost} na množině incidentů $I$.
-  Řekneme, že plán $p$ je $r$-optimální na $I$ právě tehdy, když 
-  \begin{equation*}
-    s_c(p, I) = s_c(p^*, I) = r
-  \end{equation*}
-  a je optimální v ceně.
-\end{definice}
-
-\begin{veta}[Optimální plán při $q^{\text{Lex}}$ je $r$-optimální]\label{veta:optPlanOptVCene}
-  Nechť libovolný optimální plán $p^* \in P_C$ při účelové funkci $q^{\text{Lex}}$ na množině incidentů $I$.
-  Pak $p^*$ je $r$-optimální, pro $r = s_c(p^*, I)$.
-\end{veta}
-\begin{dukaz}
-  Pro spor předpokládejme, že $p^*$ není $r$-optimální, takže není optimální v ceně.
-  Existuje tak $T^{-1}$ inverzní kanonický tah různý od identity takový, že
-  \begin{equation*}
-    p'^* = T^{-1}(p^*) \colon s_c(p'^*, I) = s_c(p^*, I).
-  \end{equation*}
-  Každý inverzní kanonický tah kromě identity snižuje cenu plánu \ref{veta:kazdyInvSnizujeCenu}.
-  Plán $p'^*$ by tak byl plán s nižší cenou než $p^*$, ale zároveň by odbavoval stejný počet incidentů.
-  Vzhledem k návrhu $q^{\text{Lex}}$, by pak byl optimální $p'^*$ s jinou, nižší cenou než $p^*$, což je spor s optimalitou $p^*$.
-\end{dukaz}
-
 \begin{veta}[O optimálních tazích]\label{veta:optimalniTahy}
   Nechť množiny incidentů $I_0, \dots, I_n$ podle definice \ref{df:INC}.
   Nechť plán optimální v ceně $p_k \in P_C \colon s_c(p_k, I_k) = r$.
