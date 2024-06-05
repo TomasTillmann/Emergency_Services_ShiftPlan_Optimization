@@ -287,12 +287,33 @@ Dále budeme zkoumat, jaké plány má smysl prohledávat.
   \end{equation*}
 \end{definice}
 
-\begin{definice}[Tah minimální alokace týmu]
-Tahem \textit{minimální alokace týmu} na plánu $p \in P_C$, rozumíme tah $T$, alokace týmu $z$ a případně alokace vozidla tak, že $s_c(T(p), I) = s_c(p, I) + 1$ a $T(p)$ je optimální v ceně.
+\begin{definice}[Tah minimální prodloužení směny týmu]
+Tahem \textit{minimální prodloužení směny týmu} na plánu $p \in P_C$, rozumíme tah $T$, prodloužení směny týmu $z$ a případně alokace vozidla tak, že
+  \begin{enumerate}
+    \item
+      $s_c(T(p), I) = s_c(p, I) + 1$,
+    \item
+      $T(p)$ je optimální v ceně,
+    \item
+      tým $z$ odbavuje $i \in I$ takový, že před provedením tahu nebyl odbavován.
+  \end{enumerate}
 \end{definice}
 
-\begin{definice}[Tah minimální prodloužení směny týmu]
-Tahem \textit{minimální prodloužení směny týmu} na plánu $p \in P_C$, rozumíme tah $T$, prodloužení směny týmu $z$ a případně alokace vozidla tak, že $s_c(T(p), I) = s_c(p, I) + 1$ a $T(p)$ je optimální v ceně.
+\begin{definice}[Tah minimální alokace týmu]
+Tahem \textit{minimální alokace týmu} na plánu $p \in P_C$, rozumíme tah $T$, alokace týmu $z$ a případně alokace vozidla tak, že
+  \begin{enumerate}
+    \item
+      $s_c(T(p), I) = s_c(p, I) + 1$,
+
+    \item
+      $T(p)$ je optimální v ceně,
+
+    \item
+      začátek směny $z$ je nejpozdější možný,
+
+    \item
+      tým $z$ odbavuje $i \in I$ takový, že před provedením tahu nebyl odbavován.
+  \end{enumerate}
 \end{definice}
 
 \begin{definice}[Optimální tahy]\label{df:optimalniTahy}
@@ -350,7 +371,7 @@ Tahem \textit{minimální prodloužení směny týmu} na plánu $p \in P_C$, roz
   Z toho důvodu $p_k$ na množině inidentů $I_{k-1}$ odbavuje incidenty $i'_1, \dots, i'_{r-1}$, o jeden méně -- opět, simulace incidenty prochází postupně \ref{simulaceAlgo}.
   Platí tak, že $s_c(p_k, I_{k-1}) = r - 1$. Plán $p_k$ však nemusí být optimální v ceně.
   Z věty \ref{veta:kazdeSnizeniCenyJeInv} víme, že snížení ceny lze docílit nějakou posloupností inverzních kanonických tahů.
-  Chceme ukázat, že v tomhle případě stačí pouze dva, abychom z nich mohli zkonstruovat optimální tah.
+  Chceme nalézt vhodnou posloupnost takovou, že díky ní zkounstruujeme optimální tah.
 
   Uvažme tým záchranářů $z$, který odbavoval incident $i_k$.
   Pro tým $z$ pak pro spuštění simulace na plánu $p_k$ na množině incidentů $I_{k-1}$ platí:
@@ -392,7 +413,7 @@ Tahem \textit{minimální prodloužení směny týmu} na plánu $p \in P_C$, roz
   \begin{equation*}
     T = T_1 \circ T_2 \colon p_k = T(p_{k-1}), 
   \end{equation*}
-  pro $T_1$ a $T_2$ inverzní tahy k $T_1^{-1}$ a $T_1^{-1}$.
+  pro korespondující kanonické tahy $T_1$ a $T_2$ takové, že jsou inverzními tahy k $T_1^{-1}$ a $T_1^{-1}$.
   Možnými tahy $T$ tak jsou:
   \begin{enumerate}
   \item
@@ -407,8 +428,11 @@ Tahem \textit{minimální prodloužení směny týmu} na plánu $p \in P_C$, roz
     identita a identita.
   \end{enumerate}
 
-  Zároveň tah alokace týmu je vždy minimální alokace týmu, jinak by $p_k$ nebyl optimální v ceně.
-  Tahy $T$ jsou optimální tahy.
+  Chtěli bychom minimální alokaci týmu. Sestrojme plán $p'_{k-1}$ tak, že
+  provedeme tah posun začátku směny a případně zkrácení směny tak, aby $z$ stále odbavoval $I_z$.
+  Plán po takovém tahu $p'_{k-1}$ stále odbavuje $i'_1, \dots , i'_{r-1}$ a zaručili jsme, že 
+  alokace týmu je vždy minimální alokace týmu, jinak by $p_k$ nebyl optimální v ceně.
+  Nalezli jsme plán $p'_{k-1}$ a optimální tah $T$ takový, že $T(p'_{k-1})$.
 \end{dukaz}
 
 \begin{veta}[O dosažitelnosti optimálního plánu optimálními tahy]\label{veta:dosazitelnostOptimalnimiTahy}
@@ -485,14 +509,51 @@ Pro zjištění všech optimálních plánu $P^*$ na množině incidentů $I$ al
   Strom optimálních tahů rozumíme strom rekurze algoritmu prohledávání prostoru plánů optimálními tahy \ref{alg:rekProhPlanu}.
 \end{definice}
 
-\begin{veta}
+\begin{veta}[Odhad počtu optimálních tahů pro plán optimální v ceně $k$-pokrývající služby]\label{veta:pocetOptTahu}
+  Nechť pohotovostní služba zaručuje $k$-pokrytí a
+  nechť plán optimální v ceně $p \in P_C$ a nechť optimální tahy $T$, které lze provést na plánu $p$ na množině $I$.
+  Pak
+  \begin{equation*}
+    1 \leq |T| \leq 2 \cdot Z_n + 1.
+  \end{equation*}
 \end{veta}
 \begin{dukaz}
+  Optimální tahy jsou minimální alokace týmu, minimální prodloužení směny týmu a identita.
+  Počet minimálních alokací je nanejvýš
+  \begin{alignat*}{2}
+    2 \cdot Z_1, \quad && Z_1 \text{ je počet nenaalokovaných vozidel.}
+  \end{alignat*}
+  Násobíme dvěma pro případnou alokaci záchranného vozidla.
+  Předpokládejme, že existuje optimální tah minimální alokace $T$, kde alokujeme tým $z$, který odbavuje incident $i \in I$.
+  Směnu naalokovanému týmu $d \in D$ přiřazujeme tak, aby směna $z$ plánu $T(p)$ byla co nejkratší a zároveň aby začínala co nejpozději.
+  Taková směna je jenom jedna.
+
+  Stačí uvažovat pouze alokace, které budou odpovídat alokování na $V_k$.
+
+  Počet minimálních prodloužení směny je nanejvýš
+  \begin{alignat*}{2}
+    2 \cdot Z_2, \quad && Z_2 \text{ je počet naalokovaných vozidel.}
+  \end{alignat*}
+  Opět násobíme dvěma pro případnou alokaci záchranného vozidla.
+  Předpokládejme, že existuje optimální tah minimální prodloužení $T$, kde prodlužujeme tým $z$, který nově odbavuje incident $i \in I$.
+  Směnu naalokovanému týmu $d \in D$ přiřazujeme tak, aby směna týmu $z$ plánu $T(p)$ byla co nejkratší.
+  Taková směna je opět jenom jedna.
+
+  Jelikož $Z_1 + Z_2 = Z_n$ a tah identita lze provést vždy a je jenom jedna, tak dohromady dostáváme:
+  \begin{equation*}
+    1 \leq |T| \leq 2 \cdot Z_n + 1.
+  \end{equation*}
 \end{dukaz}
 
 \begin{veta}[Velikost stromu optimálních tahů]
 \end{veta}
 \begin{dukaz}
-
+  Větvení stromu je dáno počtem optimálních tahů.
+  Z věty \ref{veta:pocetOptTahu} jich je nanejvýš $2 \cdot Z_n + 1$.
+  Hloubka stromu je $|I|$. 
+  Počet vrcholů stromu činí
+  \begin{equation*}
+    \sum_{i=0}^{|I|} (2 \cdot Z_n + 1)^{i} = \frac{(2 \cdot Z_n + 1)^{|I| + 1}}{2 \cdot Z_n} \in \Theta \left (Z_n^{|I| + 1} \right ).
+  \end{equation*}
 \end{dukaz}
 
