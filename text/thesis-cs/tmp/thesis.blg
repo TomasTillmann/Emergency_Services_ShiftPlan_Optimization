@@ -1,14 +1,14 @@
 [0] Config.pm:306> INFO - This is Biber 2.18
 [0] Config.pm:309> INFO - Logfile is 'tmp/thesis.blg'
-[99] biber:340> INFO - === Tue Jun  4, 2024, 18:55:12
-[221] Biber.pm:418> INFO - Reading 'tmp/thesis.bcf'
-[968] Biber.pm:978> INFO - Found 7 citekeys in bib section 0
-[1115] Biber.pm:4401> INFO - Processing section 0
-[1223] Biber.pm:4592> INFO - Looking for bibtex file 'literatura.bib' for section 0
-[1232] bibtex.pm:1713> INFO - LaTeX decoding ...
-[1378] bibtex.pm:1518> INFO - Found BibTeX data source 'literatura.bib'
-[2228] UCollate.pm:68> INFO - Overriding locale 'cs-CZ' defaults 'normalization = NFD' with 'normalization = prenormalized'
-[2229] UCollate.pm:68> INFO - Overriding locale 'cs-CZ' defaults 'variable = shifted' with 'variable = non-ignorable'
-[2230] Biber.pm:4221> INFO - Sorting list 'none/global//global/global' of type 'entry' with template 'none' and locale 'cs-CZ'
-[2281] bbl.pm:654> INFO - Writing 'tmp/thesis.bbl' with encoding 'UTF-8'
-[2315] bbl.pm:757> INFO - Output to tmp/thesis.bbl
+[144] biber:340> INFO - === Wed Jun  5, 2024, 13:39:40
+[167] Biber.pm:418> INFO - Reading 'tmp/thesis.bcf'
+[261] Biber.pm:978> INFO - Found 7 citekeys in bib section 0
+[277] Biber.pm:4401> INFO - Processing section 0
+[290] Biber.pm:4592> INFO - Looking for bibtex file 'literatura.bib' for section 0
+[291] bibtex.pm:1713> INFO - LaTeX decoding ...
+[309] bibtex.pm:1518> INFO - Found BibTeX data source 'literatura.bib'
+[404] UCollate.pm:68> INFO - Overriding locale 'cs-CZ' defaults 'variable = shifted' with 'variable = non-ignorable'
+[404] UCollate.pm:68> INFO - Overriding locale 'cs-CZ' defaults 'normalization = NFD' with 'normalization = prenormalized'
+[404] Biber.pm:4221> INFO - Sorting list 'none/global//global/global' of type 'entry' with template 'none' and locale 'cs-CZ'
+[409] bbl.pm:654> INFO - Writing 'tmp/thesis.bbl' with encoding 'UTF-8'
+[412] bbl.pm:757> INFO - Output to tmp/thesis.bbl
