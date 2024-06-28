@@ -41,10 +41,14 @@ Tato přiřazení popíšeme \textit{přiřazovacími funkcemi}:
   \end{align*}
 \end{definice}
 
-\begin{definice}[Plán pohotovostní služby]
-  Nechť $p_Z, p_A, p_{D_{1}}, p_{D_{2}}$ přiřazovací funkce.
-  Pak plán pohotovostní služby je čtveřice $p = (p_Z, p_A, p_{D_{1}}, p_{D_{2}}) \in P$, kde $P$ je množina všech plánů pohotovostních služeb.
-\end{definice}
+\textit{Plánem pohotovnostní služby} budeme označovat 
+čtveřici
+\begin{align*}
+  p = (p_Z, p_A, p_{D_{1}}, p_{D_{2}}) \in P,
+\end{align*}
+kde P je množina všech plánů pohotovostních služeb.
+Množina $P$ obsahuje všechny plány.
+Ne všechny plány jsou pro nás zajímavé. Zajímat nás budou pouze plány, které splňují nějaké \textit{omezující podmínky}.
 
 \begin{definice}[Omezující podmínky pohotovostního plánu]
   Nechť $c_z, c_a \in \mathbb{N}^{V_n}$ vektory, 
@@ -63,49 +67,37 @@ Tato přiřazení popíšeme \textit{přiřazovacími funkcemi}:
   $\forall i \colon 1 \leq i \leq V_n$, $p \in P$.
 \end{definice}
 
-Pohotovostní služba definuje \textit{maximální počty týmů záchranářů a záchranných vozidel povolených na jednotlivých výjezdových stanicích}.
-Omezující podmínky popisují maximální kapacity počtu týmu a vozidel jednotlivých výjezdových stanic.
-
-\begin{definice}[Plán pohotovostní služby splňující omezující podmínky $C$]
-  Řekneme, že plán $p \in P$ splňuje omezující podmínky $C$ právě tehdy, když
-  \begin{align*}
+Pohotovostní služba definuje omezující podmínky, tedy \textit{maximální počty týmů záchranářů a záchranných vozidel povolených na jednotlivých výjezdových stanicích}.
+Plán pohotovostní služby $p \in P$ splňující omezující podmínky $C$ je plán, který splňuje:
+\begin{align*}
     C_Z(p) = 1 \land C_A(p) = 1.
-  \end{align*}
-  V opačném případě $p$ nesplňuje omezující podmínky $C$.
-\end{definice}
-
-\begin{definice}[Množina plánů splňujících omezující podmínky $C$]
-  Množina plánů splňující omezující podmínky $P_C \subseteq P$ je definovaná:
-  \begin{align*}
-    P_C = \{ p \mid \text{$p \in P$ splňuje omezující podmínky $C$} \}.
-  \end{align*}
-\end{definice}
+\end{align*}
+V opačném případě $p$ nesplňuje omezující podmínky $C$.
+Označme $P_C$ jako \textit{množinu plánů splňujících omezující podmínky $C$}.
 
 Problém, který v této práci řešíme, je nalézt optimální plán $p_C \in P_C \subseteq P$ při nějak vhodně definované účelové funkci,
-která bude maximalizovat počet odbavených incidentů a minimalizovat celkovou ceu plánu.
+která bude maximalizovat počet odbavených incidentů a minimalizovat celkovou cenu plánu.
 
-Co je úspěšně odbavený incident a jakým způsobem zjistíme kolik incidentů plán úspěšně odbaví je detailně popisováno v sekci~\ref{SimulaceKap}.
-Formální definice ceny plánu je k nalezení zde~\ref{df:cenaPlanu}.
-Návrh vhodných účelových funkcí je diskutován v sekci \ref{kap:metodyProReseniOptSViceUcel}.
-Formální definice optimalizační úlohy je k nalezení zde \ref{df:optUloha1uc}.
+Co je úspěšně odbavený incident a jakým způsobem zjistíme kolik incidentů plán úspěšně odbaví je detailně popisováno v následující sekci~\ref{SimulaceKap}.
 
 \section{Simulace plánu pohotovostní služby}\label{SimulaceKap}
 
 Naším cílem je umět nalézt optimální plán pohotovostní služby.
-Ten určujeme podle počtu úspěšně odbavených incidentů a ceny plánu.
+Ten určujeme podle počtu úspěšně odbavených incidentů $s_I$ a ceny plánu $c$.
 Z toho důvodu jsme si formálně nadefinovali protředky, které má pohotovostní služba k dispozici a co je plán pohotovostní služby.
-V této kapitole navrhneme způsob, jakým zjistíme počet úspěšně odbavených incidentů $s^c_{pI}$ pohotovostního plánu $p$ na množine incidentů $I$ \ref{df:statsSimul}.
-Další statistiku, kterou simulací zjistíme je efektivita plánu $s^t_{pI}$ \ref{df:statsSimul}.
-Efektivitou plánu budeme schopni porovnávat plány, které mají stejnou cenu a odbaví stejný počet incidentů \ref{df:porPlanuEf}.
-Pro zjištění $s^c_{pI}$ a $s^t_{pI}$ spustíme simulaci $s$ pohotovostního plánu $p$ na dané množině $I$.
+V kapitole \ref{kap:optUloha1ucObecne} definujeme cenu plánu \ref{df:cenaPlanu}.
+V této kapitole navrhneme způsob, jakým zjistíme $s_I$ pohotovostního plánu $p$ na množine incidentů $I$.
+Pro zjištění $s_I$ spustíme simulaci $s$ pohotovostního plánu $p$ na dané množině $I$.
 Následně formálně popíšeme simulaci \ref{kap:definiceSimulace} a jaká pravidla chodu simulace se rozhodneme použít \ref{df:simulacePravidla1}, \ref{df:simulacePravidla2}.
 
 \subsection{Proč simulace?}\label{kap:procSimulace}
 
-Je velmi důležité, aby počet úspěšně odbavených incidentů $s^c_{pI}$ získaných simulací co nejvíce odpovídal počtu úspěšně odbavených incidentů,
+Je velmi důležité, aby počet úspěšně odbavených incidentů, které budeme uvažovat při optimalizaci co nejvíce odpovídal počtu úspěšně odbavených incidentů,
 kdyby byl plán $p$ použit v reálném světě a v průběhu dne by se přesně děly incidenty $I$.
-Není lepší způsob jak získat co nejdůvěryhodnější $s^c_{pI}$ než spustit simulaci, která bude co nejvíce odpovídat chování plánu v reálném světě.
-To stejné platí pro $s^t_{pI}$.
+Přesně k takovému účelu se používají simulace.
+Simulace bude simulovat chování plánu v průběhu dne tak, jak by se plán skutečně choval v reálném světě.
+Čím více bude simulace navžena tak, aby co nejvíce odpovídala chování plánu v reálném světě, tím více bude počet úspěšně odbavených incidentů simulace odpovídat
+počtu úspěšně odbavených incidentů reálnému chování.
 
 Přístup použití simulace má ještě jednu podstatnou výhodu.
 Různé pohotovostní služby mohou používat různé způsoby a pravidla, například pro výběr záchranného týmu a vozidla pro odbavení incidentu co právě nastal, nebo do jaké nemocnice incident odbavit.
@@ -113,7 +105,7 @@ Tato pravidla můžou být příliš složitá, aby je bylo možné výstižně 
 
 Avšak podstatnou nevýhodou simulace je její výpočetní náročnost a poměrně značné omezení použitelných technik obecně využívaných pro řešení optimalizačních problémů.
 
-\subsection{Definice deterministické diskrétní simulace}
+\subsection{Popis deterministické diskrétní simulace}
 
 \textit{Simulace} je proces navrhnutí modelu reálného systému a provádění tak na něm experimenty za účelem buď porozumění chování systému
 nebo za účelem vyhodnocení různých strategií chování systému.
@@ -136,21 +128,22 @@ V \textit{stochastické simulaci} nejsme schopni z aktuálního stavu systému a
 Většinou proto, že při výběru nadhcázejícího stavu figuruje element náhody.
 \cite{SimulaceBook}
 
-\subsection{Popis simulace plánu pohotovostní služby}\label{kap:definiceSimulace}
+\subsection{Popis deterministické diskrétní simulace plánu pohotovostní služby}\label{kap:definiceSimulace}
 
-\begin{definice}[Simulace pohotovostního plánu]
-  Definujme \textit{simulaci pohotovostního plánu} $p \in P_C$ na množině incidentů $I$ jako deterministickou diskrétní simulaci
-  $s \colon (p_C, I)$, kde vstupem je plán $p_C \in P_C$ a množina incidentů $I$.
-  Simulace vrátí množinu statistik $S_{pI}$.
-\end{definice}
+Definujme \textit{simulaci pohotovostního plánu} $p \in P_C$ na množině incidentů $I$ jako deterministickou diskrétní simulaci
+\begin{align*}
+  s \colon (p_C, I).
+\end{align*}
+Simulace vrátí počet úspěšně odbavených incidentů $s_I$ na množině $I$ plánem $p$. 
 
 \textit{Událost} je nastání incidentu $i \in I$ v čase $T_I(i)$, kde $T_I \colon I \rightarrow \mathbb{N}_0$, určuje čas nastání incidentu.
 \textit{Stav systému} simulace $s$ je množina $S = \{ S_A, S_Z \}$, kde $S_A$ je stav záchranných vozidel $A$ a $S_Z$ je stav týmů záchranářů $Z$. 
+Stav $S_A$ je rozmístění záchranných vozidel v prostoru. Stav $S_Z$ je informace, kdy bude zácrhranný tým k dispozici a pokud tým odbavuje nějaký incident, tak v jaké fázi odbavování zrovna je. 
 
 \begin{algorithm}[h]
   \begin{algorithmic}[1]
   \Function{Simulation}{$p, I$}
-    \State $s^{c}_{pI} \gets 0$
+    \State $s_I \gets 0$
     \State $T$ \gets 0
     \State $I' \gets \mbox{Setřídí $I$ podle času nastání, pomocí $T_I$}$
     \State $S_A \gets \mbox{Inicializuje podle $p$}$
@@ -159,15 +152,15 @@ Většinou proto, že při výběru nadhcázejícího stavu figuruje element ná
       \State $T \gets \mbox{Čas nastání $i_k$, $T_I(i_k)$}$
       \State $z_k \gets \mbox{GetBestTeam($i_k, S_A, S_Z, T$)}$
       \If{$z_k \neq \emptyset$}
-        \State $s^{c}_{pI} \gets s^{c}_{pI} + 1$
+        \State $s_I \gets s_I + 1$
         \State $a_k \gets \mbox{GetBestAmbulance($z_k, T$)}$
         \State Plan($z_k, a_k, i_k$)
       \EndIf
       \State $S_A \gets \mbox{UpdateState($S_A, i_k$)}$
       \State $S_Z \gets \mbox{UpdateState($S_Z, i_k$)}$
     \EndFor
-    \State $s^t_{pI}$ \gets \mbox{GetTimeWorking($S_Z$)}
-    \State \Return $s_{c}$, $s^t_{pI}$
+    \State $s^I$ \gets \mbox{GetTimeWorking($S_Z$)}
+    \State \Return $s_I$
   \EndFunction
   \end{algorithmic}
   \caption{Simulace plánu pohotovostní služby $p$ na množině incidentů $I$}
@@ -177,7 +170,7 @@ Většinou proto, že při výběru nadhcázejícího stavu figuruje element ná
 \vspace*{10px}
 
 Průběh simulace je následovný. 
-V krocích 2 až 6 simulace \ref{simulaceAlgo} položí $s^{c}_{pI}$ a $T$ rovno nule, setřídí si sadu incidentů podle časů nastání
+V krocích 2 až 6 simulace \ref{simulaceAlgo} položí $s_I$ a $T$ rovno nule, setřídí si sadu incidentů podle časů nastání
 a incicializuje si stavy $S_A$ a $S_Z$ podle plánu $p$.
 
 V krocích 7 až 17 odbavuje události, takže se pohybuje po krocích v časech nastání incidentů od nejdřívějšího po poslední.
@@ -185,16 +178,16 @@ V každém kroku simulace $k \in \{ 1, 2, \dots , |I|\}$ se simulace první poku
 pomocí funkce $\textit{GetBestTeam}$ \ref{df:getBestTeam}, v kroku 9. 
 Pokud takový $z_k$ neexistuje, tak pokračuje v odbavování dalších incidentů.
 
-Pokud existuje, v krocích 8 až 13 zvýší počet odbavených incidentů $s^c_{pI}$ o jedna,
+Pokud existuje, v krocích 8 až 13 zvýší počet odbavených incidentů $s_I$ o jedna,
 deterministicky nalezne pro $z_k$ nejvhodnější $a_k$, pomocí funkce \textit{GetBestAmbulance} \ref{df:getBestAmbulance} a
 aktuální incident $i_k$ naplánuje na $z_k$ spolu s $a_k$ funkcí \textit{Plan}.
-Záchranný tým $z_k$ tak \textit{odbavuje} incident $i_k$ \ref{df:odbavujeIncident}, a čas, kdy bude opět tým $z_k$ k dispozici je nastaven na čas, kdy přijíždí zpět na výjezdovou stanici.
+Záchranný tým $z_k$ tak \textit{odbavuje} incident $i_k$ \ref{df:odbavujeIncident}, a čas, kdy bude opět tým $z_k$ k dispozici je nastaven na čas, kdy incident úspěšně odbaví. 
 
 V krocích 15 a 16 aktualizuje stav systému $S_A$ a $S_Z$.
-V kroku 18 simulace spočítá celkovou dobu záchranných týmů v terénu $s^t_{pI}$ pomocí funkce \textit{GetTimeWorking} podle definice \ref{df:efPlanu}, na základě $S_Z$.
+V kroku 18 simulace spočítá celkovou dobu záchranných týmů v terénu $s_I$ pomocí funkce \textit{GetTimeWorking} podle definice \ref{df:efPlanu}, na základě $S_Z$.
 
 Simulace doběhne jakmile nejsou žádné další události k odbavení, takže jakmile projde všechny incidenty, to je po $|I|$ krocích.
-Simulace vrátí statistiky $S_{pI}$ \ref{df:statsSimul}.
+Simulace vrátí $s_I$, tudiž $s_I = s(p, I)$.
 
 \begin{definice}[Záchranný tým odbavuje incident]\label{df:odbavujeIncident}
   Řekneme, že záchranný tým $z \in Z$ odbavuje incident $i \in I$, pokud vykonává následující činnosti:
@@ -214,31 +207,6 @@ Simulace vrátí statistiky $S_{pI}$ \ref{df:statsSimul}.
     \item
       Tým $z$ přijíždí zpět na výjezdovou stanici.
   \end{enumerate}
-\end{definice}
-
-\begin{definice}[Statistiky simulace]\label{df:statsSimul}
-  Nechť $S_{pI}$ množina statistik simulace $s$, spuštěná na plánu $p \in P_C$ a dané množině incidentů $I$.
-  Statistiky $S_{pI}$ obsahují počet úspěšně odbavených incidentů:
-  \begin{align*}
-    &s^{c}_{pI} \in S_{pI} \colon 0 \leq s^{c}_{pI} \leq |I|
-  \end{align*}
-  a celkovou dobu plánu stráveného v terénu:
-  \begin{align*}
-    &s^{t}_{pI} \in S_{pI} \colon 0 \leq s^{t}_{pI} \leq \sum_{z \in Z, p_Z(z) \neq v_{\emptyset}}{p_{D_2}(z)},
-  \end{align*}
-  $p_Z, p_{D_2} \in p$. Za jako čas strávený v terénu pro tým záchranářů považujeme celkový čas strávený mimo výjezdovou stanici.
-  Takže čas strávený cestováním k incidentu, odbvováním incidentu na místě odehrání, čas strávený cestováním do nemocnice a čas strávený cestováním zpět na výjezdovou stanici.
-\end{definice}
-
-Pro snažší práci se statistikami v nadcházejícím textu definujme statistiky $s^c_{pI}$ a $s^t_{pI}$ jako funkce. 
-
-\begin{definice}[Statistiky simulace jako funkce]
-  Nechť $S_{pI}$ množina statistik simulace $s$, spuštěná na plánu $p \in P_C$ a dané množině incidentů $I$.
-  Pak
-  \begin{align*}
-    s_c(p, I) = s^c_{pI} \in S_{pI}, \\
-    s_t(p, I) = s^t_{pI} \in S_{pI},
-  \end{align*}
 \end{definice}
 
 Nyní si ukažme, jakým způsobem je nalezen nejvhodnější tým záchranářů $z_k$ pro obsloužení $i_k$ a nejvhodnější vozidlo pro $z_k$.
@@ -263,6 +231,18 @@ a jakým způsobem pak simulace \ref{simulaceAlgo} vybere ze všech takových t�
 \end{definice}
 Požadovanou dobu, nebo také \textit{gold time}, chápejme jako čas, do kterého záchranné vozidlo musí na místo incidentu dorazit, například 20 minut.
 
+Pravidla jsou navrhnuta tak, aby práce obsluhování incidentů byla rozmístěna rovnoměrně přes všechny týmy, ale aby zároveň byly incidenty obslouženy nejrychleji jak je možné.
+Třetí pravidlo pro výběr nejvhodnějšího týmu zaručuje rovnoměrnost práce a druhé co nejrychlejší obsloužení incidentu.
+
+Pravidla také počítají s možným zpožděním a raději upřednostní tým, který je aktuálně k dispozici, než tým, který ještě dokončuje jiný incident, ale mohl by i na místě incidentu
+být dříve, pokud by neměl zpoždění. Příkladem je první pravidlo pro výběr nejvhodnějšího týmu.
+
+V naší simulaci jsou použitá pravidla vybraná na základě konzultace se společností, která se danou problematikou zabývá přes 25 let a sami podobná pravidla používají pro plánovaní sanitek
+u několika jejich klientů ve Spojených státech.
+
+Není však problém naimplementovat pravidla zcela jiná, jednodušší, komplikovanější nebo klidně i stochastická.
+Jak bylo zmíněno v kapitole \ref{kap:procSimulace}, možnost volby libovolných pravidel je výhoda přístupu použití simulace.
+
 \begin{definice}\label{df:simulacePravidla2}
   Nejvhodnější tým záchranářů $z_k \in Z_k$, kde $Z_k \subseteq Z$ jsou všechny týmy záchranářů schopny úspěšně odbavit incident $i_k \in I$ je tým,
   který je nejlepší podle následujících kritérií v daném pořadí:
@@ -282,18 +262,6 @@ Funkce \textit{GetBestTeam} vrací tým záchranářu $z_k$ z týmů záchraná�
 \begin{definice}[GetBestAmbulance]
 Funkce \textit{GetBestAmbulance}\label{df:getBestAmbulance} vybere záchranné vozidlo, které je na stejné výjezdové stanici jako $z_k$ a časově je nejdříve k dispozici.
 \end{definice}
-
-Pravidla jsou navrhnuta tak, aby práce obsluhování incidentů byla rozmístěna rovnoměrně přes všechny týmy, ale aby zároveň byly incidenty obslouženy nejrychleji jak je možné.
-Třetí pravidlo pro výběr nejvhodnějšího týmu zaručuje rovnoměrnost práce a druhé co nejrychlejší obsloužení incidentu.
-
-Pravidla také počítají s možným zpožděním a raději upřednostní tým, který je aktuálně k dispozici, než tým, který ještě dokončuje jiný incident, ale mohl by i na místě incidentu
-být dříve, pokud by neměl zpoždění. Příkladem je první pravidlo pro výběr nejvhodnějšího týmu.
-
-V naší simulaci jsou použitá pravidla vybraná na základě konzultace se společností, která se danou problematikou zabývá přes 25 let a sami podobná pravidla používají pro plánovaní sanitek
-u několika jejich klientů ve Spojených státech.
-
-Není však problém naimplementovat pravidla zcela jiná, jednodušší, komplikovanější nebo klidně i stochastická.
-Jak bylo zmíněno v kapitole \ref{kap:procSimulace}, možnost volby libovolných pravidel je výhoda přístupu použití simulace.
 
 \section{Převedení problému na optimalizační úlohu s více účelovými funkcemi}\label{kap:optUloha2uc}
 \begin{definice}[Optimalizační úloha s jednou účelovou funkcí (\citet{AlgOptBook}, str. 5)]\label{df:optUloha1ucObecne}
