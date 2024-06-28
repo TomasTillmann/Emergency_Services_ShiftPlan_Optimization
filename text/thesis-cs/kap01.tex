@@ -23,23 +23,22 @@ Každý objekt je unikátní, respektivě platí
 Plánem pohotovostní služby chápeme přiřazení týmů záchranářů $z \in Z$ a záchranných vozidel $a \in A$ na konkrétní výjezdové stanice $v \in V$
 a přiřazení pracovní směny $d \in D$ každému týmu záchranářů $z \in Z$ v rámci jednoho dne.
 Tato přiřazení popíšeme \textit{přiřazovacími funkcemi}:
-
 \begin{definice}[Přiřazovací funkce]
   \begin{alignat*}{2}
     p_Z \colon Z &\rightarrow V \cup \{ v_{\emptyset} \} \quad && \hspace{30pt} \text{přiřazení týmů na stanice}, \\
     p_A \colon A &\rightarrow V \cup \{ v_{\emptyset} \} \quad && \hspace{30pt} \text{přiřazení vozidel na stanice}, \\ 
-    p_{D} \colon Z &\rightarrow D                        \quad && \hspace{30pt} \text{přiřazení směn týmům}. \\
+    p_{D} \colon Z &\rightarrow D                        \quad && \hspace{30pt} \text{přiřazení směn týmům}.
   \end{alignat*}
-  Tým $z \in Z$ nemá přiřazenou žádnou výjezdovou stanici právě tehdy, když
-  $p_{Z}(z) = v_{\emptyset}$ a $p_{D}(z) = (d_1, d_2) \colon d_2 - d_1 = 0$.
-  Záchranné vozidlo $a \in A$ nemá přiřazenou žádnou výjezdovou stanici, právě tehdy, když $p_{A}(a) = a_{\emptyset}$.
-
-  Pro pohodlnost zaveďme 
-  \begin{align*}
-    & p_{D_1}(z) \colon p_D(z) = (d_1, d_2) \Leftrightarrow p_{D_1}(z) = d_1, \\
-    & p_{D_2}(z) \colon  p_D(z) = (d_1, d_2) \Leftrightarrow p_{D_2}(z) = d_2.
-  \end{align*}
 \end{definice}
+Tým $z \in Z$ nemá přiřazenou žádnou výjezdovou stanici právě tehdy, když
+$p_{Z}(z) = v_{\emptyset}$ a $p_{D}(z) = (d_1, d_2) \colon d_2 - d_1 = 0$.
+Záchranné vozidlo $a \in A$ nemá přiřazenou žádnou výjezdovou stanici, právě tehdy, když $p_{A}(a) = a_{\emptyset}$.
+
+Pro pohodlnost zaveďme:
+\begin{align*}
+  & p_{D_1}(z) \colon p_D(z) = (d_1, d_2) \Leftrightarrow p_{D_1}(z) = d_1, \\
+  & p_{D_2}(z) \colon  p_D(z) = (d_1, d_2) \Leftrightarrow p_{D_2}(z) = d_2.
+\end{align*}
 
 \textit{Plánem pohotovnostní služby} budeme označovat 
 čtveřici
@@ -47,22 +46,22 @@ Tato přiřazení popíšeme \textit{přiřazovacími funkcemi}:
   p = (p_Z, p_A, p_{D_{1}}, p_{D_{2}}) \in P,
 \end{align*}
 kde P je množina všech plánů pohotovostních služeb.
-Množina $P$ obsahuje všechny plány.
-Ne všechny plány jsou pro nás zajímavé. Zajímat nás budou pouze plány, které splňují nějaké \textit{omezující podmínky}.
+Množina $P$ obsahuje všechny plány, ale ne všechny plány jsou pro nás zajímavé.
+Zajímat nás budou pouze plány, které splňují nějaké \textit{omezující podmínky}.
 
 \begin{definice}[Omezující podmínky pohotovostního plánu]
-  Nechť $c_z, c_a \in \mathbb{N}^{V_n}$ vektory, 
+  Nechť $c^z, c^a \in \mathbb{N}^{V_n}$ vektory, 
   kde $i$-tou položku definujeme:
   \begin{align*}
-    &c_{z_{i}} \hspace{20pt} \text{maximální počet záchranných týmů na výjezdové stanici $v_i \in V$}, \\ 
-    &c_{a_{i}} \hspace{20pt} \text{maximální počet záchranných vozidel na výjezdové stanici $v_i \in V$},
+    &c^z_i \hspace{20pt} \text{maximální počet záchranných týmů na výjezdové stanici $v_i \in V$}, \\ 
+    &c^a_i \hspace{20pt} \text{maximální počet záchranných vozidel na výjezdové stanici $v_i \in V$},
   \end{align*}
   pro $1 \leq i \leq V_n$.
   Nechť omezující podmínky $C = \{ C_Z, C_A \}$, kde $C_Z \colon P \rightarrow \{ 0, 1 \}$, $C_A \colon P \rightarrow \{ 0, 1 \}$, definované:
 
   \begin{align*}
-    C_Z(p) = 1 &\iff |\{ z \in Z \mid p_Z(z) = v_i \}| \leq c_{z_{i}}, \hspace{20pt} \text{jinak 0}, \\
-    C_A(p) = 1 &\iff |\{ a \in A \mid p_A(a) = v_i \}| \leq c_{a_{i}}, \hspace{20pt} \text{jinak 0},
+    C_Z(p) = 1 &\iff |\{ z \in Z \mid p_Z(z) = v_i \}| \leq c^z_i, \hspace{20pt} \text{jinak 0}, \\
+    C_A(p) = 1 &\iff |\{ a \in A \mid p_A(a) = v_i \}| \leq c^a_i, \hspace{20pt} \text{jinak 0},
   \end{align*}
   $\forall i \colon 1 \leq i \leq V_n$, $p \in P$.
 \end{definice}
@@ -85,7 +84,8 @@ Co je úspěšně odbavený incident a jakým způsobem zjistíme kolik incident
 Naším cílem je umět nalézt optimální plán pohotovostní služby.
 Ten určujeme podle počtu úspěšně odbavených incidentů $s_I$ a ceny plánu $c$.
 Z toho důvodu jsme si formálně nadefinovali protředky, které má pohotovostní služba k dispozici a co je plán pohotovostní služby.
-V kapitole \ref{kap:optUloha1ucObecne} definujeme cenu plánu \ref{df:cenaPlanu}.
+
+V kapitole \ref{kap:optUloha2uc} definujeme cenu plánu \ref{df:cenaPlanu}.
 V této kapitole navrhneme způsob, jakým zjistíme $s_I$ pohotovostního plánu $p$ na množine incidentů $I$.
 Pro zjištění $s_I$ spustíme simulaci $s$ pohotovostního plánu $p$ na dané množině $I$.
 Následně formálně popíšeme simulaci \ref{kap:definiceSimulace} a jaká pravidla chodu simulace se rozhodneme použít \ref{df:simulacePravidla1}, \ref{df:simulacePravidla2}.
@@ -130,65 +130,52 @@ Většinou proto, že při výběru nadhcázejícího stavu figuruje element ná
 
 \subsection{Popis deterministické diskrétní simulace plánu pohotovostní služby}\label{kap:definiceSimulace}
 
-Definujme \textit{simulaci pohotovostního plánu} $p \in P_C$ na množině incidentů $I$ jako deterministickou diskrétní simulaci
-\begin{align*}
-  s \colon (p_C, I).
-\end{align*}
-Simulace vrátí počet úspěšně odbavených incidentů $s_I$ na množině $I$ plánem $p$. 
+Abychom mohli simulovat fungování pohotovostního plánu,
+potřebujeme si první definovat, jaké podmínky musí záchranný tým splňovat, aby mohl \textit{úspěšně odbavit incident} \ref{df:simulacePravidla1}.
 
-\textit{Událost} je nastání incidentu $i \in I$ v čase $T_I(i)$, kde $T_I \colon I \rightarrow \mathbb{N}_0$, určuje čas nastání incidentu.
-\textit{Stav systému} simulace $s$ je množina $S = \{ S_A, S_Z \}$, kde $S_A$ je stav záchranných vozidel $A$ a $S_Z$ je stav týmů záchranářů $Z$. 
-Stav $S_A$ je rozmístění záchranných vozidel v prostoru. Stav $S_Z$ je informace, kdy bude zácrhranný tým k dispozici a pokud tým odbavuje nějaký incident, tak v jaké fázi odbavování zrovna je. 
+\begin{definice}\label{df:simulacePravidla1}
+  Tým záchranářů $z \in Z$ je schopen úspěšně odbavit incident $i \in I$ právě tehdy když:
+  \begin{enumerate}
+    \item
+      Je alokován a má přiřazenou směnu. Pokud tým záchranářu není alokován, tj. $f_Z(z) = v_{\emptyset}$, tak samozřejmě není schopen obsloužit $i$.
 
-\begin{algorithm}[h]
-  \begin{algorithmic}[1]
-  \Function{Simulation}{$p, I$}
-    \State $s_I \gets 0$
-    \State $T$ \gets 0
-    \State $I' \gets \mbox{Setřídí $I$ podle času nastání, pomocí $T_I$}$
-    \State $S_A \gets \mbox{Inicializuje podle $p$}$
-    \State $S_Z \gets \mbox{Inicializuje podle $p$}$
-    \For{$i_k \in I',~ k \in \{1, 2, \dots , |I|\}$}
-      \State $T \gets \mbox{Čas nastání $i_k$, $T_I(i_k)$}$
-      \State $z_k \gets \mbox{GetBestTeam($i_k, S_A, S_Z, T$)}$
-      \If{$z_k \neq \emptyset$}
-        \State $s_I \gets s_I + 1$
-        \State $a_k \gets \mbox{GetBestAmbulance($z_k, T$)}$
-        \State Plan($z_k, a_k, i_k$)
-      \EndIf
-      \State $S_A \gets \mbox{UpdateState($S_A, i_k$)}$
-      \State $S_Z \gets \mbox{UpdateState($S_Z, i_k$)}$
-    \EndFor
-    \State $s^I$ \gets \mbox{GetTimeWorking($S_Z$)}
-    \State \Return $s_I$
-  \EndFunction
-  \end{algorithmic}
-  \caption{Simulace plánu pohotovostní služby $p$ na množině incidentů $I$}
-  \label{simulaceAlgo}
-\end{algorithm}
+    \item
+      Tým je schopen dorazit na místo incidentu do požadované doby.
+      Ať už přímo z výjezdové stanice, nebo při vrácení se po vyřízení incidentu zpět na výjezdovou stanici. 
+      V prvním případě tým potřebuje mít na výjezdové stanici k dispozi volné záchranné vozidlo.
 
-\vspace*{10px}
+    \item
+      Týmu nekončí směna dříve, než je očekávaný konec celkové doby vyřízení incidentu.
+  \end{enumerate}
+\end{definice}
+\textit{Požadovanou dobu}, nebo také \textit{gold time}, chápejme jako čas, do kterého záchranné vozidlo musí na místo incidentu dorazit, například 20 minut.
 
-Průběh simulace je následovný. 
-V krocích 2 až 6 simulace \ref{simulaceAlgo} položí $s_I$ a $T$ rovno nule, setřídí si sadu incidentů podle časů nastání
-a incicializuje si stavy $S_A$ a $S_Z$ podle plánu $p$.
+Nechť $Z_i \subseteq Z$ množina záchranných týmu, které jsou schopny úspěšně odbavit incident $i \in I$.
+Pro odbavení $i$ musíme vybrat nějaký konkrétní $z_i \in Z_i$.
 
-V krocích 7 až 17 odbavuje události, takže se pohybuje po krocích v časech nastání incidentů od nejdřívějšího po poslední.
-V každém kroku simulace $k \in \{ 1, 2, \dots , |I|\}$ se simulace první pokusí deterministicky nalézt nejvhodnější $z_k \in Z$, který obslouží $i_k$,
-pomocí funkce $\textit{GetBestTeam}$ \ref{df:getBestTeam}, v kroku 9. 
-Pokud takový $z_k$ neexistuje, tak pokračuje v odbavování dalších incidentů.
+Je mnoho různých způsobu, jak $z_i$ vybrat.
+V naší simulaci jsou použitá pravidla vybraná na základě konzultace se společností, která se danou problematikou zabývá přes 25 let a sami podobná pravidla používají pro plánovaní sanitek
+u několika jejich klientů ve Spojených státech.
+Není však problém naimplementovat pravidla zcela jiná, jednodušší, komplikovanější nebo klidně i stochastická.
 
-Pokud existuje, v krocích 8 až 13 zvýší počet odbavených incidentů $s_I$ o jedna,
-deterministicky nalezne pro $z_k$ nejvhodnější $a_k$, pomocí funkce \textit{GetBestAmbulance} \ref{df:getBestAmbulance} a
-aktuální incident $i_k$ naplánuje na $z_k$ spolu s $a_k$ funkcí \textit{Plan}.
-Záchranný tým $z_k$ tak \textit{odbavuje} incident $i_k$ \ref{df:odbavujeIncident}, a čas, kdy bude opět tým $z_k$ k dispozici je nastaven na čas, kdy incident úspěšně odbaví. 
+Jak bylo zmíněno v kapitole \ref{kap:procSimulace}, možnost volby libovolných pravidel je výhoda přístupu použití simulace.
+\begin{definice}\label{df:simulacePravidla2}
+  Nejvhodnější tým záchranářů $z_i \in Z_i$, kde $Z_i \subseteq Z$ jsou všechny týmy záchranářů schopny úspěšně odbavit incident $i \in I$ je tým,
+  který je nejlepší podle následujících kritérií v daném pořadí:
+  \begin{enumerate}
+    \item Upřednostni tým, který je na výjezdové stanici před týmem, který ještě ukončuje vyřízení jednoho z předchozích incidentů. 
+    \item Upřednostni tým, který na místo incidentu dorazí dříve. 
+    \item Upřednostni tým, který již obsloužil méně incidentů a je tedy méně vyčerpaný.
+  \end{enumerate}
+\end{definice}
+Pravidla výběru \textit{nejvhodnějšího týmu záchranářů} \ref{df:simulacePravidla2} jsou navrhnuta tak,
+aby práce obsluhování incidentů byla rozmístěna rovnoměrně přes všechny týmy, ale aby zároveň byly incidenty obslouženy nejrychleji jak je možné.
+Například, třetí pravidlo pro výběr nejvhodnějšího týmu zaručuje rovnoměrnost práce a druhé co nejrychlejší obsloužení incidentu.
 
-V krocích 15 a 16 aktualizuje stav systému $S_A$ a $S_Z$.
-V kroku 18 simulace spočítá celkovou dobu záchranných týmů v terénu $s_I$ pomocí funkce \textit{GetTimeWorking} podle definice \ref{df:efPlanu}, na základě $S_Z$.
+Pravidla také počítají s možným zpožděním a raději upřednostní tým, který je aktuálně k dispozici, než tým, který ještě dokončuje jiný incident, ale mohl by i na místě incidentu
+být dříve, pokud by neměl zpoždění. Příkladem je první pravidlo pro výběr nejvhodnějšího týmu.
 
-Simulace doběhne jakmile nejsou žádné další události k odbavení, takže jakmile projde všechny incidenty, to je po $|I|$ krocích.
-Simulace vrátí $s_I$, tudiž $s_I = s(p, I)$.
-
+Jakmile je $z_i$ vybrán, naplánujeme mu incident $i$ a $z_i$ \textit{odbavuje incident $i$} \ref{df:odbavujeIncident}.
 \begin{definice}[Záchranný tým odbavuje incident]\label{df:odbavujeIncident}
   Řekneme, že záchranný tým $z \in Z$ odbavuje incident $i \in I$, pokud vykonává následující činnosti:
   \begin{enumerate}
@@ -208,60 +195,80 @@ Simulace vrátí $s_I$, tudiž $s_I = s(p, I)$.
       Tým $z$ přijíždí zpět na výjezdovou stanici.
   \end{enumerate}
 \end{definice}
-
-Nyní si ukažme, jakým způsobem je nalezen nejvhodnější tým záchranářů $z_k$ pro obsloužení $i_k$ a nejvhodnější vozidlo pro $z_k$.
-K tomu si potřebujeme definovat co znamená, že tým záchranářů je schopen \textit{úspěšně odbavit incident}
-a jakým způsobem pak simulace \ref{simulaceAlgo} vybere ze všech takových týmu ten nejvhodnější.
-
-\begin{definice}\label{df:simulacePravidla1}
-  Tým záchranářů $z \in Z$ je schopen úspěšně odbavit incident $i \in I$ právě tehdy když:
-
-  \begin{enumerate}
-    \item
-      Je alokován a má přiřazenou směnu. Pokud tým záchranářu není alokován, tj. $f_Z(z) = v_{\emptyset}$, tak samozřejmě není schopen obsloužit $i$.
-
-    \item
-      Tým je schopen dorazit na místo incidentu do požadované doby.
-      Ať už přímo z výjezdové stanice, nebo při vrácení se po vyřízení incidentu zpět na výjezdovou stanici. 
-      V prvním případě tým potřebuje mít na výjezdové stanici k dispozi volné záchranné vozidlo.
-
-    \item
-      Týmu nekončí směna dříve, než je očekávaný konec celkové doby vyřízení incidentu.
-  \end{enumerate}
-\end{definice}
-Požadovanou dobu, nebo také \textit{gold time}, chápejme jako čas, do kterého záchranné vozidlo musí na místo incidentu dorazit, například 20 minut.
-
-Pravidla jsou navrhnuta tak, aby práce obsluhování incidentů byla rozmístěna rovnoměrně přes všechny týmy, ale aby zároveň byly incidenty obslouženy nejrychleji jak je možné.
-Třetí pravidlo pro výběr nejvhodnějšího týmu zaručuje rovnoměrnost práce a druhé co nejrychlejší obsloužení incidentu.
-
-Pravidla také počítají s možným zpožděním a raději upřednostní tým, který je aktuálně k dispozici, než tým, který ještě dokončuje jiný incident, ale mohl by i na místě incidentu
-být dříve, pokud by neměl zpoždění. Příkladem je první pravidlo pro výběr nejvhodnějšího týmu.
-
-V naší simulaci jsou použitá pravidla vybraná na základě konzultace se společností, která se danou problematikou zabývá přes 25 let a sami podobná pravidla používají pro plánovaní sanitek
-u několika jejich klientů ve Spojených státech.
-
-Není však problém naimplementovat pravidla zcela jiná, jednodušší, komplikovanější nebo klidně i stochastická.
-Jak bylo zmíněno v kapitole \ref{kap:procSimulace}, možnost volby libovolných pravidel je výhoda přístupu použití simulace.
-
-\begin{definice}\label{df:simulacePravidla2}
-  Nejvhodnější tým záchranářů $z_k \in Z_k$, kde $Z_k \subseteq Z$ jsou všechny týmy záchranářů schopny úspěšně odbavit incident $i_k \in I$ je tým,
-  který je nejlepší podle následujících kritérií v daném pořadí:
-
-  \begin{enumerate}
-    \item Upřednostni tým, který je na výjezdové stanici před týmem, který ještě ukončuje vyřízení jednoho z předchozích incidentů. 
-    \item Upřednostni tým, který na místo incidentu dorazí dříve. 
-    \item Upřednostni tým, který již obsloužil méně incidentů a je tedy méně vyčerpaný.
-  \end{enumerate}
-\end{definice}
-
+Definujme si funkce, které budou v simulaci používány a pomocí výše uvedených pravidel naleznou nejvhodnější tým záchranářů $z_i$
+a pro něj nejvhodnější záchranné vozidlo.
 \begin{definice}[GetBestTeam]\label{df:getBestTeam}
-Funkce \textit{GetBestTeam} vrací tým záchranářu $z_k$ z týmů záchranářů $Z_k$, kteří jsou schopni úspěšně odbavit incident $i_k$, podle pravidel \ref{df:simulacePravidla1}
-, kde $z_k$ je nejvhodnější pro obsloužení incidentu $i_k$ ze $Z_k$ podle pravidel \ref{df:simulacePravidla2}. 
+Funkce \textit{GetBestTeam} vrací tým záchranářu $z_i$ z týmů záchranářů $Z_i$, kteří jsou schopni úspěšně odbavit aktuální incident $i \in I$,
+podle pravidel \ref{df:simulacePravidla1}
+, kde $z_i$ je nejvhodnější tým pro obsloužení incidentu $i$ ze $Z_i$, podle pravidel \ref{df:simulacePravidla2}. 
 \end{definice}
-
 \begin{definice}[GetBestAmbulance]
 Funkce \textit{GetBestAmbulance}\label{df:getBestAmbulance} vybere záchranné vozidlo, které je na stejné výjezdové stanici jako $z_k$ a časově je nejdříve k dispozici.
 \end{definice}
+
+Nyní jsme přípraveni definovat \textit{simulaci pohotovostního plánu} $p \in P_C$ na množině incidentů $I$, jako deterministickou diskrétní simulaci
+\begin{align*}
+  s_I = s (p, I),
+\end{align*}
+simulace vrátí počet úspěšně odbavených incidentů $s_I$ na množině $I$ plánem $p$. 
+\textit{Událost} je nastání incidentu 
+\begin{align*}
+  i \in I \text{ v čase } T_I(i),
+\end{align*}
+kde $T_I \colon I \rightarrow \mathbb{N}_0$, určuje čas nastání incidentu.
+\textit{Stav systému} simulace $s$ je množina
+\begin{align*}
+S = \{ S_A, S_Z \},
+\end{align*}
+kde $S_A$ je stav záchranných vozidel $A$ a $S_Z$ je stav týmů záchranářů $Z$. 
+Stav $S_A$ je rozmístění záchranných vozidel v prostoru.
+Stav $S_Z$ je informace, kdy bude záchranný tým k dispozici a pokud tým odbavuje nějaký incident, tak v jaké fázi odbavování zrovna je. 
+
+\begin{algorithm}[H]
+  \begin{algorithmic}[1]
+  \Function{Simulation}{$p, I$}
+    \State $s_I \gets 0$
+    \State $T$ \gets 0
+    \State $I' \gets \mbox{Setřídí $I$ podle času nastání, pomocí $T_I$}$
+    \State $S_Z \gets \mbox{Inicializuje podle $p$}$
+    \State $S_A \gets \mbox{Inicializuje podle $p$}$
+    \For{$i_k \in I',~ k \in \{1, 2, \dots , |I|\}$}
+      \State $T \gets \mbox{Čas nastání $i_k$, $T_I(i_k)$}$
+      \State $z_k \gets \mbox{GetBestTeam($i_k, S_Z, S_A, T$)}$
+      \If{$z_k \neq \emptyset$}
+        \State $s_I \gets s_I + 1$
+        \State $a_k \gets \mbox{GetBestAmbulance($z_k, T$)}$
+        \State Plan($z_k, a_k, i_k$)
+      \EndIf
+      \State $S_Z \gets \mbox{UpdateState($S_Z, i_k, z_k$)}$
+      \State $S_A \gets \mbox{UpdateState($S_A, i_k, a_k$)}$
+    \EndFor
+    \State \Return $s_I$
+  \EndFunction
+  \end{algorithmic}
+  \caption{Simulace plánu pohotovostní služby $p$ na množině incidentů $I$}
+  \label{simulaceAlgo}
+\end{algorithm}
+
+\vspace*{10px}
+
+Průběh simulace je následovný. 
+V krocích 2 až 6 simulace \ref{simulaceAlgo} položí $s_I$ a $T$ rovno nule, setřídí si sadu incidentů podle časů nastání
+a incicializuje si stavy $S_A$ a $S_Z$ podle plánu $p$.
+
+V krocích 7 až 17 odbavuje události, takže se pohybuje po krocích v časech nastání incidentů od nejdřívějšího po nejpozdější.
+V každém kroku simulace $k \in \{ 1, 2, \dots , |I|\}$ se simulace první pokusí deterministicky nalézt nejvhodnější $z_k \in Z$, který obslouží $i_k$,
+pomocí funkce $\textit{GetBestTeam}$ \ref{df:getBestTeam}, v kroku 9. 
+Pokud takový $z_k$ neexistuje, tak pokračuje v odbavování dalších incidentů.
+
+Pokud existuje, v krocích 8 až 13 zvýší počet odbavených incidentů $s_I$ o jedna,
+deterministicky nalezne pro $z_k$ nejvhodnější $a_k$, pomocí funkce \textit{GetBestAmbulance} \ref{df:getBestAmbulance} a
+aktuální incident $i_k$ naplánuje na $z_k$ spolu s $a_k$ funkcí \textit{Plan}.
+Záchranný tým $z_k$ tak \textit{odbavuje} incident $i_k$ \ref{df:odbavujeIncident}, a čas, kdy bude opět tým $z_k$ k dispozici je nastaven na čas, kdy incident úspěšně odbaví. 
+
+V krocích 15 a 16 aktualizuje stav systému $S_A$ a $S_Z$.
+Simulace doběhne jakmile nejsou žádné další události k odbavení, takže jakmile projde všechny incidenty, to je po $|I|$ krocích.
+Simulace vrátí $s_I$.
 
 \section{Převedení problému na optimalizační úlohu s více účelovými funkcemi}\label{kap:optUloha2uc}
 \begin{definice}[Optimalizační úloha s jednou účelovou funkcí (\citet{AlgOptBook}, str. 5)]\label{df:optUloha1ucObecne}
