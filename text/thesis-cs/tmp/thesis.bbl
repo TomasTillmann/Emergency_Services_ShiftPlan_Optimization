@@ -277,6 +277,55 @@
       \field{title}{Hybrid Metaheuristics}
       \field{year}{2016}
     \endentry
+    \entry{Metropolis}{article}{}
+      \name{author}{5}{}{%
+        {{hash=8a5a1433b01fc9b9495db8f7f03c99cb}{%
+           family={Metropolis},
+           familyi={M\bibinitperiod},
+           given={N.},
+           giveni={N\bibinitperiod}}}%
+        {{hash=132dc84f687a147e86e7084e490bd914}{%
+           family={Rosenbluth},
+           familyi={R\bibinitperiod},
+           given={A.},
+           giveni={A\bibinitperiod}}}%
+        {{hash=e490545b940c6fa75681a2bcb9abb701}{%
+           family={Rosenbluth},
+           familyi={R\bibinitperiod},
+           given={M.},
+           giveni={M\bibinitperiod}}}%
+        {{hash=e7fa9c0de4827596dc01e0ed25c17055}{%
+           family={Teller},
+           familyi={T\bibinitperiod},
+           given={A.},
+           giveni={A\bibinitperiod}}}%
+        {{hash=370b9da2b5c03b7c7eaa21e01bae9de2}{%
+           family={Teller},
+           familyi={T\bibinitperiod},
+           given={E.},
+           giveni={E\bibinitperiod}}}%
+      }
+      \strng{namehash}{43ee030e2fed7a0548ecee7f4ff56744}
+      \strng{fullhash}{2066dc4d6e6868d5b755ffbfca953740}
+      \strng{bibnamehash}{2066dc4d6e6868d5b755ffbfca953740}
+      \strng{authorbibnamehash}{2066dc4d6e6868d5b755ffbfca953740}
+      \strng{authornamehash}{43ee030e2fed7a0548ecee7f4ff56744}
+      \strng{authorfullhash}{2066dc4d6e6868d5b755ffbfca953740}
+      \field{sortinit}{3}
+      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{The Journal of Chemical Physics}
+      \field{number}{6}
+      \field{title}{Equation of state calculations by fast computing machines}
+      \field{volume}{21}
+      \field{year}{1953}
+      \field{pages}{1087\bibrangedash 1092}
+      \range{pages}{6}
+      \verb{doi}
+      \verb 10.1063/1.1699114
+      \endverb
+    \endentry
   \enddatalist
 \endrefsection
 \endinput

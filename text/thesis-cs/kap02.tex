@@ -614,17 +614,21 @@ jak diskrétních tak spojitých,
 které nelze jednoduše vyřešit v polynomiálním čase.
 Tyto metody prohledávání prostoru konfigurací koordinují interakce mezi lokálním a globálním optimalizováním,
 aby byli schopny prohledávat lokálně optimální konfigurace, ale zároveň aby z nich mohli uniknout a prostor prohledávat robustně.
+
 Často metaheuristiky při prohledávání využívají konceptu \textit{sousedství}.
 Míra, do jaké jsou sousedství využívána, se liší podle konkrétního typu metody.
 Některé metaheuristiky, jako například \textit{simulované žíhání} nebo \textit{tabu prohledávání}, využívají \textit{přípustné tahy},
 pomocí kterých přecházejí z jednoho řešení na jiné v lokálním pohledu.
 Zároveň dochází k výběru v lokálním pohledu horších konfigurací, aby se zajistila robustnost prohledávání
 a metoda neuvázla pouze v lokálním optimu.
+
 V případě metod, založených na \textit{populaci}, jako jsou například \textit{genetické algoritmy}, jsou sousedství implicitně definována
 nahrazováním komponent jednoho řešení komponentami jiného řešení, různě zvolenými pravidly výměny.
-Dalším příkladem populačních algoritmů je rodina \textit{ant colony optimization} metod,
-kde jsou sousedství definována propojením cest a procházena pomocí simulování chodu populací mravenců po těchto cestičkách
-s pravděpodobností, jenž je uřčena feromony.
+
+Dalším zajímavým příkladem metaheurstické metody je \textit{optimalizování kolonií mravenců}, spadající do kategorie metaheuristik \textit{inteligence hejna}.
+Sousedství jsou definována propojením cest a procházena pomocí simulování chodu mravenců, reprezentující nějakou kolektivní inteligenci
+Mravenci chodí po těchto cestičkách a vybírají si tak optimální konfigurace s pravděpodobností, jenž je uřčena feromony.
+
 Existuje spoustu dalších různých metod, jako v poslední době populární \textit{hybridní metody},
 které propojují více metaheuristických metod dohromady, s myšlenkou použít každou metaheuristiku co nejvhodněji,
 případně i měnit různé metaheuristiky za běhu (\citet{GlovKoch03}).
@@ -643,7 +647,7 @@ Aby metoda lokálního prohledávání pomocí sousedů správně fungovala, mus
     \State $p_{current}$ \gets $p_{start}$
     \While {true}
       \State $p^*$ \gets $p_{\emptyset}$ 
-      \For {$p \in \text{neighbours($p_{current}$)}$}
+      \For {$p \in N(p_{current})$}
         \If {$q(p, I) > q(p^*, I)$}
           \State $p^*$ \gets $p$
         \EndIf
@@ -671,7 +675,7 @@ Sousedy plánu $p \in P_C$ lze získat různými způsoby, je však důležité,
 Jako podobné plány plánu $p$ můžeme chápat plány, které se od $p$ liší co nejméně, například pouze jednou alokací týmu nebo vozidla,
 nebo v jedné směně nějakého týmu, atd.\
 
-\textit{Sousedy} $p$ tak nadefinujeme jako plány $N_p \subseteq P_C$, které vzniknou aplikováním tahu $T$,
+\textit{Sousedy} $p$ tak nadefinujeme jako plány $N(p) \subseteq P_C$, které vzniknou aplikováním tahu $T$,
 \begin{align*}
   T(p) \in P_C,
 \end{align*}
@@ -685,23 +689,22 @@ kde $T$ může být jeden z následujících \textit{sousedních tahů}:
   \item nejkratší zkrácení směny záchranného týmu,
   \item posun začátku směny záchranného týmu o nejkratší možnou dobu.
 \end{enumerate}
-Sousedy $N_p$ jsme tak zkonstruovali implicitně pomocí tahů, což je standardní způsob konstrukce sousedů nějaké konfigurace (\cite{HybridMeta}, str. 3).
+Sousedy $N(p)$ jsme tak zkonstruovali implicitně pomocí tahů, což je standardní způsob konstrukce sousedů nějaké konfigurace (\cite{HybridMeta}, str. 3).
 
 Všechny prohledané plány nebudou navzájem různé,
 například první dealokace vozidla a pak prodloužení směny nějakému týmu nebo obráceně vyústí ve stejné plány.
 Při implementaci tak dává smysl použít \textit{cache},
 abychom se vyhnuli opakovanému výpočetně náročnému spouštění simulace pro stejné plány, pouze získané jinou posloupností tahů, podobně jako v algoritmu \ref{alg:rekProhPlanu}.
 
-Mohlo by nás zajímat, až kolik sousedů $N_p$ nějaký plán $p$ může mít.
-Velikost množiny $N_p$ se bude rovnat počtu různých sousedních tahů, 
+Mohlo by nás zajímat, až kolik sousedů $N(p)$ nějaký plán $p$ může mít.
+Velikost množiny $N(p)$ se bude rovnat počtu různých sousedních tahů, 
 protože každým takovým tahem získáme unikátní plán. 
 
 \begin{veta}[Počet sousedů]
   Nechť libovolný plán $p \in P_C$, pak
   \begin{align*}
-  |N_p| \in \mathcal{O}(Z_n + A_n),
+    |N(p)| \in \mathcal{O}(Z_n + A_n).
   \end{align*}
-  kde $N_p$ jsou sousedi plánu $p$.
 \end{veta}
 \begin{dukaz}
   Nechť $Z_1$ počet naalokovaných týmu a $Z_2$ počet nenaalokovaných týmů, zřejmě
@@ -785,7 +788,7 @@ které získáme tahem, jenž není v tabu.~(\cite{GlovKoch03} str. 41 -- 49).
   \label{alg:tabusearch}
 \end{algorithm}
 
-V krocích 1--5 se inicializuje stav algoritmu. Tabu je ze začátku prázdné.
+Algoritmus \ref{alg:tabusearch} si v krocích 1--5 inicializuje stav algoritmu. Tabu je ze začátku prázdné.
 Podobně jako v lokálním prohledávání se prohledává prostor v krocích 5 až 24, dokud není splněna podmínka na řádku 13.
 V krocích 7--12 se prohledávájí pomocí sousedních tahů sousedé aktuálně prohledávaného plánu $p_{current}$. 
 
@@ -807,10 +810,20 @@ Prohledá tak více plánů a bude vracet lepší řešení, než lokální proh
 
 \subsection{Simulované žíhání}
 
-Další
+Další variantou lokálního prohledávání je \textit{simulované žíhání}.
+Podobně jako tabu prohledávání dovoluje navštěvovat lokálně neoptimální konfigurace, se snahou nalézt globální optimum.
+Je to jedna z nejpopulárnějších technik na řešení těžkých optimalizačních úloh, především kombinatorických úloh.
+
+Simulované žíhání je inspirováno metalurgickým procesem žíhání, kdy je kov zahřán na vysokou teplotu
+a následně ochlazován, za účelem odstranění vnitřních defektů.
+Stejně jako ve fyzickém procesu žíhání, simulované žíhání si dřží teplotu.
+Při vyšší teplotě je větší šance na navštěvování horších konfigurací a při nižší se pravděpodobnost snižuje, takže se navštěvují především lokálně optimální konfigurace.
+
+Při postupném chlazení, tedy snižování teploty, se v průběhu běhu simulovaného žíhání postupně navštěvují horší konfigurace méně a optimální konfigurace více častěji.
+Tento proces má zajistit ze začátku dostatečnou exploraci prostoru konfigurací, ale zároveň postupnou konvergenci k nějakému ideálně globálnímu řešení (\cite{GlovKoch03} str. 1--2).
 
 \begin{algorithm}[H]
-  \caption{Simulated Annealing Function}
+  \caption{Simulované žíhání prohledávání plánů pohotovostní služby}
   \begin{algorithmic}[1]
     \Function{SimulatedAnnealing}{$p_{start}$, $t_{start}$, $M_k$, $t_{\text{cooling}}$, $t_{\text{final}}$}
     \State $p_{\text{current}} \gets p_{start}$
@@ -818,7 +831,7 @@ Další
     \State $t \gets t_{start}$
     \While{$t > t_{\text{final}}$}
       \For{$m \gets 1$ \textbf{to} $M_k$}
-        \State $p \gets \text{zatím neprohledaný } \in \text{neighbours}(p_{\text{current}})$
+        \State $p \gets \text{zatím neprohledaný } \in N(p_{\text{current}})$
         \State $\Delta q \gets q(p_{\text{current}}) - q(p)$
         \If{$\Delta q \leq 0$}
           \State $p_{\text{current}} \gets p$
@@ -834,20 +847,23 @@ Další
     \State \Return $p_{\text{best}}$
     \EndFunction
   \end{algorithmic}
+  \label{alg:siman}
 \end{algorithm}
 
-Algoritmus si v krocích 2 až 4 inicializuje aktuálně prohledávaný plán $p_{\text{current}}$, nejlepší nalezený plán $p_{\text{best}}$ a akutální teplotu $t$.
+Algoritmus \ref{alg:siman} si v krocích 2 až 4 inicializuje aktuálně prohledávaný plán $p_{\text{current}}$, nejlepší nalezený plán $p_{\text{best}}$ a akutální teplotu $t$.
 Hlavní smyčka algoritmu v krocích 5--19 běží, dokud $t$ nepoklesne pod nejnižší dovolenou teplotu $t_{\text{final}}$.
 V každé iteraci se provádí $M_k$ iterací, přičemž každá iterace se snaží najít lepší plán ze sousedních plánů $p$.
 V kroku 8 se vypočítá rozdíl kvality $\Delta q$ aktuálně nejlepšího plánu a sousedního plánu.
 
 Podle $\Delta q$ se rozhodne, zda přijmout sousední plán rovnou, nebo až v kroku 12.
 V kroku 12 je $p$ přijato s pravděpodobností definovanou jako
-\begin{align*}
+\begin{align}\label{df:metropolis}
   \exp\left(-\frac{\Delta q}{t}\right).
-\end{align*}
-Díky tomu je umožněno akceptovat i lokálně horší řešení.
+\end{align}
+Díky \ref{df:metropolis} je umožněno akceptovat i lokálně horší řešení. Jedná se o \textit{metropolis akceptační kritérium} (\citet{Metropolis}), které modeluje
+jak přechází termodynamický systém z aktuální konfigurace.
 
 V krocích 14--16 se standardně aktualizuje $p_{\text{best}}$, pokud $p$ má vyšší kvalitu než dosud nejlepší plán.
 Po provedení $M_k$ iterací se v kroku 18 snižuje teplota $t$ pomocí ochlazovacího rozvrhu $t_{\text{cooling}}(t)$.
 Jakmile aktuální teplota klesne pod $t_{\text{final}}$, algoritmus vrátí nejlepší nalezený plán $p_{\text{best}}$.
+
