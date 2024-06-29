@@ -627,8 +627,110 @@ kde jsou sousedství definována propojením cest a procházena pomocí simulov�
 s pravděpodobností, jenž je uřčena feromony.
 Existuje spoustu dalších různých metod, jako v poslední době populární \textit{hybridní metody},
 které propojují více metaheuristických metod dohromady, s myšlenkou použít každou metaheuristiku co nejvhodněji,
-případně i měnit různé metaheuristiky za běhu.
+případně i měnit různé metaheuristiky za běhu (\citet{GlovKoch03}).
 
+\subsection{Lokální prohledávání}
 
+Asi nejjednodušší metoda na prohledávání prostoru konfigurací je \textit{lokální prohledávání}.
+Lokální prohledávání pouze lokálně prohledává prostor konfigurací od nějaké startovní konfigurace $x \in \mathcal{X}$. 
+Prostor porhledává prostřednictvním sousedů, kde vždy vybere souseda s nejlepší hodnotou účelové funkce.
+Náhodná konfigurace i sousedi musí splňovat omezení, pokud nějaká jsou.
+Aby metoda lokálního prohledávání pomocí sousedů správně fungovala, musí sousedi konfigurace $x$ být v nějakém smyslu $x$ podobné (\citet{HybridMeta}, str. 3).
 
+\begin{algorithm}[H]
+  \begin{algorithmic}[1]
+    \Function{LocalSearch}{$p_{start}$, $I$}
+    \State $p_{current}$ \gets $p_{start}$
+    \While {true}
+      \State $p^*$ \gets $p_{\emptyset}$ 
+      \For {$p \in \text{neighbours($p_{current}$)}$}
+        \If {$q(p, I) > q(p^*, I)$}
+          \State $p^*$ \gets $p$
+        \EndIf
+      \EndFor
+      \If {$p^* = p_{\emptyset}$}
+        \State \Return $p_{current}$
+      \EndIf
+      \State $p_{current}$ \gets $p^*$
+    \EndWhile
+  \EndFunction
+  \end{algorithmic}
+  \caption{Lokální prohledávání plánů pohotovostních služeb}
+  \label{alg:hillclimb}
+\end{algorithm}
+
+Algoritmus \ref{alg:hillclimb} v krocích 3 až 14 prohledává sousedy dokud není splněna podmínka v kroku 10.
+Algoritmus v kroku 5 prohledává sousední plány splňující omezující podmínky $C$, aktuálně prohledávaného plánu $p_{current}$, který je na začátku algoritmu v kroku 2 nastaven na $p_{start} \in P_C$.
+V krocích 6 a 7, pokud má soused lepší hodnocení pří účelové funkci $q \in Q_I$, tak je aktuálně nejlepší soused $p^*$ změněn na souseda $p$.
+Podmínka v kroku 10 kontroluje, zda existuje nějaký soused $p_{current}$, který má lepší hodnocení při $q$.
+Pokud ne, algoritmus našel lokální maximum, tím je $p_{current}$, proto je vrácen v kroku 11.
+V kroku 13 je $p_{current}$ nastaveno na nejlepší sousední plán.
+Zřejmě lokální prohledávání nalezne nějaké lokální maximum, jaké konkrétně, závisí pouze na startovním plánu $p_{start}$.
+
+Sousedy plánu $p \in P_C$ lze získat různými způsoby, je však důležité, aby byli $p$ v nějakém smyslu podobní.
+Jako podobné plány plánu $p$ můžeme chápat plány, které se od $p$ liší co nejméně, například pouze jednou alokací týmu nebo vozidla,
+nebo v jedné směně nějakého týmu, atd.\
+
+\textit{Sousedy} $p$ tak nadefinujeme jako plány $N_p \subseteq P_C$, které vzniknou aplikováním tahu $T$,
+\begin{align*}
+  T(p) \in P_C,
+\end{align*}
+kde $T$ může být jeden z následujících \textit{sousedních tahů}:
+\begin{enumerate}
+  \item alokování záchranného týmu,
+  \item dealokování záchranného týmu,
+  \item alokování záchranného vozidla,
+  \item dealokování záchranného vozidla,
+  \item nejkratší prodloužení směny záchranného týmu,
+  \item nejkratší zkrácení směny záchranného týmu,
+  \item posun začátku směny záchranného týmu o nejkratší možnou dobu.
+\end{enumerate}
+Sousedy $N_p$ jsme tak zkonstruovali implicitně pomocí tahů, což je standardní způsob konstrukce sousedů nějaké konfigurace (\cite{HybridMeta}, str. 3).
+
+Všechny prohledané plány nebudou navzájem různé,
+například první dealokace vozidla a pak prodloužení směny nějakému týmu nebo obráceně vyústí ve stejné plány.
+Při implementaci tak dává smysl použít \textit{cache},
+abychom se vyhnuli opakovanému výpočetně náročnému spouštění simulace pro stejné plány, pouze získané jinou posloupností tahů, podobně jako v algoritmu \ref{alg:rekProhPlanu}.
+
+Mohlo by nás zajímat, až kolik sousedů $N_p$ nějaký plán $p$ může mít.
+Velikost množiny $N_p$ se bude rovnat počtu různých sousedních tahů, 
+protože každým takovým tahem získáme unikátní plán. 
+
+\begin{veta}[Počet sousedů]
+  Nechť libovolný plán $p \in P_C$, pak
+  \begin{align*}
+  |N_p| \in \mathcal{O}(Z_n + A_n),
+  \end{align*}
+  kde $N_p$ jsou sousedi plánu $p$.
+\end{veta}
+\begin{dukaz}
+  Nechť $Z_1$ počet naalokovaných týmu a $Z_2$ počet nenaalokovaných týmů, zřejmě
+  \begin{align*}
+    Z_1 + Z_2 = Z_n.
+  \end{align*}
+  Definujme stejně $A_1$ a $A_2$ jako počty naalokovaných a nenaalokovaných vozidel.
+  Tahy počítejme postupně.
+  Počet tahů alokování záchranného týmu je počet nenaalokovaných záchranných týmů, $Z_2$.
+  Tahů dealokování týmu samozřejmě $Z_1$.
+  Stejně tak pro alokace a dealokace záchranných vozidel, čili $A_2$ a $A_1$ tahů.
+  Nejkratší prodloužení a zkrácení směny týmu je nanejvýš jedna pro každý naalokovaný tým.
+  Stejně tak pro posun začátku směny o nejkratší možnou dobu.
+  Dohromady dostáváme
+  \begin{align*}
+    (Z_1 + Z_2) + (A_1 + A_2) + 4 * Z_1 = Z_n + A_n + 4 * Z_1 \in \mathcal{O}(Z_n + A_n).
+  \end{align*}
+\end{dukaz}
+
+Pokud lokální prohledávání skončí v $k$ krocích, tak algoritmus prohledá $\mathcal{O}(k \cdot (Z_n + A_n))$ plánů.
+Jak uvidíme v kapitole (ref TODO), počet kroků $k$ k docílení lokálního optima z nějakého startovního plánu se pohybuje v desítkách,
+takže $k$ můžeme uvažovat jako konstantu.
+
+Získáváme tak velmi rychlý způsob, jak upravit libovolný plán, abychom dostali jeho \uv{nejlepší verzi}. 
+Startovní plán definuje nějaký základ, který je následně doplňován nebo redukován o záchranné týmy nebo vozidla,
+nebo jsou týmům postupně prodlužovány či zkracovány směny,
+dokud jakákoliv změna už pouze nezhorší výslednou kvalitu. 
+
+Velkou nevýhodou lokálního prohledávání je neschopnost umět nalézt kompromis mezi lokálním optimem a globálním optimem.
+
+\subsection{Tabu prohledávání}
 

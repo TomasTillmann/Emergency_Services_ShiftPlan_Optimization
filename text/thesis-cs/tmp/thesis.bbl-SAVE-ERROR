@@ -223,6 +223,60 @@
       \field{title}{Průvodce labyrintem algoritmů}
       \field{year}{2017}
     \endentry
+    \entry{GlovKoch03}{book}{}
+      \name{editor}{1}{}{%
+        {{hash=928b2ca3cbecd1e479a8fea8ca64e3ac}{%
+           family={Michel\bibnamedelima Gendreau},
+           familyi={M\bibinitperiod\bibinitdelim G\bibinitperiod},
+           given={Jean-Yves\bibnamedelima Potvin},
+           giveni={J\bibinithyphendelim Y\bibinitperiod\bibinitdelim P\bibinitperiod}}}%
+      }
+      \list{location}{1}{%
+        {Boston, MA, USA}%
+      }
+      \list{publisher}{1}{%
+        {Springer Cham}%
+      }
+      \strng{namehash}{928b2ca3cbecd1e479a8fea8ca64e3ac}
+      \strng{fullhash}{928b2ca3cbecd1e479a8fea8ca64e3ac}
+      \strng{bibnamehash}{928b2ca3cbecd1e479a8fea8ca64e3ac}
+      \strng{editorbibnamehash}{928b2ca3cbecd1e479a8fea8ca64e3ac}
+      \strng{editornamehash}{928b2ca3cbecd1e479a8fea8ca64e3ac}
+      \strng{editorfullhash}{928b2ca3cbecd1e479a8fea8ca64e3ac}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labelnamesource}{editor}
+      \field{labeltitlesource}{title}
+      \field{title}{Handbook of Metaheuristics}
+      \field{year}{2019}
+    \endentry
+    \entry{HybridMeta}{book}{}
+      \name{author}{1}{}{%
+        {{hash=20ff4e448498198368fe50d9555023f1}{%
+           family={Christian\bibnamedelima Blum},
+           familyi={C\bibinitperiod\bibinitdelim B\bibinitperiod},
+           given={Günther\bibnamedelimb R.\bibnamedelimi Raidl},
+           giveni={G\bibinitperiod\bibinitdelim R\bibinitperiod\bibinitdelim R\bibinitperiod}}}%
+      }
+      \list{location}{1}{%
+        {Boston, MA, USA}%
+      }
+      \list{publisher}{1}{%
+        {Springer Cham}%
+      }
+      \strng{namehash}{20ff4e448498198368fe50d9555023f1}
+      \strng{fullhash}{20ff4e448498198368fe50d9555023f1}
+      \strng{bibnamehash}{20ff4e448498198368fe50d9555023f1}
+      \strng{authorbibnamehash}{20ff4e448498198368fe50d9555023f1}
+      \strng{authornamehash}{20ff4e448498198368fe50d9555023f1}
+      \strng{authorfullhash}{20ff4e448498198368fe50d9555023f1}
+      \field{sortinit}{3}
+      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Hybrid Metaheuristics}
+      \field{year}{2016}
+    \endentry
   \enddatalist
 \endrefsection
 \endinput
