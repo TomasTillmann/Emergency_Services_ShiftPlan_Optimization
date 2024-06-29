@@ -1,14 +1,14 @@
-[0] Config.pm:306> INFO - This is Biber 2.18
-[1] Config.pm:309> INFO - Logfile is 'tmp/thesis.blg'
-[143] biber:340> INFO - === Sat Jun 29, 2024, 15:43:28
-[162] Biber.pm:418> INFO - Reading 'tmp/thesis.bcf'
-[259] Biber.pm:978> INFO - Found 9 citekeys in bib section 0
-[278] Biber.pm:4401> INFO - Processing section 0
-[291] Biber.pm:4592> INFO - Looking for bibtex file 'literatura.bib' for section 0
-[292] bibtex.pm:1713> INFO - LaTeX decoding ...
-[306] bibtex.pm:1518> INFO - Found BibTeX data source 'literatura.bib'
-[434] UCollate.pm:68> INFO - Overriding locale 'cs-CZ' defaults 'variable = shifted' with 'variable = non-ignorable'
-[434] UCollate.pm:68> INFO - Overriding locale 'cs-CZ' defaults 'normalization = NFD' with 'normalization = prenormalized'
-[434] Biber.pm:4221> INFO - Sorting list 'none/global//global/global' of type 'entry' with template 'none' and locale 'cs-CZ'
-[441] bbl.pm:654> INFO - Writing 'tmp/thesis.bbl' with encoding 'UTF-8'
-[446] bbl.pm:757> INFO - Output to tmp/thesis.bbl
+[3] Config.pm:306> INFO - This is Biber 2.18
+[4] Config.pm:309> INFO - Logfile is 'tmp/thesis.blg'
+[899] biber:340> INFO - === Sat Jun 29, 2024, 18:37:43
+[1037] Biber.pm:418> INFO - Reading 'tmp/thesis.bcf'
+[1830] Biber.pm:978> INFO - Found 9 citekeys in bib section 0
+[1967] Biber.pm:4401> INFO - Processing section 0
+[2063] Biber.pm:4592> INFO - Looking for bibtex file 'literatura.bib' for section 0
+[2071] bibtex.pm:1713> INFO - LaTeX decoding ...
+[2170] bibtex.pm:1518> INFO - Found BibTeX data source 'literatura.bib'
+[3076] UCollate.pm:68> INFO - Overriding locale 'cs-CZ' defaults 'variable = shifted' with 'variable = non-ignorable'
+[3077] UCollate.pm:68> INFO - Overriding locale 'cs-CZ' defaults 'normalization = NFD' with 'normalization = prenormalized'
+[3078] Biber.pm:4221> INFO - Sorting list 'none/global//global/global' of type 'entry' with template 'none' and locale 'cs-CZ'
+[3140] bbl.pm:654> INFO - Writing 'tmp/thesis.bbl' with encoding 'UTF-8'
+[3186] bbl.pm:757> INFO - Output to tmp/thesis.bbl

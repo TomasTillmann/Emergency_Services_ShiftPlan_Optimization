@@ -730,7 +730,84 @@ Startovní plán definuje nějaký základ, který je následně doplňován neb
 nebo jsou týmům postupně prodlužovány či zkracovány směny,
 dokud jakákoliv změna už pouze nezhorší výslednou kvalitu. 
 
-Velkou nevýhodou lokálního prohledávání je neschopnost umět nalézt kompromis mezi lokálním optimem a globálním optimem.
+Velkou nevýhodou lokálního prohledávání je neschopnost umět nalézt kompromis mezi lokálním optimem a globálním optimem,
+přičemž nalezené lokální optimum je v drtivé většině suboptimální (\cite{GlovKoch03} str. 43).
 
 \subsection{Tabu prohledávání}
+
+Tabu prohledávání stejně jako lokální prohledávání prohledává plány lokálně pomocí sousedů.
+Tabu prohledávání však narozdíl od lokálního prohledávání po nalezení lokálního optima v něm nezůstane,
+ale umožní i navštívit souseda s horším hodnocením.
+
+Aby se následně prohledávání nevrátilo zpět do stejného optima,
+drží si seznam inverzních tahů posledních provedených tahů. Tomuto seznamu se říká \textit{tabu} a jedná se o tahy, které 
+jsou při prohledávání zakázany.
+Velikost seznamu tabu je takzvaná \textit{tabu tenura}, a jelikož se vždy ze seznamu odstraní nejposledněji provedený tah,
+tak tabu tenura určuje po jaký počet kroků tabu prohledávání se tah uvažuje, že je zakázan. 
+
+Ovšem vždy zakázat tahy z tabu může být příliš omezující, a výsledná nalezená řešení by mohla být suboptimální.
+Z toho důvodu ještě tabu metoda využívá konceptu \textit{aspiračního kritéria}, které pokud je pro nějaký tah splěno,
+tak je soused po provedení tohoto tahu uvažován i pokud je tah zakázan, čili i když se tah nachází v tabu.
+
+Tabu prohledávání lze ukončit několika způsoby. Nejčastěji se prohledávání ukončuje, jakmile v iteraci už neexistují žádní zlepšující sousedé,
+které získáme tahem, jenž není v tabu.~(\cite{GlovKoch03} str. 41 -- 49). 
+
+\begin{algorithm}[H]
+  \begin{algorithmic}[1]
+    \Function{TabuSearch}{$p_{start}$, $I$, $t$}
+    \State $p_{current}$ \gets $p_{start}$
+    \State $p_{best}$ \gets $p_{start}$
+    \State $tabu\_list$ \gets \{\}
+    \While {true}
+      \State $p^*$ \gets $p_{\emptyset}$ 
+      \For {$T \in \text{neighbours\_moves($p_{current}$)}$}
+        \State $p$ \gets T($p_{current}$)
+        \If {$q(p, I) > q(p^*, I)$} \textbf{and} ($p \notin tabu\_list$ \textbf{or} $q(p, I) > q(p_{best}, I)$)
+          \State $p^*$ \gets $p$
+        \EndIf
+      \EndFor
+      \If {$p^* = p_{\emptyset}$}
+        \State \Return $p_{best}$
+      \EndIf
+      \State $p_{current}$ \gets $p^*$
+      \If {$q(p_{current}, I) > q(p_{best}, I)$}
+        \State $p_{best}$ \gets $p_{current}$
+      \EndIf
+      \State \text{AddFirst(tabu\_list, $T^{-1}$)}
+      \If {$|\text{tabu\_list}| > t$}
+        \State \text{RemoveLast($tabu\_list$)} 
+      \EndIf
+    \EndWhile
+    \State \Return $p_{best}$
+  \EndFunction
+  \end{algorithmic}
+  \caption{Tabu prohledávání plánů pohotovostních služeb}
+  \label{alg:tabusearch}
+\end{algorithm}
+
+V krocích 1--5 se inicializuje stav algoritmu. Tabu je ze začátku prázdné.
+Podobně jako v lokálním prohledávání se prohledává prostor v krocích 5 až 24, dokud není splněna podmínka na řádku 13.
+V krocích 7--12 se prohledávájí pomocí sousedních tahů sousedé aktuálně prohledávaného plánu $p_{current}$. 
+
+Nejzajímavější je krok 9. Zde se prvně kontroluje stejně jako v lokálním prohledávání, zda je splěna nutná podmínka, jestli je vůbec třeba souseda $p$ uvažovat.
+Druhá podmínka kontroluje, zda $p$ buď není v tabu, nebo je splněné aspirační kritérium.
+Tah $T$, který je v tabu uvažujeme pouze pokud soused $T(p_{current})$ je doposavad nejoptimálnějším nalezeným plánem.
+Takové aspirační kritérium je nejčastěji používané a obecně nejefektivnšjí aspirační kritérium~(\cite{GlovKoch03} str. 47).
+
+Podmínka v kroku 13 je totožná s podmínkou u lokálního prohledávání.
+Pokud již neexistuje žádný zlepšující soused, který není v tabu nebo nesplňuje aspirační kritérium, tak vrátíme nejlepší nalezený plán $p_{best}$.
+V kroku 17 aktualizujeme $p_{best}$, pokud jsme v aktuální iteraci nalezli kvalitnější plán.
+
+V poslední řadě, v krocích 20--23 aktualizujeme tabu.
+Do taba přidáváme inverzní tah, protože se ze souseda nechceme vrátit do původního plánu.
+Pokud je tabu větší než dovoluje hyperparametr tabu tenura $t$, odebereme nejdříve přidaný tah.
+
+Tabu prohledávání již narozdíl od lokálního prohledávání nezůstane uvězněné v lokálním optimu a díky tabu se do něj nevrátí a nezacyklí se.
+Prohledá tak více plánů a bude vracet lepší řešení, než lokální prohledávání.
+Na druhou stranu, nalezená řešení budou stále poměrně dost závislá na $p_{start}$, protože algoritmus uvažuje jenom sousední plány.
+Tento problém řeší následující algoritmus.
+
+\subsection{Simulované žíhání}
+
+
 
