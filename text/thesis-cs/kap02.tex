@@ -804,10 +804,50 @@ Pokud je tabu větší než dovoluje hyperparametr tabu tenura $t$, odebereme ne
 
 Tabu prohledávání již narozdíl od lokálního prohledávání nezůstane uvězněné v lokálním optimu a díky tabu se do něj nevrátí a nezacyklí se.
 Prohledá tak více plánů a bude vracet lepší řešení, než lokální prohledávání.
-Na druhou stranu, nalezená řešení budou stále poměrně dost závislá na $p_{start}$, protože algoritmus uvažuje jenom sousední plány.
-Tento problém řeší následující algoritmus.
 
 \subsection{Simulované žíhání}
 
+Další
 
+\begin{algorithm}[H]
+  \caption{Simulated Annealing Function}
+  \begin{algorithmic}[1]
+    \Function{SimulatedAnnealing}{$p_{start}$, $t_{start}$, $M_k$, $t_{\text{cooling}}$, $t_{\text{final}}$}
+    \State $p_{\text{current}} \gets p_{start}$
+    \State $p_{\text{best}} \gets p_{start}$
+    \State $t \gets t_{start}$
+    \While{$t > t_{\text{final}}$}
+      \For{$m \gets 1$ \textbf{to} $M_k$}
+        \State $p \gets \text{zatím neprohledaný } \in \text{neighbours}(p_{\text{current}})$
+        \State $\Delta q \gets q(p_{\text{current}}) - q(p)$
+        \If{$\Delta q \leq 0$}
+          \State $p_{\text{current}} \gets p$
+        \Else
+          \State $p_{\text{current}} \gets p$ s pravděpodobností $\exp\left(-\frac{\Delta q}{t}\right)$
+        \EndIf
+        \If{$q(p, I) > q(p_{best}, I)$}
+          \State $p_{best} \gets p$
+        \EndIf
+      \EndFor
+      \State $t \gets t_{\text{cooling}}(t)$
+    \EndWhile
+    \State \Return $p_{\text{best}}$
+    \EndFunction
+  \end{algorithmic}
+\end{algorithm}
 
+Algoritmus si v krocích 2 až 4 inicializuje aktuálně prohledávaný plán $p_{\text{current}}$, nejlepší nalezený plán $p_{\text{best}}$ a akutální teplotu $t$.
+Hlavní smyčka algoritmu v krocích 5--19 běží, dokud $t$ nepoklesne pod nejnižší dovolenou teplotu $t_{\text{final}}$.
+V každé iteraci se provádí $M_k$ iterací, přičemž každá iterace se snaží najít lepší plán ze sousedních plánů $p$.
+V kroku 8 se vypočítá rozdíl kvality $\Delta q$ aktuálně nejlepšího plánu a sousedního plánu.
+
+Podle $\Delta q$ se rozhodne, zda přijmout sousední plán rovnou, nebo až v kroku 12.
+V kroku 12 je $p$ přijato s pravděpodobností definovanou jako
+\begin{align*}
+  \exp\left(-\frac{\Delta q}{t}\right).
+\end{align*}
+Díky tomu je umožněno akceptovat i lokálně horší řešení.
+
+V krocích 14--16 se standardně aktualizuje $p_{\text{best}}$, pokud $p$ má vyšší kvalitu než dosud nejlepší plán.
+Po provedení $M_k$ iterací se v kroku 18 snižuje teplota $t$ pomocí ochlazovacího rozvrhu $t_{\text{cooling}}(t)$.
+Jakmile aktuální teplota klesne pod $t_{\text{final}}$, algoritmus vrátí nejlepší nalezený plán $p_{\text{best}}$.
