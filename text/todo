@@ -1,0 +1,20 @@
+* polish kap 2
+* doprogramovat dp
+* vytvorit testy simulace 
+* vytvorit svety, kterymi budu porovnavat metody
+--min
+* porovnej nejak vhodne jednotlive metody mezi sebou
+  * metriky
+    * cas behu
+    * kvalita nalezeneho reseni
+    * pocet dost dobrych nalezenych reseni?
+  * grafy
+  * porovnat i pro krajni pripady, vetsi data
+--idealne
+* sepsat do kapitoly 3 
+  * zaver: jake metody jsou nejlepsi
+* dodelat program jako command line utilitku
+* posledni kapitola sepsat
+  * navrh programu
+  * implementace a fungovani simulace?
+  * uzivatelska dokumentace

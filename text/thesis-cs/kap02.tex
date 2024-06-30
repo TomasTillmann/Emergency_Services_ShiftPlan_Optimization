@@ -4,6 +4,8 @@ V této kapitole vyzkoušíme různé metody, které můžeme pro nalezení opti
 
 \section{Dynamické programování}\label{kap:dynamicProgram}
 
+\subsection{Popis}
+
 \textit{Dynamické programování} je technika řešení problému, která si průběžně ukládá řešení menších podúloh a pomocí rekurzivního vztahu menší podúlohy s větší,
 definovaného \textit{rekurzivním vztahem}, řeší větší podúlohy efektivněji, až po vyřešení původní úlohy. 
 Průběžnému ukládání výsledků podúloh se říká \textit{memoizace}.
@@ -468,9 +470,9 @@ Věta \ref{veta:dosazitelnostOptimalnimiTahy} nám dává návod, jak plány $P_
       \If{$P^* = \emptyset$}
         \State $P^*$ \gets $P'^*$ 
       \ElsIf{$q^{\text{Lex}}(p^*) = q^{\text{Lex}}(p'^*)$}
-        \State $P^*$ sjednoť s $P'^*$
+        \State $P^*$ \gets $ P^* \cup P'^*$
       \ElsIf{$q^{\text{Lex}}(p^*) < q^{\text{Lex}}(p'^*)$}
-        \State $P^*$ nahraď $P'^*$
+        \State $P^*$ \gets $P'^*$
       \EndIf
     \EndFor
     \State $\text{Cache}[k, p]$ \gets $P^*$
@@ -604,7 +606,7 @@ Konkrétně jsme si ve větě \ref{veta:simulaceJakoCernaSkrinka} ukázali, že 
 tak je optimalizační úlohu NP-těžká. V minulé kapitole jsme nalezli rekurzivní vztah, který nám umožnil se na
 účelovou funkci nedívat jako na černou skříňku a nalezli jsme dramaticky lepší algoritmus \ref{alg:rekProhPlanu}, než naivní řešení \ref{kap:naivniRes}.
 
-V této kapitole jsou diskutovány metody, které na účelovou funkci pohlížejí jako na černou skřňku. 
+V této kapitole jsou diskutovány metody, které na účelovou funkci pohlížejí jako na černou skříňku. 
 Připouštíme tedy NP-těžkou složitost problému, ale ukáže se, že i tak budeme schopni docílit velmi kvalitních pohotovostních plánů.
 
 \subsection{Popis}
@@ -626,7 +628,7 @@ V případě metod, založených na \textit{populaci}, jako jsou například \te
 nahrazováním komponent jednoho řešení komponentami jiného řešení, různě zvolenými pravidly výměny.
 
 Dalším zajímavým příkladem metaheurstické metody je \textit{optimalizování kolonií mravenců}, spadající do kategorie metaheuristik \textit{inteligence hejna}.
-Sousedství jsou definována propojením cest a procházena pomocí simulování chodu mravenců, reprezentující nějakou kolektivní inteligenci
+Sousedství jsou definována propojením cest a procházena pomocí simulování chodu mravenců, reprezentující nějakou kolektivní inteligenci.
 Mravenci chodí po těchto cestičkách a vybírají si tak optimální konfigurace s pravděpodobností, jenž je uřčena feromony.
 
 Existuje spoustu dalších různých metod, jako v poslední době populární \textit{hybridní metody},
@@ -637,9 +639,42 @@ případně i měnit různé metaheuristiky za běhu (\citet{GlovKoch03}).
 
 Asi nejjednodušší metoda na prohledávání prostoru konfigurací je \textit{lokální prohledávání}.
 Lokální prohledávání pouze lokálně prohledává prostor konfigurací od nějaké startovní konfigurace $x \in \mathcal{X}$. 
-Prostor porhledává prostřednictvním sousedů, kde vždy vybere souseda s nejlepší hodnotou účelové funkce.
-Náhodná konfigurace i sousedi musí splňovat omezení, pokud nějaká jsou.
-Aby metoda lokálního prohledávání pomocí sousedů správně fungovala, musí sousedi konfigurace $x$ být v nějakém smyslu $x$ podobné (\citet{HybridMeta}, str. 3).
+Prostor porhledává prostřednictvním sousedů $N(x)$, kde vždy vybere souseda s nejlepší hodnotou účelové funkce.~(\citet{HybridMeta}, str. 3).
+
+Sousedy $N(p)$ zkonstruujeme implicitně pomocí tahů, což je standardní způsob konstrukce sousedů nějaké konfigurace (\cite{HybridMeta}, str. 3).
+Sousední plány $N(p)$ plánu $p \in P_C$ lze definovat různě. 
+
+My budeme od $p' \in N(p)$ vyžadovat alespoň následující:
+\begin{enumerate}
+  \item $\forall p \in P_C \colon N(p) \subseteq P_C$, \label{en:f}
+  \item $\forall p \in P_C, \exists(T_1, \dots, T_n) \colon (T_1 \circ \cdots \circ T_n)(p) = p^*$, kde $p^*$ je globálně optimální plán,  \label{en:s}
+  \item $\forall p \in P_C \colon p' \in N(p)$, jsou si plány $p$ a $p'$ podobné, čili z větší části mají naalokovaná stejná vozidla a týmy, se stejnými směnami. \label{en:t}
+\end{enumerate}
+
+První podmínka \ref{en:f} zakazuje navštěvování nedovolených plánů. Pro některé problémy je navštěvování nedovolených konfigurací žádoucí,
+protože omezující podmínky můžou být příliš svazující (\cite{GlovKoch03} str. 50--51).
+To ale není náš případ, čili se můžeme omezit pouze na dovolené plány.
+
+Druhá podmínka  \ref{en:s} zajišťuje, že při prohledávání je vůbec možné globální optimum navštívit.
+
+Třetí podmínka \ref{en:t} vyžaduje, aby sousední plány sdíleli s původním plánem nějaké komponenty. 
+Kdyby sousední plány nesplňovali tuto podmínku, prohledávání pomocí sousedů by se o moc nelišilo od náhodného
+generování dovolených plánů, což není efektivní způsob prohledávání.
+
+Pro představu, jedna z možných definic sousedství by mohla vypadat následovně.
+Jelikož sousední plány definujeme pomocí tahů, stačí nadefinovat tahy:
+  \begin{enumerate}
+    \item alokování záchranného týmu,
+    \item dealokování záchranného týmu,
+    \item alokování záchranného vozidla,
+    \item dealokování záchranného vozidla,
+    \item nejkratší prodloužení směny záchranného týmu,
+    \item nejkratší zkrácení směny záchranného týmu,
+    \item posun začátku směny záchranného týmu o nejkratší možnou dobu.
+  \end{enumerate}
+
+Je snadné ověřit, že sousedství definována implicitně těmito tahy splňují všechny podmínky.
+Podívejme se, jak vypadá algoritmus lokálního prohledávání plánů pomocí sousedů.
 
 \begin{algorithm}[H]
   \begin{algorithmic}[1]
@@ -664,74 +699,29 @@ Aby metoda lokálního prohledávání pomocí sousedů správně fungovala, mus
 \end{algorithm}
 
 Algoritmus \ref{alg:hillclimb} v krocích 3 až 14 prohledává sousedy dokud není splněna podmínka v kroku 10.
-Algoritmus v kroku 5 prohledává sousední plány splňující omezující podmínky $C$, aktuálně prohledávaného plánu $p_{current}$, který je na začátku algoritmu v kroku 2 nastaven na $p_{start} \in P_C$.
+Algoritmus v kroku 5 prohledává sousední plány splňující omezující podmínky $C$,
+aktuálně prohledávaného plánu $p_{current}$, který je na začátku algoritmu v kroku 2 nastaven na $p_{start} \in P_C$.
+
 V krocích 6 a 7, pokud má soused lepší hodnocení pří účelové funkci $q \in Q_I$, tak je aktuálně nejlepší soused $p^*$ změněn na souseda $p$.
 Podmínka v kroku 10 kontroluje, zda existuje nějaký soused $p_{current}$, který má lepší hodnocení při $q$.
 Pokud ne, algoritmus našel lokální maximum, tím je $p_{current}$, proto je vrácen v kroku 11.
+
 V kroku 13 je $p_{current}$ nastaveno na nejlepší sousední plán.
-Zřejmě lokální prohledávání nalezne nějaké lokální maximum, jaké konkrétně, závisí pouze na startovním plánu $p_{start}$.
+Zřejmě lokální prohledávání nalezne nějaké lokální maximum, jaké konkrétně, závisí na startovním plánu $p_{start}$ a definici $N(p)$.
 
-Sousedy plánu $p \in P_C$ lze získat různými způsoby, je však důležité, aby byli $p$ v nějakém smyslu podobní.
-Jako podobné plány plánu $p$ můžeme chápat plány, které se od $p$ liší co nejméně, například pouze jednou alokací týmu nebo vozidla,
-nebo v jedné směně nějakého týmu, atd.\
-
-\textit{Sousedy} $p$ tak nadefinujeme jako plány $N(p) \subseteq P_C$, které vzniknou aplikováním tahu $T$,
-\begin{align*}
-  T(p) \in P_C,
-\end{align*}
-kde $T$ může být jeden z následujících \textit{sousedních tahů}:
-\begin{enumerate}
-  \item alokování záchranného týmu,
-  \item dealokování záchranného týmu,
-  \item alokování záchranného vozidla,
-  \item dealokování záchranného vozidla,
-  \item nejkratší prodloužení směny záchranného týmu,
-  \item nejkratší zkrácení směny záchranného týmu,
-  \item posun začátku směny záchranného týmu o nejkratší možnou dobu.
-\end{enumerate}
-Sousedy $N(p)$ jsme tak zkonstruovali implicitně pomocí tahů, což je standardní způsob konstrukce sousedů nějaké konfigurace (\cite{HybridMeta}, str. 3).
-
-Všechny prohledané plány nebudou navzájem různé,
-například první dealokace vozidla a pak prodloužení směny nějakému týmu nebo obráceně vyústí ve stejné plány.
-Při implementaci tak dává smysl použít \textit{cache},
-abychom se vyhnuli opakovanému výpočetně náročnému spouštění simulace pro stejné plány, pouze získané jinou posloupností tahů, podobně jako v algoritmu \ref{alg:rekProhPlanu}.
-
-Mohlo by nás zajímat, až kolik sousedů $N(p)$ nějaký plán $p$ může mít.
-Velikost množiny $N(p)$ se bude rovnat počtu různých sousedních tahů, 
-protože každým takovým tahem získáme unikátní plán. 
-
-\begin{veta}[Počet sousedů]
-  Nechť libovolný plán $p \in P_C$, pak
+\begin{veta}[Časová složitost lokálního prohledávání]
+  Nechť libovolný plán $p \in P_C$, pak lokální prohledávání běži v čase
   \begin{align*}
-    |N(p)| \in \mathcal{O}(Z_n + A_n).
+    \mathcal{O}(k \cdot |N(p)|),
   \end{align*}
+  kde $k$ je počet iterací, než lokální prohledávání nalezne nějaké lokální maximum.
 \end{veta}
-\begin{dukaz}
-  Nechť $Z_1$ počet naalokovaných týmu a $Z_2$ počet nenaalokovaných týmů, zřejmě
-  \begin{align*}
-    Z_1 + Z_2 = Z_n.
-  \end{align*}
-  Definujme stejně $A_1$ a $A_2$ jako počty naalokovaných a nenaalokovaných vozidel.
-  Tahy počítejme postupně.
-  Počet tahů alokování záchranného týmu je počet nenaalokovaných záchranných týmů, $Z_2$.
-  Tahů dealokování týmu samozřejmě $Z_1$.
-  Stejně tak pro alokace a dealokace záchranných vozidel, čili $A_2$ a $A_1$ tahů.
-  Nejkratší prodloužení a zkrácení směny týmu je nanejvýš jedna pro každý naalokovaný tým.
-  Stejně tak pro posun začátku směny o nejkratší možnou dobu.
-  Dohromady dostáváme
-  \begin{align*}
-    (Z_1 + Z_2) + (A_1 + A_2) + 4 * Z_1 = Z_n + A_n + 4 * Z_1 \in \mathcal{O}(Z_n + A_n).
-  \end{align*}
-\end{dukaz}
 
-Pokud lokální prohledávání skončí v $k$ krocích, tak algoritmus prohledá $\mathcal{O}(k \cdot (Z_n + A_n))$ plánů.
-Jak uvidíme v kapitole (ref TODO), počet kroků $k$ k docílení lokálního optima z nějakého startovního plánu se pohybuje v desítkách,
-takže $k$ můžeme uvažovat jako konstantu.
-
-Získáváme tak velmi rychlý způsob, jak upravit libovolný plán, abychom dostali jeho \uv{nejlepší verzi}. 
+Pokud by $k$ i $|N(p)$| byli \uv{malé}, tak jsme získali velmi rychlý způsob, jak upravit libovolný plán, abychom dostali jeho \uv{nejlepší verzi}. 
 Startovní plán definuje nějaký základ, který je následně doplňován nebo redukován o záchranné týmy nebo vozidla,
 nebo jsou týmům postupně prodlužovány či zkracovány směny,
 dokud jakákoliv změna už pouze nezhorší výslednou kvalitu. 
+Jak konkrétně už záleží na konkrétní definici $N(p)$.
 
 Velkou nevýhodou lokálního prohledávání je neschopnost umět nalézt kompromis mezi lokálním optimem a globálním optimem,
 přičemž nalezené lokální optimum je v drtivé většině suboptimální (\cite{GlovKoch03} str. 43).
@@ -795,7 +785,7 @@ V krocích 7--12 se prohledávájí pomocí sousedních tahů sousedé aktuáln�
 Nejzajímavější je krok 9. Zde se prvně kontroluje stejně jako v lokálním prohledávání, zda je splěna nutná podmínka, jestli je vůbec třeba souseda $p$ uvažovat.
 Druhá podmínka kontroluje, zda $p$ buď není v tabu, nebo je splněné aspirační kritérium.
 Tah $T$, který je v tabu uvažujeme pouze pokud soused $T(p_{current})$ je doposavad nejoptimálnějším nalezeným plánem.
-Takové aspirační kritérium je nejčastěji používané a obecně nejefektivnšjí aspirační kritérium~(\cite{GlovKoch03} str. 47).
+Takové aspirační kritérium je nejčastěji používané a obecně nejefektivněšjí aspirační kritérium~(\cite{GlovKoch03} str. 47).
 
 Podmínka v kroku 13 je totožná s podmínkou u lokálního prohledávání.
 Pokud již neexistuje žádný zlepšující soused, který není v tabu nebo nesplňuje aspirační kritérium, tak vrátíme nejlepší nalezený plán $p_{best}$.
@@ -860,8 +850,9 @@ V kroku 12 je $p$ přijato s pravděpodobností definovanou jako
 \begin{align}\label{df:metropolis}
   \exp\left(-\frac{\Delta q}{t}\right).
 \end{align}
-Díky \ref{df:metropolis} je umožněno akceptovat i lokálně horší řešení. Jedná se o \textit{metropolis akceptační kritérium} (\citet{Metropolis}), které modeluje
+Pravděpodobností funkce \ref{df:metropolis} je takzvané \textit{metropolis akceptační kritérium} (\citet{Metropolis}), které modeluje
 jak přechází termodynamický systém z aktuální konfigurace.
+Určuje s jakou pravděpodobností v závislosti na aktuální teplotě $t$ je suboptimální soused uvažován.
 
 V krocích 14--16 se standardně aktualizuje $p_{\text{best}}$, pokud $p$ má vyšší kvalitu než dosud nejlepší plán.
 Po provedení $M_k$ iterací se v kroku 18 snižuje teplota $t$ pomocí ochlazovacího rozvrhu $t_{\text{cooling}}(t)$.
