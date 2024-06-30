@@ -38,6 +38,11 @@ public interface IObjectiveFunction
   /// <summary>
   /// Get loss. Runs the simulation. 
   /// </summary>
+  double Get(EmergencyServicePlan plan, ReadOnlySpan<Incident> incidents);
+
+  /// <summary>
+  /// Get loss. Runs the simulation. 
+  /// </summary>
   double Get(Weights weights, ImmutableArray<Incident> incidents);
 
 }

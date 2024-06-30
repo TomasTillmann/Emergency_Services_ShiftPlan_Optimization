@@ -9,9 +9,9 @@ V této kapitole vyzkoušíme různé metody, které můžeme pro nalezení opti
 \textit{Dynamické programování} je technika řešení problému, která si průběžně ukládá řešení menších podúloh a pomocí rekurzivního vztahu menší podúlohy s větší,
 definovaného \textit{rekurzivním vztahem}, řeší větší podúlohy efektivněji, až po vyřešení původní úlohy. 
 Průběžnému ukládání výsledků podúloh se říká \textit{memoizace}.
-Díky této memoizaci dynamické programování neprohledává prostor řešení duplicitně, a tak je často velmi efektivní metodou pro řešení optimalizačních úloh (\citet{dynamic}).
+Díky této memoizaci dynamické programování neprohledává prostor řešení duplicitně, a tak je často velmi efektivní metodou pro řešení optimalizačních úloh (\cite{dynamic}).
 
-Triviálním příkladem využití dynamického programování je výpočet $n$-tého \textit{Fibbonaciho čísla}. (\citet{mares}, kap. 12).
+Triviálním příkladem využití dynamického programování je výpočet $n$-tého \textit{Fibbonaciho čísla}. (\cite{mares}, kap. 12).
 Pro nás zajímavějším příkladem využití dynamického programování je řešení úlohy kombinatorické optimalizace \textit{Problému batohu}.
 
 \begin{definice}[Problém batohu]
@@ -32,18 +32,18 @@ Existuje $2^n$ možností, které předměty vložíme do batohu. Naivní řeše
 Avšak pomocí dynamického programování lze vyřešit problém batohu v \textit{pseudopolynomiálním} čase $\mathcal{O}(nc)$,
 což pro velká $n$ a konstatní $c$ je až exponenciálním zlepšením.
 
-Bellmanovy rovnice vyjadřující rekurzivní vztahy vypadají následovně,
+Rekurzivní vztahy vypadají následovně,
 
 \begin{definice}[Rekurzivní vztah pro problém batohu]\label{rov:KPrekurz}
-  \begin{align*}
+  \begin{align}
     m_{i, c'} &= m_{i - 1, c'} \text{ pokud } w_i > c', \\
     m_{i, c'} &= \max (m_{i - 1, c'}, m_{i - 1, c' - w_i} + p_i) \text{ pokud } w_i \leq c',
-  \end{align*}
+  \end{align}
   \\
   pro $0 \leq c' \leq c$ aktuální uvažovaná kapacita batohu.
 \end{definice}
 
-Rekurzivní vztah \ref{rov:KPrekurz} nám pouze říká, že ze znalostí optimálního výběru předmětů podpbroblému $m_{i-1, c' - w_i}$ a podproblému $m_{i - 1, c'}$,
+Rekurzivní vztah (viz rovnice \ref{rov:KPrekurz}) nám pouze říká, že ze znalostí optimálního výběru předmětů podpbroblému $m_{i-1, c' - w_i}$ a podproblému $m_{i - 1, c'}$,
 umíme v konstantím čase zjistit optimální výběr předmětů pro aktuální problém $c'$, tedy $m_{i, c'}$.
 Buď předmět $i$ použijeme při výběru, a tak aktuální optimální výběr je roven $m_{i - 1, c' - w_i} + p_i$,
 nebo předmět při výběru nepoužijeme, takže aktuální optimální výběr je optimální výběr podproblému, $m_{i - 1, c'}$. 
@@ -69,10 +69,10 @@ nebo předmět při výběru nepoužijeme, takže aktuální optimální výběr
 \end{algorithm}
 
 Algoritmus \ref{KP} vrací sumu hodnot optimálních předmětů přidaných do batohu.
-Jaké konkrétní předměty přispěly do sumy lze snado zjistit zpětným následováním rekurzivního vztahu \ref{rov:KPrekurz}.
+Jaké konkrétní předměty přispěly do sumy lze snado zjistit zpětným následováním rekurzivního vztahu.
 
 Rádi bychom našli nějaký podobný rekurzivní vztah v problému hledání optimálního plánu.
-Nalezením rekurzivních vztahů by pak simulace $s$ nebyla černou skříňkou a byla by splněna nutná podmínka \ref{veta:simulaceJakoCernaSkrinka} pro šanci na polynomiální řešení.
+Nalezením rekurzivních vztahů by pak simulace $s$ nebyla černou skříňkou a byla by splněna nutná podmínka (viz věta \ref{veta:simulaceJakoCernaSkrinka}) pro šanci na polynomiální řešení.
 
 \subsection{Prohledávání prostoru plánů tahy}
 
@@ -82,13 +82,14 @@ vyřešit náročná kombinatorická úloha.
 V této kapitole budeme zkoumat, jestli existují nějaké rekurzivní vztahy 
 \uv{optimálních plánu} na méně incidentech s \uv{optimálními plány} na více incidentech, abychom efektivně vyřešili optimalizační problém nalezení optimálního plánu pohotovostní služby. 
 
-Nalezneme takový rekurzivní vztah \ref{veta:optimalniTahy} a to pomocí prohledávání plánů pomocí \textit{tahů} \ref{df:tah}, konkrétně \textit{optimálních tahů} \ref{df:optimalniTahy}.
-Optimálními tahy budeme postupně budovat \textit{plány optimální v ceně} \ref{df:planOptVCene},
-podle vhodně zvolených podmnožin množiny incidentů $I$, \textit{seřazených incidentů} \ref{df:INC}.
-Věta \ref{veta:dosazitelnostOptimalnimiTahy} dokáže, že takový postup skutečně musí nalézt všechny optimální plány, ale pouze při účelové funkci $q^{\text{Lex}}$.
-Také navrhneme algoritmus \ref{alg:rekProhPlanu},
+Nalezneme takový rekurzivní vztah (viz věta \ref{veta:optimalniTahy}) a to pomocí prohledávání plánů pomocí \textit{tahů} (viz definice \ref{df:tah}),
+konkrétně \textit{optimálních tahů} (viz definice \ref{df:optimalniTahy}).
+Optimálními tahy budeme postupně budovat \textit{plány optimální v ceně} (viz definice \ref{df:planOptVCene}),
+podle vhodně zvolených podmnožin množiny incidentů $I$, \textit{seřazených incidentů} (viz definice \ref{df:INC}).
+Věta o dosažitelnosti optimálními tahy \ref{veta:dosazitelnostOptimalnimiTahy} dokáže, že takový postup skutečně musí nalézt všechny optimální plány, ale pouze při účelové funkci $q^{\text{Lex}}$.
+Také navrhneme algoritmus (viz algoritmus \ref{alg:rekProhPlanu}),
 který korektně nalezne všechny takové optimální plány pro množinu $I$, a bude fungovat rychleji než naivní řešení.
-Detailní rozebrání složitosti algoritmu popisuje věta \ref{veta:slozitostRek}.
+Detailní rozebrání složitosti algoritmu popisuje věta o složitosti algoritmu \ref{veta:slozitostRek}.
 
 \begin{definice}[Seřazené incidenty]\label{df:INC}
   Nechť množina incidentů 
@@ -226,7 +227,7 @@ Dále budeme tahy definovat pouze slovně, protože se bude vždy jednat o něja
 
 Můžou existovat plány $p \in P_C$, na kterých nějaký tah nelze provést, čili $T(p)$ je nedefinované.
 Například, pokud bychom plánu chtěli alokovat tým, ale už nejsou žádné k dispozici, nebo už není volná žádná výjezdová stanice podle omezení $C$.
-Řekněme, že tah $T$ \textit{lze provést na plánu $p \in P_C$}, pokud $T(p)$ je definováno.
+Řekněme, že tah $T$ \textit{lze provést na plánu $p \in P_C$} právě tehdy, když $T(p)$ je definováno.
 
 Pomocí tahů můžeme $P_C$ \textit{prohledávat}.
 Nechť množina tahů $T$.
@@ -269,17 +270,17 @@ Tah 4 lze chápat jako zkrácení směny \uv{zleva}.
 \end{definice}
 
 Plán optimální v ceně je takový plán, že jakýkoliv pokus o snížení ceny nějakým tahem snižující cenu způsobí, že výsledný plán bude odbavovat méně incidentů.
-Následující věta \ref{veta:lexJeOptVCene} objasní, k čemu jsou plány optimální v ceně užitečné.
+Následující věta objasní, k čemu jsou plány optimální v ceně užitečné.
 \begin{veta}[Optimální plán při účelové funkci $q^{\text{Lex}}$ je optimální v ceně]\label{veta:lexJeOptVCene}
   Optimální plán $p^*$ při účelové funkci $q^{\text{Lex}}$ na množině incidentů $I$ je optimální v ceně.
 \end{veta}
 \begin{dukaz}
   Pro spor předpokládejme, že $p^*$ není optimální v ceně.
-  Pak existuje tah snižující cenu $U$ takový, že
+  Pak existuje tah snižující cenu $T$ takový, že
   \begin{equation*}
-    s(U(p^*), I) = s(p^*, I) \land U(u(p^*)) < u(p^*).
+    s(T(p^*), I) = s(p^*, I) \land u(T(p^*)) < u(p^*).
   \end{equation*}
-  Plán $U(p^*)$ odbavuje stejně incidentů a zároveň je levnější.
+  Plán $T(p^*)$ odbavuje stejně incidentů a zároveň je levnější.
   To je spor s optimalitou $p^*$ pří účelové funkci $q^{\text{Lex}}$.
 \end{dukaz}
 
@@ -330,7 +331,7 @@ Následuje definování jednotlivých optimálních tahů.
   které lze na plánu $p$ pro množinu $I$ provést.
 \end{definice}
 
-Následující věta \ref{veta:optimalniTahy} vše spojí dohromady a poskytne základ pro postup, jak šikovně prohledávat plány pomocí optimálních tahů.
+Následující věta vše spojí dohromady a poskytne základ pro postup, jak šikovně prohledávat plány pomocí optimálních tahů.
 \begin{veta}[O optimálních tazích]\label{veta:optimalniTahy}
   Nechť množiny incidentů $I_0, \dots, I_n$ podle definice \ref{df:INC}.
   Nechť plán optimální v ceně $p_k \in P_C \colon s(p_k, I_k) = r$.
@@ -350,17 +351,18 @@ Následující věta \ref{veta:optimalniTahy} vše spojí dohromady a poskytne z
   \begin{enumerate}
     \item
       $i'_r \neq i_k$,
+      čili poslední odbavený incident $i'_r$ není poslední incident, který v $I_k$ nastal,
 
     \item
-      $i'_r = i_k$.
+      $i'_r = i_k$, čili poslední odbavený incident $i'_r$ je poslední incident, který v $I_k$ nastal.
   \end{enumerate}
   V prvním případě je hledaný $p_{k-1}$ právě $p_k$ a tah $T$ identita.
-  Platí $s(p_k, I_{k-1}) = r$, protože $p_k$ neodbaví poslední incident $i_k \not \in I_{k-1}$ a simulace incidenty prochází postupně \ref{simulaceAlgo},
+  Platí $s(p_k, I_{k-1}) = r$, protože $p_k$ neodbaví poslední incident $i_k \not \in I_{k-1}$ a simulace incidenty prochází postupně (viz algoritmus simulace \ref{simulaceAlgo}),
   takže výpočet simulace na plánu $p_{k}$ a na množinách $I_k$ i $I_{k-1}$ je do $i_{k-1}$ incidentu totožný.
   Zároveň $p_k$ je optimální v ceně na $I_k$ a jelikož $p_k$ odbavuje stejné incidenty na $I_{k-1}$, tak je optimální v ceně i na $I_{k-1}$.
 
   V druhém případě, je poslední incident $i_k = i'_r$ plánem $p_k$ odbaven.
-  Z toho důvodu $p_k$ na množině inidentů $I_{k-1}$ odbavuje incidenty $i'_1, \dots, i'_{r-1}$, o jeden méně -- opět, simulace incidenty prochází postupně \ref{simulaceAlgo}.
+  Z toho důvodu $p_k$ na množině inidentů $I_{k-1}$ odbavuje incidenty $i'_1, \dots, i'_{r-1}$, o jeden méně -- opět, simulace incidenty prochází postupně.
   Platí tak, že $s(p_k, I_{k-1}) = r - 1$. Plán $p_k$ však nemusí být optimální v ceně, takže $T$ nemusí být tah identita jak pro případ $i'_k = i'_r$. 
 
   Libovolné snížení ceny lze jistě docílit nějakou posloupností tahů snižujících cenu.
@@ -373,64 +375,56 @@ Následující věta \ref{veta:optimalniTahy} vše spojí dohromady a poskytne z
       Tým $z$ odbavuje jenom $i_k$, pak je v plánu $p_k$ naalokován zbytečně. O odbavení všech ostatních $r-1$ incidentů se postarájí ostatní týmy.
 
     \item
-      Tým $z$ odbavuje i jiné incidenty $I_z$, ale jelikož
-      \begin{equation*}
-        \forall i_z \in I_z \colon T_I(i_z) < T_I(i_k),
-      \end{equation*}
+      Tým $z$ odbavuje i jiné incidenty $I_z$, ale jelikož každý $z_i \in I_z$ nastal dříve,
       tak $z$ odbavuje $i_k$ až po odbavení všech incidentů $I_z$.
-      Aby $i_k$ úspěšně odbavil, tudiž může mít delší směnu, než by měl, pro odbavení $I_z$.
+      Aby $z$ úspěšně odbavil $i_k$ , může mít delší směnu, než by potřeboval pro odbavení všech incidentů $I_z$.
   \end{enumerate}
   V obou případech ještě může být zbytečně naalokováno vozidlo, které $z$ používal pro odbavení $i_k$.
   Žádná jiná možnost nemůže nastat.
 
-  Z pozorování plyne, že vždy existuje dvojice tahů $T_2^{-1}$ a $T_2^{-1}$, kde pro jejich složení $T^{-1} = T_2^{-1} \circ T_2^{-1}$,
-  platí, že $T^{-1}(p_k)$ je optimální v ceně a $s(T^{-1}(p_k), I_{k-1}) = r - 1$:
+  Z pozorování plyne, že vždy existuje dvojice tahů $T_1^{-1}$ a $T_2^{-1}$, kde pro jejich složení $T^{-1} = T_1^{-1} \circ T_2^{-1}$,
+  platí, že $T^{-1}(p_k)$ je optimální v ceně a $s(T^{-1}(p_k), I_{k-1}) = r - 1$.
+  Těmito tahy jsou:
   \begin{enumerate}
   \item
-    dealokace týmu a dealokace vozidla, 
+    dealokace týmu a dealokace vozidla, \label{en:_1}
   \item
-    maximální zkrácení směny týmu a dealokace vozidla,
+    dealokace týmu a identita, \label{en:_2}
   \item
-    dealokace týmu a identita,
+    maximální zkrácení směny týmu a dealokace vozidla, \label{en:_3}
   \item
-    maximální zkrácení směny týmu a identita,
+    maximální zkrácení směny týmu a identita, \label{en:_4}
   \item
-    identita a identita.
+    identita a identita. \label{en:_5}
   \end{enumerate}
-  Maximálním zkrácením směny týmu $z$ myslíme tah zkrácení směny $T$, že
+  Maximálním zkrácením směny týmu $z$ myslíme tah zkrácení směny $T'$, že
   \begin{equation}\label{eq:rrr}
-    s(T(p_k), I_{k-1}) = r - 1
+    s(T'(p_k), I_{k-1}) = r - 1
   \end{equation}
-  a směna už týmu $z$ nelze zkrátit více, aby platilo \ref{eq:rrr}.
-  Ukázali jsme existenci $T^{-1}$ v obou případech. Nechť
+  a směna už týmu $z$ nelze zkrátit více, aby platila rovnost \ref{eq:rrr}.
+
+  První \ref{en:_1} a druhý \ref{en:_2} případ pokrývají situaci, kdy $z$ odbavuje pouze $i_k$.
+  Třetí \ref{en:_3} a čtvrtý \ref{en:_4} případ pokrývají situaci, kdy $z$ odbavuje i nějaké jiné incidenty a $z$ jde zkrátit směnu, aby stále odbavoval všechny incidenty $I_z$.
+  Poslední případ \ref{en:_4} pokrývá situaci, kdy $z$ odbavuje i jiné incidenty, ale směnu mu nelze nijak zkrátit.
+
+  Ukázali jsme tak existenci $T^{-1}$ pro všechny situace. Nechť
   \begin{equation*}
     T = T_1 \circ T_2,
   \end{equation*}
   kde $T_1$ a $T_2$ jsou inverzními tahy k $T_1^{-1}$ a $T_2^{-1}$.
-  Možnými tahy $T$ tak jsou:
-  \begin{enumerate}
-  \item
-    minimální alokace týmu a alokace vozidla, 
-  \item
-    minimální prodloužení týmu a alokace vozidla,
-  \item
-    minimální alokace týmu a identita,
-  \item
-    minimální prodloužení směny týmu a identita,
-  \item
-    identita a identita.
-  \end{enumerate}
-
   Alokace týmu jsou minimální, protože $p_k$ byl plán optimální v ceně.
-  Tah $T$ je optimální tah pro každý případ.
+  Dohromady dostáváme, že tah $T$ je optimální tah, a to v každém případě.
 \end{dukaz}
+
+Předchozí věta je velmi důležitá pro navrhnutí sofistikovanějšího algoritmu prohledávání plánů.
+V následující větě je její tvrzení využito pro dokázání dosažitelnosti libovolného optimálního plánu, ale pouze při účelové funkci $q^{\text{Lex}}$,
 
 \begin{veta}[O dosažitelnosti optimálního plánu optimálními tahy]\label{veta:dosazitelnostOptimalnimiTahy}
   Optimální plán $p^* \in P_C$ na množině incidentů $I$ při účelové funkci $q^{\text{Lex}}$ je z $p_0$ dosažitelný nějakou posloupností optimálních tahů $T_1 \circ \dots T_{|I|-1}$.
 \end{veta}
 \begin{dukaz}
-  Nechť $n = |I|$.
-  Plán $p^*$ odbavuje $r = s(p^*, I)$ incidentů.
+  Nechť $n = |I|$ a
+  nechť plán $p^*$ odbavuje $r = s(p^*, I)$ incidentů.
   Z věty \ref{veta:lexJeOptVCene} je $p^*$ optimální v ceně.
   Existují pro něj podle věty \ref{veta:optimalniTahy} optimální tah $T_{n-1}$ a plán $p_{n-1}$ takové, že
   \begin{equation*}
@@ -461,13 +455,13 @@ Věta \ref{veta:dosazitelnostOptimalnimiTahy} nám dává návod, jak plány $P_
     \ElsIf{$\text{Cache}[k, p] \text{ je vyplněna}$}
       \State \Return $\text{Cache}[k, p]$
     \EndIf
-    \State $T^*_k$ \gets optimální tahy \ref{df:optimalniTahy}
-    \State $P^*$ \gets $\emptyset$
+    \State $T^*_k$ \gets optimální tahy (viz definice \ref{df:optimalniTahy})
+    \State $P^*$ \gets $p_{\emptyset}$
     \For{$T^* \in T^*_k$}
       \State $P'^*$ \gets \text{OptimalMovesSearch($T^*(p)$, $I_{k+1}$, $h$)}
       \State $p^*$ \gets libovolný z $P^*$
       \State $p'^*$ \gets libovolný z $P'^*$
-      \If{$P^* = \emptyset$}
+      \If{$P^* = p_{\emptyset}$}
         \State $P^*$ \gets $P'^*$ 
       \ElsIf{$q^{\text{Lex}}(p^*) = q^{\text{Lex}}(p'^*)$}
         \State $P^*$ \gets $ P^* \cup P'^*$
@@ -483,22 +477,46 @@ Věta \ref{veta:dosazitelnostOptimalnimiTahy} nám dává návod, jak plány $P_
   \label{alg:rekProhPlanu}
 \end{algorithm}
 
-Pro zjištění všech optimálních plánu $P^*$ na množině incidentů $I$ algoritmus \ref{alg:rekProhPlanu} zavoláme: $P^* = $ OptimalMovesSearch($p_0$, $I_1$, $|I|$).
+Pro zjištění všech optimálních plánu $P^*$ na množině incidentů $I$ algoritmus (viz algoritmus \ref{alg:rekProhPlanu}) zavoláme: $P^* = $ OptimalMovesSearch($p_{\emptyset}$, $I_1$, $|I|$).
 
-\begin{veta}[Korektnost a úplnost algoritmu \ref{alg:rekProhPlanu}]\label{}
-  Algoritmus rekurzivního prohledávání prostoru plánů optimálními tahy \ref{alg:rekProhPlanu} nalezne všechny optimální plány $P^* \in P_C$ při účelové funkci $q^{\text{Lex}}$.
+Algoritmus prohledávání plánů optimálními tahy si v kroku 7 vygeneruje všechny optimální tahy, které lze provést na incidentech $I_k$ a plánu $p$.
+Následně je v krocích 9 až 20 iteruje.
+
+V kroku 10 se rekurzivně zavolá sám na sebe.
+V argumentech předá optimální plán v ceně získaného z aktuálního plánu a z právě iterovaného optimálního tahu,
+o jedna větší množinou incidentů a maximální hloubkou rekurze, která v každé hladině rekurze činí velikost všech incidentů $I$.
+
+V krocích 11 a 12 vybere reprezentanta doposud nalezených optimálních plánů v ceně $P^*$ a nově nalezených optimálních plánů v ceně $P'^*$, vrácených z rekurze.
+Můžeme vybrat libovolně, protože všechny $P^*$ a $P'^*$ mají mezi sebou stejná ohodnocení.
+Pokud se jedná o první iteraci optimálních tahů, tak v kroku 14 nastavíme $P^*$ na $P'^*$.
+
+V kroku 15 testujeme, jestli se ohodnocení rovnají. Pokud ano, tak je sjednotíme v kroku 16.
+Pokud ovšem nově nalezené optimální plány v ceně mají lepší ohodnocení, testuje se v kroku 17, tak jimi $P^*$ nahradíme. 
+Tím se zajistí, že po proiterování všech optimálních tahů jsou doposud nalezené optimální plány v ceně s nejnižší možnou cenou.
+
+V kroku 2 rekurze pouze vrátí optimální plán v ceně s předchozí hladiny, pokud $k$ je rovno $h$, čili $p$ je nějaký optimální plán v ceně na množine $I$.
+
+Algoritmus si \textit{cachuje} mezivýsledky, v kroku 21 uloží nejlepší optimální plány v ceně pro aktuální plán.
+Pokud v rekurzi nějaký plán navštívíme vícekrát, což se jistě může stát, protože různé posloupnosti tahů můžou vést na stejný plán,
+tak se nebude znovu prohledávat celý podstrom rekurze, ale jednoduše se v kroku 5 vrátí správné optimální plány v ceně, nalezené v předchozích voláních.
+
+Jak již bylo zmíněno v kapitole \ref{kap:dynamicProgram}, tomuto způsobu \textit{cachování} se v dynamickém programování říká memoizace a je to velmi účinná technika zrychlení algoritmu.
+
+Právě jsme si algoritmus důkladně popsali, v následující větě ověříme, že je korektní, tedy že skutečně nalezne všechny optimální plány na množine $I$ při $q^{\text{Lex}}$.
+
+\begin{veta}[Korektnost a úplnost algoritmu]\label{}
+  Algoritmus rekurzivního prohledávání prostoru plánů ptimálními tahy (viz algoritmus \ref{alg:rekProhPlanu}) nalezne všechny optimální plány $P^* \in P_C$ při účelové funkci $q^{\text{Lex}}$.
 \end{veta}
 \begin{dukaz}
-  Z věty \ref{veta:dosazitelnostOptimalnimiTahy} víme, že $p^*$ je dosažitelný nějakou posloupností optimálních tahů. 
-  V algoritmu v kroku 5 množina $T^*_k$ obsahuje všechny optimální tahy, které lze provést na plánu $p$ na množině $I_k$.
-  V kroku 8 se rekurzivně zavoláme na každý $T^*(p), T^* \in T^*_k$.
-  Algoritmus tudiž prohledá každou posloupnost optimálních tahů, takže určitě i všechny takové, kterými se získá libovolný optimální plán $p \in P^*$ \ref{veta:dosazitelnostOptimalnimiTahy}.
+  Z věty \ref{veta:dosazitelnostOptimalnimiTahy} víme, že $p^*$ je dosažitelný nějakou posloupností optimálních tahů z prázdného plánu $p_{\emptyset}$. 
+  V algoritmu v kroku 7 množina $T^*_k$ obsahuje všechny optimální tahy, které lze provést na plánu $p$ na množině $I_k$.
+  V kroku 10 se rekurzivně zavoláme na každý $T^*(p), T^* \in T^*_k$.
+  Algoritmus tudiž prohledá každou posloupnost optimálních tahů, takže určitě i všechny takové, kterými se získá libovolný optimální plán $p \in P^*$ (plyne z věty \ref{veta:dosazitelnostOptimalnimiTahy}).
   Algoritmus je úplný.
 
-  V krocích 11--17 z plánů, které se vrátí rekurzí, vybíráme pouze ty optimální vůči $q^{\text{Lex}}$.
-  Vybíráme tak ze všech plánů, které jsou dosažitelné nějakou posloupností optimálních tahů ty optimální.
-  Cache je používána korektně.
-  Algoritmus je korektní.
+  V krocích 13--19 z plánů, které se vrátí rekurzí, vybíráme pouze ty optimální vůči $q^{\text{Lex}}$.
+  Vybíráme tak ze všech plánů, které jsou dosažitelné nějakou posloupností optimálních tahů ty optimální při $q^{\text{Lex}}$.
+  Zároveň i cache je korektně používaná, tudiž algoritmus je i korektní.
 \end{dukaz}
 
 Omezili jsme se na použití účelové funkce $q^{\text{Lex}}$, protože potřebujeme, aby optimální plán podle účelové funkce $q$ byl zároveň optimální v ceně.
@@ -506,8 +524,10 @@ Tento předpoklad optimální plán při $q^{\text{Lex}}$ splňuje \ref{veta:lex
 Aby byl algoritmus korektní, mohli bychom použít jakoukoliv jinou účelovou funkci $q$, pro kterou optimální plán při $q$ je zároveň optimálním v ceně.
 Podle věty \ref{veta:dosazitelnostOptimalnimiTahy} bude dosažitelný optimálními tahy, takže jej algoritmus navštíví.
 
-\begin{veta}[Odhad počtu optimálních tahů pro plán optimální v ceně]\label{veta:pocetOptTahu}
-  Nechť plán optimální v ceně $p \in P_C$ a nechť optimální tahy $T$, které lze provést na plánu $p$ na množině $I$.
+Víme, že algoritmus je korektní. Ještě by nás zajímala jeho časová složitost.
+K tomu si první odhadneme maximální počet optimálních tahů na hladině.
+\begin{veta}[Odhad počtu optimálních tahů]\label{veta:pocetOptTahu}
+  Nechť plán optimální v ceně $p \in P_C$ a nechť optimální tahy $T$, které lze provést na plánu $p$ na množině $I_k$.
   Pak
   \begin{equation*}
     1 \leq |T| \leq Z_n + 1.
@@ -515,40 +535,33 @@ Podle věty \ref{veta:dosazitelnostOptimalnimiTahy} bude dosažitelný optimáln
 \end{veta}
 \begin{dukaz}
   Optimální tahy jsou minimální alokace týmu, minimální prodloužení směny týmu a identita.
-  Počet minimálních alokací je nanejvýš
-  \begin{alignat*}{2}
-    Z_1, \quad && \hspace{15pt} \text{počet nenaalokovaných vozidel.}
-  \end{alignat*}
-  Předpokládejme, že existuje optimální tah minimální alokace $T$, kde alokujeme tým $z$, který odbavuje incident $i \in I$.
-  Směnu naalokovanému týmu $d \in D$ přiřazujeme tak, aby směna $z$ plánu $T(p)$ byla co nejkratší a zároveň aby začínala co nejpozději.
-  Taková směna je jenom jedna.
+  První spočítejme, kolik je tahů minimální alokace týmu.
+  Nechť $Z_1$ počet nenaalokovaných záchranných týmů.
+  To jsou jediné týmy, které lze alokovat.
+  Minimální alokace přiřazuje naalokovanému týmu $z$ nejkratší směnu se začátkem posunutým co nejpozději a případně alokuje záchranné vozidlo,
+  aby byly odbavovány všechny incidenty $I_{k+1}$.
+  Taková alokace ale existuje pro každý nenaalokovaný tým právě jedna.
 
-  Zároveň buď je optimálním tahem pouze tah minimální alokace týmu nebo pouze tah minimální alokace týmu spolu s vozidlem.
+  Zadruhé spočítejme, kolik je tahů minimální prodloužení týmu.
+  Nechť $Z_2$ počet naalokovaných záchranných týmů.
+  To jsou jediné týmy, kterým lze prodlužovat směna.
+  Minimální prodloužení směny týmu $z$ směnu prodlouží o nejkratší možnou dobu a případně alokuje záchranné vozidlo,
+  aby byly odbavovány všechny incidenty $I_{k+1}$.
+  Takové prodloužení opět, tentokrát pro každý naalokovaný tým existuje právě jedno.
 
-  Počet minimálních prodloužení směny je nanejvýš
-  \begin{alignat*}{2}
-    Z_2, \quad && \hspace{15pt} \text{počet naalokovaných vozidel.}
-  \end{alignat*}
-  Předpokládejme, že existuje optimální tah minimální prodloužení $T$, kde prodlužujeme tým $z$, který nově odbavuje incident $i \in I$.
-  Směnu naalokovanému týmu $d \in D$ přiřazujeme tak, aby směna týmu $z$ plánu $T(p)$ byla co nejkratší.
-  Taková směna je opět jenom jedna.
-
-  Zároveň buď je optimálním tahem pouze tah minimální prodloužení směny týmu nebo pouze tah minimální prodloužení směny týmu spolu s alokací vozidla.
-
-  Jelikož $Z_1 + Z_2 = Z_n$ a tah identita lze provést vždy a je jenom jeden, tak dohromady dostáváme:
+  Dohromady dostáváme: $Z_1 + Z_2 = Z_n$ a tah identita lze provést vždy a je jenom jeden, čili:
   \begin{equation*}
     1 \leq |T| \leq Z_n + 1.
   \end{equation*}
 \end{dukaz}
 
-\begin{definice}[Strom optimálních tahů]
-  Strom optimálních tahů rozumíme strom rekurze algoritmu prohledávání prostoru plánů optimálními tahy \ref{alg:rekProhPlanu}.
-\end{definice}
-
-\begin{veta}[Velikost stromu optimálních tahů]\label{veta:velikostStromuR}
-Počet vrcholů stromu optimálních tahů je nanejvýš
+Díky předchozí větě známe maximální počet optimálních tahů na každé hladině rekurze. Jak algoritmus probíhá,
+tvoří \textit{strom rekurze} s větvícím faktorem úměrným počtu optimálních tahů a hloubkou stromu rovnou velikosti množiny incidentů $I$.
+V následující větě spočítáme jeho velikost, což je klíčové pro zjištění složitosti algoritmu.
+\begin{veta}[Velikost stromu rekurze]\label{veta:velikostStromuR}
+Počet vrcholů stromu rekurze algoritmu je nanejvýš
   \begin{equation*}
-    \frac{(Z_n + 1)^{|I| + 1}}{Z_n} \in \mathcal{O} \left (Z_n^{|I| + 1} \right ).
+    \frac{(Z_n + 1)^{|I| + 1}}{Z_n}
   \end{equation*}
 \end{veta}
 \begin{dukaz}
@@ -561,8 +574,9 @@ Počet vrcholů stromu optimálních tahů je nanejvýš
   \end{equation*}
 \end{dukaz}
 
-\begin{veta}[Složitost alogirtmu rekurzivního prohledávání optimálních tahů \ref{alg:rekProhPlanu}]\label{veta:slozitostRek}
-  Algoritmus rekurzivního prohledávání optimálních plánů \ref{alg:rekProhPlanu} běží v čase
+Nyní máme všechny prostředky pro spočítání složitosti algoritmu.
+\begin{veta}[Složitost alogirtmu rekurzivního prohledávání optimálních tahů]\label{veta:slozitostRek}
+  Algoritmus rekurzivního prohledávání optimálních plánů běží v čase
   \begin{equation*}
     \mathcal{O}((Z_n + 1)^{|I| + 1}).
   \end{equation*}
@@ -576,28 +590,11 @@ Počet vrcholů stromu optimálních tahů je nanejvýš
 \end{dukaz}
 
 Nalezli jsme korektní algoritmus při účelové funkci $q^{\text{Lex}}$, který běží v exponenciálním čase podle počtu incidentů. 
-To je stále dramatické zlepšení oproti naivnímu řešením \ref{df:naivniRes}, jehož složitost je rovna velikosti množiny plánů \ref{veta:velikostP}.
+Sice neběží v polynomiálním čase, ale stále se jedná o dramatické zlepšení oproti naivnímu řešením, jehož složitost je rovna velikosti množiny plánů (viz věta \ref{veta:PCvelikost}).
 
-Každý vrchol stromu optimálních tahů $v$ v hloubce $h$ odpovídá nějakému plánu optimálnímu v ceně $p$ odbavující nanejvýš $h$ incidentů.
-Cesta z kořene stromu, prázdného plánu $p_0$, do vrcholu $v$, odpovídá nějaké posloupností optimálních tahů délky $log_{(Z_n + 1)}(h)$:
-\begin{equation*}
-  A_1 \circ T^1_1 \circ \dots \circ T^1_k \circ A_2 \circ T^2_1 \circ \dots \circ T^2_l \circ A_3 \circ \dots \circ A_n,
-\end{equation*}
-kde $A_i$ značí tah minimální alokace týmu a tahy $T^i_j$ jsou tahy minimální prodloužení směny týmu naalokovaného $A^i$ nebo identita.
-
-V jakém pořadí provedeme tahy alokace $A_1 \dots A_n$ nezáleží. Jestli první naalokujeme tým $z_1$ a pak tým $z_2$ nebo naopak, neovlivní výsledný získaný plán.
-To stejné platí pro tahy $T^i_1 \dots T^i_j$ -- nezáleží, jestli je první prodloužena směna týmu $z$ o čas $d_s$ a pak o čas $d_l$, nebo naopak. Výsledná délka směny $z$ bude vždy rovna $d_s + d_l$.
-Avšak nelze prodlužovat směnu týmu, který ještě není naalokován. Tahy prodloužení $T^i_1 \dots T^i_j$ se můžou provádět až po alokaci $A_i$.
-Tahy identita jsou komutativní s jakýmkoliv jiným tahem.
-
-Z toho plyne, že libovolnou permutací tahů $T^i_1 \dots T^i_j$ přes všechny alokace $A_1 \dots A_n$, kde tahy prodloužení směny $T^i_k \in T^i_1 \dots T^i_j$ následují po $A_i$
-a tahy identita lze provést kdykoliv, získáme stejný plán.
-
-Takových posloupností může být poměrně hodně, protože se jedná o nějaké permutace na $T^i_1 \dots T^i_j$ zkombinované s výběry $A_i$.
-Z toho důvodu jsme v algoritmu $\ref{alg:rekProhPlanu}$ zavedli \textit{Cache}, abychom neprohledávali podstrom různých vrcholů stejného plánu několikrát.
-Pamatování si mezivýsledků se v dynamickém programování obecně říká \textit{memoizace} a díky ní bude algoritmus znatelně rychlejší než horní odhad \ref{veta:slozitostRek}.
-
-Jak moc rychlejší přímo spočítat nelze -- jaké posloupnosti optimálních tahů jsou prohledávány příliš záleží na výpočtu simulace. 
+Strom také nemusíme prohledávat deterministicky, ale stochasticky tak, že v každé hladině rekurze budeme optimální tahy náhodně permutovat. Nemusíme ani zkoušet všechny optimální tahy,
+ale pouze nějakou část. Hlavní výhodou algoritmu tak je schopnost plány prohledávat strukturovaně a navíc kvalita nalezeného řešení bude úměrná s délkou trvání algoritmu
+-- čím déle bude běžet, tím více navštíví optimálních plánů v ceně a s větší šancí tak nalezna globální optimum.
 
 \section{Metaheuristické metody}\label{kap:heuristiky}
 

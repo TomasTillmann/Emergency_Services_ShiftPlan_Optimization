@@ -13,24 +13,21 @@ struct OptimalMove
   }
 }
 
-public class DynamicProgrammingOptimizer : LocalSearchOptimizer
+public class DynamicProgrammingOptimizer : Optimizer
 {
-  public DynamicProgrammingOptimizer(
-      World world,
-      Constraints constraints,
-      ShiftTimes shiftTimes,
-      IObjectiveFunction loss,
-      bool shouldPermutate = true,
-      int neighboursLimit = int.MaxValue,
-      Random? random = null)
-  : base(world, constraints, shiftTimes, loss, shouldPermutate, neighboursLimit, random) { }
+  private readonly LexObjectiveFunction _lex;
+  public DynamicProgrammingOptimizer(World world, Constraints constraints, ShiftTimes shiftTimes, LexObjectiveFunction lex, Random? random = null) : base(world, constraints, shiftTimes, null, random)
+  {
+    _lex = lex;
+  }
 
   public override IEnumerable<Weights> FindOptimal(ImmutableArray<Incident> incidents)
   {
+    return OptimalMovesSearch(EmergencyServicePlan.Empty, incidents, 0, incidents.Count);
   }
 
   private Dictionary<(int, EmergencyServicePlan), List<EmergencyServicePlan>> cache = new();
-  private List<EmergencyServicePlan> OptimalMovesSearch(EmergencyServicePlan p, ReadOnlySpan<Incident> incidents, int k, int h)
+  private List<EmergencyServicePlan> OptimalMovesSearch(EmergencyServicePlan p, ReadOnlySpan<Incident> I, int k, int h)
   {
     if (k == h)
     {
@@ -41,14 +38,32 @@ public class DynamicProgrammingOptimizer : LocalSearchOptimizer
       return cache[(k, p)];
     }
 
-    List<EmergencyServicePlan> optimalSoFar = new();
-    double eval = double.MinValue;
+    ReadOnlySpan<Incident> I_k = I.Slice(0, k);
+    List<EmergencyServicePlan> optimal = new();
 
-    IEnumerable<OptimalMove> optimalMoves = GenerateOptimalMoves(p, incidents.Slice(0, k));
+    IEnumerable<OptimalMove> optimalMoves = GenerateOptimalMoves(p, I_k);
     foreach (OptimalMove move in optimalMoves)
     {
-      IEnumerable<EmergencyServicePlan> optimalPlans = OptimalMovesSearch(move.Make(p), incidents, k + 1, h);
+      List<EmergencyServicePlan> optimalPlans = OptimalMovesSearch(move.Make(p), I, k + 1, h);
+      if (optimal.Count == 0)
+      {
+        optimal = optimalPlans;
+      }
+      else
+      {
+        int decision = _lex.GetLoss(optimal[0], optimalPlans[0], I_k);
+        if (decision == 0)
+        {
+          optimal.AddRange(optimalPlans);
+        }
+        else if (decision == 1)
+        {
+          optimal = optimalPlans;
+        }
+      }
     }
+    cache[(k, p)] = optimal;
+    return optimal;
   }
 
   private IEnumerable<OptimalMove> GenerateOptimalMoves(EmergencyServicePlan p, ReadOnlySpan<Incident> I)

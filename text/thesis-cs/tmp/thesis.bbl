@@ -123,13 +123,77 @@
       \strng{authorbibnamehash}{5681fb99526e3b7309d7ae9ba517a854}
       \strng{authornamehash}{5681fb99526e3b7309d7ae9ba517a854}
       \strng{authorfullhash}{5681fb99526e3b7309d7ae9ba517a854}
-      \field{sortinit}{1}
-      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{sortinit}{9}
+      \field{sortinithash}{0a5ebc79d83c96b6579069544c73c7d4}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{isbn}{80-246-0084-6}
       \field{title}{Kapitoly z diskrétní matematiky}
       \field{year}{2002}
+    \endentry
+    \entry{discrete}{incollection}{}
+      \name{author}{4}{}{%
+        {{hash=afbad19ea78fac67b8114fd5ed505b95}{%
+           family={Applegate},
+           familyi={A\bibinitperiod},
+           given={David\bibnamedelima L},
+           giveni={D\bibinitperiod\bibinitdelim L\bibinitperiod}}}%
+        {{hash=7d8d2f149f40a10880727c236201ef9a}{%
+           family={Cook},
+           familyi={C\bibinitperiod},
+           given={William\bibnamedelima J},
+           giveni={W\bibinitperiod\bibinitdelim J\bibinitperiod}}}%
+        {{hash=81b315ac97dc20110fa4ff9b29abd4f5}{%
+           family={Dash},
+           familyi={D\bibinitperiod},
+           given={Sanjeeb},
+           giveni={S\bibinitperiod}}}%
+        {{hash=8f805225d8e433c29a18a566d1f6acc6}{%
+           family={Johnson},
+           familyi={J\bibinitperiod},
+           given={David\bibnamedelima S},
+           giveni={D\bibinitperiod\bibinitdelim S\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {Princeton University Press}%
+      }
+      \strng{namehash}{e4126295e4d4d6b25b8493d29001a255}
+      \strng{fullhash}{d516369985758bf02c2f36227386e2f4}
+      \strng{bibnamehash}{d516369985758bf02c2f36227386e2f4}
+      \strng{authorbibnamehash}{d516369985758bf02c2f36227386e2f4}
+      \strng{authornamehash}{e4126295e4d4d6b25b8493d29001a255}
+      \strng{authorfullhash}{d516369985758bf02c2f36227386e2f4}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{Chapter 1, Draft of 7 August 2014}
+      \field{title}{A Practical Guide to Discrete Optimization}
+      \field{year}{2014}
+    \endentry
+    \entry{continuos}{book}{}
+      \name{author}{1}{}{%
+        {{hash=ce105616f4d0f4632c669ca08862b8a9}{%
+           family={Byrne},
+           familyi={B\bibinitperiod},
+           given={Charles\bibnamedelima L.},
+           giveni={C\bibinitperiod\bibinitdelim L\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {University of Massachusetts Lowell}%
+      }
+      \strng{namehash}{ce105616f4d0f4632c669ca08862b8a9}
+      \strng{fullhash}{ce105616f4d0f4632c669ca08862b8a9}
+      \strng{bibnamehash}{ce105616f4d0f4632c669ca08862b8a9}
+      \strng{authorbibnamehash}{ce105616f4d0f4632c669ca08862b8a9}
+      \strng{authornamehash}{ce105616f4d0f4632c669ca08862b8a9}
+      \strng{authorfullhash}{ce105616f4d0f4632c669ca08862b8a9}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Continuous Optimization}
+      \field{year}{2013}
     \endentry
     \entry{cohen2020solving}{misc}{}
       \name{author}{3}{}{%
@@ -155,8 +219,8 @@
       \strng{authorbibnamehash}{4028124b187c6acd59daecee17d1f9f5}
       \strng{authornamehash}{d0da48b9db645b197cb167ecba91200a}
       \strng{authorfullhash}{4028124b187c6acd59daecee17d1f9f5}
-      \field{sortinit}{2}
-      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{eprintclass}{cs.DS}
@@ -270,8 +334,8 @@
       \strng{authorbibnamehash}{20ff4e448498198368fe50d9555023f1}
       \strng{authornamehash}{20ff4e448498198368fe50d9555023f1}
       \strng{authorfullhash}{20ff4e448498198368fe50d9555023f1}
-      \field{sortinit}{3}
-      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{title}{Hybrid Metaheuristics}

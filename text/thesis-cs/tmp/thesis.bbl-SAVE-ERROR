@@ -155,8 +155,8 @@
       \strng{authorbibnamehash}{4028124b187c6acd59daecee17d1f9f5}
       \strng{authornamehash}{d0da48b9db645b197cb167ecba91200a}
       \strng{authorfullhash}{4028124b187c6acd59daecee17d1f9f5}
-      \field{sortinit}{2}
-      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{eprintclass}{cs.DS}
@@ -270,8 +270,8 @@
       \strng{authorbibnamehash}{20ff4e448498198368fe50d9555023f1}
       \strng{authornamehash}{20ff4e448498198368fe50d9555023f1}
       \strng{authorfullhash}{20ff4e448498198368fe50d9555023f1}
-      \field{sortinit}{3}
-      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{title}{Hybrid Metaheuristics}

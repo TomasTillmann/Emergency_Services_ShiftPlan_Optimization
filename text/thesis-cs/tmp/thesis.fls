@@ -562,6 +562,7 @@ INPUT tmp/literatura.aux
 INPUT tmp/thesis.out
 INPUT tmp/thesis.run.xml
 OUTPUT tmp/thesis.run.xml
+INPUT /usr/share/texlive/texmf-dist/fonts/type1/public/lm/lmbx12.pfb
 INPUT /usr/share/texlive/texmf-dist/fonts/type1/public/lm/lmex10.pfb
 INPUT /usr/share/texlive/texmf-dist/fonts/type1/public/lm/lmmi12.pfb
 INPUT /usr/share/texlive/texmf-dist/fonts/type1/public/lm/lmmi6.pfb

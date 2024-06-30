@@ -39,16 +39,22 @@ public abstract class ObjectiveFunction : IObjectiveFunction
     return Simulation.EmergencyServicePlan.GetShiftDurationsSum() / (Simulation.EmergencyServicePlan.GetTotalTimeActive() + 0.00000000000000000000001);
   }
 
+  public double Get(Weights weights, ImmutableArray<Incident> incidents)
+  {
+    return Get(weights, incidents.AsSpan());
+  }
+
   public double Get(Weights weights, ReadOnlySpan<Incident> incidents)
   {
     RunSimulation(weights, incidents);
     return GetLoss();
   }
 
-
-  public double Get(Weights weights, ImmutableArray<Incident> incidents)
+  public double Get(EmergencyServicePlan plan, ReadOnlySpan<Incident> incidents)
   {
-    return Get(weights, incidents.AsSpan());
+    Simulation.EmergencyServicePlan = plan;
+    Simulation.Run(incidents);
+    return GetLoss();
   }
 
   protected void RunSimulation(Weights weights, ReadOnlySpan<Incident> incidents)

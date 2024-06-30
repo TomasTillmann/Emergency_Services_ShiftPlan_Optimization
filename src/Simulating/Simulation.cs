@@ -8,7 +8,7 @@ public sealed class Simulation
 {
   public World World { get; }
 
-  public EmergencyServicePlan EmergencyServicePlan { get; }
+  public EmergencyServicePlan EmergencyServicePlan { get; set; }
 
   public bool Info { get; set; }
 
