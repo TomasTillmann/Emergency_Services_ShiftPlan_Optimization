@@ -87,13 +87,14 @@ Co budeme považovat za cenu plánu lze nalézt v definici \ref{df:cenaPlanu}.
 \section{Simulace plánu pohotovostní služby}\label{SimulaceKap}
 
 Naším cílem je umět nalézt optimální plán pohotovostní služby.
-Ten určujeme podle počtu úspěšně odbavených incidentů $s_I$ a ceny plánu $u$.
+Ten určujeme podle počtu úspěšně odbavených incidentů $s$ a ceny plánu $u$.
 Z toho důvodu jsme si formálně nadefinovali protředky, které má pohotovostní služba k dispozici a co je plán pohotovostní služby.
 
 V kapitole \ref{kap:optUloha2uc} definujeme cenu plánu (viz definice \ref{df:cenaPlanu}).
-V této kapitole navrhneme způsob, jakým zjistíme $s_I$ pohotovostního plánu $p$ na množine incidentů $I$.
-Pro zjištění $s_I$ spustíme simulaci $s$ pohotovostního plánu $p$ na dané množině $I$.
+V této kapitole navrhneme způsob, jakým zjistíme $s$ pohotovostního plánu $p$ na množine incidentů $I$.
+Pro zjištění $s$ spustíme simulaci pohotovostního plánu $p$ na dané množině $I$.
 Následně formálně popíšeme simulaci a jaká pravidla chodu simulace se rozhodneme použít.
+Proč zrovna použijeme přístupu simulace je popsáno v nadcházející kapitole.
 
 \subsection{Proč simulace?}\label{kap:procSimulace}
 
@@ -115,12 +116,13 @@ Avšak podstatnou nevýhodou simulace je její výpočetní náročnost a poměr
 \textit{Simulace} je proces navrhnutí modelu reálného systému a provádění tak na něm experimenty za účelem buď porozumění chování systému
 nebo za účelem vyhodnocení různých strategií chování systému.
 \textit{Systém simulace} je chápan jako dobře definovaná kolekce objektů a interakcí mezi nimi.
-Simulace si držuje \textit{stav systému}. Ten definuje jak se má simulace chovat.
+Simulace si udržuje \textit{stav systému}. Ten definuje jak se má simulace chovat.
 Systém simulace se může měnit průběhem simulace nebo při nastání \textit{události}.
 
 Simulace obecně dělíme na \textit{spojité} a \textit{diskrétní}.
 V \textit{spojité simulaci} se změny systému dějí kontinuálně v průběhu běhu simulace, nejčastěji podle soustavy diferenciálních rovnic.
 V \textit{diskrétní simulaci} se změny sytému dějí v diskrétních časoých úsecích, nejčastěji v čase nastání nějaké \textit{události}.
+
 Klasický způsob jak diskrétní simulace probíhá je následovný.
 Simulace odbavuje údalosti v pořadí nastání v čase.
 Při inicializaci si naplánuje nějaké údalosti.
@@ -136,7 +138,7 @@ Většinou proto, že při výběru nadhcázejícího stavu figuruje element ná
 \subsection{Popis deterministické diskrétní simulace plánu pohotovostní služby}\label{kap:definiceSimulace}
 
 Abychom mohli simulovat fungování pohotovostního plánu,
-potřebujeme si první definovat, jaké podmínky musí záchranný tým splňovat, aby mohl \textit{úspěšně odbavit incident} \ref{df:simulacePravidla1}.
+potřebujeme si první definovat, jaké podmínky musí záchranný tým splňovat, aby mohl \textit{úspěšně odbavit incident}.
 
 \begin{definice}\label{df:simulacePravidla1}
   Tým záchranářů $z \in Z$ je schopen úspěšně odbavit incident $i \in I$ právě tehdy, když:
@@ -153,7 +155,6 @@ potřebujeme si první definovat, jaké podmínky musí záchranný tým splňov
       Týmu nekončí směna dříve, než je očekávaný konec celkové doby vyřízení incidentu.
   \end{enumerate}
 \end{definice}
-\textit{Požadovanou dobu}, nebo také \textit{gold time}, chápejme jako čas, do kterého záchranné vozidlo musí na místo incidentu dorazit, například 20 minut.
 
 Nechť $Z_i \subseteq Z$ množina záchranných týmu, které jsou schopny úspěšně odbavit incident $i \in I$.
 Pro odbavení $i$ musíme vybrat nějaký konkrétní $z_i \in Z_i$.
@@ -161,8 +162,8 @@ Pro odbavení $i$ musíme vybrat nějaký konkrétní $z_i \in Z_i$.
 Je mnoho různých způsobu, jak $z_i$ vybrat.
 V naší simulaci jsou použitá pravidla vybraná na základě konzultace se společností, která se danou problematikou zabývá přes 25 let
 a sami podobná pravidla používají pro plánovaní u několika jejich klientů ve Spojených státech.
-Simulace je navržena dostatečně genericky, aby bylo možné naimplementovat i libovolná jiná pravidla, například jednodušší, komplikovanější nebo klidně i stochastická.
 
+Simulace je navržena dostatečně genericky, aby bylo možné naimplementovat i libovolná jiná pravidla, například jednodušší, komplikovanější nebo klidně i stochastická.
 Jak bylo zmíněno v kapitole \ref{kap:procSimulace}, možnost volby libovolných pravidel je výhoda přístupu použití simulace.
 \begin{definice}\label{df:simulacePravidla2}
   Nejvhodnější tým záchranářů $z_i \in Z_i$, kde $Z_i \subseteq Z$ jsou všechny týmy záchranářů schopny úspěšně odbavit incident $i \in I$ je tým,
@@ -212,9 +213,10 @@ Funkce \textit{GetBestAmbulance}\label{df:getBestAmbulance} vybere záchranné v
 
 Nyní jsme připraveni definovat \textit{simulaci pohotovostního plánu} $p \in P_C$ na množině incidentů $I$, a to jako deterministickou diskrétní simulaci
 \begin{align*}
-  s_I = s(p, I).
+  s = s(p, I).
 \end{align*}
-Simulace vrátí počet úspěšně odbavených incidentů $s_I$ na množině $I$ plánem $p$. 
+Simulace vrátí počet úspěšně odbavených incidentů $s$ na množině $I$ plánem $p$. 
+
 \textit{Událost} je nastání incidentu 
 \begin{align*}
   i \in I \text{ v čase } T_I(i),
@@ -231,7 +233,7 @@ Stav $S_Z$ je informace, kdy bude záchranný tým k dispozici a pokud tým odba
 \begin{algorithm}[H]
   \begin{algorithmic}[1]
   \Function{Simulation}{$p, I$}
-    \State $s_I \gets 0$
+    \State $s \gets 0$
     \State $T$ \gets 0
     \State $I' \gets \mbox{Setřídí $I$ podle času nastání, pomocí $T_I$}$
     \State $S_Z \gets \mbox{Inicializuje podle $p$}$
@@ -240,14 +242,14 @@ Stav $S_Z$ je informace, kdy bude záchranný tým k dispozici a pokud tým odba
       \State $T \gets \mbox{Čas nastání $i_k$, $T_I(i_k)$}$
       \State $z_k \gets \mbox{GetBestTeam($i_k, S_Z, S_A, T$)}$
       \If{$z_k \neq \emptyset$}
-        \State $s_I \gets s_I + 1$
+        \State $s \gets s + 1$
         \State $a_k \gets \mbox{GetBestAmbulance($z_k, T$)}$
         \State Plan($z_k, a_k, i_k$)
       \EndIf
       \State $S_Z \gets \mbox{UpdateState($S_Z, i_k, z_k$)}$
       \State $S_A \gets \mbox{UpdateState($S_A, i_k, a_k$)}$
     \EndFor
-    \State \Return $s_I$
+    \State \Return $s$
   \EndFunction
   \end{algorithmic}
   \caption{Simulace plánu pohotovostní služby $p$ na množině incidentů $I$}
@@ -257,24 +259,25 @@ Stav $S_Z$ je informace, kdy bude záchranný tým k dispozici a pokud tým odba
 \vspace*{10px}
 
 Průběh simulace je následovný. 
-V krocích 2 až 6 simulace (viz algoritmus \ref{simulaceAlgo}) položí $s_I$ a $T$ rovno nule, setřídí si sadu incidentů podle časů nastání
+V krocích 2 až 6 simulace (viz algoritmus \ref{simulaceAlgo}) položí $s$ a $T$ rovno nule, setřídí si sadu incidentů podle časů nastání
 a incicializuje si stavy $S_A$ a $S_Z$ podle plánu $p$.
 
 V krocích 7 až 17 odbavuje události, takže se pohybuje po krocích v časech nastání incidentů od nejdřívějšího po nejpozdější.
 V každém kroku simulace $k \in \{ 1, 2, \dots , |I|\}$ se simulace první pokusí deterministicky nalézt nejvhodnější $z_k \in Z$, který obslouží $i_k$,
-pomocí funkce $\textit{GetBestTeam}$ \ref{df:getBestTeam}, v kroku 9. 
+pomocí funkce $\textit{GetBestTeam}$ (viz definice \ref{df:getBestTeam}), v kroku 9. 
 Pokud takový $z_k$ neexistuje, tak pokračuje v odbavování dalších incidentů.
 
-Pokud existuje, v krocích 8 až 13 zvýší počet odbavených incidentů $s_I$ o jedna,
-deterministicky nalezne pro $z_k$ nejvhodnější $a_k$, pomocí funkce \textit{GetBestAmbulance} \ref{df:getBestAmbulance} a
+Pokud existuje, v krocích 8 až 13 zvýší počet odbavených incidentů $s$ o jedna,
+deterministicky nalezne pro $z_k$ nejvhodnější $a_k$, pomocí funkce \textit{GetBestAmbulance} (viz definice \ref{df:getBestAmbulance}) a
 aktuální incident $i_k$ naplánuje na $z_k$ spolu s $a_k$ funkcí \textit{Plan}.
-Záchranný tým $z_k$ tak \textit{odbavuje} incident $i_k$ \ref{df:odbavujeIncident}, a čas, kdy bude opět tým $z_k$ k dispozici je nastaven na čas, kdy incident úspěšně odbaví. 
+Záchranný tým $z_k$ tak \textit{odbavuje} incident $i_k$ (viz definice \ref{df:odbavujeIncident}), a čas, kdy bude opět tým $z_k$ k dispozici je nastaven na čas, kdy incident úspěšně odbaví. 
 
 V krocích 15 a 16 aktualizuje stav systému $S_A$ a $S_Z$.
 Simulace doběhne jakmile nejsou žádné další události k odbavení, takže jakmile projde všechny incidenty, to je po $|I|$ krocích.
-Simulace vrátí $s_I$.
+Simulace vrátí $s$, počet úspěšně odbavených incidentů.
 
 \section{Převedení problému na optimalizační úlohu s více účelovými funkcemi}\label{kap:optUloha2uc}
+
 V této kapitole si ukážeme, jak konkrétně budeme modelovat optimalizační úlohu nalezení optimálního pohotovostního plánu na množině incidentů $I$,
 pomocí počtu úspěšně odbavených incidentů $s$ a ceny plánu $u$.
 Dále si nadefinujeme potřebné pojmy, jako \textit{optimalizační úlohu s více nebo s jednou účelovou funkcí}.
@@ -305,7 +308,7 @@ Optimální řešení nemusí být jenom jedno, může jich být více. Zárove�
     x^* = \max_{x \in \mathcal{X}} \{ \mathbf{q}(x) \}, \hspace{50pt} &\mathbf{q}(x) = [q_1(x), q_2(x), \dots q_{m}(x)], q_i \in \mathcal{Q},
   \end{align*}
   pro $1 \leq i \leq m, m = |\mathcal{Q}|$,
-  kde $\mathcal{X}$ je množina všech možných konfigurací a $\mathcal{Q}$ je vektor účelových funkcí, které chceme maximalizovat.
+  kde $\mathcal{X}$ je množina všech možných konfigurací a $\mathcal{Q}$ je množina všech účelových funkcí, které chceme maximalizovat.
   Víceúčelovou funkci $\mathbf{q}(x)$ maximalizujeme po složkách.
 \end{definice}
 Z definice \ref{df:optUloha2ucObecne} je \textit{optimálním řešením optimalizační úlohy s více učelovými funkcemi}
@@ -314,7 +317,7 @@ To je konfigurace, která nabývá optima pro každou jednotlivou účelovou fun
 Zřejmě $y^{utopia}$ nemusí existovat, protože často maximalizování $q_i \in \mathcal{Q}$ může minimalizovat $q_j \in \mathcal{Q}, i \neq j$.
 V nadcházející kapitole si ukážeme jak se optimalizace takového typu řeší.
 
-V předchozí kapitole jsme si ukázali způsob, jakým nalezneme počet úspěšně odbavených incidentů $s_I$. 
+V předchozí kapitole jsme si ukázali způsob, jakým nalezneme počet úspěšně odbavených incidentů $s$. 
 Abychom mohli problém nalezení optimálního plánu modelovat jako optimalizační úlohu s více účelovými funkcemi, potřebujeme si ještě dodefinovat cenu plánu.
 \begin{definice}[Cena plánu $u$]\label{df:cenaPlanu}
   Cena plánu $u \colon P \rightarrow \mathbb{N}$,
@@ -349,7 +352,7 @@ Zároveň jsme pozorovali, že maximalizováním $s$ minimalizujeme $-u$ a naopa
 
 Optimalizační úlohy s více účelovými funkcemi, mezi kterými je potřeba nalézt kompromis pro nalezení optima, jsou velmi časté,
 a proto existuje několik metod, které optimalizační úlohy s více účelovými funkcemi řeší.
-Jednou metodou je převod víceúčelové funkce na jednu účelovou funkci, aby
+Jednou z účinných metod je převod víceúčelové funkce na jednu účelovou funkci, aby
 zároveň maximalizování víceúčelové funkce bylo stejné jako maximalizování jedné účelové funkce.
 
 Řešení optimalizační úlohy s jednou účelovou funkcí je dobře definované,
@@ -396,14 +399,14 @@ Jedná se o způsob převedení víceúčelové funkce pouze na jednu účelovou
 
 \begin{definice}[Účelová funkce měřící vzdálenost od cíle (\cite{AlgOptBook}, str. 219)]\label{df:goalP}
   \begin{align*}
-    \min_{x \in \mathcal{X}} \{ \| \mathbf{q}(x) - y^{goal} \| \}, \hspace{50pt} y^{goal} \in \mathbb{R}
+    \min_{x \in \mathcal{X}} \{ \| \mathbf{q}(x) - y^{goal} \| \}, \hspace{50pt} y^{goal} \in \mathbb{R}.
   \end{align*}
 \end{definice}
 
 Standardně $y^{goal} = \mathbf{q}(y^{utopia})$ (\cite{AlgOptBook}, str. 219).
-Zvolením vhodné normy můžeme preferovat námi vybrané účelové funkce, ale obodně jako u předchozích metod, obecně nemusí být jasné jaké účelové funkce preferovat.
+Zvolením vhodné normy můžeme preferovat námi vybrané účelové funkce, ale obodně jako u předchozích metod, obecně nemusí být jasné, jaké účelové funkce preferovat.
 Zvolením normy jako nějaké $p$-normy (například standardní euklidovské normy), budou účelové funkce implicitně preferovány podle toho,
-v jakých jednotkách se měří. Při maximalizaci budou preferovány účelové funkce s oborem hodnot ve větším rozsahu.
+v jakých jednotkách se měří. Tudiž při maximalizaci budou preferovány účelové funkce s oborem hodnot ve větším rozsahu.
 
 \subsection{Vážená exponenciální suma účelových funkcí}\label{kap:vazenaSumUcF}
 
@@ -456,11 +459,11 @@ Začneme aplikováním lexikografického porovnání (viz definice \ref{df:lexPo
   Lexikografické porovnávání optimalizace pohotovostního plánu $q^{\text{Lex}}$ definujeme jako
   \begin{align*}
     & q^{\text{Lex}}(p_1) < q^{\text{Lex}}(p_2)\Leftrightarrow\\
-    & ( s'(p_1, I) < s'(p_2, I)) \lor (s'(p_1, I) = s'(p_2, I) \land u'(p_1) < u'(p_2))
+    & ( s(p_1, I) < s(p_2, I)) \lor (s(p_1, I) = s(p_2, I) \land u(p_1) < u(p_2))
   \end{align*}
   a 
   \begin{align*}
-    q^{\text{Lex}}(p_1) = q^{\text{Lex}}(p_2) \Leftrightarrow s'(p_1, I) = s'(p_2, I) \land u'(p_1) = u'(p_2),
+    q^{\text{Lex}}(p_1) = q^{\text{Lex}}(p_2) \Leftrightarrow s(p_1, I) = s(p_2, I) \land u(p_1) = u(p_2),
   \end{align*}
   pro danou množinu incidentů $I$.
 \end{definice}
@@ -488,7 +491,7 @@ Metodu goal programming (viz definice \ref{df:goalP}) aplikujeme následovně.
 \begin{definice}[Goal programming optimalizace pohotovostního plánu]
   Víceúčelovou funkci převedeme na jednu podle metody goal programming na účelovou funkci $q^{\text{Goal}}$ definovanou jako
   \begin{align*}
-    q^{goal}(p) = \| [1 - s'(p, I), u'(p)] \|,
+    q^{Goal}(p) = \| [1 - s'(p, I), u'(p)] \|,
   \end{align*}
   pro danou množinu incidentů $I$ a libovolnou normu.
 \end{definice}
@@ -501,9 +504,9 @@ Můžeme však měřit, jak blízko $q(p)$ k $q(p^{utopia})$ je.
 
 Jako poslední aplikujeme na náš problém metodu vážené exponenciální sumy účelových funkcí (viz definice \ref{df:vazenaSumUcF}).
 \begin{definice}[Vážená exponenciální suma účelových funkcí optimalizace pohotovostního plánů]\label{df:vazenaSumaExpPohotovost}
-  Váženou exponenciální sumou účelových funkcí optimalizace pohotovostního plánů $q_{\alpha \varphi}$ definujeme jako 
+  Váženou exponenciální sumou účelových funkcí optimalizace pohotovostního plánů $q_{\alpha}^{\varphi}$ definujeme jako 
   \begin{align*}
-    q_{\alpha \varphi}(p) = \alpha (1 - s'(p, I))^\varphi + (1 - \alpha)(u'(p))^\varphi, \hspace{50pt} p \in P_C,
+    q_{\alpha}^{\varphi}(p) = \alpha (1 - s'(p, I))^\varphi + (1 - \alpha)(u'(p))^\varphi, \hspace{50pt} p \in P_C,
   \end{align*}
   pro danou množinu incidentů $I$, kde $w_1 = \alpha$ a $w_2 = 1 - \alpha$.
 \end{definice}
@@ -512,7 +515,7 @@ Stejně jako u vážené sumy účelových funkcí jsme díky parametru $\alpha$
 
 Nyní máme prostředky pro definování problému nalezení optimálního pohotovostního plánu jako optimalizační úlohy s jednou účelovou funkcí.
 
-Označme si $Q_I = \{ q^{\text{Lex}}, q^{\text{goal}}, q_{\alpha}, q_{\alpha p}\}$ jako množinu účelových funkcí na dané množině incidentů $I$.
+Označme si $Q_I = \{ q^{\text{Lex}}, q^{\text{Goal}}, q_{\alpha}, q_{\alpha}^{\varphi}\}$ jako množinu účelových funkcí na dané množině incidentů $I$.
 \begin{definice}[problém nalezení optimálního plánu jako optimalizační úloha s jednou účelovou funkcí]\label{df:optUloha1uc}
   Optimalizační úloha nalezení optimálního plánu pohotovostní služby s jednou účelovou funkcí je definována jako úloha nalezení $p^*$,
   \begin{align}
@@ -714,10 +717,10 @@ Chtěli bychom nalézt způsob, kterým nalezneme optimum ideálně v polynomiá
 
 V kapitole \ref{kap:analP} jsme přesně spočítali velikost $P$ a $P_C$ a zároveň jsme je odhadli asymptoticky.
 V kapitole \ref{kap:analVicF} jsme si ukázali základní vlastnosti účelové funkce $q \in Q_I$.
-V předchozí kapitole \ref{kap:naivniRes} jsme si ukázali, že nemůžeme úlohu vyřešit jednoduše naivním řešením v polynomiálním čase.
+V předchozí kapitole jsme si ukázali, že nemůžeme úlohu vyřešit jednoduše naivním řešením v polynomiálním čase.
 V této kapitoly dáme tyto poznatky dohromady a zklasifikujeme tak řešenou optimalizační úlohu, za účelem nalezení nejvhodnějších metod pro řešení.
 
-Vybíráme optimální konfigurace z diskrétně konečně mnoho objektů, a to sice přiřazení $p_Z$, $p_A$, $p_{D_{1}}$, $p_{D_{2}}$.
+Vybíráme optimální konfigurace z diskrétně konečně mnoho objektů, a to sice přiřazení $p_Z$, $p_A$, $p_{D_{s}}$, $p_{D_{l}}$.
 Jedná se tak o \textit{diskrétní} nebo taky \textit{kombinatorickou} optimalizaci \cite{discrete}.
 To je takový druh optimalizace, kdy se snažíme nalézt optimální konfiguraci z diskrétně mnoho možností.
 
@@ -870,6 +873,6 @@ Budeme minimálně potřebovat umět nalézt nějaké vztahy mezi $p_1, p_2 \in 
 a najít pomocí těchto vztahů optimální plán, aniž bychom museli $q$ vyhodnotit přes celý její definiční obor.
 Jedná se ale pouze o nutnou podmínku, nikoliv postačující. Čili pokud nalezneme nějaké vztahy mezi $p_1, p_2$ a nebudeme na simulaci nahlížet jako na černou skříňku,
 neznamená to, že je nutně úloha optimálních plánů pohotovostních služeb řešitelná v polynomiálním čase.
-O nalezení takových vztahů se pokusíme v kapitole \ref{kap:dynamicProgram}. Metody, které na účelovou funkci pohlíží jako na černou skříňku zkoumáme v kapitole \ref{kap:heur}.
+O nalezení takových vztahů se pokusíme v kapitole \ref{kap:dynamicProgram}. Metody, které na účelovou funkci pohlíží jako na černou skříňku zkoumáme v kapitole \ref{kap:heuristiky}.
 
 

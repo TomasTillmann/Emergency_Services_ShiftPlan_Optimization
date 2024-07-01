@@ -76,7 +76,7 @@ Nalezením rekurzivních vztahů by pak simulace $s$ nebyla černou skříňkou 
 
 \subsection{Prohledávání prostoru plánů tahy}
 
-V předchozí kapitole \ref{kap:dynamicProgram} jsme si ukázali, jak se obecně dynamickým programováním dá 
+V předchozí kapitole jsme si ukázali, jak se obecně dynamickým programováním dá 
 vyřešit náročná kombinatorická úloha.
 
 V této kapitole budeme zkoumat, jestli existují nějaké rekurzivní vztahy 
@@ -94,12 +94,12 @@ Detailní rozebrání složitosti algoritmu popisuje věta o složitosti algorit
 \begin{definice}[Seřazené incidenty]\label{df:INC}
   Nechť množina incidentů 
   \begin{equation*}
-    I = \{ i_1, \dots , i_n \} \text{, kde } \forall j, k \in \{ 1, \dots n\} \colon T_I(i_j) \leq T_I(i_k),
+    I = \{ i_1, \dots , i_n \} \text{, kde } \forall_{j \not = k} j, k \in \{ 1, \dots n\} \colon T_I(i_j) < T_I(i_k),
   \end{equation*}
   čili incidenty jsou seřazené podle času nastání.
   Definujme množiny incidentů
   \begin{equation*}
-    I_0, I_1, \dots, I_n \text{, kde } \forall k \in \{ 0, \dots, n \} \colon I_k = \{ i_1, \dots, i_k \}.
+    \emptyset = I_0, I_1, \dots, I_n \text{, kde } \forall k \in \{ 1, \dots, n \} \colon I_k = \{ i_1, \dots, i_k \}.
   \end{equation*}
 
   Incidenty $I_k$ jsou tak incidenty $I_{k-1}$ po odebrání incidentu $i_k$, který se odehrál jako poslední.
@@ -223,22 +223,21 @@ právě kterými budeme postupně budovat pro množiny incidentů $I_{k-1}$ až 
 
 \end{definice}
 
-Dále budeme tahy definovat pouze slovně, protože se bude vždy jednat o nějaké posloupnosti kanonických tahů.
+Dále budeme tahy definovat pouze slovně, protože se bude vždy jednat o nějaké posloupnosti kanonických tahů nebo o jejich inverze.
 
 Můžou existovat plány $p \in P_C$, na kterých nějaký tah nelze provést, čili $T(p)$ je nedefinované.
 Například, pokud bychom plánu chtěli alokovat tým, ale už nejsou žádné k dispozici, nebo už není volná žádná výjezdová stanice podle omezení $C$.
 Řekněme, že tah $T$ \textit{lze provést na plánu $p \in P_C$} právě tehdy, když $T(p)$ je definováno.
 
 Pomocí tahů můžeme $P_C$ \textit{prohledávat}.
-Nechť množina tahů $T$.
-Plán $p_2$ \textit{je dosažitelný tahy $T$ z plánu $p_1$}, pokud existuje posloupnost tahů $T_1 \in T, \dots, T_n \in T$ taková, že $(T_1 \circ \dots \circ T_n)(p_1) = p_2$.
+Plán $p_2$ \textit{je dosažitelný tahy $T$ z plánu $p_1$}, pokud existuje posloupnost tahů $T_1, \dots, T_n$ taková, že $(T_1 \circ \dots \circ T_n)(p_1) = p_2$.
 Pokud optimální plán $p^* \in P_C$ je nějakými tahy $T_i$ dosažitelný z $p \in P_C$, pak ho můžeme prohledáváním, které začíná v $p$ nalézt.
 Pomocí tahů můžeme $P_C$ prohledávat sofistikovaněji, než je jenom všechny procházet, jak jsme dělali v naivním řešení \ref{df:naivniRes}.
 
 Některé plány totiž ani nemá smysl prohledávat, jako například plány, které naalokují záchranáře tak nešikovně, že neodbavují úspěšně žádný incident.
 Taková naalokování jenom přispívají do ceny plánu, ale nijak do počtu úspěšně odbavených incidentů.
 
-Dále budeme zkoumat, jaké plány má smysl prohledávat a jakými tahy jsme takové plány schopni nalézt, tedy jsou dosažitelné.
+Dále budeme zkoumat, jaké plány má smysl prohledávat a jakými tahy jsme takové plány schopni nalézt.
 \begin{definice}[Tahy snižující cenu]\label{df:invKanTahy}
   Za tahy snižující cenu rozumíme tahy:
   \begin{enumerate}
@@ -290,10 +289,10 @@ Následujícím tahům budeme říkat \textit{optimální tahy}, a těmito tahy 
 Následuje definování jednotlivých optimálních tahů.
 
 \begin{definice}[Tah minimální prodloužení směny týmu]
-  Tahem \textit{minimální prodloužení směny týmu} na plánu $p \in P_C$ pro množinu incidentů $I$, rozumíme tah $T$, prodloužení směny týmu a případně alokace vozidla tak, že
+  Tahem \textit{minimální prodloužení směny týmu} na plánu $p \in P_C$ pro množinu incidentů $I_{k-1}$, rozumíme tah $T$, prodloužení směny týmu a případně alokace vozidla tak, že
   \begin{enumerate}
     \item
-      $s(T(p), I) = s(p, I) + 1$,
+      $s(T(p), I_{k}) = s(p, I_{k-1}) + 1$,
     \item
       $T(p)$ je optimální v ceně.
     % \item
@@ -302,10 +301,10 @@ Následuje definování jednotlivých optimálních tahů.
 \end{definice}
 
 \begin{definice}[Tah minimální alokace týmu]
-  Tahem \textit{minimální alokace týmu} na $p \in P_C$ pro množinu incidentů $I$, rozumíme tah $T$, alokace týmu a případně alokace vozidla tak, že
+  Tahem \textit{minimální alokace týmu} na $p \in P_C$ pro množinu incidentů $I_{k-1}$, rozumíme tah $T$, alokace týmu a případně alokace vozidla tak, že
   \begin{enumerate}
     \item
-      $s(T(p), I) = s(p, I) + 1$,
+      $s(T(p), I_k) = s(p, I_{k-1}) + 1$,
 
     \item
       $T(p)$ je optimální v ceně,
@@ -314,7 +313,7 @@ Následuje definování jednotlivých optimálních tahů.
       % tým $z$ odbavuje $i \in I$ takový, že $p$ incident $i$ neodbavoval,
 
     \item
-      $T$ alokuje směnu s nejpozdějším možným začátkem směny, aby $T(p)$ stále odbavoval incident $i$. 
+      $T$ alokuje směnu s nejpozdějším možným začátkem směny.
   \end{enumerate}
 \end{definice}
 
@@ -363,10 +362,13 @@ Následující věta vše spojí dohromady a poskytne základ pro postup, jak š
 
   V druhém případě, je poslední incident $i_k = i'_r$ plánem $p_k$ odbaven.
   Z toho důvodu $p_k$ na množině inidentů $I_{k-1}$ odbavuje incidenty $i'_1, \dots, i'_{r-1}$, o jeden méně -- opět, simulace incidenty prochází postupně.
-  Platí tak, že $s(p_k, I_{k-1}) = r - 1$. Plán $p_k$ však nemusí být optimální v ceně, takže $T$ nemusí být tah identita jak pro případ $i'_k = i'_r$. 
+  Platí tak,
+  \begin{align*}
+    s(p_k, I_{k-1}) = r - 1.
+  \end{align*}
+  Plán $p_k$ však nemusí být optimální v ceně, takže $T$ nemusí být tah identita jak pro případ $i'_k = i'_r$. 
 
-  Libovolné snížení ceny lze jistě docílit nějakou posloupností tahů snižujících cenu.
-  Chceme nalézt vhodnou posloupnost takovou, že díky ní zkounstruujeme optimální tah.
+  Nyní rozborem případů ukážeme, že v každé situaci, která může nastat, existuje optimální tah $T$ splňující znění věty.
 
   Uvažme tým záchranářů $z$, který odbavoval incident $i_k$.
   Pro tým $z$ pak pro spuštění simulace na plánu $p_k$ na množině incidentů $I_{k-1}$ platí:
@@ -417,10 +419,11 @@ Následující věta vše spojí dohromady a poskytne základ pro postup, jak š
 \end{dukaz}
 
 Předchozí věta je velmi důležitá pro navrhnutí sofistikovanějšího algoritmu prohledávání plánů.
-V následující větě je její tvrzení využito pro dokázání dosažitelnosti libovolného optimálního plánu, ale pouze při účelové funkci $q^{\text{Lex}}$,
+V následující větě je její tvrzení využito pro dokázání dosažitelnosti libovolného optimálního plánu, ale pouze při účelové funkci $q^{\text{Lex}}$.
 
 \begin{veta}[O dosažitelnosti optimálního plánu optimálními tahy]\label{veta:dosazitelnostOptimalnimiTahy}
-  Optimální plán $p^* \in P_C$ na množině incidentů $I$ při účelové funkci $q^{\text{Lex}}$ je z $p_0$ dosažitelný nějakou posloupností optimálních tahů $T_1 \circ \dots T_{|I|-1}$.
+  Optimální plán $p^* \in P_C$ na množině incidentů $I$ při účelové funkci $q^{\text{Lex}}$ je z $p_0 = p_{\emptyset}$
+  dosažitelný nějakou posloupností optimálních tahů $T_0 \circ \dots T_{|I|-1}$.
 \end{veta}
 \begin{dukaz}
   Nechť $n = |I|$ a
@@ -435,11 +438,11 @@ V následující větě je její tvrzení využito pro dokázání dosažitelnos
 
   Takovou konstrukcí sestrojíme $p_{k}, T_{k}, \forall k \in \{ 0, \dots, n-1 \}$. 
   Plán $p_0$ je z věty \ref{veta:optimalniTahy} plán na prázdné množině odbavující buď jeden nebo nula incidentů, optimální v ceně.
-  Pro prázdnou množinu incidentů jakýkoliv jiný plán než prázdný plán $p_0$ není optimální v ceně.
+  Pro prázdnou množinu incidentů jakýkoliv jiný plán než prázdný plán $p_{\emptyset}$ není optimální v ceně.
   Tudiž plán $p_0$ je prázdný plán.
   Tahy $T_k$ jsou optimální tahy, takže se jedná o hledanou posloupnost takovou, že
   \begin{equation*}
-    p^* = (T_0 \circ T_1 \circ \dots \circ T_{n-1})(p_0).
+    p^* = (T_0 \circ T_1 \circ \dots \circ T_{n-1})(p_{\emptyset}).
   \end{equation*}
 \end{dukaz}
 
@@ -496,7 +499,7 @@ Tím se zajistí, že po proiterování všech optimálních tahů jsou doposud 
 
 V kroku 2 rekurze pouze vrátí optimální plán v ceně s předchozí hladiny, pokud $k$ je rovno $h$, čili $p$ je nějaký optimální plán v ceně na množine $I$.
 
-Algoritmus si \textit{cachuje} mezivýsledky, v kroku 21 uloží nejlepší optimální plány v ceně pro aktuální plán.
+Algoritmus si \textit{cachuje} mezivýsledky. V kroku 21 uloží nejlepší optimální plány v ceně pro aktuální plán.
 Pokud v rekurzi nějaký plán navštívíme vícekrát, což se jistě může stát, protože různé posloupnosti tahů můžou vést na stejný plán,
 tak se nebude znovu prohledávat celý podstrom rekurze, ale jednoduše se v kroku 5 vrátí správné optimální plány v ceně, nalezené v předchozích voláních.
 
@@ -505,11 +508,11 @@ Jak již bylo zmíněno v kapitole \ref{kap:dynamicProgram}, tomuto způsobu \te
 Právě jsme si algoritmus důkladně popsali, v následující větě ověříme, že je korektní, tedy že skutečně nalezne všechny optimální plány na množine $I$ při $q^{\text{Lex}}$.
 
 \begin{veta}[Korektnost a úplnost algoritmu]\label{}
-  Algoritmus rekurzivního prohledávání prostoru plánů ptimálními tahy (viz algoritmus \ref{alg:rekProhPlanu}) nalezne všechny optimální plány $P^* \in P_C$ při účelové funkci $q^{\text{Lex}}$.
+  Algoritmus rekurzivního prohledávání prostoru plánů optimálními tahy (viz algoritmus \ref{alg:rekProhPlanu}) nalezne všechny optimální plány $P^* \subseteq P_C$ při účelové funkci $q^{\text{Lex}}$.
 \end{veta}
 \begin{dukaz}
-  Z věty \ref{veta:dosazitelnostOptimalnimiTahy} víme, že $p^*$ je dosažitelný nějakou posloupností optimálních tahů z prázdného plánu $p_{\emptyset}$. 
-  V algoritmu v kroku 7 množina $T^*_k$ obsahuje všechny optimální tahy, které lze provést na plánu $p$ na množině $I_k$.
+  Z věty \ref{veta:dosazitelnostOptimalnimiTahy} víme, že $p^* \in P^*$ je dosažitelný nějakou posloupností optimálních tahů z prázdného plánu $p_{\emptyset}$. 
+  V algoritmu v kroku 7 množina $T^*_k$ obsahuje všechny optimální tahy, které lze provést na plánu $p$ na množině $I_k$, počínaje prázdným plánem a prvním incidentem.
   V kroku 10 se rekurzivně zavoláme na každý $T^*(p), T^* \in T^*_k$.
   Algoritmus tudiž prohledá každou posloupnost optimálních tahů, takže určitě i všechny takové, kterými se získá libovolný optimální plán $p \in P^*$ (plyne z věty \ref{veta:dosazitelnostOptimalnimiTahy}).
   Algoritmus je úplný.
@@ -520,7 +523,7 @@ Právě jsme si algoritmus důkladně popsali, v následující větě ověřím
 \end{dukaz}
 
 Omezili jsme se na použití účelové funkce $q^{\text{Lex}}$, protože potřebujeme, aby optimální plán podle účelové funkce $q$ byl zároveň optimální v ceně.
-Tento předpoklad optimální plán při $q^{\text{Lex}}$ splňuje \ref{veta:lexJeOptVCene}.
+Tento předpoklad optimální plán při $q^{\text{Lex}}$ splňuje (viz věta \ref{veta:lexJeOptVCene}).
 Aby byl algoritmus korektní, mohli bychom použít jakoukoliv jinou účelovou funkci $q$, pro kterou optimální plán při $q$ je zároveň optimálním v ceně.
 Podle věty \ref{veta:dosazitelnostOptimalnimiTahy} bude dosažitelný optimálními tahy, takže jej algoritmus navštíví.
 
@@ -547,7 +550,7 @@ K tomu si první odhadneme maximální počet optimálních tahů na hladině.
   To jsou jediné týmy, kterým lze prodlužovat směna.
   Minimální prodloužení směny týmu $z$ směnu prodlouží o nejkratší možnou dobu a případně alokuje záchranné vozidlo,
   aby byly odbavovány všechny incidenty $I_{k+1}$.
-  Takové prodloužení opět, tentokrát pro každý naalokovaný tým existuje právě jedno.
+  Takové prodloužení opět, tentokrát pro naalokované týmy, existuje právě jedno.
 
   Dohromady dostáváme: $Z_1 + Z_2 = Z_n$ a tah identita lze provést vždy a je jenom jeden, čili:
   \begin{equation*}
@@ -601,7 +604,7 @@ ale pouze nějakou část. Hlavní výhodou algoritmu tak je schopnost plány pr
 V kapitole \ref{kap:NP} jsme diskutovali, do jaké třídy složitosti patří optimalizační úloha nalezení optimálního pohotovostního plánu.
 Konkrétně jsme si ve větě \ref{veta:simulaceJakoCernaSkrinka} ukázali, že pokud na účelovou funkci budeme nahlížet jako na černou skříňku,
 tak je optimalizační úlohu NP-těžká. V minulé kapitole jsme nalezli rekurzivní vztah, který nám umožnil se na
-účelovou funkci nedívat jako na černou skříňku a nalezli jsme dramaticky lepší algoritmus \ref{alg:rekProhPlanu}, než naivní řešení \ref{kap:naivniRes}.
+účelovou funkci nedívat jako na černou skříňku a nalezli jsme dramaticky lepší algoritmus \ref{alg:rekProhPlanu}, než naivní řešení (viz kapitola \ref{kap:naivniRes}).
 
 V této kapitole jsou diskutovány metody, které na účelovou funkci pohlížejí jako na černou skříňku. 
 Připouštíme tedy NP-těžkou složitost problému, ale ukáže se, že i tak budeme schopni docílit velmi kvalitních pohotovostních plánů.
@@ -630,13 +633,13 @@ Mravenci chodí po těchto cestičkách a vybírají si tak optimální konfigur
 
 Existuje spoustu dalších různých metod, jako v poslední době populární \textit{hybridní metody},
 které propojují více metaheuristických metod dohromady, s myšlenkou použít každou metaheuristiku co nejvhodněji,
-případně i měnit různé metaheuristiky za běhu (\citet{GlovKoch03}).
+případně i měnit různé metaheuristiky za běhu~\cite{GlovKoch03}.
 
 \subsection{Lokální prohledávání}
 
 Asi nejjednodušší metoda na prohledávání prostoru konfigurací je \textit{lokální prohledávání}.
 Lokální prohledávání pouze lokálně prohledává prostor konfigurací od nějaké startovní konfigurace $x \in \mathcal{X}$. 
-Prostor porhledává prostřednictvním sousedů $N(x)$, kde vždy vybere souseda s nejlepší hodnotou účelové funkce.~(\citet{HybridMeta}, str. 3).
+Prostor porhledává prostřednictvním sousedů $N(x)$, kde vždy vybere souseda s nejlepší hodnotou účelové funkce.~(\cite{HybridMeta}, str. 3).
 
 Sousedy $N(p)$ zkonstruujeme implicitně pomocí tahů, což je standardní způsob konstrukce sousedů nějaké konfigurace (\cite{HybridMeta}, str. 3).
 Sousední plány $N(p)$ plánu $p \in P_C$ lze definovat různě. 
@@ -649,7 +652,7 @@ My budeme od $p' \in N(p)$ vyžadovat alespoň následující:
 \end{enumerate}
 
 První podmínka \ref{en:f} zakazuje navštěvování nedovolených plánů. Pro některé problémy je navštěvování nedovolených konfigurací žádoucí,
-protože omezující podmínky můžou být příliš svazující (\cite{GlovKoch03} str. 50--51).
+protože omezující podmínky můžou být příliš svazující (\cite{GlovKoch03}, str. 50--51).
 To ale není náš případ, čili se můžeme omezit pouze na dovolené plány.
 
 Druhá podmínka  \ref{en:s} zajišťuje, že při prohledávání je vůbec možné globální optimum navštívit.
@@ -671,6 +674,7 @@ Jelikož sousední plány definujeme pomocí tahů, stačí nadefinovat tahy:
   \end{enumerate}
 
 Je snadné ověřit, že sousedství definována implicitně těmito tahy splňují všechny podmínky.
+
 Podívejme se, jak vypadá algoritmus lokálního prohledávání plánů pomocí sousedů.
 
 \begin{algorithm}[H]
@@ -695,7 +699,7 @@ Podívejme se, jak vypadá algoritmus lokálního prohledávání plánů pomoc�
   \label{alg:hillclimb}
 \end{algorithm}
 
-Algoritmus \ref{alg:hillclimb} v krocích 3 až 14 prohledává sousedy dokud není splněna podmínka v kroku 10.
+Algoritmus lokálního prohledávání \ref{alg:hillclimb} v krocích 3 až 14 prohledává sousedy dokud není splněna podmínka v kroku 10.
 Algoritmus v kroku 5 prohledává sousední plány splňující omezující podmínky $C$,
 aktuálně prohledávaného plánu $p_{current}$, který je na začátku algoritmu v kroku 2 nastaven na $p_{start} \in P_C$.
 
@@ -721,7 +725,7 @@ dokud jakákoliv změna už pouze nezhorší výslednou kvalitu.
 Jak konkrétně už záleží na konkrétní definici $N(p)$.
 
 Velkou nevýhodou lokálního prohledávání je neschopnost umět nalézt kompromis mezi lokálním optimem a globálním optimem,
-přičemž nalezené lokální optimum je v drtivé většině suboptimální (\cite{GlovKoch03} str. 43).
+přičemž nalezené lokální optimum je v drtivé většině suboptimální (\cite{GlovKoch03}, str. 43).
 
 \subsection{Tabu prohledávání}
 
@@ -740,7 +744,7 @@ Z toho důvodu ještě tabu metoda využívá konceptu \textit{aspiračního kri
 tak je soused po provedení tohoto tahu uvažován i pokud je tah zakázan, čili i když se tah nachází v tabu.
 
 Tabu prohledávání lze ukončit několika způsoby. Nejčastěji se prohledávání ukončuje, jakmile v iteraci už neexistují žádní zlepšující sousedé,
-které získáme tahem, jenž není v tabu.~(\cite{GlovKoch03} str. 41 -- 49). 
+které získáme tahem, jenž není v tabu.~(\cite{GlovKoch03}, str. 41--49). 
 
 \begin{algorithm}[H]
   \begin{algorithmic}[1]
@@ -775,14 +779,14 @@ které získáme tahem, jenž není v tabu.~(\cite{GlovKoch03} str. 41 -- 49).
   \label{alg:tabusearch}
 \end{algorithm}
 
-Algoritmus \ref{alg:tabusearch} si v krocích 1--5 inicializuje stav algoritmu. Tabu je ze začátku prázdné.
+Algoritmus tabu prohledávání \ref{alg:tabusearch} si v krocích 1--5 inicializuje stav algoritmu. Tabu je ze začátku prázdné.
 Podobně jako v lokálním prohledávání se prohledává prostor v krocích 5 až 24, dokud není splněna podmínka na řádku 13.
 V krocích 7--12 se prohledávájí pomocí sousedních tahů sousedé aktuálně prohledávaného plánu $p_{current}$. 
 
 Nejzajímavější je krok 9. Zde se prvně kontroluje stejně jako v lokálním prohledávání, zda je splěna nutná podmínka, jestli je vůbec třeba souseda $p$ uvažovat.
 Druhá podmínka kontroluje, zda $p$ buď není v tabu, nebo je splněné aspirační kritérium.
 Tah $T$, který je v tabu uvažujeme pouze pokud soused $T(p_{current})$ je doposavad nejoptimálnějším nalezeným plánem.
-Takové aspirační kritérium je nejčastěji používané a obecně nejefektivněšjí aspirační kritérium~(\cite{GlovKoch03} str. 47).
+Takové aspirační kritérium je nejčastěji používané a obecně nejefektivněšjí aspirační kritérium~(\cite{GlovKoch03}, str. 47).
 
 Podmínka v kroku 13 je totožná s podmínkou u lokálního prohledávání.
 Pokud již neexistuje žádný zlepšující soused, který není v tabu nebo nesplňuje aspirační kritérium, tak vrátíme nejlepší nalezený plán $p_{best}$.
@@ -807,7 +811,7 @@ Stejně jako ve fyzickém procesu žíhání, simulované žíhání si dřží 
 Při vyšší teplotě je větší šance na navštěvování horších konfigurací a při nižší se pravděpodobnost snižuje, takže se navštěvují především lokálně optimální konfigurace.
 
 Při postupném chlazení, tedy snižování teploty, se v průběhu běhu simulovaného žíhání postupně navštěvují horší konfigurace méně a optimální konfigurace více častěji.
-Tento proces má zajistit ze začátku dostatečnou exploraci prostoru konfigurací, ale zároveň postupnou konvergenci k nějakému ideálně globálnímu řešení (\cite{GlovKoch03} str. 1--2).
+Tento proces má zajistit ze začátku dostatečnou exploraci prostoru konfigurací, ale zároveň postupnou konvergenci k nějakému ideálně globálnímu řešení (\cite{GlovKoch03}, str. 1--2).
 
 \begin{algorithm}[H]
   \caption{Simulované žíhání prohledávání plánů pohotovostní služby}
@@ -837,7 +841,7 @@ Tento proces má zajistit ze začátku dostatečnou exploraci prostoru konfigura
   \label{alg:siman}
 \end{algorithm}
 
-Algoritmus \ref{alg:siman} si v krocích 2 až 4 inicializuje aktuálně prohledávaný plán $p_{\text{current}}$, nejlepší nalezený plán $p_{\text{best}}$ a akutální teplotu $t$.
+Algoritmus simulovaného žíhání \ref{alg:siman} si v krocích 2 až 4 inicializuje aktuálně prohledávaný plán $p_{\text{current}}$, nejlepší nalezený plán $p_{\text{best}}$ a akutální teplotu $t$.
 Hlavní smyčka algoritmu v krocích 5--19 běží, dokud $t$ nepoklesne pod nejnižší dovolenou teplotu $t_{\text{final}}$.
 V každé iteraci se provádí $M_k$ iterací, přičemž každá iterace se snaží najít lepší plán ze sousedních plánů $p$.
 V kroku 8 se vypočítá rozdíl kvality $\Delta q$ aktuálně nejlepšího plánu a sousedního plánu.
@@ -847,7 +851,7 @@ V kroku 12 je $p$ přijato s pravděpodobností definovanou jako
 \begin{align}\label{df:metropolis}
   \exp\left(-\frac{\Delta q}{t}\right).
 \end{align}
-Pravděpodobností funkce \ref{df:metropolis} je takzvané \textit{metropolis akceptační kritérium} (\citet{Metropolis}), které modeluje
+Pravděpodobností funkce \ref{df:metropolis} je takzvané \textit{metropolis akceptační kritérium} (\cite{Metropolis}), které modeluje
 jak přechází termodynamický systém z aktuální konfigurace.
 Určuje s jakou pravděpodobností v závislosti na aktuální teplotě $t$ je suboptimální soused uvažován.
 
