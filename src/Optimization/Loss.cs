@@ -30,13 +30,13 @@ public abstract class ObjectiveFunction : IObjectiveFunction
   /// <inheritdoc/>
   public double GetCost()
   {
-    return Simulation.EmergencyServicePlan.GetCost() / (MaxEmergencyServicePlanShiftDuration + AvailableAmbulancesTotalCount);
+    return Simulation.Plan.GetCost() / (MaxEmergencyServicePlanShiftDuration + AvailableAmbulancesTotalCount);
   }
 
   /// <inheritdoc/>
   public double GetEffectivity()
   {
-    return Simulation.EmergencyServicePlan.GetShiftDurationsSum() / (Simulation.EmergencyServicePlan.GetTotalTimeActive() + 0.00000000000000000000001);
+    return Simulation.Plan.GetShiftDurationsSum() / (Simulation.Plan.GetTotalTimeActive() + 0.00000000000000000000001);
   }
 
   public double Get(Weights weights, ImmutableArray<Incident> incidents)
@@ -52,14 +52,14 @@ public abstract class ObjectiveFunction : IObjectiveFunction
 
   public double Get(EmergencyServicePlan plan, ReadOnlySpan<Incident> incidents)
   {
-    Simulation.EmergencyServicePlan = plan;
+    Simulation.Plan = plan;
     Simulation.Run(incidents);
     return GetLoss();
   }
 
   protected void RunSimulation(Weights weights, ReadOnlySpan<Incident> incidents)
   {
-    weights.MapTo(Simulation.EmergencyServicePlan);
+    weights.MapTo(Simulation.Plan);
     Simulation.Run(incidents);
   }
 }

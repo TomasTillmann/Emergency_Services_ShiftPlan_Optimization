@@ -36,7 +36,7 @@ public abstract class Optimizer : IOptimizer
     ObjectiveFunction = objectiveFunction;
     Constraints = constraints;
     InitWeights();
-    StartWeights.MapTo(ObjectiveFunction.Simulation.EmergencyServicePlan);
+    StartWeights.MapTo(ObjectiveFunction.Simulation.Plan);
   }
 
   public abstract IEnumerable<Weights> FindOptimal(ImmutableArray<Incident> incidents);

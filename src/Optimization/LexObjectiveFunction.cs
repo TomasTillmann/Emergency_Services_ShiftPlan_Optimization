@@ -15,11 +15,11 @@ public class LexObjectiveFunction
 
   public int GetLoss(EmergencyServicePlan plan1, EmergencyServicePlan plan2, ReadOnlySpan<Incident> incidents)
   {
-    Simulation.EmergencyServicePlan = plan1;
+    Simulation.Plan = plan1;
     Simulation.Run(incidents);
     int c1 = Simulation.HandledIncidentsCount;
 
-    Simulation.EmergencyServicePlan = plan2;
+    Simulation.Plan = plan2;
     Simulation.Run(incidents);
     int c2 = Simulation.HandledIncidentsCount;
 

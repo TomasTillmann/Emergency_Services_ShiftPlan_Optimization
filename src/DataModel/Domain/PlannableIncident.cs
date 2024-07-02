@@ -57,6 +57,8 @@ public partial class PlannableIncident
   public class Factory
   {
     public PlannableIncident WorkingInstance { get; }
+    public SimulationState State { get; set; }
+    public EmergencyServicePlan Plan { get; set; }
 
     private DistanceCalculator distanceCalculator;
     private ImmutableArray<Hospital> hospitals;
@@ -72,23 +74,22 @@ public partial class PlannableIncident
     public static readonly PlannableIncident Empty = new PlannableIncident();
 
     /// Creates new instance of the shared instance.
-    public PlannableIncident GetCopy(in Incident incident, MedicTeam shift)
+    public PlannableIncident GetCopy(in Incident incident, MedicTeamId teamId, Depot homeDepot)
     {
-      return new PlannableIncident(Get(in incident, shift));
+      return new PlannableIncident(Get(teamId, in incident));
     }
 
     /// In order not to allocate memory for PlannableIncidentOpt all the time, factory always returns shared instance.
     /// Only this factory can modify its attributes and client has only read only access.
     /// This is helpful for intermmidiate calculations.
     /// If you would like to get instance, where factory would not change its attributes, use <see cref="GetCopy(in Incident, MedicTeam)"/>.
-    public PlannableIncident Get(in Incident incident, MedicTeam shift)
+    public PlannableIncident Get(MedicTeamId teamId, in Incident incident)
     {
-      // by ref?
       WorkingInstance.Incident = incident;
 
       WorkingInstance.NearestHospital = distanceCalculator.GetNearestHospital(incident.Location);
 
-      WorkingInstance.ToIncidentDrive = GetToIncidentDriveAndAmbIndex(incident.OccurenceSec, incident.Location, shift, out int ambIndex);
+      WorkingInstance.ToIncidentDrive = GetToIncidentDriveAndAmbIndex(incident.OccurenceSec, incident.Location, teamId, out int ambIndex);
 
       WorkingInstance.AmbulanceIndex = ambIndex;
 
@@ -99,32 +100,36 @@ public partial class PlannableIncident
 
       WorkingInstance.InHospitalDelivery = Interval.GetByStartAndDuration(WorkingInstance.ToHospitalDrive.EndSec, incident.InHospitalDeliverySec);
 
-      int toDepotDriveDurationSec = distanceCalculator.GetTravelDurationSec(WorkingInstance.NearestHospital.Location, shift.Depot.Location);
+      int toDepotDriveDurationSec = distanceCalculator.GetTravelDurationSec(WorkingInstance.NearestHospital.Location, Plan.Depots[teamId.DepotIndex].Location);
       WorkingInstance.ToDepotDrive = Interval.GetByStartAndDuration(WorkingInstance.InHospitalDelivery.EndSec, toDepotDriveDurationSec);
 
       return WorkingInstance;
     }
 
-    public Interval GetToIncidentDrive(int incidentOccurenceTimeSec, Coordinate incidentLocation, MedicTeam medicTeam)
+    public Interval GetToIncidentDrive(int incidentOccurenceTimeSec, Coordinate incidentLocation, MedicTeamId teamId)
     {
-      return GetToIncidentDriveAndAmbIndex(incidentOccurenceTimeSec, incidentLocation, medicTeam, out _);
+      return GetToIncidentDriveAndAmbIndex(incidentOccurenceTimeSec, incidentLocation, teamId, out _);
     }
 
-    private Interval GetToIncidentDriveAndAmbIndex(int incidentOccurenceTimeSec, Coordinate incidentLocation, MedicTeam medicTeam, out int ambIndex)
+    private Interval GetToIncidentDriveAndAmbIndex(int incidentOccurenceTimeSec, Coordinate incidentLocation, MedicTeamId teamId, out int ambIndex)
     {
-      CalculateStartTimeAndAmbulanceStartingLocation(medicTeam, incidentOccurenceTimeSec, out int startTimeSec, out Coordinate ambStartLoc, out ambIndex);
+      CalculateStartTimeAndAmbulanceStartingLocation(teamId, incidentOccurenceTimeSec, out int startTimeSec, out Coordinate ambStartLoc, out ambIndex);
 
       int toIncidentTravelDurationSec = distanceCalculator.GetTravelDurationSec(ambStartLoc, incidentLocation);
 
       return Interval.GetByStartAndDuration(startTimeSec, toIncidentTravelDurationSec);
     }
 
-    private void CalculateStartTimeAndAmbulanceStartingLocation(MedicTeam medicTeam, int incidentOccurenceTimeSec, out int startTimeSec, out Coordinate ambStartLoc, out int ambIndex)
+    private void CalculateStartTimeAndAmbulanceStartingLocation(MedicTeamId teamId, int incidentOccurenceTimeSec, out int startTimeSec, out Coordinate ambStartLoc, out int ambIndex)
     {
-      int firstPossibleStartTimeSec = Math.Max(incidentOccurenceTimeSec, medicTeam.Shift.StartSec);
+      MedicTeamState teamState = State.TeamState(teamId);
+      MedicTeam team = Plan.Team(teamId);
+
+      int firstPossibleStartTimeSec = Math.Max(incidentOccurenceTimeSec, team.Shift.StartSec);
+      Depot homeDepot = Plan.Depots[teamId.DepotIndex];
 
       // Is in depot.
-      if (medicTeam.IsInDepot(firstPossibleStartTimeSec))
+      if (teamState.IsInDepot(firstPossibleStartTimeSec))
       {
         int whenAmbulanceFree = int.MaxValue;
         int possibleStartingTime = int.MaxValue;
@@ -132,22 +137,22 @@ public partial class PlannableIncident
 
         // Finds ambulance which is available the earliest, and sets startTimeSec to first possible starting time.
         // That cannot be time before the shift starts, and it's either the time the shift starts or when the earliest ambulance is available.
-        for (int i = 0; i < medicTeam.Depot.Ambulances.Count; ++i)
+        for (int i = 0; i < homeDepot.Ambulances.Count; ++i)
         {
-          if (whenAmbulanceFree > medicTeam.Depot.Ambulances[i].WhenFreeSec)
+          if (whenAmbulanceFree > homeDepot.Ambulances[i].WhenFreeSec)
           {
-            whenAmbulanceFree = medicTeam.Depot.Ambulances[i].WhenFreeSec;
+            whenAmbulanceFree = homeDepot.Ambulances[i].WhenFreeSec;
             possibleStartingTime = Math.Max(firstPossibleStartTimeSec, whenAmbulanceFree);
             ambIndex = i;
           }
         }
 
         startTimeSec = possibleStartingTime;
-        ambStartLoc = medicTeam.Depot.Location;
+        ambStartLoc = homeDepot.Location;
         return;
       }
 
-      PlannableIncident currentlyHandlingIncident = medicTeam.LastPlannedIncident;
+      PlannableIncident currentlyHandlingIncident = teamState.LastPlannedIncident;
       Coordinate hospitalLocation = currentlyHandlingIncident.NearestHospital.Location;
 
       // Medic team will use the same ambulance.
@@ -159,7 +164,7 @@ public partial class PlannableIncident
         startTimeSec = firstPossibleStartTimeSec + Ambulance.ReroutePenaltySec;
 
         int durationDrivingSec = incidentOccurenceTimeSec - currentlyHandlingIncident.ToDepotDrive.StartSec;
-        ambStartLoc = distanceCalculator.GetNewLocation(hospitalLocation, medicTeam.Depot.Location, durationDrivingSec, firstPossibleStartTimeSec);
+        ambStartLoc = distanceCalculator.GetNewLocation(hospitalLocation, homeDepot.Location, durationDrivingSec, firstPossibleStartTimeSec);
 
         return;
       }

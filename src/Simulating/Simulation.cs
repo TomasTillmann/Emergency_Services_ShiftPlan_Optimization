@@ -6,11 +6,11 @@ namespace Simulating;
 
 public sealed class Simulation
 {
-  public World World { get; }
+  public SimulationState State { get; set; }
 
-  public EmergencyServicePlan EmergencyServicePlan { get; set; }
+  private EmergencyServicePlan Plan { get; set; }
 
-  public bool Info { get; set; }
+  #region Stats
 
   /// <summary>
   /// Total count of incidents the simulation was run on. 
@@ -26,105 +26,98 @@ public sealed class Simulation
   /// </summary>
   public double SuccessRate => (TotalIncidentsCount - NotHandledIncidentsCount) / (double)TotalIncidentsCount;
 
+  #endregion
+
   public List<int> UnhandledIncidents { get; } = new();
 
   private readonly MedicTeamsEvaluator _medicTeamsEvaluator;
   private readonly PlannableIncident.Factory _plannableIncidentFactory;
 
-  public Simulation(World world, bool info = false)
+  public Simulation(World world, Constraints constraints, bool info = false)
   {
-    World = world;
-    _plannableIncidentFactory = new PlannableIncident.Factory(world.DistanceCalculator, world.Hospitals);
-    _medicTeamsEvaluator = new MedicTeamsEvaluator(world.DistanceCalculator, world.Hospitals, world.GoldenTimeSec);
-    Info = info;
+    State = new SimulationState(world.Depots.Length, constraints);
 
-    EmergencyServicePlan = new EmergencyServicePlan
-    {
-      AvailableMedicTeams = World.AvailableMedicTeams,
-      AvailableAmbulances = World.AvailableAmbulances,
-      Depots = World.Depots
-    };
+    _plannableIncidentFactory = new PlannableIncident.Factory(world.DistanceCalculator, world.Hospitals);
+    _medicTeamsEvaluator = new MedicTeamsEvaluator(world.DistanceCalculator, world.Hospitals);
   }
 
   /// <summary>
   /// Performs simulation on Depots.
   /// </summary>
-  public void Run(ReadOnlySpan<Incident> incidents)
+  public void Run(EmergencyServicePlan plan, ReadOnlySpan<Incident> incidents)
   {
-    ResetState(incidents.Length);
+    Plan = plan;
+    TotalIncidentsCount = incidents.Length;
+    Prepare();
 
     PlannableIncident plannableIncidentForBestShift;
     Incident currentIncident;
-    MedicTeam bestMedicTeam;
+    MedicTeamId bestMedicTeam;
     MedicTeam medicTeam;
 
-    for (int i = 0; i < incidents.Length; ++i)
+    for (int i = 0; i < TotalIncidentsCount; ++i)
     {
       currentIncident = incidents[i];
-
-      // Has to be assigned to something in order to compile, but it will be reassigned to first handling shift found.
-      // If not, than the other loop won't happen, therefore it's value is irrelevant.
-      bestMedicTeam = default(MedicTeam);
+      bestMedicTeam = new MedicTeamId { DepotIndex = -1, OnDepotIndex = -1 };
 
       // Find handling medic team. 
-      int findBetterFromIndex = int.MaxValue;
-      for (int j = 0; j < EmergencyServicePlan.AllocatedMedicTeamsCount; ++j)
+      int depotIndex = 0;
+      int teamIndex = 0;
+      for (; depotIndex < Plan.Depots.Length; ++depotIndex)
       {
-        medicTeam = EmergencyServicePlan.AvailableMedicTeams[j];
-
-        if (_medicTeamsEvaluator.IsHandling(medicTeam, in currentIncident))
+        for (; teamIndex < Plan.Depots[depotIndex].MedicTeams.Count; ++teamIndex)
         {
-          bestMedicTeam = medicTeam;
-          findBetterFromIndex = j + 1;
-          break;
+          if (_medicTeamsEvaluator.IsHandling(new MedicTeamId(teamIndex, depotIndex), in currentIncident))
+          {
+            bestMedicTeam = new MedicTeamId { DepotIndex = depotIndex, OnDepotIndex = teamIndex };
+            break;
+          }
         }
       }
 
-      // No hadnling medic team exists. 
-      if (findBetterFromIndex == int.MaxValue)
+      // No handling medic team exists. 
+      if (bestMedicTeam.DepotIndex == -1 && bestMedicTeam.OnDepotIndex == -1)
       {
         NotHandledIncidentsCount++;
-        if (Info) UnhandledIncidents.Add(i);
         continue;
       }
 
-      for (int j = findBetterFromIndex; j < EmergencyServicePlan.AllocatedMedicTeamsCount; ++j)
+      for (; depotIndex < Plan.Depots.Length; ++depotIndex)
       {
-        medicTeam = EmergencyServicePlan.AvailableMedicTeams[j];
-
-        if (_medicTeamsEvaluator.IsHandling(medicTeam, in currentIncident))
+        for (teamIndex = teamIndex + 1; teamIndex < Plan.Depots[depotIndex].MedicTeams.Count; ++teamIndex)
         {
-          bestMedicTeam = _medicTeamsEvaluator.GetBetter(bestMedicTeam, medicTeam, in currentIncident);
+          if (_medicTeamsEvaluator.IsHandling(new MedicTeamId(teamIndex, depotIndex), in currentIncident))
+          {
+            bestMedicTeam = _medicTeamsEvaluator.GetBetter(bestMedicTeam, new MedicTeamId(depotIndex, teamIndex), in currentIncident);
+          }
         }
       }
 
-      plannableIncidentForBestShift = _plannableIncidentFactory.Get(in currentIncident, bestMedicTeam);
-      if (Info) bestMedicTeam.PlanAndAddToHistory(plannableIncidentForBestShift); else bestMedicTeam.PlanEfficient(plannableIncidentForBestShift);
+      plannableIncidentForBestShift = _plannableIncidentFactory.Get(bestMedicTeam, in currentIncident);
+      State.PlanIncident(bestMedicTeam, plannableIncidentForBestShift);
     }
   }
 
-  private void ResetState(int incidentsCount)
+  private void Prepare()
   {
-    // Clear planned incidents and last planned incident from previous iterations.
-    for (int i = 0; i < EmergencyServicePlan.AllocatedMedicTeamsCount; ++i)
-    {
-      EmergencyServicePlan.AvailableMedicTeams[i].ClearPlannedIncidents();
-      EmergencyServicePlan.AvailableMedicTeams[i].ResetLastPlannedIncident();
-      EmergencyServicePlan.AvailableMedicTeams[i].TimeActiveSec = 0;
-    }
+    _plannableIncidentFactory.Plan = Plan;
+    _medicTeamsEvaluator.Plan = Plan;
+    Reset();
+  }
 
-    // Set WhenFree to 0 seconds to all ambulances
-    for (int i = 0; i < EmergencyServicePlan.AllocatedAmbulancesCount; ++i)
-    {
-      EmergencyServicePlan.AvailableAmbulances[i].WhenFreeSec = 0;
-    }
+  private void Reset()
+  {
+    ResetState();
+    ResetStats();
+  }
 
-    if (Info)
-    {
-      UnhandledIncidents.Clear();
-    }
+  private void ResetState()
+  {
+    State.Clear(Plan);
+  }
 
+  private void ResetStats()
+  {
     NotHandledIncidentsCount = 0;
-    TotalIncidentsCount = incidentsCount;
   }
 }

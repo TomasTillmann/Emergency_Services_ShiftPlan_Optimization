@@ -8,7 +8,8 @@ public class Depot
 {
   public int Index { get; init; }
   public Coordinate Location { get; init; }
-  public List<Ambulance> Ambulances { get; init; }
+  public List<Ambulance> Ambulances { get; init; } = new();
+  public List<MedicTeam> MedicTeams { get; init; } = new();
 
   public override string ToString()
   {

@@ -22,16 +22,16 @@ public class IncidentsNormalizer
     int max = _shiftTimes.MaxDurationSec;
     ReadOnlySpan<Incident> incidentsSpan = incidents.AsSpan();
 
-    _simulation.EmergencyServicePlan.AllocatedMedicTeamsCount = 1;
-    _simulation.EmergencyServicePlan.AllocatedAmbulancesCount = 1;
+    _simulation.Plan.AllocatedMedicTeamsCount = 1;
+    _simulation.Plan.AllocatedAmbulancesCount = 1;
 
     for (int depotIndex = 0; depotIndex < _simulation.World.Depots.Length; ++depotIndex)
     {
       for (int startSecIndex = 0; startSecIndex < _shiftTimes.AllowedStartingTimesSecSorted.Length; ++startSecIndex)
       {
-        _simulation.EmergencyServicePlan.AvailableMedicTeams[0].Depot = _simulation.World.Depots[depotIndex];
-        _simulation.EmergencyServicePlan.AvailableMedicTeams[0].Depot.Ambulances.Add(_simulation.EmergencyServicePlan.AvailableAmbulances[0]);
-        _simulation.EmergencyServicePlan.AvailableMedicTeams[0].Shift = Interval.GetByStartAndDuration(_shiftTimes.AllowedStartingTimesSecSorted[startSecIndex], max);
+        _simulation.Plan.AvailableMedicTeams[0].Depot = _simulation.World.Depots[depotIndex];
+        _simulation.Plan.AvailableMedicTeams[0].Depot.Ambulances.Add(_simulation.Plan.AvailableAmbulances[0]);
+        _simulation.Plan.AvailableMedicTeams[0].Shift = Interval.GetByStartAndDuration(_shiftTimes.AllowedStartingTimesSecSorted[startSecIndex], max);
 
         for (int incidentIndex = 0; incidentIndex < incidents.Length; ++incidentIndex)
         {
@@ -43,8 +43,8 @@ public class IncidentsNormalizer
           }
         }
 
-        _simulation.EmergencyServicePlan.AvailableMedicTeams[0].Depot.Ambulances.Clear();
-        _simulation.EmergencyServicePlan.AvailableMedicTeams[0].Depot = null;
+        _simulation.Plan.AvailableMedicTeams[0].Depot.Ambulances.Clear();
+        _simulation.Plan.AvailableMedicTeams[0].Depot = null;
       }
     }
 

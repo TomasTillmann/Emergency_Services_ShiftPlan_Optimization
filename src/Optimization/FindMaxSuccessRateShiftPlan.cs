@@ -49,26 +49,26 @@ public class FindMaxSuccessRateShiftPlan
 
       if (_simulation.SuccessRate == 1)
       {
-        _optimals.Add(Weights.GetFrom(_simulation.EmergencyServicePlan, _constraints.MaxMedicTeamsOnDepotCount));
+        _optimals.Add(Weights.GetFrom(_simulation.Plan, _constraints.MaxMedicTeamsOnDepotCount));
       }
       else if (_simulation.SuccessRate > _globalBestSuccessRate)
       {
         _globalBestSuccessRate = _simulation.SuccessRate;
-        _globalBestWeights = Weights.GetFrom(_simulation.EmergencyServicePlan, _constraints.MaxMedicTeamsOnDepotCount);
+        _globalBestWeights = Weights.GetFrom(_simulation.Plan, _constraints.MaxMedicTeamsOnDepotCount);
       }
 
       return;
     }
 
-    ++_simulation.EmergencyServicePlan.AllocatedMedicTeamsCount;
-    ++_simulation.EmergencyServicePlan.AllocatedAmbulancesCount;
+    ++_simulation.Plan.AllocatedMedicTeamsCount;
+    ++_simulation.Plan.AllocatedAmbulancesCount;
 
-    _simulation.EmergencyServicePlan.AvailableMedicTeams[availableMedicTeamIndex].Depot = _simulation.World.Depots[depotIndex];
-    _simulation.EmergencyServicePlan.AvailableMedicTeams[availableMedicTeamIndex].Depot.Ambulances.Add(_simulation.EmergencyServicePlan.AvailableAmbulances[availableAmbulanceIndex]);
+    _simulation.Plan.AvailableMedicTeams[availableMedicTeamIndex].Depot = _simulation.World.Depots[depotIndex];
+    _simulation.Plan.AvailableMedicTeams[availableMedicTeamIndex].Depot.Ambulances.Add(_simulation.Plan.AvailableAmbulances[availableAmbulanceIndex]);
 
     for (int startSecIndex = 0; startSecIndex < _shiftTimes.AllowedStartingTimesSecSorted.Length; ++startSecIndex)
     {
-      _simulation.EmergencyServicePlan.AvailableMedicTeams[availableMedicTeamIndex].Shift = Interval.GetByStartAndDuration(_shiftTimes.AllowedStartingTimesSecSorted[startSecIndex], _max);
+      _simulation.Plan.AvailableMedicTeams[availableMedicTeamIndex].Shift = Interval.GetByStartAndDuration(_shiftTimes.AllowedStartingTimesSecSorted[startSecIndex], _max);
 
       if (medicTeamsOnDepotCount == _constraints.MaxMedicTeamsOnDepotCount)
       {
@@ -83,10 +83,10 @@ public class FindMaxSuccessRateShiftPlan
       --medicTeamsOnDepotCount;
     }
 
-    _simulation.EmergencyServicePlan.AvailableMedicTeams[availableMedicTeamIndex].Depot.Ambulances.Clear();
-    _simulation.EmergencyServicePlan.AvailableMedicTeams[availableMedicTeamIndex].Depot = null;
+    _simulation.Plan.AvailableMedicTeams[availableMedicTeamIndex].Depot.Ambulances.Clear();
+    _simulation.Plan.AvailableMedicTeams[availableMedicTeamIndex].Depot = null;
 
-    --_simulation.EmergencyServicePlan.AllocatedMedicTeamsCount;
-    --_simulation.EmergencyServicePlan.AllocatedAmbulancesCount;
+    --_simulation.Plan.AllocatedMedicTeamsCount;
+    --_simulation.Plan.AllocatedAmbulancesCount;
   }
 }

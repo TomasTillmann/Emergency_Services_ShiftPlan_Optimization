@@ -7,28 +7,23 @@ namespace ESSP.DataModel;
 public class MedicTeamsEvaluator
 {
   private readonly PlannableIncident.Factory _plannableIncidentFactory;
-  private readonly int _goldenTimeSec;
 
-  public MedicTeamsEvaluator(DistanceCalculator distanceCalculator, ImmutableArray<Hospital> hospitals, int goldenTimeSec)
+  public SimulationState State { get; set; }
+  public EmergencyServicePlan Plan { get; set; }
+
+  public MedicTeamsEvaluator(DistanceCalculator distanceCalculator, ImmutableArray<Hospital> hospitals)
   {
     this._plannableIncidentFactory = new PlannableIncident.Factory(distanceCalculator, hospitals);
-    _goldenTimeSec = goldenTimeSec;
   }
 
-  public bool IsHandling(MedicTeam medicTeam, in Incident incident)
+  public bool IsHandling(MedicTeamId teamId, in Incident incident)
   {
-    PlannableIncident plannableIncident = _plannableIncidentFactory.Get(incident, medicTeam);
-    return IsHandling(medicTeam, plannableIncident);
+    PlannableIncident plannableIncident = _plannableIncidentFactory.Get(teamId, in incident);
+    return IsHandling(teamId, plannableIncident);
   }
 
-  public bool IsHandling(MedicTeam medicTeam, PlannableIncident plannableIncident)
+  public bool IsHandling(MedicTeamId teamId, PlannableIncident plannableIncident)
   {
-    // Not allocated.
-    if (medicTeam.Shift.DurationSec == 0)
-    {
-      return false;
-    }
-
     // No ambulance available.
     if (plannableIncident.AmbulanceIndex == -1)
     {
@@ -37,14 +32,15 @@ public class MedicTeamsEvaluator
 
     // 1
     if (plannableIncident.ToIncidentDrive.StartSec + plannableIncident.ToIncidentDrive.DurationSec
-        > plannableIncident.Incident.OccurenceSec + _goldenTimeSec)
+        > plannableIncident.Incident.OccurenceSec + plannableIncident.Incident.GoldTimeSec)
     {
       return false;
     }
 
     // 1, 2, 3, 4
+    MedicTeam team = Plan.Team(teamId);
     const int overdue = 30 * 60;
-    if (plannableIncident.InHospitalDelivery.EndSec > medicTeam.Shift.EndSec + overdue)
+    if (plannableIncident.InHospitalDelivery.EndSec > team.Shift.EndSec + overdue)
     {
       return false;
     }
@@ -56,31 +52,34 @@ public class MedicTeamsEvaluator
   /// Rreturns better shift out of the two based on defined conditions.
   /// If both shifts are equaly good, <paramref name="medicTeam1"/> is returned.
   /// </summary>
-  public MedicTeam GetBetter(MedicTeam medicTeam1, MedicTeam medicTeam2, in Incident incident)
+  public MedicTeamId GetBetter(MedicTeamId medicTeamId1, MedicTeamId medicTeamId2, in Incident incident)
   {
+    MedicTeamState medicTeam1State = State.TeamState(medicTeamId1);
+    MedicTeamState medicTeam2State = State.TeamState(medicTeamId2);
+
     // 1
-    bool isShift1Free = medicTeam1.IsFree(incident.OccurenceSec);
-    if (!(isShift1Free && medicTeam2.IsFree(incident.OccurenceSec)))
+    bool isShift1Free = medicTeam1State.IsFree(incident.OccurenceSec);
+    if (!(isShift1Free && medicTeam2State.IsFree(incident.OccurenceSec)))
     {
-      return isShift1Free ? medicTeam1 : medicTeam2;
+      return isShift1Free ? medicTeamId1 : medicTeamId2;
     }
 
     // 2
-    Interval shift1ToIncidentDrive = _plannableIncidentFactory.GetToIncidentDrive(incident.OccurenceSec, incident.Location, medicTeam1);
-    Interval shift2ToIncidentDrive = _plannableIncidentFactory.GetToIncidentDrive(incident.OccurenceSec, incident.Location, medicTeam2);
+    Interval shift1ToIncidentDrive = _plannableIncidentFactory.GetToIncidentDrive(incident.OccurenceSec, incident.Location, medicTeamId1);
+    Interval shift2ToIncidentDrive = _plannableIncidentFactory.GetToIncidentDrive(incident.OccurenceSec, incident.Location, medicTeamId2);
 
     if (shift1ToIncidentDrive.EndSec != shift2ToIncidentDrive.EndSec)
     {
-      return shift1ToIncidentDrive.EndSec < shift2ToIncidentDrive.EndSec ? medicTeam1 : medicTeam2;
+      return shift1ToIncidentDrive.EndSec < shift2ToIncidentDrive.EndSec ? medicTeamId1 : medicTeamId2;
     }
 
     // 3
-    if (medicTeam1.TimeActiveSec != medicTeam2.TimeActiveSec)
+    if (medicTeam1State.TimeActiveSec != medicTeam2State.TimeActiveSec)
     {
-      return medicTeam1.TimeActiveSec < medicTeam2.TimeActiveSec ? medicTeam1 : medicTeam2;
+      return medicTeam1State.TimeActiveSec < medicTeam2State.TimeActiveSec ? medicTeamId1 : medicTeamId2;
     }
 
-    return medicTeam1;
+    return medicTeamId1;
   }
 }
 

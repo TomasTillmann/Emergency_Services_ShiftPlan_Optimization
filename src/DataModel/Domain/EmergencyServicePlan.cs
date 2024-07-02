@@ -1,47 +1,77 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 
 namespace ESSP.DataModel;
 
 public class EmergencyServicePlan
 {
-  public ImmutableArray<MedicTeam> AvailableMedicTeams { get; set; }
-  public int AllocatedMedicTeamsCount { get; set; }
-
-  public ImmutableArray<Ambulance> AvailableAmbulances { get; set; }
-  public int AllocatedAmbulancesCount { get; set; }
-
   public ImmutableArray<Depot> Depots { get; init; }
 
-  /// <summary>
-  /// <returns> Total shift duration of all teams in minutes. </returns>
-  /// </summary>
-  public double GetShiftDurationsSum()
+  public MedicTeam Team(MedicTeamId teamId) => Depots[teamId.DepotIndex].MedicTeams[teamId.OnDepotIndex];
+  public Ambulance Ambulance(AmbulanceId ambId) => Depots[ambId.DepotIndex].Ambulances[ambId.OnDepotIndex];
+
+  public int AmbulancesCount { get; private set; }
+  public int MedicTeamsCount { get; private set; }
+  public int TotalShiftDuration { get; private set; }
+
+  public int Cost => TotalShiftDuration + AmbulancesCount;
+
+  public void AllocateTeam(int depotIndex, MedicTeam team)
   {
-    double sum = 0;
-
-    for (int i = 0; i < AllocatedMedicTeamsCount; ++i)
-    {
-      sum += AvailableMedicTeams[i].Shift.DurationSec / 60;
-    }
-
-    return sum;
+    Depots[depotIndex].MedicTeams.Add(team);
+    ++MedicTeamsCount;
+    TotalShiftDuration += team.Shift.DurationSec;
   }
 
-  public double GetTotalTimeActive()
+  public void DeallocateTeam(int depotIndex, int teamIndex)
   {
-    double totalTimeActive = 0;
-
-    for (int i = 0; i < AllocatedMedicTeamsCount; ++i)
-    {
-      totalTimeActive += AvailableMedicTeams[i].TimeActiveSec;
-    }
-
-    return totalTimeActive;
+    // TODO: reorganizes stuff - can it be done faster?
+    MedicTeam team = Depots[depotIndex].MedicTeams[teamIndex];
+    Depots[depotIndex].MedicTeams.RemoveAt(teamIndex);
+    --MedicTeamsCount;
+    TotalShiftDuration -= team.Shift.DurationSec;
   }
 
-  public double GetCost()
+  public void ChangeShift(int depotIndex, int teamIndex, Interval shift)
   {
-    return GetShiftDurationsSum() + AllocatedAmbulancesCount;
+    TotalShiftDuration -= Depots[depotIndex].MedicTeams[teamIndex].Shift.DurationSec;
+    TotalShiftDuration += shift.DurationSec;
+    Depots[depotIndex].MedicTeams[teamIndex].Shift = shift;
+  }
+
+  public void AllocateAmbulance(int depotIndex, Ambulance ambulance)
+  {
+    Depots[depotIndex].Ambulances.Add(ambulance);
+    ++AmbulancesCount;
+  }
+
+  public void DeallocateAmbulance(int depotIndex, int ambulanceIndex)
+  {
+    Depots[depotIndex].Ambulances.RemoveAt(ambulanceIndex);
+    --AmbulancesCount;
+  }
+
+  public IEnumerable<MedicTeam> MedicTeams()
+  {
+    for (int i = 0; i < Depots.Length; ++i)
+    {
+      for (int j = 0; j < Depots[i].MedicTeams.Count; ++j)
+      {
+        yield return Depots[i].MedicTeams[j];
+      }
+    }
+  }
+
+  public IEnumerable<Ambulance> Ambulances()
+  {
+    for (int i = 0; i < Depots.Length; ++i)
+    {
+      for (int j = 0; j < Depots[i].Ambulances.Count; ++j)
+      {
+        yield return Depots[i].Ambulances[j];
+      }
+    }
   }
 }

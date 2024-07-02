@@ -83,12 +83,12 @@ public class Visualizer : IDisposable
     writer ??= _writer;
     loss.Simulation.Info = true;
 
-    weights.MapTo(loss.Simulation.EmergencyServicePlan);
+    weights.MapTo(loss.Simulation.Plan);
     loss.Simulation.Run(incidents.AsSpan());
 
-    WriteGraph(loss.Simulation.EmergencyServicePlan, incidents, writer);
+    WriteGraph(loss.Simulation.Plan, incidents, writer);
     writer.WriteLine("ambulances:");
-    writer.WriteLine(string.Join("\n", loss.Simulation.EmergencyServicePlan.Depots.Select(depot => $"{depot.Index}: {depot.Ambulances.Count}")));
+    writer.WriteLine(string.Join("\n", loss.Simulation.Plan.Depots.Select(depot => $"{depot.Index}: {depot.Ambulances.Count}")));
     writer.WriteLine();
     writer.WriteLine("Unhandled:");
     writer.WriteLine(string.Join("\n", loss.Simulation.UnhandledIncidents.Select(index => incidents[index])));
