@@ -11,9 +11,9 @@ public class MedicTeamsEvaluator
   public SimulationState State { get; set; }
   public EmergencyServicePlan Plan { get; set; }
 
-  public MedicTeamsEvaluator(DistanceCalculator distanceCalculator, ImmutableArray<Hospital> hospitals)
+  public MedicTeamsEvaluator(World world)
   {
-    this._plannableIncidentFactory = new PlannableIncident.Factory(distanceCalculator, hospitals);
+    this._plannableIncidentFactory = new PlannableIncident.Factory(world);
   }
 
   public bool IsHandling(MedicTeamId teamId, in Incident incident)

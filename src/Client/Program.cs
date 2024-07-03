@@ -4,7 +4,6 @@
 //#define serializing
 
 using ESSP.DataModel;
-using Optimization;
 using Optimizing;
 using Simulating;
 using System.Collections.Immutable;
@@ -44,88 +43,28 @@ class Program
 #endif
 
 #if AllOptimizers_Parametrized1
-  static void Main()
+  public static void Main()
   {
-    Visualizer visualizer = new(_debug);
-
     Random random = new Random(66);
     IInputParametrization input = new Input1(random);
     World world = input.GetWorld();
     Constraints constraints = input.GetConstraints();
     ShiftTimes shiftTimes = input.GetShiftTimes();
+
     ImmutableArray<Incident> incidents = input.GetIncidents();
-    Weights startWeights = Weights.GetUniformlyRandom(world, constraints, shiftTimes, random);
 
     IOptimizer optimizer;
     Simulation simulation;
-    IObjectiveFunction loss;
-    List<IOptimizer> optimizers = new();
+    IUtilityFunction utilityFunction;
 
-    IncidentsNormalizer normalizer = new(world, shiftTimes);
-    incidents = normalizer.Normalize(incidents);
-    Console.WriteLine("incidents count: " + incidents.Length);
+    simulation = new(world, constraints);
+    utilityFunction = new WeightedSum(simulation, EmergencyServicePlan.GetMaxCost(world, shiftTimes));
+    IMoveGenerator moveGenerator = new AllBasicMovesGenerator(shiftTimes, constraints);
+    optimizer = new LocalSearchOptimizer(world, constraints, utilityFunction, moveGenerator);
 
-    simulation = new(world);
-    loss = new StandardLoss(simulation, shiftTimes);
-    // visualizer.PlotGraph(loss, startWeights, incidents, _debug);
-
-    simulation = new(world);
-    loss = new StandardLoss(simulation, shiftTimes, alpha: 0.9, beta: 0.1);
-    optimizer = new DynamicProgrammingOptimizer(world, constraints, shiftTimes, loss, random: random);
-    optimizer.StartWeights = startWeights;
-    optimizer.Debug = _debug;
-    optimizers.Add(optimizer);
-
-    optimizer = new GeneticAlgorithmOptimizer(world, constraints, shiftTimes, lossCoeff: 0.01f, populationSize: 700, populations: 80, mutationP: 0.01, random: random);
-    optimizer.StartWeights = startWeights;
-    optimizer.Debug = _debug;
-    optimizers.Add(optimizer);
-
-    simulation = new(world);
-    loss = new SuccessRateLoss(simulation, shiftTimes);
-    optimizer = new HillClimbOptimizer(world, constraints, shiftTimes, loss, iterations: 200, random: random);
-    optimizer.StartWeights = startWeights;
-    optimizer.Debug = _debug;
-    optimizers.Add(optimizer);
-
-
-    // FindMaxSuccessRateShiftPlan findMax = new(world, shiftTimes, constraints);
-    // var o = findMax.FindOptimal(incidents).First();
-    // visualizer.PlotGraph(loss, o, incidents);
-
-    simulation = new(world);
-    loss = new SuccessRateLoss(simulation, shiftTimes);
-    optimizer = new SimulatedAnnealingOptimizer(world, constraints, shiftTimes, loss, random: random);
-    optimizer.StartWeights = startWeights;
-    optimizer.Debug = _debug;
-    optimizers.Add(optimizer);
-
-
-    simulation = new(world);
-    loss = new StandardLoss(simulation, shiftTimes);
-    optimizer = new RandomWalkOptimizer(world, constraints, shiftTimes, loss, iterations: 10_000, random: random);
-    optimizer.Debug = _debug;
-    optimizers.Add(optimizer);
-
-    simulation = new(world);
-    loss = new StandardLoss(simulation, shiftTimes);
-    optimizer = new TabuSearchOptimizer(world, constraints, shiftTimes, loss, tabuSize: 300, iterations: 200, random: random);
-    optimizer.StartWeights = startWeights;
-    optimizer.Debug = _debug;
-    optimizers.Add(optimizer);
-
-    foreach (IOptimizer opt in optimizers)
-    {
-      _debug.WriteLine($"{opt.GetType().Name}: ");
-      Stopwatch sw = Stopwatch.StartNew();
-      var optimals = opt.FindOptimal(incidents).ToList();
-      _debug.WriteLine("Elapsed: " + sw.Elapsed);
-      optimals.ForEach(optimal => visualizer.PlotGraph(loss, optimal, incidents));
-      break;
-    }
-
-    visualizer.Dispose();
-    _debug.Dispose();
+    Stopwatch sw = Stopwatch.StartNew();
+    var optimals = optimizer.GetBest(incidents.AsSpan()).ToList();
+    _debug.WriteLine("Elapsed: " + sw.Elapsed);
   }
 #endif
 

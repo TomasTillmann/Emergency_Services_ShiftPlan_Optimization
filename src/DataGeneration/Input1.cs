@@ -1,4 +1,7 @@
+using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 using ESSP.DataModel;
 
 public class Input1 : IInputParametrization
@@ -7,6 +10,7 @@ public class Input1 : IInputParametrization
   private readonly DataModelGenerator _dataGenerator = new();
   private const int avaialbeMedicTeamsCount = 25;
   private const int availableAmbulancesCount = 90;
+  private const int depotsCount = 10;
 
   public Input1(Random random = null)
   {
@@ -17,11 +21,8 @@ public class Input1 : IInputParametrization
   {
     return new Constraints
     {
-      AvailableMedicTeamsCount = avaialbeMedicTeamsCount,
-      AvailableAmbulancesCount = availableAmbulancesCount,
-      MaxMedicTeamsOnDepotCount = 10,
-      MaxAmbulancesOnDepotCount = 30,
-      MinAmbulancesOnDepotCount = 0
+      MaxTeamsPerDepotCount = Enumerable.Repeat(30, depotsCount).ToImmutableArray(),
+      MaxAmbulancesPerDepotCount = Enumerable.Repeat(20, depotsCount).ToImmutableArray(),
     };
   }
 
@@ -30,11 +31,10 @@ public class Input1 : IInputParametrization
     // World init
     World world = WorldMapper.MapBack(_dataGenerator.GenerateWorldModel(
       worldSize: new CoordinateModel { XMet = 50_000, YMet = 50_000 },
-      depotsCount: 8,
+      depotsCount: depotsCount,
       hospitalsCount: 20,
       availableMedicTeamsCount: avaialbeMedicTeamsCount,
       availableAmbulancesCount: availableAmbulancesCount,
-      goldenTimeSec: 200.ToMinutes().ToSeconds().Value,
       random: _random
     ));
 

@@ -5,7 +5,7 @@ namespace ESSP.DataModel;
 public class MedicTeamState
 {
   public int TimeActiveSec { get; set; }
-  public PlannableIncident LastPlannedIncident { get; set; } = PlannableIncident.Factory.Empty;
+  public PlannableIncident LastPlannedIncident { get; set; } = PlannableIncident.Factory.GetNewEmpty;
 
   /// <summary>
   /// Returns true if shift is free in current time and false if not.
@@ -24,7 +24,7 @@ public class MedicTeamState
   public void Clear()
   {
     TimeActiveSec = 0;
-    LastPlannedIncident = Plann
+    LastPlannedIncident.FillFrom(PlannableIncident.Factory.Empty);
   }
 }
 

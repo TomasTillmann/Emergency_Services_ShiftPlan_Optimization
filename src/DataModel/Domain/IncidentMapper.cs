@@ -14,6 +14,7 @@ public static class IncidentMapper
       OccurenceSec = incident.OccurenceSec,
       OnSceneDurationSec = incident.OnSceneDurationSec,
       InHospitalDeliverySec = incident.InHospitalDeliverySec,
+      GoldTimeSec = incident.GoldTimeSec
     };
   }
 
@@ -25,6 +26,7 @@ public static class IncidentMapper
       OccurenceSec = model.OccurenceSec,
       OnSceneDurationSec = model.OnSceneDurationSec,
       InHospitalDeliverySec = model.InHospitalDeliverySec,
+      GoldTimeSec = model.GoldTimeSec
     };
   }
 }

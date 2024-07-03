@@ -19,7 +19,6 @@ public static class WorldMapper
       Hospitals = world.Hospitals.Select(hospital => _hospitalMapper.Map(hospital)).ToList(),
       AvailableMedicTeams = world.AvailableMedicTeams.ToList(),
       AvailableAmbulances = world.AvailableAmbulances.ToList(),
-      GoldenTimeSec = world.GoldenTimeSec
     };
   }
 
@@ -33,7 +32,6 @@ public static class WorldMapper
       DistanceCalculator = new DistanceCalculator(hospitals.ToArray()),
       AvailableMedicTeams = model.AvailableMedicTeams.ToImmutableArray(),
       AvailableAmbulances = model.AvailableAmbulances.ToImmutableArray(),
-      GoldenTimeSec = model.GoldenTimeSec
     };
   }
 }

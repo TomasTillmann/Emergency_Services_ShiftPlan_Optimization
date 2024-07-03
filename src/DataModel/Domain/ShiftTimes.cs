@@ -15,6 +15,7 @@ public class ShiftTimes
   public int[] AllowedStartingTimesSecSorted { get; init; }
 
   private readonly HashSet<int> _allowedStartingTimesSec;
+  
   public HashSet<int> AllowedShiftStartingTimesSec
   {
     get
@@ -58,5 +59,29 @@ public class ShiftTimes
     random ??= new Random();
     int index = random.Next(-1, AllowedShiftDurationsSec.Count());
     return index == -1 ? 0 : AllowedDurationsSecSorted.ElementAt(index);
+  }
+
+  public int GetLonger(int durationSec)
+  {
+    int index = Array.BinarySearch(AllowedDurationsSecSorted, durationSec);
+    return AllowedDurationsSecSorted[index + 1];
+  }
+
+  public int GetShorter(int durationSec)
+  {
+    int index = Array.BinarySearch(AllowedDurationsSecSorted, durationSec);
+    return AllowedDurationsSecSorted[index - 1];
+  }
+
+  public int GetLater(int startTime)
+  {
+    int index = Array.BinarySearch(AllowedStartingTimesSecSorted, startTime);
+    return AllowedStartingTimesSecSorted[index + 1];
+  }
+
+  public int GetEarlier(int startTime)
+  {
+    int index = Array.BinarySearch(AllowedStartingTimesSecSorted, startTime);
+    return AllowedStartingTimesSecSorted[index - 1];
   }
 }

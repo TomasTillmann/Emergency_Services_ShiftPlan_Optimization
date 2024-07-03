@@ -12,8 +12,6 @@ public class DepotMapper
     return new DepotModel
     {
       Location = _coordinateMapper.Map(depot.Location),
-      Ambulances = depot.Ambulances.Select(amb => _ambulanceMapper.Map(amb)).ToList(),
-      Index = depot.Index,
     };
   }
 
@@ -22,8 +20,6 @@ public class DepotMapper
     return new Depot
     {
       Location = _coordinateMapper.MapBack(model.Location),
-      Ambulances = model.Ambulances.Select(amb => _ambulanceMapper.MapBack(amb)).ToList(),
-      Index = model.Index,
     };
   }
 }

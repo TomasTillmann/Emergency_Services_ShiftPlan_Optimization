@@ -17,14 +17,14 @@ public sealed class Simulation
   /// </summary>
   public int TotalIncidentsCount { get; private set; }
 
-  public int NotHandledIncidentsCount { get; private set; }
+  public int UnhandledIncidentsCount { get; private set; }
 
-  public int HandledIncidentsCount => TotalIncidentsCount - NotHandledIncidentsCount;
+  public int HandledIncidentsCount => TotalIncidentsCount - UnhandledIncidentsCount;
 
   /// <summary>
   /// Success rate of last run simulation.
   /// </summary>
-  public double SuccessRate => (TotalIncidentsCount - NotHandledIncidentsCount) / (double)TotalIncidentsCount;
+  public double SuccessRate => (TotalIncidentsCount - UnhandledIncidentsCount) / (double)TotalIncidentsCount;
 
   #endregion
 
@@ -33,12 +33,12 @@ public sealed class Simulation
   private readonly MedicTeamsEvaluator _medicTeamsEvaluator;
   private readonly PlannableIncident.Factory _plannableIncidentFactory;
 
-  public Simulation(World world, Constraints constraints, bool info = false)
+  public Simulation(World world, Constraints constraints)
   {
     State = new SimulationState(world.Depots.Length, constraints);
 
-    _plannableIncidentFactory = new PlannableIncident.Factory(world.DistanceCalculator, world.Hospitals);
-    _medicTeamsEvaluator = new MedicTeamsEvaluator(world.DistanceCalculator, world.Hospitals);
+    _plannableIncidentFactory = new PlannableIncident.Factory(world);
+    _medicTeamsEvaluator = new MedicTeamsEvaluator(world);
   }
 
   /// <summary>
@@ -63,9 +63,9 @@ public sealed class Simulation
       // Find handling medic team. 
       int depotIndex = 0;
       int teamIndex = 0;
-      for (; depotIndex < Plan.Depots.Length; ++depotIndex)
+      for (; depotIndex < Plan.Assignments.Length; ++depotIndex)
       {
-        for (; teamIndex < Plan.Depots[depotIndex].MedicTeams.Count; ++teamIndex)
+        for (; teamIndex < Plan.Assignments[depotIndex].MedicTeams.Count; ++teamIndex)
         {
           if (_medicTeamsEvaluator.IsHandling(new MedicTeamId(teamIndex, depotIndex), in currentIncident))
           {
@@ -78,13 +78,13 @@ public sealed class Simulation
       // No handling medic team exists. 
       if (bestMedicTeam.DepotIndex == -1 && bestMedicTeam.OnDepotIndex == -1)
       {
-        NotHandledIncidentsCount++;
+        UnhandledIncidentsCount++;
         continue;
       }
 
-      for (; depotIndex < Plan.Depots.Length; ++depotIndex)
+      for (; depotIndex < Plan.Assignments.Length; ++depotIndex)
       {
-        for (teamIndex = teamIndex + 1; teamIndex < Plan.Depots[depotIndex].MedicTeams.Count; ++teamIndex)
+        for (teamIndex = teamIndex + 1; teamIndex < Plan.Assignments[depotIndex].MedicTeams.Count; ++teamIndex)
         {
           if (_medicTeamsEvaluator.IsHandling(new MedicTeamId(teamIndex, depotIndex), in currentIncident))
           {
@@ -118,6 +118,6 @@ public sealed class Simulation
 
   private void ResetStats()
   {
-    NotHandledIncidentsCount = 0;
+    UnhandledIncidentsCount = 0;
   }
 }

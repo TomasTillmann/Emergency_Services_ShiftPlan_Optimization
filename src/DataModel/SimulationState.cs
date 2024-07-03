@@ -43,14 +43,14 @@ public class SimulationState
   /// </summary>
   public void Clear(EmergencyServicePlan plan)
   {
-    for (int i = 0; i < plan.Depots.Length; ++i)
+    for (int i = 0; i < plan.Assignments.Length; ++i)
     {
-      for (int j = 0; j < plan.Depots[i].MedicTeams.Count; ++j)
+      for (int j = 0; j < plan.Assignments[i].MedicTeams.Count; ++j)
       {
         _teamStates[i][j].Clear();
       }
 
-      for (int j = 0; j < plan.Depots[i].Ambulances.Count; ++j)
+      for (int j = 0; j < plan.Assignments[i].Ambulances.Count; ++j)
       {
         _ambulanceStates[i][j].Clear();
       }

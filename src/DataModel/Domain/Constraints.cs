@@ -1,7 +1,9 @@
+using System.Collections.Immutable;
+
 namespace ESSP.DataModel;
 
 public class Constraints
 {
-  public int[] MaxTeamsPerDepotCount { get; }
-  public int[] MaxAmbulancesPerDepotCount { get; }
+  public ImmutableArray<int> MaxTeamsPerDepotCount { get; init; }
+  public ImmutableArray<int> MaxAmbulancesPerDepotCount { get; init; }
 }

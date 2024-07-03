@@ -1,20 +1,19 @@
-﻿namespace Optimizing;
+using ESSP.DataModel;
+
+namespace Optimizing;
 
 public readonly struct Move
 {
+  public static Move Identity = new Move { Type = MoveType.Identity };
+
+  public MoveType Type { get; init; }
+  public Interval Shift { get; init; }
   public int DepotIndex { get; init; }
   public int OnDepotIndex { get; init; }
-  public MoveType MoveType { get; init; }
-
-  public static Move Identity = new Move { OnDepotIndex = -1 /* The specific index doesn't matter. */ , MoveType = MoveType.NoMove };
-
-  public static bool operator !=(in Move a, in Move b) => !(a == b);
-
-  public static bool operator ==(in Move a, in Move b) =>
-    a.DepotIndex == b.DepotIndex && a.OnDepotIndex == b.OnDepotIndex && a.MoveType == b.MoveType;
 
   public override string ToString()
   {
-    return $"({MoveType}, {DepotIndex}, {OnDepotIndex})";
+    return $"({Type}, {Shift}, {DepotIndex}, {OnDepotIndex})";
   }
 }
+

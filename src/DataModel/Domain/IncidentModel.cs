@@ -10,6 +10,7 @@ public record IncidentModel
   public int OccurenceSec { get; set; }
   public int OnSceneDurationSec { get; set; }
   public int InHospitalDeliverySec { get; set; }
+  public int GoldTimeSec { get; set; }
 }
 
 

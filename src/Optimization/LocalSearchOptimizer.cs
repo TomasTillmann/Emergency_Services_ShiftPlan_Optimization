@@ -1,118 +1,54 @@
+
 using ESSP.DataModel;
+using Optimizng;
 
 namespace Optimizing;
 
-public abstract class LocalSearchOptimizer : MoveOptimizer
+public class LocalSearchOptimizer : NeighbourOptimizer
 {
-  public int NeighboursLimit { get; set; }
-  public bool ShouldPermutate { get; set; }
+  public EmergencyServicePlan StartPlan { get; set; }
 
-  public LocalSearchOptimizer(World world, Constraints constraints, ShiftTimes shiftTimes, IObjectiveFunction loss, bool shouldPermutate = true, int neighboursLimit = int.MaxValue, Random? random = null)
-  : base(world, constraints, shiftTimes, loss, random)
+  public LocalSearchOptimizer(World world, Constraints constraints, IUtilityFunction utilityFunction, IMoveGenerator moveGenerator)
+  : base(world, constraints, utilityFunction, moveGenerator)
   {
-    NeighboursLimit = neighboursLimit;
-    ShouldPermutate = shouldPermutate;
+    StartPlan = EmergencyServicePlan.GetNewEmpty(world);
   }
 
-  /// <summary>
-  /// Generates neighbouring moves in <see cref="NeighboursLimit"/> limit in randomly permutated order.
-  /// Returns length of generated moves in <see cref="movesBuffer"/>.
-  /// </summary>
-  public void GetMovesToNeighbours(Weights weights)
+  public override List<EmergencyServicePlan> GetBest(ReadOnlySpan<Incident> incidents)
   {
-    Span<int> permutatedDepots = stackalloc int[World.Depots.Length];
-    for (int i = 0; i < permutatedDepots.Length; ++i)
-    {
-      permutatedDepots[i] = i;
-    }
+    EmergencyServicePlan currentPlan = EmergencyServicePlan.GetNewEmpty(World);
+    currentPlan.FillFrom(StartPlan);
 
-    Span<int> permutatedShiftsOnDepot = stackalloc int[Constraints.MaxMedicTeamsOnDepotCount];
-    for (int i = 0; i < permutatedShiftsOnDepot.Length; ++i)
+    MoveSequence bestMove = MoveSequence.GetNewEmpty(1);
+    while (true)
     {
-      permutatedShiftsOnDepot[i] = i;
-    }
+      bestMove.Count = 0;
+      double bestEval = UtilityFunction.Get(currentPlan, incidents);
 
-    if (ShouldPermutate)
-    {
-      Permutate(toPermutate: permutatedDepots);
-      Permutate(toPermutate: permutatedShiftsOnDepot);
-    }
-
-    movesBuffer.Clear();
-    int shiftChangesNeighboursCount = 0;
-    int allocationNeighboursCount = 0;
-    Move? move;
-
-    for (int depotIndex = 0; shiftChangesNeighboursCount < NeighboursLimit && depotIndex < World.Depots.Length; ++depotIndex)
-    {
-      for (int shiftOnDepotIndex = 0; shiftOnDepotIndex < Constraints.MaxMedicTeamsOnDepotCount && shiftChangesNeighboursCount < NeighboursLimit; ++shiftOnDepotIndex)
+      foreach (MoveSequenceDuo moves in MoveGenerator.GetMoves(currentPlan))
       {
-        if (TryGenerateMove(weights, permutatedDepots[depotIndex], permutatedShiftsOnDepot[shiftOnDepotIndex], MoveType.ShiftShorter, out move))
+        ModifyMakeMove(currentPlan, moves.Normal);
+
+        double neighbourEval = UtilityFunction.Get(currentPlan, incidents);
+        if (neighbourEval >= bestEval)
         {
-          movesBuffer.Add(move.Value);
-          shiftChangesNeighboursCount++;
+          bestMove.FillFrom(moves.Normal);
+          bestEval = neighbourEval;
         }
 
-        if (TryGenerateMove(weights, permutatedDepots[depotIndex], permutatedShiftsOnDepot[shiftOnDepotIndex], MoveType.ShiftLonger, out move))
-        {
-          movesBuffer.Add(move.Value);
-          shiftChangesNeighboursCount++;
-        }
-
-        if (TryGenerateMove(weights, permutatedDepots[depotIndex], permutatedShiftsOnDepot[shiftOnDepotIndex], MoveType.ShiftEarlier, out move))
-        {
-          movesBuffer.Add(move.Value);
-          shiftChangesNeighboursCount++;
-        }
-
-        if (TryGenerateMove(weights, permutatedDepots[depotIndex], permutatedShiftsOnDepot[shiftOnDepotIndex], MoveType.ShiftLater, out move))
-        {
-          movesBuffer.Add(move.Value);
-          shiftChangesNeighboursCount++;
-        }
-
-        if (TryGenerateMove(weights, permutatedDepots[depotIndex], permutatedShiftsOnDepot[shiftOnDepotIndex], MoveType.AllocateMedicTeam, out move))
-        {
-          movesBuffer.Add(move.Value);
-          shiftChangesNeighboursCount++;
-        }
-
-        if (TryGenerateMove(weights, permutatedDepots[depotIndex], permutatedShiftsOnDepot[shiftOnDepotIndex], MoveType.DeallocateMedicTeam, out move))
-        {
-          movesBuffer.Add(move.Value);
-          shiftChangesNeighboursCount++;
-        }
+        ModifyMakeInverseMove(currentPlan, moves.Inverse);
       }
 
-      if (TryGenerateMove(weights, permutatedDepots[depotIndex], -1, MoveType.AllocateAmbulance, out move))
+      // plateu
+      if (bestMove.Count == 0)
       {
-        movesBuffer.Add(move.Value);
-        allocationNeighboursCount++;
+        return new List<EmergencyServicePlan>()
+        {
+          currentPlan
+        };
       }
 
-      if (TryGenerateMove(weights, permutatedDepots[depotIndex], -1, MoveType.DeallocateAmbulance, out move))
-      {
-        movesBuffer.Add(move.Value);
-        allocationNeighboursCount++;
-      }
-    }
-
-    //Debug.WriteLine("moves: " + string.Join(", ", movesBuffer));
-    //Console.WriteLine($"Neighbours: {movesBuffer.Count}");
-  }
-
-  /// <summary>
-  /// Fisher-Yates permutation algorithm with limit when to end the permutation.
-  /// </summary>
-  private void Permutate(Span<int> toPermutate)
-  {
-    for (int i = 0; i < toPermutate.Length; ++i)
-    {
-      int nextSwap = _random.Next(i, toPermutate.Length);
-
-      int temp = toPermutate[i];
-      toPermutate[i] = toPermutate[nextSwap];
-      toPermutate[nextSwap] = temp;
+      ModifyMakeMove(currentPlan, bestMove);
     }
   }
 }

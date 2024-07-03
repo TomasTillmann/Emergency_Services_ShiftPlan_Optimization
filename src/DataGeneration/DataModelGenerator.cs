@@ -13,7 +13,6 @@ public class DataModelGenerator
       int hospitalsCount,
       int availableMedicTeamsCount,
       int availableAmbulancesCount,
-      int goldenTimeSec,
       Random random = null
   )
   {
@@ -41,8 +40,6 @@ public class DataModelGenerator
       DepotModel depot = new DepotModel()
       {
         Location = randomLoc,
-        Ambulances = new List<AmbulanceModel>(),
-        Index = i,
       };
 
       worldModel.Depots.Add(depot);
@@ -64,10 +61,6 @@ public class DataModelGenerator
         Location = randomLoc
       });
     }
-    //
-
-    // golden time
-    worldModel.GoldenTimeSec = goldenTimeSec;
     //
 
     return worldModel;
@@ -103,6 +96,7 @@ public class DataModelGenerator
         OccurenceSec = random.Next(duration.Value),
         OnSceneDurationSec = Math.Min(Math.Max(10.ToMinutes().ToSeconds().Value, (int)onSceneDurationDistribution.Sample()), 30.ToMinutes().ToSeconds().Value),
         InHospitalDeliverySec = Math.Min(Math.Max(10.ToMinutes().ToSeconds().Value, (int)inHospitalDeliveryDistribution.Sample()), 30.ToMinutes().ToSeconds().Value),
+        GoldTimeSec = 20.ToMinutes().ToSeconds().Value
       };
 
       incidents.Add(incident);
