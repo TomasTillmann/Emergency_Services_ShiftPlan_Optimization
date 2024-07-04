@@ -1,15 +1,14 @@
 
 using ESSP.DataModel;
-using Optimizng;
 
 namespace Optimizing;
 
 public class LocalSearchOptimizer : NeighbourOptimizer
 {
   public EmergencyServicePlan StartPlan { get; set; }
-  
+
   public int PlateuIteration { get; private set; }
-  
+
   public int MaxIterations { get; set; }
 
   public LocalSearchOptimizer(int maxIterations, World world, Constraints constraints, IUtilityFunction utilityFunction, IMoveGenerator moveGenerator)

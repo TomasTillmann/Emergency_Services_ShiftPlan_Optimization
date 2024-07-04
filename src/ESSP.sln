@@ -19,7 +19,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Optimization", "Optimizatio
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Simulating", "Simulating\Simulating.csproj", "{FBD93F92-2658-469A-8B60-2C2680F3A4AC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MoveGenerationTest", "MoveGenerationTest\MoveGenerationTest.csproj", "{8101F4F3-8F99-4E5B-89CE-A0E692D34EF8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{8101F4F3-8F99-4E5B-89CE-A0E692D34EF8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
