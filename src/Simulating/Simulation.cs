@@ -6,8 +6,8 @@ namespace Simulating;
 
 public sealed class Simulation
 {
-  private SimulationState _state;
-  public SimulationState State
+  private ISimulationState _state;
+  public ISimulationState State
   {
     get => _state;
     set
@@ -62,7 +62,6 @@ public sealed class Simulation
     PlannableIncident plannableIncidentForBestShift;
     Incident currentIncident;
     MedicTeamId bestMedicTeam;
-    MedicTeam medicTeam;
 
     for (int i = 0; i < TotalIncidentsCount; ++i)
     {
@@ -88,6 +87,7 @@ public sealed class Simulation
       if (bestMedicTeam.DepotIndex == -1 && bestMedicTeam.OnDepotIndex == -1)
       {
         UnhandledIncidentsCount++;
+        UnhandledIncidents.Add(i);
         continue;
       }
 
@@ -127,6 +127,7 @@ public sealed class Simulation
 
   private void ResetStats()
   {
+    UnhandledIncidents.Clear();
     UnhandledIncidentsCount = 0;
   }
 }

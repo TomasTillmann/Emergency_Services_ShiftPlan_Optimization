@@ -5,15 +5,15 @@ namespace Optimizing;
 
 public abstract class UtilityFunctionBase : IUtilityFunction
 {
-  protected int HandledIncidentsCount => _simulation.HandledIncidentsCount;
-  protected int UnhandledIncidentsCount => _simulation.UnhandledIncidentsCount;
-  protected int TotalIncidentsCount => _simulation.TotalIncidentsCount;
-  protected int PlanCost { get; private set; }
+  public int HandledIncidentsCount => _simulation.HandledIncidentsCount;
+  public int UnhandledIncidentsCount => _simulation.UnhandledIncidentsCount;
+  public int TotalIncidentsCount => _simulation.TotalIncidentsCount;
+  public int PlanCost { get; private set; }
 
-  protected double HandledIncidentsCountScaled => HandledIncidentsCount / (double)TotalIncidentsCount;
-  protected double PlanCostScaled => PlanCost / _maxPlanCost;
+  public double HandledIncidentsCountScaled => HandledIncidentsCount / (double)TotalIncidentsCount;
+  public double PlanCostScaled => PlanCost / _maxPlanCost;
+  
   private readonly double _maxPlanCost;
-
   private readonly Simulation _simulation;
 
   public UtilityFunctionBase(Simulation simulation, double maxPlanCost)
@@ -22,7 +22,7 @@ public abstract class UtilityFunctionBase : IUtilityFunction
     _maxPlanCost = maxPlanCost;
   }
 
-  public virtual double Get(EmergencyServicePlan plan, ReadOnlySpan<Incident> incidents)
+  public virtual double Evaluate(EmergencyServicePlan plan, ReadOnlySpan<Incident> incidents)
   {
     PlanCost = plan.Cost;
     _simulation.Run(plan, incidents);

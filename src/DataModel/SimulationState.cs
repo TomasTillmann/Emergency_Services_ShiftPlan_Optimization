@@ -1,6 +1,6 @@
 namespace ESSP.DataModel;
 
-public class SimulationState
+public class SimulationState : ISimulationState
 {
   private readonly MedicTeamState[][] _teamStates;
   private readonly AmbulanceState[][] _ambulanceStates;
@@ -31,7 +31,7 @@ public class SimulationState
     }
   }
 
-  public void PlanIncident(MedicTeamId teamId, PlannableIncident incident)
+  public virtual void PlanIncident(MedicTeamId teamId, PlannableIncident incident)
   {
     _teamStates[teamId.DepotIndex][teamId.OnDepotIndex].LastPlannedIncident.FillFrom(incident);
     _ambulanceStates[teamId.DepotIndex][incident.AmbulanceIndex].WhenFreeSec = incident.ToDepotDrive.EndSec;

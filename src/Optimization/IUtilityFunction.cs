@@ -5,5 +5,11 @@ namespace Optimizing;
 
 public interface IUtilityFunction
 {
-  double Get(EmergencyServicePlan plan, ReadOnlySpan<Incident> incidents);
+  int HandledIncidentsCount { get; } 
+  int UnhandledIncidentsCount { get; }
+  int TotalIncidentsCount { get; }
+  int PlanCost { get; }
+  double HandledIncidentsCountScaled { get; } 
+  double PlanCostScaled { get; }
+  double Evaluate(EmergencyServicePlan plan, ReadOnlySpan<Incident> incidents);
 }

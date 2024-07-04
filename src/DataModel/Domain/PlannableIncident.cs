@@ -47,7 +47,7 @@ public partial class PlannableIncident
 
   public override string ToString()
   {
-    return $"({Incident.OccurenceSec}), {ToIncidentDrive}, {OnSceneDuration}, {ToHospitalDrive}, {InHospitalDelivery}, {ToDepotDrive}";
+    return $"({Incident.OccurenceSec}), {ToIncidentDrive}, {ToHospitalDrive}, {ToDepotDrive}";
   }
 }
 
@@ -57,7 +57,7 @@ public partial class PlannableIncident
   public class Factory
   {
     public PlannableIncident WorkingInstance { get; }
-    public SimulationState State { get; set; }
+    public ISimulationState State { get; set; }
     public EmergencyServicePlan Plan { get; set; }
 
     private readonly DistanceCalculator _distanceCalculator;

@@ -8,9 +8,9 @@ public class Input1 : IInputParametrization
 {
   private readonly Random _random;
   private readonly DataModelGenerator _dataGenerator = new();
-  private const int avaialbeMedicTeamsCount = 25;
-  private const int availableAmbulancesCount = 90;
-  private const int depotsCount = 10;
+  private const int avaialbeMedicTeamsCount = 20;
+  private const int availableAmbulancesCount = 20;
+  private const int depotsCount = 20;
 
   public Input1(Random random = null)
   {
@@ -46,8 +46,8 @@ public class Input1 : IInputParametrization
     // Incidents init
     ImmutableArray<Incident> incidents = _dataGenerator.GenerateIncidentModels(
       worldSize: new CoordinateModel { XMet = 50_000, YMet = 50_000 },
-      incidentsCount: 10,
-      duration: 24.ToHours().ToSeconds(),
+      incidentsCount: 40,
+      duration: 21.ToHours().ToSeconds(),
       onSceneDurationNormalExpected: 20.ToMinutes().ToSeconds(),
       onSceneDurationNormalStddev: 10.ToMinutes().ToSeconds(),
       inHospitalDeliveryNormalExpected: 15.ToMinutes().ToSeconds(),

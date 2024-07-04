@@ -8,9 +8,9 @@ public class MedicTeamsEvaluator
 {
   private readonly PlannableIncident.Factory _plannableIncidentFactory;
 
-  private SimulationState _state;
+  private ISimulationState _state;
 
-  public SimulationState State
+  public ISimulationState State
   {
     get => _state;
     set

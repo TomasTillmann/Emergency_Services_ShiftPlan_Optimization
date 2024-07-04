@@ -96,7 +96,7 @@ public class DataModelGenerator
         OccurenceSec = random.Next(duration.Value),
         OnSceneDurationSec = Math.Min(Math.Max(10.ToMinutes().ToSeconds().Value, (int)onSceneDurationDistribution.Sample()), 30.ToMinutes().ToSeconds().Value),
         InHospitalDeliverySec = Math.Min(Math.Max(10.ToMinutes().ToSeconds().Value, (int)inHospitalDeliveryDistribution.Sample()), 30.ToMinutes().ToSeconds().Value),
-        GoldTimeSec = 20.ToMinutes().ToSeconds().Value
+        GoldTimeSec = 40.ToMinutes().ToSeconds().Value
       };
 
       incidents.Add(incident);
