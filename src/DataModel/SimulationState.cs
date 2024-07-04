@@ -11,20 +11,20 @@ public class SimulationState
   public SimulationState(int availableDepotsCount, Constraints constraints)
   {
     _teamStates = new MedicTeamState[availableDepotsCount][];
-    for (int i = 0; i < _teamStates.GetLength(0); ++i)
+    for (int i = 0; i < availableDepotsCount; ++i)
     {
       _teamStates[i] = new MedicTeamState[constraints.MaxTeamsPerDepotCount[i]];
-      for (int j = 0; j < _teamStates.GetLength(1); ++j)
+      for (int j = 0; j < constraints.MaxTeamsPerDepotCount[i]; ++j)
       {
         _teamStates[i][j] = new MedicTeamState();
       }
     }
 
     _ambulanceStates = new AmbulanceState[availableDepotsCount][];
-    for (int i = 0; i < _ambulanceStates.GetLength(0); ++i)
+    for (int i = 0; i < availableDepotsCount; ++i)
     {
       _ambulanceStates[i] = new AmbulanceState[constraints.MaxAmbulancesPerDepotCount[i]];
-      for (int j = 0; j < _ambulanceStates.GetLength(1); ++j)
+      for (int j = 0; j < constraints.MaxAmbulancesPerDepotCount[i]; ++j)
       {
         _ambulanceStates[i][j] = new AmbulanceState();
       }

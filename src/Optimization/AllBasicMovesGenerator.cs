@@ -5,9 +5,8 @@ namespace Optimizing;
 public class AllBasicMovesGenerator : MoveGeneratorBase
 {
   public AllBasicMovesGenerator(ShiftTimes shiftTimes, Constraints constraints)
-  : base(shiftTimes, constraints, 1)
+  : base(shiftTimes, constraints, 2)
   {
-    Moves.Count = 1;
   }
 
   public override IEnumerable<MoveSequenceDuo> GetMoves(EmergencyServicePlan plan)
@@ -44,6 +43,7 @@ public class AllBasicMovesGenerator : MoveGeneratorBase
   private IEnumerable<MoveSequenceDuo> GetShiftChanges(EmergencyServicePlan plan, MedicTeamId teamId)
   {
     Interval shift = plan.Team(teamId).Shift;
+    Moves.Count = 1;
 
     if (plan.CanLonger(teamId, ShiftTimes))
     {
@@ -132,13 +132,27 @@ public class AllBasicMovesGenerator : MoveGeneratorBase
 
   private IEnumerable<MoveSequenceDuo> GetTeamAllocations(EmergencyServicePlan plan, int depotIndex)
   {
+    Moves.Count = 2;
     if (plan.CanAllocateTeam(depotIndex, Constraints))
     {
+      Moves.Count = 2;
       Moves.Inverse.MovesBuffer[0] = new Move
       {
         Type = MoveType.TeamDeallocation,
         DepotIndex = depotIndex,
         OnDepotIndex = plan.Assignments[depotIndex].MedicTeams.Count
+      };
+      
+      Moves.Inverse.MovesBuffer[1] = new Move
+      {
+        Type = MoveType.AmbulanceDeallocation,
+        DepotIndex = depotIndex,
+      };
+      
+      Moves.Normal.MovesBuffer[1] = new Move
+      {
+        Type = MoveType.AmbulanceAllocation,
+        DepotIndex = depotIndex,
       };
 
       for (int i = 0; i < ShiftTimes.AllowedStartingTimesSecSorted.Length; ++i)
@@ -157,6 +171,7 @@ public class AllBasicMovesGenerator : MoveGeneratorBase
 
   private IEnumerable<MoveSequenceDuo> GetTeamDeallocations(EmergencyServicePlan plan, MedicTeamId teamId)
   {
+    Moves.Count = 1;
     if (plan.CanDeallocateTeam(teamId, ShiftTimes))
     {
       Moves.Inverse.MovesBuffer[0] = new Move
@@ -179,6 +194,7 @@ public class AllBasicMovesGenerator : MoveGeneratorBase
 
   private IEnumerable<MoveSequenceDuo> GetAmbMoves(EmergencyServicePlan plan, int depotIndex)
   {
+    Moves.Count = 1;
     if (plan.CanAllocateAmbulance(depotIndex, Constraints))
     {
       Moves.Inverse.MovesBuffer[0] = new Move

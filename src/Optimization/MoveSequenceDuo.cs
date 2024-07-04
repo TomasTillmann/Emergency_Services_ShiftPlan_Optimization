@@ -2,7 +2,18 @@ namespace Optimizing;
 
 public class MoveSequenceDuo
 {
-  public int Count { get; set; }
+  private int _count;
+
+  public int Count
+  {
+    get => _count;
+    set
+    {
+      _count = value;
+      Normal.Count = value;
+      Inverse.Count = value;
+    }
+  }
   public MoveSequence Normal { get; set; }
   public MoveSequence Inverse { get; set; }
 

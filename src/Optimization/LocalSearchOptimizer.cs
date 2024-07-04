@@ -19,7 +19,7 @@ public class LocalSearchOptimizer : NeighbourOptimizer
     EmergencyServicePlan currentPlan = EmergencyServicePlan.GetNewEmpty(World);
     currentPlan.FillFrom(StartPlan);
 
-    MoveSequence bestMove = MoveSequence.GetNewEmpty(1);
+    MoveSequence bestMove = MoveSequence.GetNewEmpty(MoveGenerator.MovesBufferSize);
     while (true)
     {
       bestMove.Count = 0;

@@ -9,6 +9,11 @@ namespace MoveGenerationTest;
 
 public static class BasicMovesGeneratorHelperExtensions
 {
+    /// <summary>
+    /// </summary>
+    /// <param name="moves">If produced by <see cref="MoveGeneratorBase"/>, the instance is shared, due to performance reasons.
+    /// For correct enumeration, calling e.g. ToList() is not sufficient. You need to copy the shred instance for every one enumeration.</param>
+    /// <returns></returns>
     public static List<MoveSequenceDuo> Enumerate(this IEnumerable<MoveSequenceDuo> moves)
     {
         return moves
@@ -38,35 +43,41 @@ public class AllBasicMovesGeneratorTest
         
         AllBasicMovesGenerator moveGenerator = new(shiftTimes, constraints);
         List<MoveSequenceDuo> moves = moveGenerator.GetMoves(plan).Enumerate();
-        //File.WriteAllText("FromEmptyTeamAllocationsTestExpected.json",
-         //               JsonSerializer.Serialize(moves, new JsonSerializerOptions { WriteIndented = true }));
          var expected = JsonSerializer.Deserialize<List<MoveSequenceDuo>>(File.ReadAllText("FromEmptyTeamAllocationsTestExpected.json"));
          moves.Should().BeEquivalentTo(expected);
     }
     
     [Fact]
-    public void FromRandom1()
+    public void FromRandom1Percentage_100()
     {
         Random random = new Random(66);
         var input = new MoveGeneratorTestInput(random);
         World world = input.GetWorld();
         Constraints constraints = input.GetConstraints();
         ShiftTimes shiftTimes = input.GetShiftTimes();
-        EmergencyServicePlan plan = EmergencyServicePlan.GetNewEmpty(world);
-        
+        IPlanSampler sampler = new PlanSamperUniform(world, shiftTimes, constraints, 1.0, random);
+        EmergencyServicePlan plan = sampler.Sample(); 
         
         AllBasicMovesGenerator moveGenerator = new(shiftTimes, constraints);
         List<MoveSequenceDuo> moves = moveGenerator.GetMoves(plan).Enumerate();
-         moves.Should().BeEquivalentTo(new List<MoveSequenceDuo>());
+         var expected = JsonSerializer.Deserialize<List<MoveSequenceDuo>>(File.ReadAllText("FromRandom1AllocationsTestExpected.json"));
+         moves.Should().BeEquivalentTo(expected);
     }
     
     [Fact]
-    public void FromEmptyAmbulanceAllocation()
+    public void FromRandom2Percentage_50()
     {
-    }
-    
-    [Fact]
-    public void FromEmptyAmbulanceDeallocation()
-    {
+        Random random = new Random(66);
+        var input = new MoveGeneratorTestInput(random);
+        World world = input.GetWorld();
+        Constraints constraints = input.GetConstraints();
+        ShiftTimes shiftTimes = input.GetShiftTimes();
+        IPlanSampler sampler = new PlanSamperUniform(world, shiftTimes, constraints, 0.8, random);
+        EmergencyServicePlan plan = sampler.Sample(); 
+        
+        AllBasicMovesGenerator moveGenerator = new(shiftTimes, constraints);
+        List<MoveSequenceDuo> moves = moveGenerator.GetMoves(plan).Enumerate();
+         var expected = JsonSerializer.Deserialize<List<MoveSequenceDuo>>(File.ReadAllText("FromRandom2AllocationsTestExpected.json"));
+         moves.Should().BeEquivalentTo(expected);
     }
 }

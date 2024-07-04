@@ -1,6 +1,6 @@
 using ESSP.DataModel;
 
-namespace Optimization;
+namespace Optimizing;
 
 public interface IPlanSampler
 {

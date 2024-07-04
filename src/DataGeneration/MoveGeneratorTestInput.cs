@@ -9,8 +9,8 @@ public class MoveGeneratorTestInput : IInputParametrization
 {
   private readonly Random _random;
   private readonly DataModelGenerator _dataGenerator = new();
-  private const int avaialbeMedicTeamsCount = 3;
-  private const int availableAmbulancesCount = 3;
+  private const int avaialbeMedicTeamsCount = 10;
+  private const int availableAmbulancesCount = 5;
   private const int depotsCount = 3;
 
   public MoveGeneratorTestInput(Random random = null)
@@ -54,19 +54,12 @@ public class MoveGeneratorTestInput : IInputParametrization
     {
       AllowedShiftStartingTimesSec = new HashSet<int>()
       {
-        4.ToHours().ToMinutes().ToSeconds().Value,
-        8.ToHours().ToMinutes().ToSeconds().Value,
-        12.ToHours().ToMinutes().ToSeconds().Value,
-        16.ToHours().ToMinutes().ToSeconds().Value,
+        1, 2, 3, 4
       },
 
       AllowedShiftDurationsSec = new HashSet<int>()
       {
-        4.ToHours().ToMinutes().ToSeconds().Value,
-        6.ToHours().ToMinutes().ToSeconds().Value,
-        8.ToHours().ToMinutes().ToSeconds().Value,
-        10.ToHours().ToMinutes().ToSeconds().Value,
-        12.ToHours().ToMinutes().ToSeconds().Value,
+        10, 20, 30, 40
       }
     };
     //

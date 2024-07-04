@@ -47,7 +47,7 @@ public class Input1 : IInputParametrization
     ImmutableArray<Incident> incidents = _dataGenerator.GenerateIncidentModels(
       worldSize: new CoordinateModel { XMet = 50_000, YMet = 50_000 },
       incidentsCount: 10,
-      duration: 21.ToHours().ToSeconds(),
+      duration: 24.ToHours().ToSeconds(),
       onSceneDurationNormalExpected: 20.ToMinutes().ToSeconds(),
       onSceneDurationNormalStddev: 10.ToMinutes().ToSeconds(),
       inHospitalDeliveryNormalExpected: 15.ToMinutes().ToSeconds(),

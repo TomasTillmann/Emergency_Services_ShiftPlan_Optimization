@@ -8,8 +8,29 @@ public class MedicTeamsEvaluator
 {
   private readonly PlannableIncident.Factory _plannableIncidentFactory;
 
-  public SimulationState State { get; set; }
-  public EmergencyServicePlan Plan { get; set; }
+  private SimulationState _state;
+
+  public SimulationState State
+  {
+    get => _state;
+    set
+    {
+      _state = value;
+      _plannableIncidentFactory.State = value;
+    }
+  }
+
+  private EmergencyServicePlan _plan;
+
+  public EmergencyServicePlan Plan
+  {
+    get => _plan;
+    set
+    {
+      _plan = value;
+      _plannableIncidentFactory.Plan = value;
+    }
+  }
 
   public MedicTeamsEvaluator(World world)
   {
@@ -39,7 +60,7 @@ public class MedicTeamsEvaluator
 
     // 1, 2, 3, 4
     MedicTeam team = Plan.Team(teamId);
-    const int overdue = 30 * 60;
+    const int overdue = 60 * 60;
     if (plannableIncident.InHospitalDelivery.EndSec > team.Shift.EndSec + overdue)
     {
       return false;

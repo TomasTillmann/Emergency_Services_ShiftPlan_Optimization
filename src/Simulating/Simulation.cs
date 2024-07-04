@@ -6,7 +6,17 @@ namespace Simulating;
 
 public sealed class Simulation
 {
-  public SimulationState State { get; set; }
+  private SimulationState _state;
+  public SimulationState State
+  {
+    get => _state;
+    set
+    {
+      _state = value;
+      _medicTeamsEvaluator.State = value;
+      _plannableIncidentFactory.State = value;
+    }
+  }
 
   private EmergencyServicePlan Plan { get; set; }
 
@@ -35,10 +45,9 @@ public sealed class Simulation
 
   public Simulation(World world, Constraints constraints)
   {
-    State = new SimulationState(world.Depots.Length, constraints);
-
     _plannableIncidentFactory = new PlannableIncident.Factory(world);
     _medicTeamsEvaluator = new MedicTeamsEvaluator(world);
+    State = new SimulationState(world.Depots.Length, constraints);
   }
 
   /// <summary>
@@ -67,7 +76,7 @@ public sealed class Simulation
       {
         for (; teamIndex < Plan.Assignments[depotIndex].MedicTeams.Count; ++teamIndex)
         {
-          if (_medicTeamsEvaluator.IsHandling(new MedicTeamId(teamIndex, depotIndex), in currentIncident))
+          if (_medicTeamsEvaluator.IsHandling(new MedicTeamId(depotIndex, teamIndex), in currentIncident))
           {
             bestMedicTeam = new MedicTeamId { DepotIndex = depotIndex, OnDepotIndex = teamIndex };
             break;
@@ -86,7 +95,7 @@ public sealed class Simulation
       {
         for (teamIndex = teamIndex + 1; teamIndex < Plan.Assignments[depotIndex].MedicTeams.Count; ++teamIndex)
         {
-          if (_medicTeamsEvaluator.IsHandling(new MedicTeamId(teamIndex, depotIndex), in currentIncident))
+          if (_medicTeamsEvaluator.IsHandling(new MedicTeamId(depotIndex, teamIndex), in currentIncident))
           {
             bestMedicTeam = _medicTeamsEvaluator.GetBetter(bestMedicTeam, new MedicTeamId(depotIndex, teamIndex), in currentIncident);
           }

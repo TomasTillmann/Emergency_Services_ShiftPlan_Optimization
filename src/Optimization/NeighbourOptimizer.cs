@@ -23,7 +23,7 @@ public abstract class NeighbourOptimizer : OptimizerBase
 
   protected void ModifyMakeInverseMove(EmergencyServicePlan plan, MoveSequence moveSequence)
   {
-    for (int i = moveSequence.Count - 1; i > 0; --i)
+    for (int i = moveSequence.Count - 1; i >=0; --i)
     {
       DoMove(plan, moveSequence.MovesBuffer[i]);
     }
@@ -37,7 +37,7 @@ public abstract class NeighbourOptimizer : OptimizerBase
         break;
 
       case MoveType.TeamAllocation:
-        plan.AllocateTeam(move.DepotIndex);
+        plan.AllocateTeam(move.DepotIndex, move.Shift);
         break;
 
       case MoveType.TeamDeallocation:
