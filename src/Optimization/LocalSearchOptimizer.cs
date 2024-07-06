@@ -6,20 +6,21 @@ namespace Optimizing;
 public class LocalSearchOptimizer : NeighbourOptimizer
 {
   public EmergencyServicePlan StartPlan { get; set; }
-
   public int PlateuIteration { get; private set; }
-
   public int MaxIterations { get; set; }
+  private readonly GaantView _gaantView;
 
   public LocalSearchOptimizer(int maxIterations, World world, Constraints constraints, IUtilityFunction utilityFunction, IMoveGenerator moveGenerator)
   : base(world, constraints, utilityFunction, moveGenerator)
   {
     StartPlan = EmergencyServicePlan.GetNewEmpty(world);
     MaxIterations = maxIterations;
+    _gaantView = new GaantView(world, constraints);
   }
 
   public override List<EmergencyServicePlan> GetBest(ReadOnlySpan<Incident> incidents)
   {
+    using StreamWriter writer = new("/home/tom/School/Bakalarka/Emergency_Services_ShiftPlan_Optimization/src/log.txt");
     EmergencyServicePlan currentPlan = EmergencyServicePlan.GetNewEmpty(World);
     currentPlan.FillFrom(StartPlan);
 
@@ -39,6 +40,7 @@ public class LocalSearchOptimizer : NeighbourOptimizer
         {
           bestMove.FillFrom(moves.Normal);
           bestEval = neighbourEval;
+          _gaantView.Show(currentPlan, incidents, writer);
         }
 
         ModifyMakeInverseMove(currentPlan, moves.Inverse);
@@ -50,6 +52,7 @@ public class LocalSearchOptimizer : NeighbourOptimizer
         break;
       }
 
+      Console.WriteLine($"best move: {bestMove}");
       ModifyMakeMove(currentPlan, bestMove);
     }
     return new List<EmergencyServicePlan>()

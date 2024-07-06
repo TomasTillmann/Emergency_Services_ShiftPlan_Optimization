@@ -1,6 +1,5 @@
 using System.Collections.Immutable;
 using ESSP.DataModel;
-using Optimization;
 using MyExtensions;
 
 namespace Optimizing;
@@ -12,8 +11,7 @@ public class OptimalMovesSearchOptimizer
   private readonly MoveMaker _moveMaker;
   private readonly ShiftTimes _shiftTimes;
   private readonly Random _random;
-  private readonly Dictionary<
-
+  private readonly HashSet<(int K, EmergencyServicePlan Plan)> _cache;
 
   private StreamWriter writer;
   private EmergencyServicePlan best;
@@ -30,6 +28,7 @@ public class OptimalMovesSearchOptimizer
     _lexComparer = new(world, constraints);
     _moveMaker = new();
     _shiftTimes = shiftTimes;
+    _cache = new(new PlanComparer());
     _random = random ?? new Random();
 
     _gaantView = new(world, constraints);
@@ -72,13 +71,24 @@ public class OptimalMovesSearchOptimizer
     }
 
     movesGenerators[k].K = k;
+    int m = 0;
     //writer.WriteLine($"k: {k}" + string.Join(", ", _movesGenerator.GetMoves(current).Enumerate(2)));
     foreach (MoveSequenceDuo move in movesGenerators[k].GetMoves(current))
     {
+      ++m;
+      Console.WriteLine($"k: {k}, m: {m}");
+
       //writer.WriteLine($"k: {k}\n{move}");
-      //Console.WriteLine($"k: {k}");
       _moveMaker.ModifyMakeMove(current, move.Normal);
-      OptimalMovesSearch(current, incidents, k + 1, h);
+      if (!_cache.Contains((k, current)))
+      {
+        _cache.Add((k, current));
+        OptimalMovesSearch(current, incidents, k + 1, h);
+      }
+      else
+      {
+        Console.WriteLine($"visited");
+      }
       _moveMaker.ModifyMakeInverseMove(current, move.Inverse);
       //writer.Flush();
     }

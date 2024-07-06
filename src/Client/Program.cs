@@ -1,12 +1,11 @@
-﻿//#define LocalSearch 
-#define DynamicProgramming 
+﻿#define LocalSearch 
+//#define DynamicProgramming 
 
 using ESSP.DataModel;
 using Optimizing;
 using Simulating;
 using System.Collections.Immutable;
 using System.Diagnostics;
-using Optimization;
 
 namespace Client;
 
@@ -15,27 +14,24 @@ class Program
 #if LocalSearch
   public static void Main()
   {
-    Random random = new Random(66);
+    Random random = new Random(420);
     IInputParametrization input = new Input1(random);
     World world = input.GetWorld();
     Constraints constraints = input.GetConstraints();
     ShiftTimes shiftTimes = input.GetShiftTimes();
-
+    PlanSampler planSampler = new PlanSamperUniform(world, shiftTimes, constraints, 0.5, random);
     ImmutableArray<Incident> incidents = input.GetIncidents();
 
-    LocalSearchOptimizer optimizer;
-    Simulation simulation;
-    IUtilityFunction utilityFunction;
-
-    simulation = new(world, constraints);
-    utilityFunction = new WeightedSum(simulation, EmergencyServicePlan.GetMaxCost(world, shiftTimes));
+    Simulation simulation = new(world, constraints);
+    IUtilityFunction utilityFunction = new WeightedSum(simulation, EmergencyServicePlan.GetMaxCost(world, shiftTimes));
     IMoveGenerator moveGenerator = new AllBasicMovesGenerator(shiftTimes, constraints);
-    optimizer = new LocalSearchOptimizer(30, world, constraints, utilityFunction, moveGenerator);
+    var optimizer = new LocalSearchOptimizer(int.MaxValue, world, constraints, utilityFunction, moveGenerator);
+    //optimizer.StartPlan = planSampler.Sample();
 
     Stopwatch sw = Stopwatch.StartNew();
     var optimal = optimizer.GetBest(incidents.AsSpan()).ToList().First();
     double eval = utilityFunction.Evaluate(optimal, incidents.AsSpan());
-    
+
     Console.WriteLine($"Iteration: {optimizer.PlateuIteration} " +
                       $"eval: {eval}," +
                       $"handled: {utilityFunction.HandledIncidentsCount} / {incidents.Length} " +
