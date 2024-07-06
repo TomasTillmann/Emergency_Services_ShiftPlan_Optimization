@@ -38,6 +38,24 @@ public class SimulationState : ISimulationState
     _teamStates[teamId.DepotIndex][teamId.OnDepotIndex].TimeActiveSec += incident.IncidentHandling.DurationSec;
   }
 
+  public virtual void FillFrom(ISimulationState other)
+  {
+    SimulationState casted = (SimulationState)other;
+    for (int i = 0; i < _teamStates.Length; ++i)
+    {
+      for (int j = 0; j < _teamStates[i].Length; ++j)
+      {
+        _teamStates[i][j].LastPlannedIncident.FillFrom(casted._teamStates[i][j].LastPlannedIncident);
+        _teamStates[i][j].TimeActiveSec = casted._teamStates[i][j].TimeActiveSec;
+      }
+
+      for (int j = 0; j < _ambulanceStates[i].Length; ++j)
+      {
+        _ambulanceStates[i][j].WhenFreeSec = casted._ambulanceStates[i][j].WhenFreeSec;
+      }
+    }
+  }
+
   /// <summary>
   /// Clears state of only plan's dimensions.
   /// </summary>

@@ -1,5 +1,5 @@
-﻿#define LocalSearch 
-//#define DynamicProgramming 
+﻿//#define LocalSearch 
+#define DynamicProgramming 
 
 using ESSP.DataModel;
 using Optimizing;

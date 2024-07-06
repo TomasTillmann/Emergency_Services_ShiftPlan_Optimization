@@ -50,11 +50,11 @@ public sealed class Simulation
     State = new SimulationState(world.Depots.Length, constraints);
   }
 
-  public int Run(EmergencyServicePlan plan, ReadOnlySpan<Incident> incidents)
+  public int Run(EmergencyServicePlan plan, ReadOnlySpan<Incident> incidents, bool resetState = true)
   {
     Plan = plan;
     TotalIncidentsCount = incidents.Length;
-    Prepare();
+    Prepare(resetState);
 
     PlannableIncident plannableIncidentForBestShift;
     Incident currentIncident;
@@ -106,16 +106,19 @@ public sealed class Simulation
     return HandledIncidentsCount;
   }
 
-  private void Prepare()
+  private void Prepare(bool resetState)
   {
     _plannableIncidentFactory.Plan = Plan;
     _medicTeamsEvaluator.Plan = Plan;
-    Reset();
+    Reset(resetState);
   }
 
-  private void Reset()
+  private void Reset(bool resetState)
   {
-    ResetState();
+    if (resetState)
+    {
+      ResetState();
+    }
     ResetStats();
   }
 

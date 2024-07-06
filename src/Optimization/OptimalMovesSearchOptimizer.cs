@@ -38,12 +38,14 @@ public class OptimalMovesSearchOptimizer
   {
     writer = new("/home/tom/School/Bakalarka/Emergency_Services_ShiftPlan_Optimization/src/log.txt");
     PlansVisited = 0;
+
     movesGenerators = new OptimalMovesGenerator[incidents.Length];
-    for (int i = 0; i < movesGenerators.Length; ++i)
+    for (int k = 0; k < movesGenerators.Length; ++k)
     {
-      movesGenerators[i] = new(World, _shiftTimes, Constraints, 2, _random);
-      movesGenerators[i].Incidents = incidents;
-      movesGenerators[i].writer = writer;
+      movesGenerators[k] = new(World, _shiftTimes, Constraints, 2, _random);
+      movesGenerators[k].Incidents = incidents;
+      movesGenerators[k].writer = writer;
+      movesGenerators[k].K = k;
     }
 
     best = EmergencyServicePlan.GetNewEmpty(World);
@@ -70,7 +72,6 @@ public class OptimalMovesSearchOptimizer
       return;
     }
 
-    movesGenerators[k].K = k;
     int m = 0;
     //writer.WriteLine($"k: {k}" + string.Join(", ", _movesGenerator.GetMoves(current).Enumerate(2)));
     foreach (MoveSequenceDuo move in movesGenerators[k].GetMoves(current))
