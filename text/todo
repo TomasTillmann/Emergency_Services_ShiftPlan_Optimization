@@ -1,8 +1,7 @@
-* polish kap 2
-* doprogramovat dp
-* vytvorit testy simulace 
+* proc ten stav simulace nefunguje
+* tabu
+* simulovana zihacka
 * vytvorit svety, kterymi budu porovnavat metody
---min
 * porovnej nejak vhodne jednotlive metody mezi sebou
   * metriky
     * cas behu
@@ -14,7 +13,8 @@
 * sepsat do kapitoly 3 
   * zaver: jake metody jsou nejlepsi
 * dodelat program jako command line utilitku
-* posledni kapitola sepsat
+* posledni kapitola sepsat ?????
   * navrh programu
   * implementace a fungovani simulace?
   * uzivatelska dokumentace
+* vytvorit testy simulace 

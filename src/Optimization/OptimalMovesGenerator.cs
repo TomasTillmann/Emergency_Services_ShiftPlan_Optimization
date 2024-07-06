@@ -21,7 +21,6 @@ public class OptimalMovesGenerator(
   private readonly Simulation _simulation = new(world, constraints);
   private readonly MoveMaker _moveMaker = new();
   private readonly Random _random = random ?? new Random();
-  private readonly ISimulationState _simulationState = new SimulationState(world.Depots.Length, constraints);
 
   public override IEnumerable<MoveSequenceDuo> GetMoves(EmergencyServicePlan plan)
   {
@@ -38,14 +37,15 @@ public class OptimalMovesGenerator(
       yield break;
     }
 
-    // set the simulation state to state after handling all but the last incident
+    ISimulationState simulationState = new SimulationState(world.Depots.Length, constraints);
+
     int r = _simulation.Run(plan, Incidents.AsSpan().Slice(0, K - 1));
-    //_simulationState.FillFrom(_simulation.State);
+    simulationState.FillFrom(_simulation.State);
 
-    //_simulation.State = _simulationState;
-    int new_r = _simulation.Run(plan, Incidents.AsSpan().Slice(0, K));
+    _simulation.State.FillFrom(simulationState);
+    int new_r = _simulation.Run(plan, Incidents.AsSpan().Slice(K - 1, 1));
 
-    if (new_r == r + 1)
+    if (new_r == 1)
     {
       // incident is handled already. No shift needs to be prolonged or new team / ambulance need to be allocated.
       //writer.WriteLine("Identity -> r = r + 1");
@@ -55,13 +55,13 @@ public class OptimalMovesGenerator(
     else
     {
       bool cantHandle = true;
-      foreach (var move in OptimalMovesShiftProlonging(plan, Incidents, r))
+      foreach (var move in OptimalMovesShiftProlonging(plan, Incidents, simulationState))
       {
         cantHandle = false;
         yield return move;
       }
 
-      foreach (var move in OptimalMovesTeamAllocations(plan, Incidents, startTimeIndex, r))
+      foreach (var move in OptimalMovesTeamAllocations(plan, Incidents, startTimeIndex, simulationState))
       {
         cantHandle = false;
         yield return move;
@@ -75,7 +75,7 @@ public class OptimalMovesGenerator(
     }
   }
 
-  private IEnumerable<MoveSequenceDuo> OptimalMovesTeamAllocations(EmergencyServicePlan plan, ImmutableArray<Incident> incidents, int startTimeIndex, int r)
+  private IEnumerable<MoveSequenceDuo> OptimalMovesTeamAllocations(EmergencyServicePlan plan, ImmutableArray<Incident> incidents, int startTimeIndex, ISimulationState simulationState)
   {
     int[] permutated = new int[plan.Assignments.Length];
     for (int i = 0; i < permutated.Length; ++i) permutated[i] = i;
@@ -101,12 +101,12 @@ public class OptimalMovesGenerator(
               plan.Assignments[permutated[depotIndex]].MedicTeams.Count
             );
 
-            //_simulation.State = _simulationState;
+            _simulation.State.FillFrom(simulationState);
             _moveMaker.ModifyMakeMove(plan, Moves.Normal);
-            new_r = _simulation.Run(plan, incidents.AsSpan().Slice(0, K - 1));
+            new_r = _simulation.Run(plan, incidents.AsSpan().Slice(K - 1, 1));
             _moveMaker.ModifyMakeInverseMove(plan, Moves.Inverse);
 
-            if (new_r == r + 1)
+            if (new_r == 1)
             {
               yield return Moves;
               goto next;
@@ -120,12 +120,12 @@ public class OptimalMovesGenerator(
                 plan.Assignments[permutated[depotIndex]].MedicTeams.Count
               );
 
-              //_simulation.State = _simulationState;
+              _simulation.State.FillFrom(simulationState);
               _moveMaker.ModifyMakeMove(plan, Moves.Normal);
-              new_r = _simulation.Run(plan, incidents.AsSpan().Slice(0, K - 1));
+              new_r = _simulation.Run(plan, incidents.AsSpan().Slice(K - 1, 1));
               _moveMaker.ModifyMakeInverseMove(plan, Moves.Inverse);
 
-              if (new_r == r + 1)
+              if (new_r == 1)
               {
                 yield return Moves;
                 goto next;
@@ -138,7 +138,7 @@ public class OptimalMovesGenerator(
     }
   }
 
-  private IEnumerable<MoveSequenceDuo> OptimalMovesShiftProlonging(EmergencyServicePlan plan, ImmutableArray<Incident> incidents, int r)
+  private IEnumerable<MoveSequenceDuo> OptimalMovesShiftProlonging(EmergencyServicePlan plan, ImmutableArray<Incident> incidents, ISimulationState simulationState)
   {
     int[] permutated = new int[plan.Assignments.Length];
     for (int i = 0; i < permutated.Length; ++i) permutated[i] = i;
@@ -157,12 +157,12 @@ public class OptimalMovesGenerator(
           {
             ChangeShift(teamId, oldShift, Interval.GetByStartAndDuration(oldShift.StartSec, ShiftTimes.AllowedDurationsSecSorted[durationIndex]));
 
-            //_simulation.State = _simulationState;
+            _simulation.State.FillFrom(simulationState);
             _moveMaker.ModifyMakeMove(plan, Moves.Normal);
-            int new_r = _simulation.Run(plan, incidents.AsSpan().Slice(0, K - 1));
+            int new_r = _simulation.Run(plan, incidents.AsSpan().Slice(K - 1, 1));
             _moveMaker.ModifyMakeInverseMove(plan, Moves.Inverse);
 
-            if (new_r == r + 1)
+            if (new_r == 1)
             {
               yield return Moves;
               goto next;
