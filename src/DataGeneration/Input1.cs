@@ -41,12 +41,12 @@ public class Input1 : IInputParametrization
     return world;
   }
 
-  public ImmutableArray<Incident> GetIncidents()
+  public ImmutableArray<Incident> GetIncidents(int count)
   {
     // Incidents init
     ImmutableArray<Incident> incidents = _dataGenerator.GenerateIncidentModels(
       worldSize: new CoordinateModel { XMet = 50_000, YMet = 50_000 },
-      incidentsCount: 50,
+      incidentsCount: count,
       duration: 21.ToHours().ToSeconds(),
       onSceneDurationNormalExpected: 20.ToMinutes().ToSeconds(),
       onSceneDurationNormalStddev: 10.ToMinutes().ToSeconds(),

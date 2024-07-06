@@ -66,11 +66,11 @@ public sealed class Simulation
       bestMedicTeam = new MedicTeamId { DepotIndex = -1, OnDepotIndex = -1 };
 
       // Find handling medic team. 
-      int depotIndex = 0;
-      int teamIndex = 0;
-      for (; depotIndex < Plan.Assignments.Length; ++depotIndex)
+      int depotIndex = -1;
+      int teamIndex = -1;
+      for (depotIndex = 0; depotIndex < Plan.Assignments.Length; ++depotIndex)
       {
-        for (; teamIndex < Plan.Assignments[depotIndex].MedicTeams.Count; ++teamIndex)
+        for (teamIndex = 0; teamIndex < Plan.Assignments[depotIndex].MedicTeams.Count; ++teamIndex)
         {
           if (_medicTeamsEvaluator.IsHandling(new MedicTeamId(depotIndex, teamIndex), in currentIncident))
           {
@@ -88,9 +88,20 @@ public sealed class Simulation
         continue;
       }
 
-      for (; depotIndex < Plan.Assignments.Length; ++depotIndex)
+      if (depotIndex != Plan.Assignments.Length)
       {
         for (teamIndex = teamIndex + 1; teamIndex < Plan.Assignments[depotIndex].MedicTeams.Count; ++teamIndex)
+        {
+          if (_medicTeamsEvaluator.IsHandling(new MedicTeamId(depotIndex, teamIndex), in currentIncident))
+          {
+            bestMedicTeam = _medicTeamsEvaluator.GetBetter(bestMedicTeam, new MedicTeamId(depotIndex, teamIndex), in currentIncident);
+          }
+        }
+      }
+
+      for (depotIndex = depotIndex + 1; depotIndex < Plan.Assignments.Length; ++depotIndex)
+      {
+        for (teamIndex = 0; teamIndex < Plan.Assignments[depotIndex].MedicTeams.Count; ++teamIndex)
         {
           if (_medicTeamsEvaluator.IsHandling(new MedicTeamId(depotIndex, teamIndex), in currentIncident))
           {

@@ -51,7 +51,7 @@ class Program
     World world = input.GetWorld();
     Constraints constraints = input.GetConstraints();
     ShiftTimes shiftTimes = input.GetShiftTimes();
-    ImmutableArray<Incident> incidents = input.GetIncidents();
+    ImmutableArray<Incident> incidents = input.GetIncidents(50);
     OptimalMovesSearchOptimizer optimizer;
     Simulation simulation;
     IUtilityFunction utilityFunction;

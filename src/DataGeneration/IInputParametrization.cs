@@ -4,7 +4,7 @@ using ESSP.DataModel;
 public interface IInputParametrization
 {
   World GetWorld();
-  ImmutableArray<Incident> GetIncidents();
+  ImmutableArray<Incident> GetIncidents(int count);
   ShiftTimes GetShiftTimes();
   Constraints GetConstraints();
 }

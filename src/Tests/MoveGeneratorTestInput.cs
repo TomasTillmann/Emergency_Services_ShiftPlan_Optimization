@@ -33,7 +33,7 @@ public class MoveGeneratorTestInput(Random random = null) : IInputParametrizatio
     return world;
   }
 
-  public ImmutableArray<Incident> GetIncidents()
+  public ImmutableArray<Incident> GetIncidents(int count)
   {
     throw new NotImplementedException();
   }

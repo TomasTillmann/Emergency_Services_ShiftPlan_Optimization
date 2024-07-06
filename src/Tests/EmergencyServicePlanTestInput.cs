@@ -33,7 +33,7 @@ public class EmergencyServicePlanTestInput(Random random = null) : IInputParamet
         return world;
     }
 
-    public ImmutableArray<Incident> GetIncidents()
+    public ImmutableArray<Incident> GetIncidents(int count)
     {
         throw new NotImplementedException();
     }

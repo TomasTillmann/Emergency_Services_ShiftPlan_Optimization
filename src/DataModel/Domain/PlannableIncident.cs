@@ -134,7 +134,7 @@ public partial class PlannableIncident
       if (teamState.IsInDepot(firstPossibleStartTimeSec))
       {
         int whenAmbulanceFree = int.MaxValue;
-        ambIndex = -1; // will always be reassigned for the earliest one
+        ambIndex = -1; // will always be reassigned for the earliest one, if exists
 
         // Finds ambulance which is available the earliest, and sets startTimeSec to first possible starting time.
         // That cannot be time before the shift starts, and it's either the time the shift starts or when the earliest ambulance is available.
