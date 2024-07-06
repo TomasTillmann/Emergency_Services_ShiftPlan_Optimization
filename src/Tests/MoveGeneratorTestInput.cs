@@ -1,22 +1,13 @@
-using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Linq;
+using ESSP.DataModel;
 
-namespace ESSP.DataModel;
-
-public class MoveGeneratorTestInput : IInputParametrization
+public class MoveGeneratorTestInput(Random random = null) : IInputParametrization
 {
-  private readonly Random _random;
+  private readonly Random _random = random ?? new Random();
   private readonly DataModelGenerator _dataGenerator = new();
-  private const int avaialbeMedicTeamsCount = 10;
+  private const int availalbeMedicTeamsCount = 10;
   private const int availableAmbulancesCount = 5;
   private const int depotsCount = 3;
-
-  public MoveGeneratorTestInput(Random random = null)
-  {
-    _random = random ?? new Random();
-  }
 
   public Constraints GetConstraints()
   {
@@ -34,7 +25,7 @@ public class MoveGeneratorTestInput : IInputParametrization
       worldSize: new CoordinateModel { XMet = 10_000, YMet = 10_000 },
       depotsCount: depotsCount,
       hospitalsCount: 20,
-      availableMedicTeamsCount: avaialbeMedicTeamsCount,
+      availableMedicTeamsCount: availalbeMedicTeamsCount,
       availableAmbulancesCount: availableAmbulancesCount,
       random: _random
     ));
@@ -52,15 +43,9 @@ public class MoveGeneratorTestInput : IInputParametrization
     // shift times init
     ShiftTimes shiftTimes = new()
     {
-      AllowedShiftStartingTimesSec = new HashSet<int>()
-      {
-        1, 2, 3, 4
-      },
+      AllowedShiftStartingTimesSec = [1, 2, 3, 4],
 
-      AllowedShiftDurationsSec = new HashSet<int>()
-      {
-        10, 20, 30, 40
-      }
+      AllowedShiftDurationsSec = [10, 20, 30, 40]
     };
     //
 

@@ -26,26 +26,33 @@ public class EmergencyServicePlan
   // creates an empty plan
   private EmergencyServicePlan(int depotCount, ImmutableArray<MedicTeam> allAvailableTeams, ImmutableArray<Ambulance> allAvailableAmbulances)
   {
-    Assignments = Enumerable.Repeat(new DepotAssignment(), depotCount).ToImmutableArray();
     var assignmentsTemp = new DepotAssignment[depotCount];
-    for (int i = 0; i < Assignments.Length; ++i)
+    for (int i = 0; i < assignmentsTemp.Length; ++i)
     {
       assignmentsTemp[i] = new DepotAssignment();
     }
     Assignments = assignmentsTemp.ToImmutableArray();
 
-    AvailableMedicTeams = allAvailableTeams.ToList();
-    AvailableAmbulances = allAvailableAmbulances.ToList();
+    AvailableMedicTeams = [..allAvailableTeams];
+    for (int i = 0; i < allAvailableTeams.Length; ++i)
+    {
+      AvailableMedicTeams[i] = new MedicTeam(allAvailableTeams[i].Shift);
+    }
+
+    AvailableAmbulances = [..allAvailableAmbulances];
+    for (int i = 0; i < allAvailableAmbulances.Length; ++i)
+    {
+      AvailableAmbulances[i] = new Ambulance();
+    }
   }
 
   public void AllocateTeam(int depotIndex, Interval shift)
   {
-    MedicTeam team = AvailableMedicTeams[AvailableMedicTeams.Count - 1];
+    MedicTeam team = AvailableMedicTeams[^1];
     AvailableMedicTeams.RemoveAt(AvailableMedicTeams.Count - 1);
     team.Shift = shift;
     Assignments[depotIndex].MedicTeams.Add(team);
-    ++MedicTeamsCount;
-    TotalShiftDuration += team.Shift.DurationSec;
+    UpdateAfterTeamAllocation(team.Shift.DurationSec);
   }
 
   public void DeallocateTeam(int depotIndex, int teamIndex)
@@ -53,23 +60,21 @@ public class EmergencyServicePlan
     MedicTeam team = Assignments[depotIndex].MedicTeams[teamIndex];
     Assignments[depotIndex].MedicTeams.RemoveAt(teamIndex);
     AvailableMedicTeams.Add(team);
-    --MedicTeamsCount;
-    TotalShiftDuration -= team.Shift.DurationSec;
+    UpdateAfterTeamDeallocation(team.Shift.DurationSec);
   }
 
   public void ChangeShift(int depotIndex, int teamIndex, Interval shift)
   {
-    TotalShiftDuration -= Assignments[depotIndex].MedicTeams[teamIndex].Shift.DurationSec;
-    TotalShiftDuration += shift.DurationSec;
+    UpdateAfterShiftChange(Assignments[depotIndex].MedicTeams[teamIndex].Shift.DurationSec, shift.DurationSec);
     Assignments[depotIndex].MedicTeams[teamIndex].Shift = shift;
   }
 
   public void AllocateAmbulance(int depotIndex)
   {
-    Ambulance ambulance = AvailableAmbulances[AvailableAmbulances.Count - 1];
+    Ambulance ambulance = AvailableAmbulances[^1];
     AvailableAmbulances.RemoveAt(AvailableAmbulances.Count - 1);
     Assignments[depotIndex].Ambulances.Add(ambulance);
-    ++AmbulancesCount;
+    UpdateAfterAmbulanceAllocate();
   }
 
   public void DeallocateAmbulance(int depotIndex)
@@ -78,18 +83,42 @@ public class EmergencyServicePlan
     Ambulance ambulance = Assignments[depotIndex].Ambulances[index];
     Assignments[depotIndex].Ambulances.RemoveAt(index);
     AvailableAmbulances.Add(ambulance);
-    --AmbulancesCount;
+    UpdateAfterAmbulanceDeallocate();
   }
 
   public void FillFrom(EmergencyServicePlan other)
   {
+    DeallocateAll();
+    
     for (int depotIndex = 0; depotIndex < other.Assignments.Length; ++depotIndex)
     {
-      Assignments[depotIndex].MedicTeams.Clear();
-      Assignments[depotIndex].MedicTeams.AddRange(other.Assignments[depotIndex].MedicTeams);
+      for (int teamIndex = 0; teamIndex < other.Assignments[depotIndex].MedicTeams.Count; ++teamIndex)
+      {
+        AllocateTeam(depotIndex, other.Assignments[depotIndex].MedicTeams[teamIndex].Shift);
+      }
 
-      Assignments[depotIndex].Ambulances.Clear();
-      Assignments[depotIndex].Ambulances.AddRange(other.Assignments[depotIndex].Ambulances);
+      for (int ambIndex = 0;  ambIndex < other.Assignments[depotIndex].Ambulances.Count; ++ambIndex)
+      {
+        AllocateAmbulance(depotIndex);
+      }
+    }
+  }
+  
+  public void DeallocateAll()
+  {
+    for (int depotIndex = 0; depotIndex < Assignments.Length; ++depotIndex)
+    {
+      for (int teamIndex = 0; teamIndex < Assignments[depotIndex].MedicTeams.Count; ++teamIndex)
+      {
+        DeallocateTeam(depotIndex, teamIndex);
+        --teamIndex;
+      }
+
+      for (int ambIndex = 0; ambIndex < Assignments[depotIndex].Ambulances.Count; ++ambIndex)
+      {
+        DeallocateAmbulance(depotIndex);
+        --ambIndex;
+      }
     }
   }
 
@@ -140,5 +169,33 @@ public class EmergencyServicePlan
   public bool CanDeallocateAmbulance(int depotIndex)
   {
     return Assignments[depotIndex].Ambulances.Count > 0;
+  }
+  
+  private void UpdateAfterTeamAllocation(int durationSec)
+  {
+    ++MedicTeamsCount;
+    TotalShiftDuration += durationSec;
+  }
+  
+  private void UpdateAfterTeamDeallocation(int durationSec)
+  {
+    --MedicTeamsCount;
+    TotalShiftDuration -= durationSec;
+  }
+  
+  private void UpdateAfterShiftChange(int oldDurationSec, int newDurationSec)
+  {
+    TotalShiftDuration -= oldDurationSec;
+    TotalShiftDuration += newDurationSec;
+  }
+  
+  private void UpdateAfterAmbulanceAllocate()
+  {
+    ++AmbulancesCount;
+  }
+  
+  private void UpdateAfterAmbulanceDeallocate()
+  {
+    --AmbulancesCount;
   }
 }

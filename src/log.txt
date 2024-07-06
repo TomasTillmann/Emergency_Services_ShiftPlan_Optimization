@@ -1,29 +1,1337 @@
-0           1           2           3           4           5           6           7           8-----------9-----------10-----------11-----------12-----------13-----------14           15           16           17           18           19           20           21           22           23           
-                                                                                                >>>ooooo====<<>>oooooo==<       >>oo===<<<<  >>oooo===<<< >>oo=====<    >>>oo====<<<                                                                                                            
-0           1           2           3           4           5           6           7           8           9           10           11           12           13           14           15           16-----------17-----------18-----------19-----------20-----------21-----------22           23           
-                                                                                                                                                                                                >>oooooo==<  >>>ooooo=====<<>>oooooo====<<>>>oooo=====<<>>ooo===<<<<<                           
-0-----------1-----------2-----------3-----------4-----------5-----------6-----------7-----------8           9           10           11           12           13           14           15           16           17           18           19           20           21           22           23           
-     >>>oo======< >>oo===<    >>>>oo====<<>>>>>>oooooo====< >>oooooo====<<<  >oooooo====< >>>>>ooooo======<<<<                                                                                                                                                                                  
-0           1           2           3           4           5           6           7           8           9           10           11           12           13           14           15           16-----------17-----------18-----------19-----------20-----------21-----------22           23           
-                                                                                                                                                                                                >>>>>ooo====<<<<<>>>oooooo====<      >oo====<       >>>>>>oooo=====<<<<<                        
-0           1           2           3           4           5           6           7           8           9           10           11           12           13           14           15           16-----------17-----------18-----------19-----------20-----------21-----------22           23           
-                                                                                                                                                                                                                >>oooooo=====<                       >>>oooooo==<<<                             
-0-----------1-----------2-----------3-----------4-----------5-----------6           7           8           9           10           11           12           13           14           15           16           17           18           19           20           21           22           23           
-             >>ooooo=====<<<<          >>>ooooo===<<<                 >>ooooo====<                                                                                                                                                                                                              
-0           1           2           3           4           5           6           7           8           9           10           11           12           13           14           15           16-----------17-----------18-----------19-----------20-----------21-----------22           23           
-                                                                                                                                                                                                                  >>>>>oo===<<<<                       >>>>>oooo==<<<<<<                        
-0           1           2           3           4           5           6           7           8           9           10           11           12           13           14           15           16-----------17-----------18-----------19-----------20-----------21-----------22           23           
-                                                                                                                                                                                                                     >oooooo====<<                       >>>>ooooo===<<<<<                      
-0           1           2           3           4           5           6           7           8           9           10           11           12           13           14           15           16-----------17-----------18-----------19-----------20-----------21-----------22           23           
-                                                                                                                                                                                                                        >>ooooo=====<<<                   >>>>oo====<<<<                        
-0           1           2           3           4           5           6           7           8           9           10           11           12           13           14           15           16-----------17-----------18-----------19-----------20           21           22           23           
-                                                                                                                                                                                                                                                                                                
-0-----------1-----------2-----------3-----------4           5           6           7           8           9           10           11           12           13           14           15           16           17           18           19           20           21           22           23           
-                      >>>oooooo====<<<<    >>>oo====<                                                                                                                                                                                                                                           
-0           1           2           3           4           5           6           7           8-----------9-----------10-----------11-----------12           13           14           15           16           17           18           19           20           21           22           23           
-                                                                                                            >>>>>ooo====<<<<     >>>>oooo==<<<<                                                                                                                                                 
-0           1           2           3           4           5           6           7           8-----------9-----------10-----------11-----------12           13           14           15           16           17           18           19           20           21           22           23           
-                                                                                                               >>oooooo===<         >>>oooo======<                                                                                                                                              
-0           1           2           3           4           5           6           7           8           9           10           11           12-----------13-----------14-----------15-----------16           17           18           19           20           21           22           23           
-                                                                                                                                                                            >>>>>oooo==<<<<<                                                                                                    
-Unhandled incidents: 
+k: 1
+Normal: (TeamAllocation, (0, 14400), 1, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (TeamDeallocation, (0, 0), 1, 0), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 2
+Normal: (TeamAllocation, (0, 14400), 1, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (TeamDeallocation, (0, 0), 1, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 3
+Normal: (ShiftChange, (0, 21600), 1, 0), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (0, 14400), 1, 0), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 4
+Normal: (ShiftChange, (0, 28800), 1, 0), (Identity, (0, 0), 0, 0)
+Inverse: (ShiftChange, (0, 21600), 1, 0), (Identity, (0, 0), 0, 0)
+k: 5
+Normal: (ShiftChange, (0, 43200), 1, 0), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (0, 28800), 1, 0), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 5
+Normal: (ShiftChange, (0, 43200), 1, 1), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (0, 14400), 1, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 4
+Normal: (ShiftChange, (0, 28800), 1, 1), (Identity, (0, 0), 0, 0)
+Inverse: (ShiftChange, (0, 14400), 1, 1), (Identity, (0, 0), 0, 0)
+k: 5
+Normal: (ShiftChange, (0, 43200), 1, 0), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (0, 21600), 1, 0), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 5
+Normal: (ShiftChange, (0, 43200), 1, 1), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (0, 28800), 1, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 3
+Normal: (ShiftChange, (0, 21600), 1, 1), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (0, 14400), 1, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 4
+Normal: (ShiftChange, (0, 28800), 1, 0), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (0, 14400), 1, 0), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 5
+Normal: (ShiftChange, (0, 43200), 1, 0), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (0, 28800), 1, 0), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 5
+Normal: (ShiftChange, (0, 43200), 1, 1), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (0, 21600), 1, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 4
+Normal: (ShiftChange, (0, 28800), 1, 1), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (0, 21600), 1, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 5
+Normal: (ShiftChange, (0, 43200), 1, 0), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (0, 14400), 1, 0), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 5
+Normal: (ShiftChange, (0, 43200), 1, 1), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (0, 28800), 1, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 2
+Normal: (TeamAllocation, (0, 14400), 0, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (TeamDeallocation, (0, 0), 0, 0), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 3
+Normal: (TeamAllocation, (14400, 14400), 0, 0), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (TeamDeallocation, (0, 0), 0, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 4
+Normal: (Identity, (0, 0), 0, 0), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (Identity, (0, 0), 0, 0), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 5
+Normal: (ShiftChange, (0, 43200), 0, 0), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (0, 14400), 0, 0), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 6
+Normal: (ShiftChange, (14400, 36000), 0, 1), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (14400, 14400), 0, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 5
+Normal: (ShiftChange, (14400, 28800), 0, 1), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (14400, 14400), 0, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 6
+Normal: (ShiftChange, (14400, 36000), 0, 1), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (14400, 28800), 0, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 3
+Normal: (ShiftChange, (0, 21600), 0, 0), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (0, 14400), 0, 0), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 4
+Normal: (TeamAllocation, (14400, 14400), 1, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (TeamDeallocation, (0, 0), 1, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 5
+Normal: (TeamAllocation, (14400, 28800), 0, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (TeamDeallocation, (0, 0), 0, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 6
+Normal: (ShiftChange, (14400, 36000), 0, 1), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (14400, 28800), 0, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 5
+Normal: (ShiftChange, (0, 43200), 0, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (0, 21600), 0, 0), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 6
+Normal: (TeamAllocation, (43200, 14400), 0, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (TeamDeallocation, (0, 0), 0, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 7
+Normal: (ShiftChange, (43200, 21600), 0, 1), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (43200, 14400), 0, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+UPDATE
+:0:0-----------1-----------2-----------3-----------4-----------5-----------6-----------7-----------8-----------9-----------10-----------11-----------12           13           14           15           16           17           18           19           20           21           22           23           
+               >>>>>>>oooo=====<<<<<<<                                                                                              >>>>>ooooo=====<<<<                                                                                                                                         
+:0:0           1           2           3           4           5           6           7           8           9           10           11           12-----------13-----------14-----------15-----------16-----------17-----------18           19           20           21           22           23           
+                                                                                                                                                       >>>>>oo=====<<<<<                                     >oooo===<                                                                          
+:1:0-----------1-----------2-----------3-----------4           5           6           7           8           9           10           11           12           13           14           15           16           17           18           19           20           21           22           23           
+        >>>>>>oooooo===<<<<<<                                                                                                                                                                                                                                                                   
+:1:0           1           2           3           4-----------5-----------6-----------7-----------8           9           10           11           12           13           14           15           16           17           18           19           20           21           22           23           
+                                                >>>>>ooooo====<<<<<<  >>>ooooo===<<<                                                                                                                                                                                                            
+Count: 1
+Unhandled incidents: 7
+k: 6
+Normal: (ShiftChange, (14400, 36000), 1, 1), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (14400, 14400), 1, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 5
+Normal: (ShiftChange, (14400, 28800), 1, 1), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (14400, 14400), 1, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 6
+Normal: (TeamAllocation, (14400, 36000), 0, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (TeamDeallocation, (0, 0), 0, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 6
+Normal: (ShiftChange, (14400, 36000), 1, 1), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (14400, 28800), 1, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 4
+Normal: (TeamAllocation, (14400, 14400), 0, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (TeamDeallocation, (0, 0), 0, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 5
+Normal: (ShiftChange, (0, 43200), 0, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (0, 21600), 0, 0), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 6
+Normal: (ShiftChange, (14400, 36000), 0, 1), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (14400, 14400), 0, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 5
+Normal: (ShiftChange, (14400, 28800), 0, 1), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (14400, 14400), 0, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 6
+Normal: (ShiftChange, (14400, 36000), 0, 1), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (14400, 28800), 0, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 4
+Normal: (ShiftChange, (0, 28800), 0, 0), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (0, 21600), 0, 0), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 5
+Normal: (TeamAllocation, (28800, 14400), 1, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (TeamDeallocation, (0, 0), 1, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 6
+Normal: (TeamAllocation, (28800, 21600), 0, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (TeamDeallocation, (0, 0), 0, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 7
+Normal: (ShiftChange, (28800, 36000), 0, 1), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (28800, 21600), 0, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 6
+Normal: (ShiftChange, (28800, 21600), 1, 1), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (28800, 14400), 1, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 7
+Normal: (TeamAllocation, (28800, 36000), 0, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (TeamDeallocation, (0, 0), 0, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 7
+Normal: (ShiftChange, (28800, 36000), 1, 1), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (28800, 21600), 1, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+UPDATE
+:0:0-----------1-----------2-----------3-----------4-----------5-----------6-----------7-----------8           9           10           11           12           13           14           15           16           17           18           19           20           21           22           23           
+               >>>>>>>oooo=====<<<<<<<         >ooooo====<            >>>>>ooooo===<<<<<                                                                                                                                                                                                        
+:1:0-----------1-----------2-----------3-----------4           5           6           7           8           9           10           11           12           13           14           15           16           17           18           19           20           21           22           23           
+        >>>>>>oooooo===<<<<<<                                                                                                                                                                                                                                                                   
+:1:0           1           2           3           4           5           6           7           8-----------9-----------10-----------11-----------12-----------13-----------14-----------15-----------16-----------17-----------18           19           20           21           22           23           
+                                                                                                                                    >>>ooooo=====<<<  >>oo=====<                                             >>>>>>>oooo====<<<<<<<                                                             
+Count: 1
+Unhandled incidents: 7
+k: 5
+Normal: (TeamAllocation, (28800, 14400), 0, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (TeamDeallocation, (0, 0), 0, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 6
+Normal: (ShiftChange, (28800, 21600), 0, 1), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (28800, 14400), 0, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 7
+Normal: (ShiftChange, (28800, 36000), 0, 1), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (28800, 21600), 0, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 5
+Normal: (ShiftChange, (0, 43200), 0, 0), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (0, 28800), 0, 0), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 6
+Normal: (TeamAllocation, (43200, 14400), 1, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (TeamDeallocation, (0, 0), 1, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 7
+Normal: (TeamAllocation, (43200, 21600), 0, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (TeamDeallocation, (0, 0), 0, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 7
+Normal: (ShiftChange, (43200, 21600), 1, 1), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (43200, 14400), 1, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 2
+Normal: (TeamAllocation, (0, 14400), 2, 0), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (TeamDeallocation, (0, 0), 2, 0), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 3
+Normal: (TeamAllocation, (14400, 14400), 2, 0), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (TeamDeallocation, (0, 0), 2, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 4
+Normal: (Identity, (0, 0), 0, 0), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (Identity, (0, 0), 0, 0), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 5
+Normal: (ShiftChange, (0, 43200), 1, 0), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (0, 14400), 1, 0), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 6
+Normal: (TeamAllocation, (43200, 14400), 1, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (TeamDeallocation, (0, 0), 1, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 7
+Normal: (ShiftChange, (43200, 21600), 1, 1), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (43200, 14400), 1, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 6
+Normal: (ShiftChange, (14400, 36000), 2, 1), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (14400, 14400), 2, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 5
+Normal: (ShiftChange, (14400, 28800), 2, 1), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (14400, 14400), 2, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 6
+Normal: (ShiftChange, (14400, 36000), 2, 1), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (14400, 28800), 2, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 3
+Normal: (TeamAllocation, (14400, 14400), 1, 0), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (TeamDeallocation, (0, 0), 1, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 4
+Normal: (Identity, (0, 0), 0, 0), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (Identity, (0, 0), 0, 0), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 5
+Normal: (TeamAllocation, (0, 43200), 0, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (TeamDeallocation, (0, 0), 0, 0), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 6
+Normal: (ShiftChange, (14400, 36000), 1, 1), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (14400, 14400), 1, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 5
+Normal: (ShiftChange, (0, 43200), 1, 0), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (0, 14400), 1, 0), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 6
+Normal: (ShiftChange, (14400, 36000), 1, 1), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (14400, 14400), 1, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 5
+Normal: (ShiftChange, (14400, 28800), 1, 1), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (14400, 14400), 1, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 6
+Normal: (ShiftChange, (14400, 36000), 1, 1), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (14400, 28800), 1, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 3
+Normal: (TeamAllocation, (0, 21600), 0, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (TeamDeallocation, (0, 0), 0, 0), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 4
+Normal: (TeamAllocation, (14400, 14400), 1, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (TeamDeallocation, (0, 0), 1, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 5
+Normal: (ShiftChange, (0, 43200), 0, 0), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (0, 21600), 0, 0), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 6
+Normal: (ShiftChange, (14400, 36000), 1, 1), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (14400, 14400), 1, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 7
+Normal: (TeamAllocation, (43200, 21600), 0, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (TeamDeallocation, (0, 0), 0, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 5
+Normal: (ShiftChange, (14400, 28800), 1, 1), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (14400, 14400), 1, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 6
+Normal: (TeamAllocation, (14400, 36000), 0, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (TeamDeallocation, (0, 0), 0, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 6
+Normal: (ShiftChange, (14400, 36000), 1, 1), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (14400, 28800), 1, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 4
+Normal: (TeamAllocation, (14400, 14400), 2, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (TeamDeallocation, (0, 0), 2, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 5
+Normal: (TeamAllocation, (14400, 28800), 1, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (TeamDeallocation, (0, 0), 1, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 6
+Normal: (ShiftChange, (14400, 36000), 1, 1), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (14400, 28800), 1, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 5
+Normal: (TeamAllocation, (14400, 28800), 0, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (TeamDeallocation, (0, 0), 0, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 6
+Normal: (ShiftChange, (14400, 36000), 0, 1), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (14400, 28800), 0, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 5
+Normal: (ShiftChange, (14400, 28800), 2, 1), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (14400, 14400), 2, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 6
+Normal: (TeamAllocation, (14400, 36000), 1, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (TeamDeallocation, (0, 0), 1, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 6
+Normal: (ShiftChange, (14400, 36000), 2, 1), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (14400, 28800), 2, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 5
+Normal: (ShiftChange, (0, 43200), 0, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (0, 21600), 0, 0), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 6
+Normal: (TeamAllocation, (43200, 14400), 1, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (TeamDeallocation, (0, 0), 1, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 7
+Normal: (ShiftChange, (43200, 21600), 1, 1), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (43200, 14400), 1, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 6
+Normal: (TeamAllocation, (43200, 14400), 0, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (TeamDeallocation, (0, 0), 0, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 7
+Normal: (ShiftChange, (43200, 21600), 0, 1), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (43200, 14400), 0, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 6
+Normal: (ShiftChange, (14400, 36000), 2, 1), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (14400, 14400), 2, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 7
+Normal: (TeamAllocation, (43200, 21600), 1, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (TeamDeallocation, (0, 0), 1, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 4
+Normal: (TeamAllocation, (14400, 14400), 0, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (TeamDeallocation, (0, 0), 0, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 5
+Normal: (ShiftChange, (0, 43200), 0, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (0, 21600), 0, 0), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 6
+Normal: (ShiftChange, (14400, 36000), 0, 1), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (14400, 14400), 0, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 5
+Normal: (ShiftChange, (14400, 28800), 0, 1), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (14400, 14400), 0, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 6
+Normal: (ShiftChange, (14400, 36000), 0, 1), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (14400, 28800), 0, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 4
+Normal: (ShiftChange, (0, 28800), 0, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (0, 21600), 0, 0), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 5
+Normal: (TeamAllocation, (28800, 14400), 1, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (TeamDeallocation, (0, 0), 1, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 6
+Normal: (ShiftChange, (28800, 21600), 1, 1), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (28800, 14400), 1, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 7
+Normal: (TeamAllocation, (28800, 36000), 0, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (TeamDeallocation, (0, 0), 0, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 7
+Normal: (ShiftChange, (28800, 36000), 1, 1), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (28800, 21600), 1, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 5
+Normal: (TeamAllocation, (28800, 14400), 2, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (TeamDeallocation, (0, 0), 2, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 6
+Normal: (ShiftChange, (28800, 21600), 2, 1), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (28800, 14400), 2, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 7
+Normal: (TeamAllocation, (28800, 36000), 1, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (TeamDeallocation, (0, 0), 1, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 7
+Normal: (ShiftChange, (28800, 36000), 2, 1), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (28800, 21600), 2, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 5
+Normal: (TeamAllocation, (28800, 14400), 0, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (TeamDeallocation, (0, 0), 0, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 6
+Normal: (ShiftChange, (28800, 21600), 0, 1), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (28800, 14400), 0, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 7
+Normal: (ShiftChange, (28800, 36000), 0, 1), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (28800, 21600), 0, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 5
+Normal: (ShiftChange, (0, 43200), 0, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (0, 28800), 0, 0), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 6
+Normal: (TeamAllocation, (43200, 14400), 1, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (TeamDeallocation, (0, 0), 1, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 7
+Normal: (ShiftChange, (43200, 21600), 1, 1), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (43200, 14400), 1, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 6
+Normal: (TeamAllocation, (43200, 14400), 0, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (TeamDeallocation, (0, 0), 0, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 7
+Normal: (ShiftChange, (43200, 21600), 0, 1), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (43200, 14400), 0, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 6
+Normal: (TeamAllocation, (43200, 14400), 2, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (TeamDeallocation, (0, 0), 2, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 7
+Normal: (ShiftChange, (43200, 21600), 2, 1), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (43200, 14400), 2, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 3
+Normal: (ShiftChange, (0, 21600), 1, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (0, 14400), 1, 0), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 4
+Normal: (TeamAllocation, (14400, 14400), 1, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (TeamDeallocation, (0, 0), 1, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 5
+Normal: (TeamAllocation, (0, 43200), 0, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (TeamDeallocation, (0, 0), 0, 0), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 6
+Normal: (ShiftChange, (14400, 36000), 1, 1), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (14400, 14400), 1, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 7
+Normal: (TeamAllocation, (43200, 21600), 0, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (TeamDeallocation, (0, 0), 0, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 5
+Normal: (ShiftChange, (0, 43200), 1, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (0, 21600), 1, 0), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 6
+Normal: (ShiftChange, (14400, 36000), 1, 1), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (14400, 14400), 1, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 5
+Normal: (ShiftChange, (14400, 28800), 1, 1), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (14400, 14400), 1, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 6
+Normal: (ShiftChange, (14400, 36000), 1, 1), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (14400, 28800), 1, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 4
+Normal: (TeamAllocation, (0, 28800), 0, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (TeamDeallocation, (0, 0), 0, 0), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 5
+Normal: (TeamAllocation, (28800, 14400), 0, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (TeamDeallocation, (0, 0), 0, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 6
+Normal: (ShiftChange, (28800, 21600), 0, 1), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (28800, 14400), 0, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 7
+Normal: (ShiftChange, (28800, 36000), 0, 1), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (28800, 21600), 0, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 5
+Normal: (TeamAllocation, (28800, 14400), 1, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (TeamDeallocation, (0, 0), 1, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 6
+Normal: (ShiftChange, (28800, 21600), 1, 1), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (28800, 14400), 1, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 7
+Normal: (ShiftChange, (28800, 36000), 1, 1), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (28800, 21600), 1, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 5
+Normal: (TeamAllocation, (28800, 14400), 2, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (TeamDeallocation, (0, 0), 2, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 6
+Normal: (ShiftChange, (28800, 21600), 2, 1), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (28800, 14400), 2, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 7
+Normal: (ShiftChange, (28800, 36000), 2, 1), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (28800, 21600), 2, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 5
+Normal: (ShiftChange, (0, 43200), 0, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (0, 28800), 0, 0), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 6
+Normal: (TeamAllocation, (43200, 14400), 2, 0), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (TeamDeallocation, (0, 0), 2, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 7
+Normal: (ShiftChange, (43200, 21600), 2, 1), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (43200, 14400), 2, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 6
+Normal: (TeamAllocation, (43200, 14400), 0, 0), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (TeamDeallocation, (0, 0), 0, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 7
+Normal: (ShiftChange, (43200, 21600), 0, 1), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (43200, 14400), 0, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 6
+Normal: (TeamAllocation, (43200, 14400), 1, 0), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (TeamDeallocation, (0, 0), 1, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 7
+Normal: (TeamAllocation, (43200, 21600), 0, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (TeamDeallocation, (0, 0), 0, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 7
+Normal: (ShiftChange, (43200, 21600), 1, 1), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (43200, 14400), 1, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 4
+Normal: (TeamAllocation, (0, 28800), 2, 0), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (TeamDeallocation, (0, 0), 2, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 5
+Normal: (TeamAllocation, (14400, 28800), 1, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (TeamDeallocation, (0, 0), 1, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 6
+Normal: (ShiftChange, (14400, 36000), 1, 1), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (14400, 28800), 1, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 5
+Normal: (TeamAllocation, (0, 43200), 0, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (TeamDeallocation, (0, 0), 0, 0), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 5
+Normal: (ShiftChange, (0, 43200), 2, 1), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (0, 28800), 2, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 6
+Normal: (TeamAllocation, (14400, 36000), 1, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (TeamDeallocation, (0, 0), 1, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 5
+Normal: (ShiftChange, (0, 43200), 1, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (0, 21600), 1, 0), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 4
+Normal: (ShiftChange, (0, 28800), 1, 0), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (0, 21600), 1, 0), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 5
+Normal: (TeamAllocation, (28800, 14400), 2, 0), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (TeamDeallocation, (0, 0), 2, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 6
+Normal: (ShiftChange, (28800, 21600), 2, 1), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (28800, 14400), 2, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 7
+Normal: (ShiftChange, (28800, 36000), 2, 1), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (28800, 21600), 2, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 5
+Normal: (TeamAllocation, (28800, 14400), 1, 0), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (TeamDeallocation, (0, 0), 1, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 6
+Normal: (ShiftChange, (28800, 21600), 1, 1), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (28800, 14400), 1, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 7
+Normal: (ShiftChange, (28800, 36000), 1, 1), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (28800, 21600), 1, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 5
+Normal: (TeamAllocation, (0, 43200), 0, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (TeamDeallocation, (0, 0), 0, 0), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 6
+Normal: (TeamAllocation, (43200, 14400), 2, 0), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (TeamDeallocation, (0, 0), 2, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 7
+Normal: (TeamAllocation, (43200, 21600), 1, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (TeamDeallocation, (0, 0), 1, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 7
+Normal: (ShiftChange, (43200, 21600), 2, 1), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (43200, 14400), 2, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 6
+Normal: (TeamAllocation, (43200, 14400), 0, 0), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (TeamDeallocation, (0, 0), 0, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 7
+Normal: (ShiftChange, (43200, 21600), 0, 1), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (43200, 14400), 0, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 6
+Normal: (TeamAllocation, (43200, 14400), 1, 0), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (TeamDeallocation, (0, 0), 1, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 7
+Normal: (TeamAllocation, (43200, 21600), 0, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (TeamDeallocation, (0, 0), 0, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 7
+Normal: (ShiftChange, (43200, 21600), 1, 1), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (43200, 14400), 1, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 5
+Normal: (ShiftChange, (0, 43200), 1, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (0, 28800), 1, 0), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 6
+Normal: (TeamAllocation, (43200, 14400), 2, 0), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (TeamDeallocation, (0, 0), 2, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 7
+Normal: (ShiftChange, (43200, 21600), 2, 1), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (43200, 14400), 2, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 6
+Normal: (TeamAllocation, (43200, 14400), 1, 0), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (TeamDeallocation, (0, 0), 1, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 7
+Normal: (ShiftChange, (43200, 21600), 1, 1), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (43200, 14400), 1, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 1
+Normal: (TeamAllocation, (0, 14400), 0, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (TeamDeallocation, (0, 0), 0, 0), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 2
+Normal: (TeamAllocation, (0, 14400), 1, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (TeamDeallocation, (0, 0), 1, 0), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 3
+Normal: (ShiftChange, (0, 21600), 0, 0), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (0, 14400), 0, 0), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 4
+Normal: (TeamAllocation, (14400, 14400), 1, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (TeamDeallocation, (0, 0), 1, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 5
+Normal: (ShiftChange, (0, 43200), 0, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (0, 21600), 0, 0), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 6
+Normal: (ShiftChange, (14400, 36000), 1, 1), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (14400, 14400), 1, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 7
+Normal: (TeamAllocation, (43200, 21600), 0, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (TeamDeallocation, (0, 0), 0, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 5
+Normal: (ShiftChange, (14400, 28800), 1, 1), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (14400, 14400), 1, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 6
+Normal: (ShiftChange, (14400, 36000), 1, 1), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (14400, 28800), 1, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 4
+Normal: (TeamAllocation, (14400, 14400), 0, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (TeamDeallocation, (0, 0), 0, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 5
+Normal: (ShiftChange, (0, 43200), 0, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (0, 21600), 0, 0), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 6
+Normal: (ShiftChange, (14400, 36000), 0, 1), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (14400, 14400), 0, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 5
+Normal: (ShiftChange, (14400, 28800), 0, 1), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (14400, 14400), 0, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 6
+Normal: (ShiftChange, (14400, 36000), 0, 1), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (14400, 28800), 0, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 4
+Normal: (ShiftChange, (0, 28800), 0, 0), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (0, 21600), 0, 0), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 5
+Normal: (ShiftChange, (0, 43200), 0, 0), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (0, 28800), 0, 0), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 6
+Normal: (TeamAllocation, (43200, 14400), 1, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (TeamDeallocation, (0, 0), 1, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 7
+Normal: (ShiftChange, (43200, 21600), 1, 1), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (43200, 14400), 1, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 2
+Normal: (TeamAllocation, (0, 14400), 2, 0), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (TeamDeallocation, (0, 0), 2, 0), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 3
+Normal: (TeamAllocation, (14400, 14400), 0, 0), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (TeamDeallocation, (0, 0), 0, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 4
+Normal: (Identity, (0, 0), 0, 0), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (Identity, (0, 0), 0, 0), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 5
+Normal: (ShiftChange, (0, 43200), 0, 0), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (0, 14400), 0, 0), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 6
+Normal: (ShiftChange, (14400, 36000), 0, 1), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (14400, 14400), 0, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 5
+Normal: (ShiftChange, (14400, 28800), 0, 1), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (14400, 14400), 0, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 6
+Normal: (ShiftChange, (14400, 36000), 0, 1), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (14400, 28800), 0, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 3
+Normal: (TeamAllocation, (14400, 14400), 2, 0), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (TeamDeallocation, (0, 0), 2, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 4
+Normal: (Identity, (0, 0), 0, 0), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (Identity, (0, 0), 0, 0), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 5
+Normal: (ShiftChange, (0, 43200), 0, 0), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (0, 14400), 0, 0), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 6
+Normal: (ShiftChange, (14400, 36000), 2, 1), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (14400, 14400), 2, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 5
+Normal: (ShiftChange, (14400, 28800), 2, 1), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (14400, 14400), 2, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 6
+Normal: (ShiftChange, (14400, 36000), 2, 1), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (14400, 28800), 2, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 3
+Normal: (ShiftChange, (0, 21600), 0, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (0, 14400), 0, 0), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 4
+Normal: (TeamAllocation, (14400, 14400), 2, 0), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (TeamDeallocation, (0, 0), 2, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 5
+Normal: (TeamAllocation, (14400, 28800), 0, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (TeamDeallocation, (0, 0), 0, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 6
+Normal: (ShiftChange, (14400, 36000), 0, 1), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (14400, 28800), 0, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 5
+Normal: (ShiftChange, (14400, 28800), 2, 1), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (14400, 14400), 2, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 6
+Normal: (ShiftChange, (14400, 36000), 2, 1), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (14400, 28800), 2, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 5
+Normal: (ShiftChange, (0, 43200), 0, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (0, 21600), 0, 0), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 6
+Normal: (ShiftChange, (14400, 36000), 2, 1), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (14400, 14400), 2, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 4
+Normal: (TeamAllocation, (14400, 14400), 0, 0), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (TeamDeallocation, (0, 0), 0, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 5
+Normal: (ShiftChange, (0, 43200), 0, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (0, 21600), 0, 0), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 6
+Normal: (ShiftChange, (14400, 36000), 0, 1), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (14400, 14400), 0, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 5
+Normal: (ShiftChange, (14400, 28800), 0, 1), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (14400, 14400), 0, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 6
+Normal: (ShiftChange, (14400, 36000), 0, 1), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (14400, 28800), 0, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 4
+Normal: (ShiftChange, (0, 28800), 0, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (0, 21600), 0, 0), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 5
+Normal: (ShiftChange, (0, 43200), 0, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (0, 28800), 0, 0), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 6
+Normal: (TeamAllocation, (43200, 14400), 0, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (TeamDeallocation, (0, 0), 0, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 7
+Normal: (ShiftChange, (43200, 21600), 0, 1), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (43200, 14400), 0, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 6
+Normal: (TeamAllocation, (43200, 14400), 2, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (TeamDeallocation, (0, 0), 2, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 7
+Normal: (ShiftChange, (43200, 21600), 2, 1), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (43200, 14400), 2, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 2
+Normal: (TeamAllocation, (0, 14400), 0, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (TeamDeallocation, (0, 0), 0, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 3
+Normal: (ShiftChange, (0, 21600), 0, 0), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (0, 14400), 0, 0), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 4
+Normal: (ShiftChange, (0, 28800), 0, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (0, 21600), 0, 0), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 5
+Normal: (ShiftChange, (0, 43200), 0, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (0, 28800), 0, 0), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 5
+Normal: (ShiftChange, (0, 43200), 0, 1), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (0, 14400), 0, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 4
+Normal: (ShiftChange, (0, 28800), 0, 1), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (0, 14400), 0, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 5
+Normal: (ShiftChange, (0, 43200), 0, 0), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (0, 21600), 0, 0), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 5
+Normal: (ShiftChange, (0, 43200), 0, 1), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (0, 28800), 0, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 3
+Normal: (ShiftChange, (0, 21600), 0, 1), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (0, 14400), 0, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 4
+Normal: (ShiftChange, (0, 28800), 0, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (0, 14400), 0, 0), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 5
+Normal: (ShiftChange, (0, 43200), 0, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (0, 28800), 0, 0), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 5
+Normal: (ShiftChange, (0, 43200), 0, 1), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (0, 21600), 0, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 4
+Normal: (ShiftChange, (0, 28800), 0, 1), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (0, 21600), 0, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 5
+Normal: (ShiftChange, (0, 43200), 0, 0), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (0, 14400), 0, 0), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 5
+Normal: (ShiftChange, (0, 43200), 0, 1), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (0, 28800), 0, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 1
+Normal: (TeamAllocation, (0, 14400), 2, 0), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (TeamDeallocation, (0, 0), 2, 0), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 2
+Normal: (TeamAllocation, (0, 14400), 1, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (TeamDeallocation, (0, 0), 1, 0), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 3
+Normal: (TeamAllocation, (14400, 14400), 1, 0), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (TeamDeallocation, (0, 0), 1, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 4
+Normal: (Identity, (0, 0), 0, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (Identity, (0, 0), 0, 0), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 5
+Normal: (ShiftChange, (0, 43200), 1, 0), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (0, 14400), 1, 0), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 6
+Normal: (ShiftChange, (14400, 36000), 1, 1), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (14400, 14400), 1, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 5
+Normal: (ShiftChange, (14400, 28800), 1, 1), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (14400, 14400), 1, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 6
+Normal: (ShiftChange, (14400, 36000), 1, 1), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (14400, 28800), 1, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 3
+Normal: (TeamAllocation, (14400, 14400), 2, 0), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (TeamDeallocation, (0, 0), 2, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 4
+Normal: (Identity, (0, 0), 0, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (Identity, (0, 0), 0, 0), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 5
+Normal: (TeamAllocation, (0, 43200), 0, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (TeamDeallocation, (0, 0), 0, 0), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 6
+Normal: (TeamAllocation, (43200, 14400), 1, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (TeamDeallocation, (0, 0), 1, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 7
+Normal: (ShiftChange, (43200, 21600), 1, 1), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (43200, 14400), 1, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 6
+Normal: (ShiftChange, (14400, 36000), 2, 1), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (14400, 14400), 2, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 5
+Normal: (ShiftChange, (0, 43200), 1, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (0, 14400), 1, 0), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 6
+Normal: (TeamAllocation, (43200, 14400), 1, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (TeamDeallocation, (0, 0), 1, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 7
+Normal: (ShiftChange, (43200, 21600), 1, 1), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (43200, 14400), 1, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 6
+Normal: (ShiftChange, (14400, 36000), 2, 1), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (14400, 14400), 2, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 7
+Normal: (TeamAllocation, (43200, 21600), 1, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (TeamDeallocation, (0, 0), 1, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 5
+Normal: (ShiftChange, (14400, 28800), 2, 1), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (14400, 14400), 2, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 6
+Normal: (ShiftChange, (14400, 36000), 2, 1), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (14400, 28800), 2, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 3
+Normal: (TeamAllocation, (0, 21600), 0, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (TeamDeallocation, (0, 0), 0, 0), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 4
+Normal: (TeamAllocation, (14400, 14400), 1, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (TeamDeallocation, (0, 0), 1, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 5
+Normal: (ShiftChange, (14400, 28800), 1, 1), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (14400, 14400), 1, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 6
+Normal: (ShiftChange, (14400, 36000), 1, 1), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (14400, 28800), 1, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 5
+Normal: (ShiftChange, (0, 43200), 0, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (0, 21600), 0, 0), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 6
+Normal: (ShiftChange, (14400, 36000), 1, 1), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (14400, 14400), 1, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 4
+Normal: (TeamAllocation, (14400, 14400), 0, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (TeamDeallocation, (0, 0), 0, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 5
+Normal: (ShiftChange, (0, 43200), 0, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (0, 21600), 0, 0), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 6
+Normal: (ShiftChange, (14400, 36000), 0, 1), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (14400, 14400), 0, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 5
+Normal: (ShiftChange, (14400, 28800), 0, 1), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (14400, 14400), 0, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 6
+Normal: (ShiftChange, (14400, 36000), 0, 1), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (14400, 28800), 0, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 4
+Normal: (TeamAllocation, (14400, 14400), 2, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (TeamDeallocation, (0, 0), 2, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 5
+Normal: (ShiftChange, (14400, 28800), 2, 1), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (14400, 14400), 2, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 6
+Normal: (ShiftChange, (14400, 36000), 2, 1), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (14400, 28800), 2, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 5
+Normal: (ShiftChange, (0, 43200), 0, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (0, 21600), 0, 0), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 6
+Normal: (ShiftChange, (14400, 36000), 2, 1), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (14400, 14400), 2, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 4
+Normal: (ShiftChange, (0, 28800), 0, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (0, 21600), 0, 0), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 5
+Normal: (TeamAllocation, (28800, 14400), 2, 0), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (TeamDeallocation, (0, 0), 2, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 6
+Normal: (ShiftChange, (28800, 21600), 2, 1), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (28800, 14400), 2, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 7
+Normal: (ShiftChange, (28800, 36000), 2, 1), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (28800, 21600), 2, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 5
+Normal: (TeamAllocation, (28800, 14400), 1, 0), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (TeamDeallocation, (0, 0), 1, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 6
+Normal: (ShiftChange, (28800, 21600), 1, 1), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (28800, 14400), 1, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 7
+Normal: (ShiftChange, (28800, 36000), 1, 1), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (28800, 21600), 1, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 5
+Normal: (TeamAllocation, (28800, 14400), 0, 0), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (TeamDeallocation, (0, 0), 0, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 6
+Normal: (ShiftChange, (28800, 21600), 0, 1), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (28800, 14400), 0, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 7
+Normal: (ShiftChange, (28800, 36000), 0, 1), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (28800, 21600), 0, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 5
+Normal: (ShiftChange, (0, 43200), 0, 0), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (0, 28800), 0, 0), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 6
+Normal: (TeamAllocation, (43200, 14400), 0, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (TeamDeallocation, (0, 0), 0, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 7
+Normal: (ShiftChange, (43200, 21600), 0, 1), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (43200, 14400), 0, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 6
+Normal: (TeamAllocation, (43200, 14400), 2, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (TeamDeallocation, (0, 0), 2, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 7
+Normal: (TeamAllocation, (43200, 21600), 0, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (TeamDeallocation, (0, 0), 0, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 7
+Normal: (ShiftChange, (43200, 21600), 2, 1), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (43200, 14400), 2, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 6
+Normal: (TeamAllocation, (43200, 14400), 1, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (TeamDeallocation, (0, 0), 1, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 7
+Normal: (TeamAllocation, (43200, 21600), 0, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (TeamDeallocation, (0, 0), 0, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 7
+Normal: (ShiftChange, (43200, 21600), 1, 1), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (43200, 14400), 1, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 3
+Normal: (ShiftChange, (0, 21600), 1, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (0, 14400), 1, 0), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 4
+Normal: (TeamAllocation, (14400, 14400), 1, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (TeamDeallocation, (0, 0), 1, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 5
+Normal: (TeamAllocation, (0, 43200), 0, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (TeamDeallocation, (0, 0), 0, 0), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 6
+Normal: (ShiftChange, (14400, 36000), 1, 1), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (14400, 14400), 1, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 5
+Normal: (ShiftChange, (0, 43200), 1, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (0, 21600), 1, 0), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 6
+Normal: (ShiftChange, (14400, 36000), 1, 1), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (14400, 14400), 1, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 5
+Normal: (ShiftChange, (14400, 28800), 1, 1), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (14400, 14400), 1, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 6
+Normal: (ShiftChange, (14400, 36000), 1, 1), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (14400, 28800), 1, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 4
+Normal: (TeamAllocation, (0, 28800), 0, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (TeamDeallocation, (0, 0), 0, 0), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 5
+Normal: (TeamAllocation, (28800, 14400), 1, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (TeamDeallocation, (0, 0), 1, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 6
+Normal: (ShiftChange, (28800, 21600), 1, 1), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (28800, 14400), 1, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 7
+Normal: (TeamAllocation, (28800, 36000), 0, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (TeamDeallocation, (0, 0), 0, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 7
+Normal: (ShiftChange, (28800, 36000), 1, 1), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (28800, 21600), 1, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 5
+Normal: (TeamAllocation, (28800, 14400), 2, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (TeamDeallocation, (0, 0), 2, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 6
+Normal: (TeamAllocation, (28800, 21600), 1, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (TeamDeallocation, (0, 0), 1, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 7
+Normal: (ShiftChange, (28800, 36000), 1, 1), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (28800, 21600), 1, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 6
+Normal: (TeamAllocation, (28800, 21600), 0, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (TeamDeallocation, (0, 0), 0, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 7
+Normal: (ShiftChange, (28800, 36000), 0, 1), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (28800, 21600), 0, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 6
+Normal: (ShiftChange, (28800, 21600), 2, 1), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (28800, 14400), 2, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 7
+Normal: (TeamAllocation, (28800, 36000), 0, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (TeamDeallocation, (0, 0), 0, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 7
+Normal: (TeamAllocation, (28800, 36000), 1, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (TeamDeallocation, (0, 0), 1, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 7
+Normal: (ShiftChange, (28800, 36000), 2, 1), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (28800, 21600), 2, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 5
+Normal: (TeamAllocation, (28800, 14400), 0, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (TeamDeallocation, (0, 0), 0, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 6
+Normal: (ShiftChange, (28800, 21600), 0, 1), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (28800, 14400), 0, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 7
+Normal: (ShiftChange, (28800, 36000), 0, 1), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (28800, 21600), 0, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 5
+Normal: (ShiftChange, (0, 43200), 0, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (0, 28800), 0, 0), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 6
+Normal: (TeamAllocation, (43200, 14400), 1, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (TeamDeallocation, (0, 0), 1, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 7
+Normal: (ShiftChange, (43200, 21600), 1, 1), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (43200, 14400), 1, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 6
+Normal: (TeamAllocation, (43200, 14400), 0, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (TeamDeallocation, (0, 0), 0, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 7
+Normal: (ShiftChange, (43200, 21600), 0, 1), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (43200, 14400), 0, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 6
+Normal: (TeamAllocation, (43200, 14400), 2, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (TeamDeallocation, (0, 0), 2, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 7
+Normal: (TeamAllocation, (43200, 21600), 1, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (TeamDeallocation, (0, 0), 1, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 7
+Normal: (ShiftChange, (43200, 21600), 2, 1), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (43200, 14400), 2, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 4
+Normal: (TeamAllocation, (0, 28800), 2, 0), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (TeamDeallocation, (0, 0), 2, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 5
+Normal: (TeamAllocation, (14400, 28800), 1, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (TeamDeallocation, (0, 0), 1, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 6
+Normal: (ShiftChange, (14400, 36000), 1, 1), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (14400, 28800), 1, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 5
+Normal: (TeamAllocation, (0, 43200), 0, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (TeamDeallocation, (0, 0), 0, 0), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 5
+Normal: (ShiftChange, (0, 43200), 2, 1), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (0, 28800), 2, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 6
+Normal: (TeamAllocation, (14400, 36000), 1, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (TeamDeallocation, (0, 0), 1, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 5
+Normal: (ShiftChange, (0, 43200), 1, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (0, 21600), 1, 0), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 6
+Normal: (TeamAllocation, (43200, 14400), 1, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (TeamDeallocation, (0, 0), 1, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 7
+Normal: (ShiftChange, (43200, 21600), 1, 1), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (43200, 14400), 1, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 4
+Normal: (ShiftChange, (0, 28800), 1, 0), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (0, 21600), 1, 0), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 5
+Normal: (TeamAllocation, (28800, 14400), 1, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (TeamDeallocation, (0, 0), 1, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 6
+Normal: (ShiftChange, (28800, 21600), 1, 1), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (28800, 14400), 1, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 7
+Normal: (ShiftChange, (28800, 36000), 1, 1), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (28800, 21600), 1, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 5
+Normal: (TeamAllocation, (0, 43200), 0, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (TeamDeallocation, (0, 0), 0, 0), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 6
+Normal: (TeamAllocation, (43200, 14400), 1, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (TeamDeallocation, (0, 0), 1, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 7
+Normal: (ShiftChange, (43200, 21600), 1, 1), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (43200, 14400), 1, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 6
+Normal: (TeamAllocation, (43200, 14400), 2, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (TeamDeallocation, (0, 0), 2, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 7
+Normal: (TeamAllocation, (43200, 21600), 1, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (TeamDeallocation, (0, 0), 1, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 7
+Normal: (TeamAllocation, (43200, 21600), 0, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (TeamDeallocation, (0, 0), 0, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 7
+Normal: (ShiftChange, (43200, 21600), 2, 1), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (43200, 14400), 2, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 6
+Normal: (TeamAllocation, (43200, 14400), 0, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (TeamDeallocation, (0, 0), 0, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 7
+Normal: (ShiftChange, (43200, 21600), 0, 1), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (43200, 14400), 0, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 5
+Normal: (TeamAllocation, (0, 43200), 2, 0), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (TeamDeallocation, (0, 0), 2, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 6
+Normal: (TeamAllocation, (28800, 21600), 1, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (TeamDeallocation, (0, 0), 1, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 7
+Normal: (ShiftChange, (28800, 36000), 1, 1), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (28800, 21600), 1, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 5
+Normal: (ShiftChange, (0, 43200), 1, 0), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (0, 28800), 1, 0), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 6
+Normal: (TeamAllocation, (43200, 14400), 1, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (TeamDeallocation, (0, 0), 1, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 7
+Normal: (ShiftChange, (43200, 21600), 1, 1), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (43200, 14400), 1, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 6
+Normal: (TeamAllocation, (43200, 14400), 2, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (TeamDeallocation, (0, 0), 2, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 7
+Normal: (ShiftChange, (43200, 21600), 2, 1), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (43200, 14400), 2, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 2
+Normal: (TeamAllocation, (0, 14400), 2, 0), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (TeamDeallocation, (0, 0), 2, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 3
+Normal: (TeamAllocation, (0, 21600), 1, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (TeamDeallocation, (0, 0), 1, 0), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 4
+Normal: (TeamAllocation, (14400, 14400), 1, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (TeamDeallocation, (0, 0), 1, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 5
+Normal: (ShiftChange, (0, 43200), 1, 0), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (0, 21600), 1, 0), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 6
+Normal: (ShiftChange, (14400, 36000), 1, 1), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (14400, 14400), 1, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 5
+Normal: (ShiftChange, (14400, 28800), 1, 1), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (14400, 14400), 1, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 6
+Normal: (ShiftChange, (14400, 36000), 1, 1), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (14400, 28800), 1, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 4
+Normal: (TeamAllocation, (0, 28800), 0, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (TeamDeallocation, (0, 0), 0, 0), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 5
+Normal: (TeamAllocation, (28800, 14400), 0, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (TeamDeallocation, (0, 0), 0, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 6
+Normal: (ShiftChange, (28800, 21600), 0, 1), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (28800, 14400), 0, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 7
+Normal: (ShiftChange, (28800, 36000), 0, 1), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (28800, 21600), 0, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 5
+Normal: (ShiftChange, (0, 43200), 0, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (0, 28800), 0, 0), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 5
+Normal: (ShiftChange, (0, 43200), 2, 1), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (0, 14400), 2, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 6
+Normal: (TeamAllocation, (28800, 21600), 1, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (TeamDeallocation, (0, 0), 1, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 7
+Normal: (ShiftChange, (28800, 36000), 1, 1), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (28800, 21600), 1, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 4
+Normal: (ShiftChange, (0, 28800), 2, 1), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (0, 14400), 2, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 5
+Normal: (TeamAllocation, (14400, 28800), 1, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (TeamDeallocation, (0, 0), 1, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 6
+Normal: (ShiftChange, (14400, 36000), 1, 1), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (14400, 28800), 1, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 5
+Normal: (TeamAllocation, (0, 43200), 0, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (TeamDeallocation, (0, 0), 0, 0), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 5
+Normal: (ShiftChange, (0, 43200), 2, 1), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (0, 28800), 2, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 5
+Normal: (ShiftChange, (0, 43200), 1, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (0, 21600), 1, 0), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 4
+Normal: (ShiftChange, (0, 28800), 1, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (0, 21600), 1, 0), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 5
+Normal: (TeamAllocation, (0, 43200), 0, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (TeamDeallocation, (0, 0), 0, 0), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 6
+Normal: (TeamAllocation, (43200, 14400), 0, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (TeamDeallocation, (0, 0), 0, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 7
+Normal: (ShiftChange, (43200, 21600), 0, 1), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (43200, 14400), 0, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 6
+Normal: (TeamAllocation, (43200, 14400), 1, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (TeamDeallocation, (0, 0), 1, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 7
+Normal: (ShiftChange, (43200, 21600), 1, 1), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (43200, 14400), 1, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 5
+Normal: (ShiftChange, (0, 43200), 1, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (0, 28800), 1, 0), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 5
+Normal: (ShiftChange, (0, 43200), 2, 1), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (0, 14400), 2, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 3
+Normal: (ShiftChange, (0, 21600), 2, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (0, 14400), 2, 0), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 4
+Normal: (ShiftChange, (0, 28800), 2, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (0, 21600), 2, 0), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 5
+Normal: (TeamAllocation, (0, 43200), 0, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (TeamDeallocation, (0, 0), 0, 0), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 5
+Normal: (TeamAllocation, (0, 43200), 1, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (TeamDeallocation, (0, 0), 1, 0), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 5
+Normal: (ShiftChange, (0, 43200), 2, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (0, 28800), 2, 0), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 5
+Normal: (ShiftChange, (0, 43200), 2, 1), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (0, 14400), 2, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 4
+Normal: (ShiftChange, (0, 28800), 2, 1), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (0, 14400), 2, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 5
+Normal: (TeamAllocation, (0, 43200), 1, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (TeamDeallocation, (0, 0), 1, 0), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 5
+Normal: (ShiftChange, (0, 43200), 2, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (0, 21600), 2, 0), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 5
+Normal: (ShiftChange, (0, 43200), 2, 1), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (0, 28800), 2, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 3
+Normal: (ShiftChange, (0, 21600), 2, 1), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (0, 14400), 2, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 4
+Normal: (ShiftChange, (0, 28800), 2, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (0, 14400), 2, 0), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 5
+Normal: (TeamAllocation, (0, 43200), 0, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (TeamDeallocation, (0, 0), 0, 0), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 6
+Normal: (TeamAllocation, (43200, 14400), 0, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (TeamDeallocation, (0, 0), 0, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 7
+Normal: (ShiftChange, (43200, 21600), 0, 1), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (43200, 14400), 0, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 5
+Normal: (TeamAllocation, (0, 43200), 1, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (TeamDeallocation, (0, 0), 1, 0), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 5
+Normal: (ShiftChange, (0, 43200), 2, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (0, 28800), 2, 0), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 5
+Normal: (ShiftChange, (0, 43200), 2, 1), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (0, 21600), 2, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 4
+Normal: (ShiftChange, (0, 28800), 2, 1), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (0, 21600), 2, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 5
+Normal: (ShiftChange, (0, 43200), 2, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (0, 14400), 2, 0), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 5
+Normal: (ShiftChange, (0, 43200), 2, 1), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (0, 28800), 2, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 2
+Normal: (TeamAllocation, (0, 14400), 0, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (TeamDeallocation, (0, 0), 0, 0), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 3
+Normal: (TeamAllocation, (14400, 14400), 2, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (TeamDeallocation, (0, 0), 2, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 4
+Normal: (Identity, (0, 0), 0, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (Identity, (0, 0), 0, 0), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 5
+Normal: (TeamAllocation, (14400, 28800), 0, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (TeamDeallocation, (0, 0), 0, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 6
+Normal: (ShiftChange, (14400, 36000), 0, 1), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (14400, 28800), 0, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 5
+Normal: (ShiftChange, (14400, 28800), 2, 1), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (14400, 14400), 2, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 6
+Normal: (TeamAllocation, (14400, 36000), 0, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (TeamDeallocation, (0, 0), 0, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 6
+Normal: (ShiftChange, (14400, 36000), 2, 1), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (14400, 28800), 2, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 5
+Normal: (ShiftChange, (0, 43200), 0, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (ShiftChange, (0, 14400), 0, 0), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 6
+Normal: (TeamAllocation, (43200, 14400), 0, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (TeamDeallocation, (0, 0), 0, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 7
+Normal: (ShiftChange, (43200, 21600), 0, 1), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (43200, 14400), 0, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 6
+Normal: (ShiftChange, (14400, 36000), 2, 1), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (14400, 14400), 2, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 7
+Normal: (TeamAllocation, (43200, 21600), 0, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (TeamDeallocation, (0, 0), 0, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 3
+Normal: (TeamAllocation, (14400, 14400), 0, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (TeamDeallocation, (0, 0), 0, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 4
+Normal: (Identity, (0, 0), 0, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (Identity, (0, 0), 0, 0), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 5
+Normal: (ShiftChange, (0, 43200), 0, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (0, 14400), 0, 0), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 6
+Normal: (ShiftChange, (14400, 36000), 0, 1), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (14400, 14400), 0, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 5
+Normal: (ShiftChange, (14400, 28800), 0, 1), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (14400, 14400), 0, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 6
+Normal: (ShiftChange, (14400, 36000), 0, 1), (AmbulanceAllocation, (0, 0), 2, 0)
+Inverse: (ShiftChange, (14400, 28800), 0, 1), (AmbulanceDeallocation, (0, 0), 2, 0)
+k: 3
+Normal: (ShiftChange, (0, 21600), 0, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (0, 14400), 0, 0), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 4
+Normal: (TeamAllocation, (14400, 14400), 0, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (TeamDeallocation, (0, 0), 0, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 5
+Normal: (ShiftChange, (0, 43200), 0, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (0, 21600), 0, 0), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 6
+Normal: (ShiftChange, (14400, 36000), 0, 1), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (14400, 14400), 0, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 5
+Normal: (ShiftChange, (14400, 28800), 0, 1), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (14400, 14400), 0, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 6
+Normal: (ShiftChange, (14400, 36000), 0, 1), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (14400, 28800), 0, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 4
+Normal: (TeamAllocation, (14400, 14400), 2, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (TeamDeallocation, (0, 0), 2, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 5
+Normal: (ShiftChange, (0, 43200), 0, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (0, 21600), 0, 0), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 6
+Normal: (ShiftChange, (14400, 36000), 2, 1), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (14400, 14400), 2, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 7
+Normal: (TeamAllocation, (43200, 21600), 0, 0), (AmbulanceAllocation, (0, 0), 0, 0)
+Inverse: (TeamDeallocation, (0, 0), 0, 1), (AmbulanceDeallocation, (0, 0), 0, 0)
+k: 5
+Normal: (ShiftChange, (14400, 28800), 2, 1), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (14400, 14400), 2, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 6
+Normal: (ShiftChange, (14400, 36000), 2, 1), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (14400, 28800), 2, 1), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 4
+Normal: (ShiftChange, (0, 28800), 0, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (0, 21600), 0, 0), (AmbulanceDeallocation, (0, 0), 1, 0)
+k: 5
+Normal: (ShiftChange, (0, 43200), 0, 0), (AmbulanceAllocation, (0, 0), 1, 0)
+Inverse: (ShiftChange, (0, 28800), 0, 0), (AmbulanceDeallocation, (0, 0), 1, 0)

@@ -50,10 +50,7 @@ public sealed class Simulation
     State = new SimulationState(world.Depots.Length, constraints);
   }
 
-  /// <summary>
-  /// Performs simulation on Depots.
-  /// </summary>
-  public void Run(EmergencyServicePlan plan, ReadOnlySpan<Incident> incidents)
+  public int Run(EmergencyServicePlan plan, ReadOnlySpan<Incident> incidents)
   {
     Plan = plan;
     TotalIncidentsCount = incidents.Length;
@@ -105,6 +102,8 @@ public sealed class Simulation
       plannableIncidentForBestShift = _plannableIncidentFactory.Get(bestMedicTeam, in currentIncident);
       State.PlanIncident(bestMedicTeam, plannableIncidentForBestShift);
     }
+
+    return HandledIncidentsCount;
   }
 
   private void Prepare()

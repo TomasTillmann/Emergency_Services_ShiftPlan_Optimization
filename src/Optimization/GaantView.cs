@@ -24,6 +24,7 @@ public class GaantView
         {
             for (int onDepotIndex = 0; onDepotIndex < plan.Assignments[depotIndex].MedicTeams.Count; ++onDepotIndex)
             {
+                writer.Write($":{depotIndex}:");
                 Seconds end = 24.ToHours().ToMinutes().ToSeconds();
                 for (Seconds time = 0.ToSeconds(); time < end; time += (5 * 60).ToSeconds())
                 {
@@ -66,9 +67,9 @@ public class GaantView
                 }
                 writer.WriteLine();
             }
-            writer.Flush();
         }
 
-        writer.WriteLine("Unhandled incidents: " + string.Join(", ", _simulation.UnhandledIncidents));
+        writer.WriteLine($"Count: {_simulation.UnhandledIncidents.Count}\nUnhandled incidents: " + string.Join(", ", _simulation.UnhandledIncidents));
+        writer.Flush();
     }
 }

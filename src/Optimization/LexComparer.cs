@@ -21,7 +21,7 @@ public class LexComparer
 
     _simulation.Run(p2, incidents.AsSpan());
     int handled2 = _simulation.HandledIncidentsCount;
-    int cost2 = p1.Cost;
+    int cost2 = p2.Cost;
 
     if (handled1 > handled2 || (handled1 == handled2 && cost1 < cost2))
     {

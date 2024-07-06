@@ -22,6 +22,12 @@ public class SimulationStateVerbose : SimulationState
         }
     }
 
+    public override void Clear(EmergencyServicePlan plan)
+    {
+        base.Clear(plan);
+        _plannedIncidentsForTeam.Clear();
+    }
+
     public List<PlannableIncident> GetAllPlannedIncidents(MedicTeamId teamId)
     {
         if (!_plannedIncidentsForTeam.ContainsKey(teamId)) return new List<PlannableIncident>();

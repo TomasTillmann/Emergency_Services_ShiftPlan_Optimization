@@ -60,7 +60,7 @@ public class MedicTeamsEvaluator
 
     // 1, 2, 3, 4
     MedicTeam team = Plan.Team(teamId);
-    const int overdue = 60 * 60;
+    const int overdue = 20 * 60;
     if (plannableIncident.InHospitalDelivery.EndSec > team.Shift.EndSec + overdue)
     {
       return false;

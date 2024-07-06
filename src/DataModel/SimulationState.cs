@@ -41,7 +41,7 @@ public class SimulationState : ISimulationState
   /// <summary>
   /// Clears state of only plan's dimensions.
   /// </summary>
-  public void Clear(EmergencyServicePlan plan)
+  public virtual void Clear(EmergencyServicePlan plan)
   {
     for (int i = 0; i < plan.Assignments.Length; ++i)
     {

@@ -8,9 +8,9 @@ public class Input1 : IInputParametrization
 {
   private readonly Random _random;
   private readonly DataModelGenerator _dataGenerator = new();
-  private const int avaialbeMedicTeamsCount = 20;
-  private const int availableAmbulancesCount = 20;
-  private const int depotsCount = 20;
+  private const int avaialbeMedicTeamsCount = 5;
+  private const int availableAmbulancesCount = 5;
+  private const int depotsCount = 3;
 
   public Input1(Random random = null)
   {
@@ -21,8 +21,8 @@ public class Input1 : IInputParametrization
   {
     return new Constraints
     {
-      MaxTeamsPerDepotCount = Enumerable.Repeat(30, depotsCount).ToImmutableArray(),
-      MaxAmbulancesPerDepotCount = Enumerable.Repeat(20, depotsCount).ToImmutableArray(),
+      MaxTeamsPerDepotCount = Enumerable.Repeat(2, depotsCount).ToImmutableArray(),
+      MaxAmbulancesPerDepotCount = Enumerable.Repeat(2, depotsCount).ToImmutableArray(),
     };
   }
 
@@ -46,7 +46,7 @@ public class Input1 : IInputParametrization
     // Incidents init
     ImmutableArray<Incident> incidents = _dataGenerator.GenerateIncidentModels(
       worldSize: new CoordinateModel { XMet = 50_000, YMet = 50_000 },
-      incidentsCount: 40,
+      incidentsCount: 8,
       duration: 21.ToHours().ToSeconds(),
       onSceneDurationNormalExpected: 20.ToMinutes().ToSeconds(),
       onSceneDurationNormalStddev: 10.ToMinutes().ToSeconds(),

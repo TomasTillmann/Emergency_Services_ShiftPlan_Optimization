@@ -43,127 +43,38 @@ public class AllBasicMovesGenerator : MoveGeneratorBase
   private IEnumerable<MoveSequenceDuo> GetShiftChanges(EmergencyServicePlan plan, MedicTeamId teamId)
   {
     Interval shift = plan.Team(teamId).Shift;
-    Moves.Count = 1;
-
     if (plan.CanLonger(teamId, ShiftTimes))
     {
-      Moves.Inverse.MovesBuffer[0] = new Move
-      {
-        Type = MoveType.ShiftChange,
-        Shift = shift,
-        DepotIndex = teamId.DepotIndex,
-        OnDepotIndex = teamId.OnDepotIndex
-      };
-
-      Moves.Normal.MovesBuffer[0] = new Move
-      {
-        Type = MoveType.ShiftChange,
-        Shift = Interval.GetByStartAndDuration(shift.StartSec, ShiftTimes.GetLonger(shift.DurationSec)),
-        DepotIndex = teamId.DepotIndex,
-        OnDepotIndex = teamId.OnDepotIndex
-      };
-
+      ChangeShift(teamId, shift, Interval.GetByStartAndDuration(shift.StartSec, ShiftTimes.GetLonger(shift.DurationSec)));
       yield return Moves;
     }
 
     if (plan.CanShorten(teamId, ShiftTimes))
     {
-      Moves.Inverse.MovesBuffer[0] = new Move
-      {
-        Type = MoveType.ShiftChange,
-        Shift = shift,
-        DepotIndex = teamId.DepotIndex,
-        OnDepotIndex = teamId.OnDepotIndex
-      };
-
-      Moves.Normal.MovesBuffer[0] = new Move
-      {
-        Type = MoveType.ShiftChange,
-        Shift = Interval.GetByStartAndDuration(shift.StartSec, ShiftTimes.GetShorter(shift.DurationSec)),
-        DepotIndex = teamId.DepotIndex,
-        OnDepotIndex = teamId.OnDepotIndex
-      };
-
+      ChangeShift(teamId, shift, Interval.GetByStartAndDuration(shift.StartSec, ShiftTimes.GetShorter(shift.DurationSec)));
       yield return Moves;
     }
 
     if (plan.CanEarlier(teamId, ShiftTimes))
     {
-      Moves.Inverse.MovesBuffer[0] = new Move
-      {
-        Type = MoveType.ShiftChange,
-        Shift = shift,
-        DepotIndex = teamId.DepotIndex,
-        OnDepotIndex = teamId.OnDepotIndex
-      };
-
-      Moves.Normal.MovesBuffer[0] = new Move
-      {
-        Type = MoveType.ShiftChange,
-        Shift = Interval.GetByStartAndDuration(ShiftTimes.GetEarlier(shift.StartSec), shift.DurationSec),
-        DepotIndex = teamId.DepotIndex,
-        OnDepotIndex = teamId.OnDepotIndex
-      };
-
+      ChangeShift(teamId, shift, Interval.GetByStartAndDuration(ShiftTimes.GetEarlier(shift.StartSec), shift.DurationSec));
       yield return Moves;
     }
 
     if (plan.CanLater(teamId, ShiftTimes))
     {
-      Moves.Inverse.MovesBuffer[0] = new Move
-      {
-        Type = MoveType.ShiftChange,
-        Shift = shift,
-        DepotIndex = teamId.DepotIndex,
-        OnDepotIndex = teamId.OnDepotIndex
-      };
-
-      Moves.Normal.MovesBuffer[0] = new Move
-      {
-        Type = MoveType.ShiftChange,
-        Shift = Interval.GetByStartAndDuration(ShiftTimes.GetLater(shift.StartSec), shift.DurationSec),
-        DepotIndex = teamId.DepotIndex,
-        OnDepotIndex = teamId.OnDepotIndex
-      };
-
+      ChangeShift(teamId, shift, Interval.GetByStartAndDuration(ShiftTimes.GetLater(shift.StartSec), shift.DurationSec));
       yield return Moves;
     }
   }
 
   private IEnumerable<MoveSequenceDuo> GetTeamAllocations(EmergencyServicePlan plan, int depotIndex)
   {
-    Moves.Count = 2;
-    if (plan.CanAllocateTeam(depotIndex, Constraints))
+    if (plan.CanAllocateTeam(depotIndex, Constraints) && plan.CanAllocateAmbulance(depotIndex, Constraints))
     {
-      Moves.Count = 2;
-      Moves.Inverse.MovesBuffer[0] = new Move
-      {
-        Type = MoveType.TeamDeallocation,
-        DepotIndex = depotIndex,
-        OnDepotIndex = plan.Assignments[depotIndex].MedicTeams.Count
-      };
-      
-      Moves.Inverse.MovesBuffer[1] = new Move
-      {
-        Type = MoveType.AmbulanceDeallocation,
-        DepotIndex = depotIndex,
-      };
-      
-      Moves.Normal.MovesBuffer[1] = new Move
-      {
-        Type = MoveType.AmbulanceAllocation,
-        DepotIndex = depotIndex,
-      };
-
       for (int i = 0; i < ShiftTimes.AllowedStartingTimesSecSorted.Length; ++i)
       {
-        Moves.Normal.MovesBuffer[0] = new Move
-        {
-          Type = MoveType.TeamAllocation,
-          DepotIndex = depotIndex,
-          Shift = Interval.GetByStartAndDuration(ShiftTimes.AllowedStartingTimesSecSorted[i], ShiftTimes.MinDurationSec)
-        };
-
+        AllocateTeamAndAmbulance(depotIndex, Interval.GetByStartAndDuration(ShiftTimes.AllowedStartingTimesSecSorted[i], ShiftTimes.MinDurationSec), plan.Assignments[depotIndex].MedicTeams.Count);
         yield return Moves;
       }
     }
@@ -171,61 +82,18 @@ public class AllBasicMovesGenerator : MoveGeneratorBase
 
   private IEnumerable<MoveSequenceDuo> GetTeamDeallocations(EmergencyServicePlan plan, MedicTeamId teamId)
   {
-    Moves.Count = 1;
     if (plan.CanDeallocateTeam(teamId, ShiftTimes))
     {
-      Moves.Inverse.MovesBuffer[0] = new Move
-      {
-        Type = MoveType.TeamAllocation,
-        DepotIndex = teamId.DepotIndex,
-        Shift = plan.Team(teamId).Shift
-      };
-
-      Moves.Normal.MovesBuffer[0] = new Move
-      {
-        Type = MoveType.TeamDeallocation,
-        DepotIndex = teamId.DepotIndex,
-        OnDepotIndex = teamId.OnDepotIndex
-      };
-
+      DeallocateTeam(teamId, plan.Team(teamId).Shift);
       yield return Moves;
     }
   }
 
   private IEnumerable<MoveSequenceDuo> GetAmbMoves(EmergencyServicePlan plan, int depotIndex)
   {
-    Moves.Count = 1;
-    if (plan.CanAllocateAmbulance(depotIndex, Constraints))
-    {
-      Moves.Inverse.MovesBuffer[0] = new Move
-      {
-        Type = MoveType.AmbulanceDeallocation,
-        DepotIndex = depotIndex
-      };
-
-      Moves.Normal.MovesBuffer[0] = new Move
-      {
-        Type = MoveType.AmbulanceAllocation,
-        DepotIndex = depotIndex
-      };
-
-      yield return Moves;
-    }
-
     if (plan.CanDeallocateAmbulance(depotIndex))
     {
-      Moves.Inverse.MovesBuffer[0] = new Move
-      {
-        Type = MoveType.AmbulanceAllocation,
-        DepotIndex = depotIndex
-      };
-
-      Moves.Normal.MovesBuffer[0] = new Move
-      {
-        Type = MoveType.AmbulanceDeallocation,
-        DepotIndex = depotIndex
-      };
-
+      DeallocateAmbulance(depotIndex);
       yield return Moves;
     }
   }
