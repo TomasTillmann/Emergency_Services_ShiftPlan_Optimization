@@ -14,6 +14,7 @@ public class OptimalMovesGenerator(
   : MoveGeneratorBase(shiftTimes, constraints, movesBufferSize)
 {
   public int K { get; set; }
+  public TextWriter writer;
   public ImmutableArray<Incident> Incidents { get; set; }
   private readonly Simulation _simulation = new(world, constraints);
   private readonly MoveMaker _moveMaker = new();
@@ -29,6 +30,7 @@ public class OptimalMovesGenerator(
       // incident happens before any shift could possible be allocated, therefore it cannot be handled. 
       // Identity move is returned, so this incident is ignored.
       // There is no branch, where this incident could possibly be handled.
+      //writer.WriteLine("No way");
       Identity();
       yield return Moves;
       yield break;
@@ -38,19 +40,29 @@ public class OptimalMovesGenerator(
     if (r + 1 == new_r)
     {
       // incident is handled already. No shift needs to be prolonged or new team / ambulance need to be allocated.
+      //writer.WriteLine("Identity -> r = r + 1");
       Identity();
       yield return Moves;
     }
     else
     {
+      bool cantHandle = true;
+      foreach (var move in OptimalMovesShiftProlonging(plan, Incidents, r))
+      {
+        cantHandle = false;
+        yield return move;
+      }
+      
       foreach (var move in OptimalMovesTeamAllocations(plan, Incidents, r, startTimeIndex))
       {
+        cantHandle = false;
         yield return move;
       }
 
-      foreach (var move in OptimalMovesShiftProlonging(plan, Incidents, r))
+      if (cantHandle)
       {
-        yield return move;
+        Identity();
+        yield return Moves;
       }
     }
   }
@@ -64,7 +76,7 @@ public class OptimalMovesGenerator(
     
     for (int depotIndex = 0; depotIndex < plan.Assignments.Length; ++depotIndex)
     {
-      for (; startTimeIndex >= 0; --startTimeIndex)
+      for (int currStartTimeIndex = startTimeIndex; currStartTimeIndex >= 0; --currStartTimeIndex)
       {
         for (int durationIndex = 0; durationIndex < ShiftTimes.AllowedDurationsSecSorted.Length; ++durationIndex)
         {

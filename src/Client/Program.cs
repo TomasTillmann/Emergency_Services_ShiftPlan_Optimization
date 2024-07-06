@@ -50,7 +50,7 @@ class Program
 #if DynamicProgramming
   public static void Main()
   {
-    Random random = new Random(66);
+    Random random = new Random(420);
     IInputParametrization input = new Input1(random);
     World world = input.GetWorld();
     Constraints constraints = input.GetConstraints();
@@ -61,7 +61,7 @@ class Program
     IUtilityFunction utilityFunction;
 
     simulation = new(world, constraints);
-    optimizer = new OptimalMovesSearchOptimizer(world, shiftTimes, constraints);
+    optimizer = new OptimalMovesSearchOptimizer(world, shiftTimes, constraints, random);
 
     Stopwatch sw = Stopwatch.StartNew();
     var optimal = optimizer.GetBest(incidents).First();
