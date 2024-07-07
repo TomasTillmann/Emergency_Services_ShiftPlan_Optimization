@@ -3,7 +3,6 @@ namespace Optimizing;
 public class MoveSequenceDuo
 {
   private int _count;
-
   public int Count
   {
     get => _count;
@@ -17,13 +16,22 @@ public class MoveSequenceDuo
   public MoveSequence Normal { get; set; }
   public MoveSequence Inverse { get; set; }
 
-  public MoveSequenceDuo(int maxMovesSize)
+  public static MoveSequenceDuo GetNewEmpty(int maxMovesSize) => new(maxMovesSize);
+
+  private MoveSequenceDuo(int maxMovesSize)
   {
-    Normal = new MoveSequence(maxMovesSize);
-    Inverse = new MoveSequence(maxMovesSize);
+    Normal = MoveSequence.GetNewEmpty(maxMovesSize);
+    Inverse = MoveSequence.GetNewEmpty(maxMovesSize);
   }
-  
-  public MoveSequenceDuo() {}
+
+  public MoveSequenceDuo() { }
+
+  public void FillFrom(MoveSequenceDuo other)
+  {
+    Count = other.Count;
+    Normal.FillFrom(other.Normal);
+    Inverse.FillFrom(other.Inverse);
+  }
 
   public override string ToString()
   {

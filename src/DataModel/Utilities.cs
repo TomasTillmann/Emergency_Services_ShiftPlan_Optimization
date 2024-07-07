@@ -36,7 +36,7 @@ public static class BasicMovesGeneratorHelperExtensions
     return moves
       .Select(shared =>
       {
-        MoveSequenceDuo x = new MoveSequenceDuo(bufferSize);
+        MoveSequenceDuo x = MoveSequenceDuo.GetNewEmpty(bufferSize);
         shared.Normal.Count = shared.Count;
         shared.Inverse.Count = shared.Count;
         x.Normal.FillFrom(shared.Normal);

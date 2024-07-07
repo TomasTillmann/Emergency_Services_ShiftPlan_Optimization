@@ -1,5 +1,6 @@
 ﻿//#define LocalSearch 
-#define DynamicProgramming 
+//#define DynamicProgramming 
+#define TabuSearch
 
 using ESSP.DataModel;
 using Optimizing;
@@ -26,6 +27,38 @@ class Program
     IUtilityFunction utilityFunction = new WeightedSum(simulation, EmergencyServicePlan.GetMaxCost(world, shiftTimes));
     IMoveGenerator moveGenerator = new AllBasicMovesGenerator(shiftTimes, constraints);
     var optimizer = new LocalSearchOptimizer(int.MaxValue, world, constraints, utilityFunction, moveGenerator);
+    //optimizer.StartPlan = planSampler.Sample();
+
+    Stopwatch sw = Stopwatch.StartNew();
+    var optimal = optimizer.GetBest(incidents.AsSpan()).ToList().First();
+    double eval = utilityFunction.Evaluate(optimal, incidents.AsSpan());
+
+    Console.WriteLine($"Iteration: {optimizer.PlateuIteration} " +
+                      $"eval: {eval}," +
+                      $"handled: {utilityFunction.HandledIncidentsCount} / {incidents.Length} " +
+                      $"cost: {optimal.Cost}");
+
+    using StreamWriter writer = new("/home/tom/School/Bakalarka/Emergency_Services_ShiftPlan_Optimization/src/log.txt");
+    GaantView gaant = new GaantView(world, constraints);
+    gaant.Show(optimal, incidents.AsSpan(), writer);
+  }
+#endif
+
+#if TabuSearch
+  public static void Main()
+  {
+    Random random = new Random(420);
+    IInputParametrization input = new Input1(random);
+    World world = input.GetWorld();
+    Constraints constraints = input.GetConstraints();
+    ShiftTimes shiftTimes = input.GetShiftTimes();
+    PlanSampler planSampler = new PlanSamperUniform(world, shiftTimes, constraints, 0.5, random);
+    ImmutableArray<Incident> incidents = input.GetIncidents(10);
+
+    Simulation simulation = new(world, constraints);
+    IUtilityFunction utilityFunction = new WeightedSum(simulation, EmergencyServicePlan.GetMaxCost(world, shiftTimes));
+    IMoveGenerator moveGenerator = new AllBasicMovesGenerator(shiftTimes, constraints);
+    var optimizer = new TabuSearchOptimizer(world, constraints, utilityFunction, moveGenerator, tabuTenure: 1000);
     //optimizer.StartPlan = planSampler.Sample();
 
     Stopwatch sw = Stopwatch.StartNew();

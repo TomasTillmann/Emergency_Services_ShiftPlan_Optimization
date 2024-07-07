@@ -24,9 +24,4 @@ public abstract class NeighbourOptimizer : OptimizerBase
   {
     _moveMaker.ModifyMakeInverseMove(plan, moveSequence);
   }
-
-  private void DoMove(EmergencyServicePlan plan, Move move)
-  {
-    _moveMaker.DoMove(plan, move);
-  }
 }

@@ -20,7 +20,7 @@ public class MoveMaker
     }
   }
 
-  public void DoMove(EmergencyServicePlan plan, Move move)
+  private void DoMove(EmergencyServicePlan plan, Move move)
   {
     switch (move.Type)
     {

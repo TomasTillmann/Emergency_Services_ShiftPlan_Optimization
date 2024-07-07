@@ -16,8 +16,8 @@ public abstract class MoveGeneratorBase : IMoveGenerator
     MovesBufferSize = movesBufferSize;
     Moves = new MoveSequenceDuo
     {
-      Normal = new MoveSequence(movesBufferSize),
-      Inverse = new MoveSequence(movesBufferSize)
+      Normal = MoveSequence.GetNewEmpty(movesBufferSize),
+      Inverse = MoveSequence.GetNewEmpty(movesBufferSize)
     };
   }
 
@@ -140,6 +140,7 @@ public abstract class MoveGeneratorBase : IMoveGenerator
 
   protected void DeallocateAmbulance(int depotIndex)
   {
+    Moves.Count = 1;
     Moves.Inverse.MovesBuffer[0] = new Move
     {
       Type = MoveType.AmbulanceAllocation,

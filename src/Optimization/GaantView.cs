@@ -69,7 +69,8 @@ public class GaantView
       }
     }
 
-    writer.WriteLine($"Count: {_simulation.UnhandledIncidents.Count}\nUnhandled incidents: " + string.Join(", ", _simulation.UnhandledIncidents));
+    writer.WriteLine($"handled count: {_simulation.HandledIncidentsCount} / {_simulation.TotalIncidentsCount}, cost: {plan.Cost}");
+    writer.WriteLine($"Unhandled: " + string.Join(", ", _simulation.UnhandledIncidents));
     writer.Flush();
   }
 }
