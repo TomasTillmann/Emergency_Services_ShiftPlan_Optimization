@@ -1,6 +1,6 @@
 ﻿//#define LocalSearch 
-//#define DynamicProgramming 
-#define TabuSearch
+#define DynamicProgramming 
+//#define TabuSearch
 
 using ESSP.DataModel;
 using Optimizing;
@@ -84,24 +84,15 @@ class Program
     World world = input.GetWorld();
     Constraints constraints = input.GetConstraints();
     ShiftTimes shiftTimes = input.GetShiftTimes();
-    ImmutableArray<Incident> incidents = input.GetIncidents(50);
-    OptimalMovesSearchOptimizer optimizer;
-    Simulation simulation;
-    IUtilityFunction utilityFunction;
+    ImmutableArray<Incident> incidents = input.GetIncidents(100);
 
-    simulation = new(world, constraints);
-    optimizer = new OptimalMovesSearchOptimizer(world, shiftTimes, constraints, random);
-
-    Stopwatch sw = Stopwatch.StartNew();
+    Simulation simulation = new(world, constraints);
+    var optimizer = new OptimalMovesSearchOptimizer(world, shiftTimes, constraints, random);
     var optimal = optimizer.GetBest(incidents).First();
 
     simulation.Run(optimal, incidents.AsSpan());
     Console.WriteLine($"handled: {simulation.HandledIncidentsCount} / {incidents.Length} " +
                       $"cost: {optimal.Cost}");
-
-    // using StreamWriter writer = new("/home/tom/School/Bakalarka/Emergency_Services_ShiftPlan_Optimization/src/log.txt");
-    // GaantView gaant = new GaantView(world, constraints);
-    // gaant.Show(optimal, incidents.AsSpan(), writer);
   }
 #endif
 }

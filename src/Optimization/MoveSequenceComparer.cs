@@ -24,7 +24,7 @@ public class MoveSequenceComparer : IEqualityComparer<MoveSequence>
 
   public int GetHashCode([DisallowNull] MoveSequence obj)
   {
-    return obj.GetHashCode();
+    return HashCode.Combine(obj.Count, obj.MovesBuffer[0], obj.MovesBuffer[1]);
   }
 }
 

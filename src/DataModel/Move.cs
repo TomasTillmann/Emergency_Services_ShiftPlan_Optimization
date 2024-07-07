@@ -12,11 +12,10 @@ public readonly struct Move
   public int OnDepotIndex { get; init; }
 
   public static bool operator ==(Move x, Move y) => x.Type == y.Type && x.Shift == y.Shift && x.DepotIndex == y.DepotIndex && x.OnDepotIndex == y.OnDepotIndex;
-  public static bool operator !=(Move x, Move y) => !(x == y);
+  public static bool operator !=(Move x, Move y) => x.Type != y.Type || x.Shift != y.Shift || x.DepotIndex != y.DepotIndex || x.OnDepotIndex != y.OnDepotIndex;
 
   public override string ToString()
   {
     return $"({Type}, {Shift}, {DepotIndex}, {OnDepotIndex})";
   }
 }
-

@@ -38,7 +38,8 @@ public class TabuSearchOptimizer : NeighbourOptimizer
     MoveSequenceDuo bestMove = MoveSequenceDuo.GetNewEmpty(MoveGenerator.MovesBufferSize);
     for (PlateuIteration = 0; PlateuIteration < MaxIterations; ++PlateuIteration)
     {
-      if (PlateuIteration % 10 == 0) Console.WriteLine(PlateuIteration);
+      //if (PlateuIteration % 10 == 0) Console.WriteLine($"{PlateuIteration}: {tabu.Count}");
+      //if (PlateuIteration % 100 == 0) writer.WriteLine(string.Join("\n", tabu.ToList()));
 
       double bestNeighborEval = double.MinValue;
       foreach (var move in MoveGenerator.GetMoves(current))
@@ -61,7 +62,7 @@ public class TabuSearchOptimizer : NeighbourOptimizer
           bestNeighborEval = neighbourEval;
           bestMove.FillFrom(move);
         }
-        
+
         //if (neighbourEval > bestNeighborEval && (!tabu.Contains(current) || neighbourEval > bestPlanEval))
 
         _moveMaker.ModifyMakeInverseMove(current, move.Inverse);
