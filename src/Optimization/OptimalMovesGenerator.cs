@@ -43,7 +43,7 @@ public class OptimalMovesGenerator(
     simulationState.FillFrom(_simulation.State);
 
     _simulation.State.FillFrom(simulationState);
-    int new_r = _simulation.Run(plan, Incidents.AsSpan().Slice(K - 1, 1));
+    int new_r = _simulation.Run(plan, Incidents.AsSpan().Slice(K - 1, 1), resetState: false);
 
     if (new_r == 1)
     {
@@ -103,7 +103,7 @@ public class OptimalMovesGenerator(
 
             _simulation.State.FillFrom(simulationState);
             _moveMaker.ModifyMakeMove(plan, Moves.Normal);
-            new_r = _simulation.Run(plan, incidents.AsSpan().Slice(K - 1, 1));
+            new_r = _simulation.Run(plan, incidents.AsSpan().Slice(K - 1, 1), resetState: false);
             _moveMaker.ModifyMakeInverseMove(plan, Moves.Inverse);
 
             if (new_r == 1)
@@ -122,7 +122,7 @@ public class OptimalMovesGenerator(
 
               _simulation.State.FillFrom(simulationState);
               _moveMaker.ModifyMakeMove(plan, Moves.Normal);
-              new_r = _simulation.Run(plan, incidents.AsSpan().Slice(K - 1, 1));
+              new_r = _simulation.Run(plan, incidents.AsSpan().Slice(K - 1, 1), resetState: false);
               _moveMaker.ModifyMakeInverseMove(plan, Moves.Inverse);
 
               if (new_r == 1)
@@ -159,7 +159,7 @@ public class OptimalMovesGenerator(
 
             _simulation.State.FillFrom(simulationState);
             _moveMaker.ModifyMakeMove(plan, Moves.Normal);
-            int new_r = _simulation.Run(plan, incidents.AsSpan().Slice(K - 1, 1));
+            int new_r = _simulation.Run(plan, incidents.AsSpan().Slice(K - 1, 1), resetState: false);
             _moveMaker.ModifyMakeInverseMove(plan, Moves.Inverse);
 
             if (new_r == 1)
