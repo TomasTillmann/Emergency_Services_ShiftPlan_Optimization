@@ -8,8 +8,8 @@ public class Input1 : IInputParametrization
 {
   private readonly Random _random;
   private readonly DataModelGenerator _dataGenerator = new();
-  private const int avaialbeMedicTeamsCount = 20;
-  private const int availableAmbulancesCount = 12;
+  private const int avaialbeMedicTeamsCount = 50;
+  private const int availableAmbulancesCount = 20;
   private const int depotsCount = 30;
 
   public Input1(Random random = null)

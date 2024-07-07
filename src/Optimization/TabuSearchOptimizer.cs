@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using ESSP.DataModel;
 
 namespace Optimizing;
@@ -25,7 +24,7 @@ public class TabuSearchOptimizer : NeighbourOptimizer
     using StreamWriter writer = new("/home/tom/School/Bakalarka/Emergency_Services_ShiftPlan_Optimization/src/log.txt");
     GaantView gaant = new(World, Constraints);
 
-    HashSet<MoveSequence?> tabu = new(TabuTenure, new MoveSequenceComparer());
+    HashSet<MoveSequence> tabu = new(TabuTenure, new MoveSequenceComparer());
     MoveSequence[] tabuQueue = new MoveSequence[TabuTenure];
     int tabuQueueIndex = -1;
 
@@ -37,29 +36,33 @@ public class TabuSearchOptimizer : NeighbourOptimizer
     double bestPlanEval = UtilityFunction.Evaluate(bestPlan, incidents);
 
     MoveSequenceDuo bestMove = MoveSequenceDuo.GetNewEmpty(MoveGenerator.MovesBufferSize);
-    double bestNeighborEval;
-
     for (PlateuIteration = 0; PlateuIteration < MaxIterations; ++PlateuIteration)
     {
-      Console.WriteLine(PlateuIteration);
+      if (PlateuIteration % 10 == 0) Console.WriteLine(PlateuIteration);
 
-      bestNeighborEval = double.MinValue;
+      double bestNeighborEval = double.MinValue;
       foreach (var move in MoveGenerator.GetMoves(current))
       {
         _moveMaker.ModifyMakeMove(current, move.Normal);
 
         double neighbourEval = UtilityFunction.Evaluate(current, incidents);
-        if (tabu.Contains(move.Normal))
-        {
 
-        }
-        if (neighbourEval > bestNeighborEval && (!tabu.Contains(move.Normal) || neighbourEval > bestPlanEval))
+        if (neighbourEval > bestNeighborEval && !tabu.Contains(move.Normal))
         {
-          gaant.Show(current, incidents, writer);
-          writer.WriteLine($"eval: {neighbourEval}");
+          //gaant.Show(current, incidents, writer);
+          //writer.WriteLine($"eval: {neighbourEval}");
           bestNeighborEval = neighbourEval;
           bestMove.FillFrom(move);
         }
+        else if (neighbourEval > bestPlanEval)
+        {
+          //gaant.Show(current, incidents, writer);
+          //writer.WriteLine($"eval: {neighbourEval}");
+          bestNeighborEval = neighbourEval;
+          bestMove.FillFrom(move);
+        }
+        
+        //if (neighbourEval > bestNeighborEval && (!tabu.Contains(current) || neighbourEval > bestPlanEval))
 
         _moveMaker.ModifyMakeInverseMove(current, move.Inverse);
       }
@@ -67,50 +70,27 @@ public class TabuSearchOptimizer : NeighbourOptimizer
       // plateu
       if (bestNeighborEval == double.MinValue)
       {
-        return new List<EmergencyServicePlan> { bestPlan };
+        return [bestPlan];
       }
 
       _moveMaker.ModifyMakeMove(current, bestMove.Normal);
 
       if (bestNeighborEval > bestPlanEval)
       {
+        gaant.Show(current, incidents, writer);
         bestPlan.FillFrom(current);
+        bestPlanEval = bestNeighborEval;
       }
 
       int position = (tabuQueueIndex + 1) % TabuTenure;
-      tabu.Remove(tabuQueue[position]);
-      tabu.Add(MoveSequence.GetNewFrom(bestMove.Inverse));
+      //tabu.Remove(tabuQueue[position]);
+      MoveSequence bestMoveCopy = MoveSequence.GetNewFrom(bestMove.Inverse);
+      tabu.Add(bestMoveCopy);
       tabuQueueIndex = position;
-      tabuQueue[tabuQueueIndex] = bestMove.Inverse;
+      tabuQueue[tabuQueueIndex] = bestMoveCopy;
     }
 
-    return new List<EmergencyServicePlan> { bestPlan };
-  }
-
-  public class MoveSequenceComparer : IEqualityComparer<MoveSequence>
-  {
-    public bool Equals(MoveSequence x, MoveSequence y)
-    {
-      if (x.Count != y.Count)
-      {
-        return false;
-      }
-
-      for (int i = 0; i < x.Count; ++i)
-      {
-        if (x.MovesBuffer[i] != y.MovesBuffer[i])
-        {
-          return false;
-        }
-      }
-
-      return true;
-    }
-
-    public int GetHashCode([DisallowNull] MoveSequence obj)
-    {
-      return HashCode.Combine(obj.Count, );
-    }
+    return [bestPlan];
   }
 }
 

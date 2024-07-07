@@ -28,7 +28,7 @@ public class OptimalMovesSearchOptimizer
     _lexComparer = new(world, constraints);
     _moveMaker = new();
     _shiftTimes = shiftTimes;
-    _cache = new(new PlanComparer());
+    _cache = new(new OptimalMovesPlanComparer());
     _random = random ?? new Random();
 
     _gaantView = new(world, constraints);

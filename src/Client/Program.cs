@@ -53,7 +53,7 @@ class Program
     Constraints constraints = input.GetConstraints();
     ShiftTimes shiftTimes = input.GetShiftTimes();
     PlanSampler planSampler = new PlanSamperUniform(world, shiftTimes, constraints, 0.5, random);
-    ImmutableArray<Incident> incidents = input.GetIncidents(10);
+    ImmutableArray<Incident> incidents = input.GetIncidents(100);
 
     Simulation simulation = new(world, constraints);
     IUtilityFunction utilityFunction = new WeightedSum(simulation, EmergencyServicePlan.GetMaxCost(world, shiftTimes));
