@@ -2,8 +2,8 @@ namespace ESSP.DataModel;
 
 public record CoordinateModel
 {
-  public int XMet { get; set; }
-  public int YMet { get; set; }
+  public double Longitude { get; set; }
+  public double Latitude { get; set; }
 }
 
 

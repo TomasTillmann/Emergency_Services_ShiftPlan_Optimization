@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using DistanceAPI;
 using MathNet.Numerics.Distributions;
 
 namespace ESSP.DataModel;
@@ -20,11 +21,11 @@ public class DataModelGenerator
     WorldModel worldModel = new();
 
     // available medic teams
-    worldModel.AvailableMedicTeams = Enumerable.Range(0, availableMedicTeamsCount).Select(_ => new MedicTeam()).ToList();
+    worldModel.AvailableMedicTeams = Enumerable.Range(0, availableMedicTeamsCount).Select(_ => new MedicTeamModel()).ToList();
     //
 
     // available ambulances
-    worldModel.AvailableAmbulances = Enumerable.Range(0, availableAmbulancesCount).Select(_ => new Ambulance()).ToList();
+    worldModel.AvailableAmbulances = Enumerable.Range(0, availableAmbulancesCount).Select(_ => new AmbulanceModel()).ToList();
     //
 
     // depots
@@ -33,8 +34,8 @@ public class DataModelGenerator
     {
       CoordinateModel randomLoc = new()
       {
-        XMet = random.Next(worldSize.XMet),
-        YMet = random.Next(worldSize.YMet)
+        Longitude = random.NextDouble() * worldSize.Longitude,
+        Latitude = random.NextDouble() * worldSize.Latitude
       };
 
       DepotModel depot = new DepotModel()
@@ -52,8 +53,8 @@ public class DataModelGenerator
     {
       CoordinateModel randomLoc = new()
       {
-        XMet = random.Next(worldSize.XMet),
-        YMet = random.Next(worldSize.YMet)
+        Longitude = random.NextDouble() * worldSize.Longitude,
+        Latitude = random.NextDouble() * worldSize.Latitude
       };
 
       worldModel.Hospitals.Add(new HospitalModel()
@@ -86,8 +87,8 @@ public class DataModelGenerator
     {
       CoordinateModel randomLoc = new()
       {
-        XMet = random.Next(worldSize.XMet),
-        YMet = random.Next(worldSize.YMet)
+        Longitude = random.NextDouble() * worldSize.Longitude,
+        Latitude = random.NextDouble() * worldSize.Latitude
       };
 
       IncidentModel incident = new()

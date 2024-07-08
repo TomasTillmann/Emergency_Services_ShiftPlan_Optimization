@@ -22,7 +22,7 @@ public class TabuSearchTestInput(Random random = null) : IInputParametrization
     {
         // World init
         World world = WorldMapper.MapBack(_dataGenerator.GenerateWorldModel(
-            worldSize: new CoordinateModel { XMet = 50_000, YMet = 50_000 },
+            worldSize: new CoordinateModel { Longitude = 50_000, Latitude = 50_000 },
             depotsCount: depotsCount,
             hospitalsCount: 20,
             availableMedicTeamsCount: availalbeMedicTeamsCount,
@@ -36,7 +36,7 @@ public class TabuSearchTestInput(Random random = null) : IInputParametrization
     public ImmutableArray<Incident> GetIncidents(int count)
     {
         ImmutableArray<Incident> incidents = _dataGenerator.GenerateIncidentModels(
-            worldSize: new CoordinateModel { XMet = 50_000, YMet = 50_000 },
+            worldSize: new CoordinateModel { Longitude = 50_000, Latitude = 50_000 },
             incidentsCount: count,
             duration: 21.ToHours().ToSeconds(),
             onSceneDurationNormalExpected: 20.ToMinutes().ToSeconds(),

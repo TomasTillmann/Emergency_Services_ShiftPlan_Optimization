@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using DistanceAPI;
 using ESSP.DataModel;
 using MyExtensions;
 
@@ -59,7 +60,14 @@ public class OptimalMovesSearchOptimizer
     if (k == h)
     {
       int res = _lexComparer.Compare(best, current, incidents);
-      Console.WriteLine(PlansVisited++);
+      if (PlansVisited % 50 == 0)
+      {
+        Console.WriteLine(PlansVisited++);
+        var calc = ((RealDistanceCalculator)World.DistanceCalculator);
+        Console.WriteLine($"Nearest hospitals: {calc.NearestHospitalHits} / {calc.NearestHospitalTotal}");
+        Console.WriteLine($"Travel durations: {calc.TravelDurationHits} / {calc.TravelDurationTotal}");
+        Console.WriteLine($"Intermediate locations: {calc.IntermediateLocationsHits} / {calc.IntermediateLocationsTotal}");
+      }
       // current is better than best
       if (res == 1)
       {

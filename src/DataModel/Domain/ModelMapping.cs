@@ -6,8 +6,8 @@ public class CoordinateMapper
   {
     return new CoordinateModel
     {
-      XMet = coordinate.XMet,
-      YMet = coordinate.YMet
+      Latitude = coordinate.Latitude,
+      Longitude = coordinate.Longitude
     };
   }
 
@@ -15,8 +15,8 @@ public class CoordinateMapper
   {
     return new Coordinate
     {
-      XMet = model.XMet,
-      YMet = model.YMet
+      Latitude = model.Latitude,
+      Longitude = model.Longitude
     };
   }
 }

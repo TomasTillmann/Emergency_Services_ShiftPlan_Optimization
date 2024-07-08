@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using DistanceAPI;
 using ESSP.DataModel;
 
 public class Input1 : IInputParametrization
@@ -21,22 +22,21 @@ public class Input1 : IInputParametrization
   {
     return new Constraints
     {
-      MaxTeamsPerDepotCount = Enumerable.Repeat(2, depotsCount).ToImmutableArray(),
-      MaxAmbulancesPerDepotCount = Enumerable.Repeat(2, depotsCount).ToImmutableArray(),
+      MaxTeamsPerDepotCount = Enumerable.Repeat(10, depotsCount).ToImmutableArray(),
+      MaxAmbulancesPerDepotCount = Enumerable.Repeat(10, depotsCount).ToImmutableArray(),
     };
   }
 
   public World GetWorld()
   {
     // World init
-    World world = WorldMapper.MapBack(_dataGenerator.GenerateWorldModel(
-      worldSize: new CoordinateModel { XMet = 50_000, YMet = 50_000 },
-      depotsCount: depotsCount,
-      hospitalsCount: 20,
-      availableMedicTeamsCount: avaialbeMedicTeamsCount,
-      availableAmbulancesCount: availableAmbulancesCount,
-      random: _random
-    ));
+    var worldModel = new WorldModel
+    {
+      Depots = new List<DepotModel>
+      {
+        
+      }
+    };
 
     return world;
   }
@@ -45,7 +45,7 @@ public class Input1 : IInputParametrization
   {
     // Incidents init
     ImmutableArray<Incident> incidents = _dataGenerator.GenerateIncidentModels(
-      worldSize: new CoordinateModel { XMet = 50_000, YMet = 50_000 },
+      worldSize: new CoordinateModel { Longitude = 50_000, Latitude = 50_000 },
       incidentsCount: count,
       duration: 21.ToHours().ToSeconds(),
       onSceneDurationNormalExpected: 20.ToMinutes().ToSeconds(),

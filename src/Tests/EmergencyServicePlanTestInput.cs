@@ -22,7 +22,7 @@ public class EmergencyServicePlanTestInput(Random random = null) : IInputParamet
     {
         // World init
         World world = WorldMapper.MapBack(_dataGenerator.GenerateWorldModel(
-            worldSize: new CoordinateModel { XMet = 10_000, YMet = 10_000 },
+            worldSize: new CoordinateModel { Longitude = 10_000, Latitude = 10_000 },
             depotsCount: depotsCount,
             hospitalsCount: 20,
             availableMedicTeamsCount: availalbeMedicTeamsCount,

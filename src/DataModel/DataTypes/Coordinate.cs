@@ -2,28 +2,18 @@ using System;
 
 namespace ESSP.DataModel
 {
-  public readonly struct Coordinate : IComparable<Coordinate>
+  public readonly struct Coordinate
   {
-    public int XMet { get; init; }
-    public int YMet { get; init; }
-
-    /// lexicographical comparision - first by X and than by Y
-    public int CompareTo(Coordinate other)
-    {
-      int comp = XMet.CompareTo(other.XMet);
-      if (comp == 0)
-      {
-        return YMet.CompareTo(other.YMet);
-      }
-      else
-      {
-        return comp;
-      }
-    }
+    ///<summary>about 10 meters</summary> 
+    public static double Epsilon = 0.0001;
+    public double Longitude { get; init; }
+    public double Latitude { get; init; }
+    public static bool operator ==(Coordinate x, Coordinate y) => Math.Abs(x.Latitude - y.Latitude) <= Epsilon && Math.Abs(x.Longitude - y.Longitude) <= Epsilon;
+    public static bool operator !=(Coordinate x, Coordinate y) => !(x == y);
 
     public override string ToString()
     {
-      return $"({XMet}, {YMet})";
+      return $"({Latitude}, {Longitude})";
     }
   }
 }

@@ -1,7 +1,7 @@
 ﻿//#define LocalSearch 
-//#define DynamicProgramming 
+#define DynamicProgramming 
 //#define TabuSearch
-#define SimulatedAnnealing
+//#define SimulatedAnnealing
 
 using ESSP.DataModel;
 using Optimizing;

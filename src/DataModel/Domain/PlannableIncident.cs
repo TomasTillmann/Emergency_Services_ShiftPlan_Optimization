@@ -60,7 +60,7 @@ public partial class PlannableIncident
     public ISimulationState State { get; set; }
     public EmergencyServicePlan Plan { get; set; }
 
-    private readonly DistanceCalculator _distanceCalculator;
+    private readonly IDistanceCalculator _distanceCalculator;
     private readonly ImmutableArray<Hospital> _hospitals;
     private readonly ImmutableArray<Depot> _depots;
 
@@ -165,7 +165,7 @@ public partial class PlannableIncident
         startTimeSec = firstPossibleStartTimeSec + Ambulance.ReroutePenaltySec;
 
         int durationDrivingSec = incidentOccurenceTimeSec - currentlyHandlingIncident.ToDepotDrive.StartSec;
-        ambStartLoc = _distanceCalculator.GetNewLocation(hospitalLocation, _depots[teamId.DepotIndex].Location, durationDrivingSec, firstPossibleStartTimeSec);
+        ambStartLoc = _distanceCalculator.GetIntermediateLocation(hospitalLocation, _depots[teamId.DepotIndex].Location, durationDrivingSec);
 
         return;
       }
