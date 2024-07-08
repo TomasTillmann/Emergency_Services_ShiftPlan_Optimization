@@ -9,9 +9,9 @@ V této kapitole vyzkoušíme různé metody, které můžeme pro nalezení opti
 \textit{Dynamické programování} je technika řešení problému, která si průběžně ukládá řešení menších podúloh a pomocí rekurzivního vztahu menší podúlohy s větší,
 definovaného \textit{rekurzivním vztahem}, řeší větší podúlohy efektivněji, až po vyřešení původní úlohy. 
 Průběžnému ukládání výsledků podúloh se říká \textit{memoizace}.
-Díky této memoizaci dynamické programování neprohledává prostor řešení duplicitně, a tak je často velmi efektivní metodou pro řešení optimalizačních úloh (\cite{dynamic}).
+Díky této memoizaci dynamické programování neprohledává prostor řešení duplicitně, a tak je často velmi efektivní metodou pro řešení optimalizačních úloh \cite{dynamic}.
 
-Triviálním příkladem využití dynamického programování je výpočet $n$-tého \textit{Fibbonaciho čísla}. (\cite{mares}, kap. 12).
+Triviálním příkladem využití dynamického programování je výpočet $n$-tého \textit{Fibbonaciho čísla} \cite{mares}.
 Pro nás zajímavějším příkladem využití dynamického programování je řešení úlohy kombinatorické optimalizace \textit{Problému batohu}.
 
 \begin{definice}[Problém batohu]
@@ -19,8 +19,7 @@ Pro nás zajímavějším příkladem využití dynamického programování je �
   Každý předmět $i$ má výdělek $p_i$ a váhu $w_i$. Problém batohu pak je,
 
   \begin{alignat*}{2}
-    &\normalfont \text{maximalizuj} \hspace{30pt} &z = \sum_{i=1}^n p_i x_i, \\
-    \\
+    &\normalfont \text{maximalizování} \hspace{30pt} &z = \sum_{i=1}^n p_i x_i, \\
     &\normalfont \text{splňující}   \hspace{30pt} &\sum_{i = 1}^{n} w_i x_i \leq c,
   \end{alignat*}
   \\
@@ -379,6 +378,7 @@ Následující věta vše spojí dohromady a poskytne základ pro postup, jak š
     \item
       Tým $z$ odbavuje i jiné incidenty $I_z$, ale jelikož každý $z_i \in I_z$ nastal dříve,
       tak $z$ odbavuje $i_k$ až po odbavení všech incidentů $I_z$.
+      Zde využíváme předpokladu, že incidenty se odehrávájí v různých časech (viz definice $I$ v kapitole \ref{kap:formalizaceProblemu}).
       Aby $z$ úspěšně odbavil $i_k$ , může mít delší směnu, než by potřeboval pro odbavení všech incidentů $I_z$.
   \end{enumerate}
   V obou případech ještě může být zbytečně naalokováno vozidlo, které $z$ používal pro odbavení $i_k$.
@@ -405,8 +405,8 @@ Následující věta vše spojí dohromady a poskytne základ pro postup, jak š
   \end{equation}
   a směna už týmu $z$ nelze zkrátit více, aby platila rovnost \ref{eq:rrr}.
 
-  První \ref{en:_1} a druhý \ref{en:_2} případ pokrývají situaci, kdy $z$ odbavuje pouze $i_k$.
-  Třetí \ref{en:_3} a čtvrtý \ref{en:_4} případ pokrývají situaci, kdy $z$ odbavuje i nějaké jiné incidenty a $z$ jde zkrátit směnu, aby stále odbavoval všechny incidenty $I_z$.
+  Případ \ref{en:_1} a případ \ref{en:_2} pokrývají situaci, kdy $z$ odbavuje pouze $i_k$.
+  Případ \ref{en:_3} a případ \ref{en:_4} pokrývají situaci, kdy $z$ odbavuje i nějaké jiné incidenty a $z$ jde zkrátit směnu, aby stále odbavoval všechny incidenty $I_z$.
   Poslední případ \ref{en:_4} pokrývá situaci, kdy $z$ odbavuje i jiné incidenty, ale směnu mu nelze nijak zkrátit.
 
   Ukázali jsme tak existenci $T^{-1}$ pro všechny situace. Nechť
@@ -452,27 +452,23 @@ Věta \ref{veta:dosazitelnostOptimalnimiTahy} nám dává návod, jak plány $P_
 
 \begin{algorithm}[H]
   \begin{algorithmic}[1]
-  \Function{OptimalMovesSearch}{$p$, $I_k$, $h$}
+  \Function{OptimalMovesSearch}{$p$, $I_k$, $h$, $P^*$}
     \If{$k = h$}
-      \State \Return $\{ p \}$
-    \ElsIf{$\text{Cache}[k, p] \text{ je vyplněna}$}
-      \State \Return $\text{Cache}[k, p]$
+      \State $p^*$ \gets $\forall p \in P^*$
+      \If{$q^{\text{Lex}}(p^*, I_k) = q^{\text{Lex}}(p, I_k)$}
+        \State $P^*$ \gets $ P^* \cup p$
+      \ElsIf{$q^{\text{Lex}}(p^*, I_k) < q^{\text{Lex}}(p)$}
+        \State $P^*$ \gets $\{ p \}$
+      \EndIf
+      \State \Return $P^*$
     \EndIf
     \State $T^*_k$ \gets optimální tahy (viz definice \ref{df:optimalniTahy})
-    \State $P^*$ \gets $p_{\emptyset}$
     \For{$T^* \in T^*_k$}
-      \State $P'^*$ \gets \text{OptimalMovesSearch($T^*(p)$, $I_{k+1}$, $h$)}
-      \State $p^*$ \gets libovolný z $P^*$
-      \State $p'^*$ \gets libovolný z $P'^*$
-      \If{$P^* = p_{\emptyset}$}
-        \State $P^*$ \gets $P'^*$ 
-      \ElsIf{$q^{\text{Lex}}(p^*) = q^{\text{Lex}}(p'^*)$}
-        \State $P^*$ \gets $ P^* \cup P'^*$
-      \ElsIf{$q^{\text{Lex}}(p^*) < q^{\text{Lex}}(p'^*)$}
-        \State $P^*$ \gets $P'^*$
+      \If{\text{\textbf{not}} $\text{Visited}[k, T^*(p)]$}
+        \State $P^*$ \gets \text{OptimalMovesSearch($T^*(p)$, $I_{k+1}$, $h$, $P^*$)}
+        \State $\text{Visited}[k, T^*(p)]$ \gets \text{true}
       \EndIf
     \EndFor
-    \State $\text{Cache}[k, p]$ \gets $P^*$
     \State \Return $P^*$
   \EndFunction
   \end{algorithmic}
@@ -480,46 +476,37 @@ Věta \ref{veta:dosazitelnostOptimalnimiTahy} nám dává návod, jak plány $P_
   \label{alg:rekProhPlanu}
 \end{algorithm}
 
-Pro zjištění všech optimálních plánu $P^*$ na množině incidentů $I$ algoritmus (viz algoritmus \ref{alg:rekProhPlanu}) zavoláme: $P^* = $ OptimalMovesSearch($p_{\emptyset}$, $I_1$, $|I|$).
+Pro zjištění všech optimálních plánu $P^*$ na množině incidentů $I$ algoritmus (viz algoritmus \ref{alg:rekProhPlanu}) zavoláme: $P^* = $ OptimalMovesSearch($p_{\emptyset}$, $I_1$, $|I|$, $\{ p_{\emptyset} \}$).
 
-Algoritmus prohledávání plánů optimálními tahy si v kroku 7 vygeneruje všechny optimální tahy, které lze provést na incidentech $I_k$ a plánu $p$.
-Následně je v krocích 9 až 20 iteruje.
+Pokud je v kroku 2 dosaženo hloubky $h$, algoritmus \ref{alg:rekProhPlanu} zkontroluje, zda je aktuální plán $p$ lepší než dosud nejlepší plán $p^* \in P^*$ podle účelové funkce $q^{\text{Lex}}$:
+\begin{enumerate}
+  \item Pokud je aktuální plán $p$ lepší, v kroku 7 se $P^*$ nahrádí množinou obsahující pouze aktuální plán $p$. 
+  \item Pokud je stejně kvalitní, plán $p$ se v kroku 5 přidá do množiny $P^*$.
+  \item Pokud je horší, plán $p$ není zajímavý a ignoruje se.
+\end{enumerate}
+Plán $p^*$ může být vybrán libovolně, protože všechny $p \in P^*$ mají stejné ohodnocení při účelové funkci $q^{\text{Lex}}$.
+V kroku 9 se vrátí aktualizovaná množina doposud nejlepších nalezených plánů $P^*$.
 
-V kroku 10 se rekurzivně zavolá sám na sebe.
-V argumentech předá optimální plán v ceně získaného z aktuálního plánu a z právě iterovaného optimálního tahu,
-o jedna větší množinou incidentů a maximální hloubkou rekurze, která v každé hladině rekurze činí velikost všech incidentů $I$.
+Na každé hladině rekurze se v kroku 11 vygenerují optimální tahy pro aktuální množinu incidentů $I_k$, a pokud plán $T^*(p)$ vzniklý optimálním tahem $T^*$ nebyl navštíven,
+rekurzivně se na něj algoritmus zavolá a aktualizuje se \textit{cache} navštívených stavů \textit{Visited}.
 
-V krocích 11 a 12 vybere reprezentanta doposud nalezených optimálních plánů v ceně $P^*$ a nově nalezených optimálních plánů v ceně $P'^*$, vrácených z rekurze.
-Můžeme vybrat libovolně, protože všechny $P^*$ a $P'^*$ mají mezi sebou stejná ohodnocení.
-Pokud se jedná o první iteraci optimálních tahů, tak v kroku 14 nastavíme $P^*$ na $P'^*$.
-
-V kroku 15 testujeme, jestli se ohodnocení rovnají. Pokud ano, tak je sjednotíme v kroku 16.
-Pokud ovšem nově nalezené optimální plány v ceně mají lepší ohodnocení, testuje se v kroku 17, tak jimi $P^*$ nahradíme. 
-Tím se zajistí, že po proiterování všech optimálních tahů jsou doposud nalezené optimální plány v ceně s nejnižší možnou cenou.
-
-V kroku 2 rekurze pouze vrátí optimální plán v ceně s předchozí hladiny, pokud $k$ je rovno $h$, čili $p$ je nějaký optimální plán v ceně na množine $I$.
-
-Algoritmus si \textit{cachuje} mezivýsledky. V kroku 21 uloží nejlepší optimální plány v ceně pro aktuální plán.
-Pokud v rekurzi nějaký plán navštívíme vícekrát, což se jistě může stát, protože různé posloupnosti tahů můžou vést na stejný plán,
-tak se nebude znovu prohledávat celý podstrom rekurze, ale jednoduše se v kroku 5 vrátí správné optimální plány v ceně, nalezené v předchozích voláních.
-
-Jak již bylo zmíněno v kapitole \ref{kap:dynamicProgram}, tomuto způsobu \textit{cachování} se v dynamickém programování říká memoizace a je to velmi účinná technika zrychlení algoritmu.
-
-Právě jsme si algoritmus důkladně popsali, v následující větě ověříme, že je korektní, tedy že skutečně nalezne všechny optimální plány na množine $I$ při $q^{\text{Lex}}$.
+Tímto způsobem se systematicky prohledává celý prostor možných plánů a ukládají se všechny doposud nejlepší nalezené plány $P^*$.
+Zároveň díky \textit{Visited} se zbytečně neprohledává podstrom ve stejné hloubce se stejným plánem vícekrát.
 
 \begin{veta}[Korektnost a úplnost algoritmu]\label{}
   Algoritmus rekurzivního prohledávání prostoru plánů optimálními tahy (viz algoritmus \ref{alg:rekProhPlanu}) nalezne všechny optimální plány $P^* \subseteq P_C$ při účelové funkci $q^{\text{Lex}}$.
 \end{veta}
 \begin{dukaz}
   Z věty \ref{veta:dosazitelnostOptimalnimiTahy} víme, že $p^* \in P^*$ je dosažitelný nějakou posloupností optimálních tahů z prázdného plánu $p_{\emptyset}$. 
-  V algoritmu v kroku 7 množina $T^*_k$ obsahuje všechny optimální tahy, které lze provést na plánu $p$ na množině $I_k$, počínaje prázdným plánem a prvním incidentem.
-  V kroku 10 se rekurzivně zavoláme na každý $T^*(p), T^* \in T^*_k$.
+  V algoritmu v kroku 11 množina $T^*_k$ obsahuje všechny optimální tahy, které lze provést na plánu $p$ na množině $I_k$, počínaje prázdným plánem a prvním incidentem.
+  V kroku 14 se rekurzivně zavoláme na každý $T^*(p), T^* \in T^*_k$, pokud již nebyl navštíven.
+  Není důvod vícekrát prohledávát stejný podstrom, protože vrácená $P^*$ by byla stejná.
   Algoritmus tudiž prohledá každou posloupnost optimálních tahů, takže určitě i všechny takové, kterými se získá libovolný optimální plán $p \in P^*$ (plyne z věty \ref{veta:dosazitelnostOptimalnimiTahy}).
   Algoritmus je úplný.
 
-  V krocích 13--19 z plánů, které se vrátí rekurzí, vybíráme pouze ty optimální vůči $q^{\text{Lex}}$.
-  Vybíráme tak ze všech plánů, které jsou dosažitelné nějakou posloupností optimálních tahů ty optimální při $q^{\text{Lex}}$.
-  Zároveň i cache je korektně používaná, tudiž algoritmus je i korektní.
+  V krocích 3-8 vybíráme pouze plány optimální vůči $q^{\text{Lex}}$.
+  Vybíráme tak ze všech plánů, které jsou dosažitelné nějakou posloupností optimálních tahů, ty optimální při $q^{\text{Lex}}$.
+  Zároveň i \textit{cache} je korektně používaná, tudiž algoritmus je i korektní.
 \end{dukaz}
 
 Omezili jsme se na použití účelové funkce $q^{\text{Lex}}$, protože potřebujeme, aby optimální plán podle účelové funkce $q$ byl zároveň optimální v ceně.
@@ -615,49 +602,49 @@ Připouštíme tedy NP-těžkou složitost problému, ale ukáže se, že i tak 
 jak diskrétních tak spojitých,
 které nelze jednoduše vyřešit v polynomiálním čase.
 Tyto metody prohledávání prostoru konfigurací koordinují interakce mezi lokálním a globálním optimalizováním,
-aby byli schopny prohledávat lokálně optimální konfigurace, ale zároveň aby z nich mohli uniknout a prostor prohledávat robustně.
+aby byli schopny prohledávat lokálně optimální konfigurace, ale zároveň aby z nich mohli uniknout a prostor prohledávat robustně \cite{GlovKoch03}.
 
 Často metaheuristiky při prohledávání využívají konceptu \textit{sousedství}.
 Míra, do jaké jsou sousedství využívána, se liší podle konkrétního typu metody.
 Některé metaheuristiky, jako například \textit{simulované žíhání} nebo \textit{tabu prohledávání}, využívají \textit{přípustné tahy},
 pomocí kterých přecházejí z jednoho řešení na jiné v lokálním pohledu.
 Zároveň dochází k výběru v lokálním pohledu horších konfigurací, aby se zajistila robustnost prohledávání
-a metoda neuvázla pouze v lokálním optimu.
+a metoda neuvázla pouze v lokálním optimu \cite{GlovKoch03}.
 
-V případě metod, založených na \textit{populaci}, jako jsou například \textit{genetické algoritmy}, jsou sousedství implicitně definována
+V případě metod, založených na \textit{populaci}, jako jsou například \textit{genetické algoritmy} \cite{genetic}, jsou sousedství implicitně definována
 nahrazováním komponent jednoho řešení komponentami jiného řešení, různě zvolenými pravidly výměny.
 
-Dalším zajímavým příkladem metaheurstické metody je \textit{optimalizování kolonií mravenců}, spadající do kategorie metaheuristik \textit{inteligence hejna}.
+Dalším zajímavým příkladem metaheurstické metody je \textit{optimalizování kolonií mravenců}, spadající do kategorie metaheuristik \textit{inteligence hejna} \cite{ACO}.
 Sousedství jsou definována propojením cest a procházena pomocí simulování chodu mravenců, reprezentující nějakou kolektivní inteligenci.
 Mravenci chodí po těchto cestičkách a vybírají si tak optimální konfigurace s pravděpodobností, jenž je uřčena feromony.
 
 Existuje spoustu dalších různých metod, jako v poslední době populární \textit{hybridní metody},
 které propojují více metaheuristických metod dohromady, s myšlenkou použít každou metaheuristiku co nejvhodněji,
-případně i měnit různé metaheuristiky za běhu~\cite{GlovKoch03}.
+případně i měnit různé metaheuristiky za běhu~\cite{HybridMeta}.
 
 \subsection{Lokální prohledávání}
 
 Asi nejjednodušší metoda na prohledávání prostoru konfigurací je \textit{lokální prohledávání}.
 Lokální prohledávání pouze lokálně prohledává prostor konfigurací od nějaké startovní konfigurace $x \in \mathcal{X}$. 
-Prostor porhledává prostřednictvním sousedů $N(x)$, kde vždy vybere souseda s nejlepší hodnotou účelové funkce.~(\cite{HybridMeta}, str. 3).
+Prostor porhledává prostřednictvním sousedů $N(x)$, kde vždy vybere souseda s nejlepší hodnotou účelové funkce.~(\citet{HybridMeta}, str. 3).
 
-Sousedy $N(p)$ zkonstruujeme implicitně pomocí tahů, což je standardní způsob konstrukce sousedů nějaké konfigurace (\cite{HybridMeta}, str. 3).
+Sousedy $N(p)$ zkonstruujeme implicitně pomocí tahů, což je standardní způsob konstrukce sousedů nějaké konfigurace (\citet{HybridMeta}, str. 3).
 Sousední plány $N(p)$ plánu $p \in P_C$ lze definovat různě. 
 
 My budeme od $p' \in N(p)$ vyžadovat alespoň následující:
 \begin{enumerate}
-  \item $\forall p \in P_C \colon N(p) \subseteq P_C$, \label{en:f}
-  \item $\forall p \in P_C, \exists(T_1, \dots, T_n) \colon (T_1 \circ \cdots \circ T_n)(p) = p^*$, kde $p^*$ je globálně optimální plán,  \label{en:s}
-  \item $\forall p \in P_C \colon p' \in N(p)$, jsou si plány $p$ a $p'$ podobné, čili z větší části mají naalokovaná stejná vozidla a týmy, se stejnými směnami. \label{en:t}
+  \item $\forall p \in P_C \colon N(p) \subseteq P_C$ \label{en:f}.
+  \item $\forall p \in P_C, \exists(T_1, \dots, T_n) \colon (T_1 \circ \cdots \circ T_n)(p) = p^*$, kde $p^*$ je globálně optimální plán. \label{en:s}
+  \item Pro všechny $p' \in N(p)$ pro dané $p$ platí, že jsou si plány $p$ a $p'$ podobné, čili z větší části mají naalokovaná stejná vozidla a týmy, se stejnými směnami. \label{en:t}
 \end{enumerate}
 
-První podmínka \ref{en:f} zakazuje navštěvování nedovolených plánů. Pro některé problémy je navštěvování nedovolených konfigurací žádoucí,
-protože omezující podmínky můžou být příliš svazující (\cite{GlovKoch03}, str. 50--51).
+Podmínka \ref{en:f} zakazuje navštěvování nedovolených plánů. Pro některé problémy je navštěvování nedovolených konfigurací žádoucí,
+protože omezující podmínky můžou být příliš svazující (\citet{GlovKoch03}, str. 50-51).
 To ale není náš případ, čili se můžeme omezit pouze na dovolené plány.
 
-Druhá podmínka  \ref{en:s} zajišťuje, že při prohledávání je vůbec možné globální optimum navštívit.
+Podmínka  \ref{en:s} zajišťuje, že při prohledávání je vůbec možné globální optimum navštívit.
 
-Třetí podmínka \ref{en:t} vyžaduje, aby sousední plány sdíleli s původním plánem nějaké komponenty. 
+Podmínka \ref{en:t} vyžaduje, aby sousední plány sdíleli s původním plánem nějaké komponenty. 
 Kdyby sousední plány nesplňovali tuto podmínku, prohledávání pomocí sousedů by se o moc nelišilo od náhodného
 generování dovolených plánů, což není efektivní způsob prohledávání.
 
@@ -711,12 +698,18 @@ V kroku 13 je $p_{current}$ nastaveno na nejlepší sousední plán.
 Zřejmě lokální prohledávání nalezne nějaké lokální maximum, jaké konkrétně, závisí na startovním plánu $p_{start}$ a definici $N(p)$.
 
 \begin{veta}[Časová složitost lokálního prohledávání]
-  Nechť libovolný plán $p \in P_C$, pak lokální prohledávání běži v čase
+  Nechť libovolný plán $p \in P_C$, pak lokální prohledávání běží v čase
   \begin{align*}
-    \mathcal{O}(k \cdot |N(p)|),
+    \mathcal{O}(k \cdot |N(p)| \cdot |I| \cdot |Z|),
   \end{align*}
   kde $k$ je počet iterací, než lokální prohledávání nalezne nějaké lokální maximum.
 \end{veta}
+\begin{dukaz}
+  Prohledáváme v každé iteraci všechny sousedy. Celkem je tudiž prohledáno $k \cdot |N(p)|$ plánů.
+  Každý plán vyhodnocujeme při účelové funkci $q \in Q_I$. Vyhodnocení $q(p, I)$ je konstantní až na spuštění simulace. 
+  Složitost simulace je $|I| \cdot |Z|$, protože pro každý incident je třeba nalézt nejvhodnější plán.
+  Aktualizace stavů a spočítání doby odbdavování považujeme za konstantní.
+\end{dukaz}
 
 Pokud by $k$ i $|N(p)$| byli \uv{malé}, tak jsme získali velmi rychlý způsob, jak upravit libovolný plán, abychom dostali jeho \uv{nejlepší verzi}. 
 Startovní plán definuje nějaký základ, který je následně doplňován nebo redukován o záchranné týmy nebo vozidla,
@@ -725,7 +718,7 @@ dokud jakákoliv změna už pouze nezhorší výslednou kvalitu.
 Jak konkrétně už záleží na konkrétní definici $N(p)$.
 
 Velkou nevýhodou lokálního prohledávání je neschopnost umět nalézt kompromis mezi lokálním optimem a globálním optimem,
-přičemž nalezené lokální optimum je v drtivé většině suboptimální (\cite{GlovKoch03}, str. 43).
+přičemž nalezené lokální optimum je v drtivé většině suboptimální (\citet{GlovKoch03}, str. 43).
 
 \subsection{Tabu prohledávání}
 
@@ -744,7 +737,7 @@ Z toho důvodu ještě tabu metoda využívá konceptu \textit{aspiračního kri
 tak je soused po provedení tohoto tahu uvažován i pokud je tah zakázan, čili i když se tah nachází v tabu.
 
 Tabu prohledávání lze ukončit několika způsoby. Nejčastěji se prohledávání ukončuje, jakmile v iteraci už neexistují žádní zlepšující sousedé,
-které získáme tahem, jenž není v tabu.~(\cite{GlovKoch03}, str. 41--49). 
+které získáme tahem, jenž není v tabu.~(\citet{GlovKoch03}, str. 41--49). 
 
 \begin{algorithm}[H]
   \begin{algorithmic}[1]
@@ -756,7 +749,7 @@ které získáme tahem, jenž není v tabu.~(\cite{GlovKoch03}, str. 41--49).
       \State $p^*$ \gets $p_{\emptyset}$ 
       \For {$T \in \text{neighbours\_moves($p_{current}$)}$}
         \State $p$ \gets T($p_{current}$)
-        \If {$q(p, I) > q(p^*, I)$} \textbf{and} ($p \notin tabu\_list$ \textbf{or} $q(p, I) > q(p_{best}, I)$)
+        \If {$q(p, I) > q(p^*, I)$ \textbf{and} ($T \notin tabu\_list$ \textbf{or} $q(p, I) > q(p_{best}, I)$)}
           \State $p^*$ \gets $p$
         \EndIf
       \EndFor
@@ -786,7 +779,7 @@ V krocích 7--12 se prohledávájí pomocí sousedních tahů sousedé aktuáln�
 Nejzajímavější je krok 9. Zde se prvně kontroluje stejně jako v lokálním prohledávání, zda je splěna nutná podmínka, jestli je vůbec třeba souseda $p$ uvažovat.
 Druhá podmínka kontroluje, zda $p$ buď není v tabu, nebo je splněné aspirační kritérium.
 Tah $T$, který je v tabu uvažujeme pouze pokud soused $T(p_{current})$ je doposavad nejoptimálnějším nalezeným plánem.
-Takové aspirační kritérium je nejčastěji používané a obecně nejefektivněšjí aspirační kritérium~(\cite{GlovKoch03}, str. 47).
+Takové aspirační kritérium je nejčastěji používané a obecně nejefektivněšjí aspirační kritérium~(\citet{GlovKoch03}, str. 47).
 
 Podmínka v kroku 13 je totožná s podmínkou u lokálního prohledávání.
 Pokud již neexistuje žádný zlepšující soused, který není v tabu nebo nesplňuje aspirační kritérium, tak vrátíme nejlepší nalezený plán $p_{best}$.
@@ -811,7 +804,7 @@ Stejně jako ve fyzickém procesu žíhání, simulované žíhání si dřží 
 Při vyšší teplotě je větší šance na navštěvování horších konfigurací a při nižší se pravděpodobnost snižuje, takže se navštěvují především lokálně optimální konfigurace.
 
 Při postupném chlazení, tedy snižování teploty, se v průběhu běhu simulovaného žíhání postupně navštěvují horší konfigurace méně a optimální konfigurace více častěji.
-Tento proces má zajistit ze začátku dostatečnou exploraci prostoru konfigurací, ale zároveň postupnou konvergenci k nějakému ideálně globálnímu řešení (\cite{GlovKoch03}, str. 1--2).
+Tento proces má zajistit ze začátku dostatečnou exploraci prostoru konfigurací, ale zároveň postupnou konvergenci k nějakému ideálně globálnímu řešení (\citet{GlovKoch03}, str. 1-2).
 
 \begin{algorithm}[H]
   \caption{Simulované žíhání prohledávání plánů pohotovostní služby}
@@ -823,7 +816,7 @@ Tento proces má zajistit ze začátku dostatečnou exploraci prostoru konfigura
     \While{$t > t_{\text{final}}$}
       \For{$m \gets 1$ \textbf{to} $M_k$}
         \State $p \gets \text{zatím neprohledaný } \in N(p_{\text{current}})$
-        \State $\Delta q \gets q(p_{\text{current}}) - q(p)$
+        \State $\Delta q \gets q(p_{\text{current}}, I) - q(p, I)$
         \If{$\Delta q \leq 0$}
           \State $p_{\text{current}} \gets p$
         \Else
@@ -851,7 +844,7 @@ V kroku 12 je $p$ přijato s pravděpodobností definovanou jako
 \begin{align}\label{df:metropolis}
   \exp\left(-\frac{\Delta q}{t}\right).
 \end{align}
-Pravděpodobností funkce \ref{df:metropolis} je takzvané \textit{metropolis akceptační kritérium} (\cite{Metropolis}), které modeluje
+Pravděpodobností funkce \ref{df:metropolis} je takzvané \textit{metropolis akceptační kritérium} \cite{Metropolis}, které modeluje
 jak přechází termodynamický systém z aktuální konfigurace.
 Určuje s jakou pravděpodobností v závislosti na aktuální teplotě $t$ je suboptimální soused uvažován.
 

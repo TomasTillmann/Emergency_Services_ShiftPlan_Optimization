@@ -83,13 +83,10 @@ public class OptimalMovesSearchOptimizer
       _moveMaker.ModifyMakeMove(current, move.Normal);
       if (!_cache.Contains((k, current)))
       {
-        _cache.Add((k, current));
         OptimalMovesSearch(current, incidents, k + 1, h);
+        _cache.Add((k, current));
       }
-      else
-      {
-        Console.WriteLine($"visited");
-      }
+      
       _moveMaker.ModifyMakeInverseMove(current, move.Inverse);
       //writer.Flush();
     }

@@ -1,6 +1,6 @@
 \chapter{Převedení na optimalizační úlohu}
 
-\section{Formalizace problému}
+\section{Formalizace problému}\label{kap:formalizaceProblemu}
 
 Ústředním problémem pohotovostních služeb je umět naplánovat týmy záchranářů a záchranná vozidla na výjezdové stanice tak, aby efektivně odbavili co největší počet incidentů,
 za co nejméně zbytečně vynaložených nákladů, v rámci jednoho dne.
@@ -31,8 +31,8 @@ Záchranné vozidlo $a \in A$ nemá přiřazenou žádnou výjezdovou stanici, p
 
 Pro pohodlnost zaveďme:
 \begin{align*}
-  & p_{D_s}(z) \colon p_D(z) = (d_s, d_l) \Leftrightarrow p_{D_s}(z) = d_s, \\
-  & p_{D_l}(z) \colon  p_D(z) = (d_s, d_l) \Leftrightarrow p_{D_l}(z) = d_l.
+  & p_D(z) = (d_s, d_l) \Rightarrow p_{D_s}(z) = d_s, \\
+  & p_D(z) = (d_s, d_l) \Rightarrow p_{D_l}(z) = d_l.
 \end{align*}
 
 \textit{Plánem pohotovnostní služby} budeme označovat 
@@ -45,18 +45,18 @@ Množina $P$ obsahuje všechny plány, ale ne všechny plány jsou pro nás zaj�
 Zajímat nás budou pouze plány, které splňují nějaké \textit{omezující podmínky}.
 Pohotovostní služba definuje omezující podmínky, a to konkrétně \textit{maximální počty týmů záchranářů a záchranných vozidel povolených na jednotlivých výjezdových stanicích}.
 \begin{definice}[Omezující podmínky pohotovostního plánu]
-  Nechť $c^z, c^a \in \mathbb{N}^{V_n}$ vektory, 
+  Nechť $\mathbf{c^z}, \mathbf{c^a} \in \mathbb{N}^{V_n}$ vektory, 
   kde $i$-tou položku definujeme:
   \begin{align*}
-    &c^z_i \hspace{20pt} \text{maximální počet záchranných týmů na výjezdové stanici $v_i \in V$}, \\ 
-    &c^a_i \hspace{20pt} \text{maximální počet záchranných vozidel na výjezdové stanici $v_i \in V$},
+    &\mathbf{c^z}_i \hspace{20pt} \text{maximální počet záchranných týmů na výjezdové stanici $v_i \in V$}, \\ 
+    &\mathbf{c^a}_i \hspace{20pt} \text{maximální počet záchranných vozidel na výjezdové stanici $v_i \in V$},
   \end{align*}
   pro $1 \leq i \leq V_n$.
   Nechť omezující podmínky $C = \{ C_Z, C_A \}$, kde $C_Z \colon P \rightarrow \{ 0, 1 \}$, $C_A \colon P \rightarrow \{ 0, 1 \}$, definované:
 
   \begin{align*}
-    C_Z(p) = 1 &\iff |\{ z \in Z \mid p_Z(z) = v_i \}| \leq c^z_i, \hspace{20pt} \text{jinak 0}, \\
-    C_A(p) = 1 &\iff |\{ a \in A \mid p_A(a) = v_i \}| \leq c^a_i, \hspace{20pt} \text{jinak 0},
+    C_Z(p) = 1 &\iff |\{ z \in Z \mid p_Z(z) = v_i \}| \leq \mathbf{c^z}_i, \hspace{20pt} \text{jinak 0}, \\
+    C_A(p) = 1 &\iff |\{ a \in A \mid p_A(a) = v_i \}| \leq \mathbf{c^a}_i, \hspace{20pt} \text{jinak 0},
   \end{align*}
   $\forall i \colon 1 \leq i \leq V_n$, $p \in P$.
 \end{definice}
@@ -75,24 +75,25 @@ Pohotovostní plán pak bude v průběhu dne odbavovat \textit{incidenty}.
   \item čas nastání,
   \item požadováná maximální doba příjezdu záchranné jednotky.
 \end{enumerate}
-Budeme vždy uvažovat pouze incidenty, které se odehrávájí v rámci jednoho dne, označme $I$.
+Budeme vždy uvažovat pouze incidenty, které se odehrávájí v rámci jednoho dne. Tuto množinu označme $I$.
+
 Zároveň neexistují dva incidenty, které se odehrají v přesně stejný čas.
+Tento předpoklad je bez újmy na obecnosti, protože kdyby bylo žádoucí, aby se dva incidenty odehráli v přesně stejný čas,
+tak jednomu z nich stačí čas nastání posunout o vteřinu.
 
-Problém, který v této práci řešíme, je nalézt optimální plán $p_C \in P_C \subseteq P$ při nějak vhodně definované účelové funkci,
-která bude maximalizovat počet úspěšně odbavených incidentů a minimalizovat celkovou cenu plánu.
-
-Co je úspěšně odbavený incident a jakým způsobem zjistíme kolik incidentů plán úspěšně odbaví je detailně popisováno v následující kapitole. 
-Co budeme považovat za cenu plánu lze nalézt v definici \ref{df:cenaPlanu}.
+Problém, který v této práci řešíme, je nalézt \textit{optimální plán} $p_C \in P_C \subseteq P$,
+tedy plán,
+který bude maximalizovat počet \textit{úspěšně odbavených incidentů $s_I$} a minimalizovat \textit{celkovou cenu plánu $u(p)$}.
 
 \section{Simulace plánu pohotovostní služby}\label{SimulaceKap}
 
 Naším cílem je umět nalézt optimální plán pohotovostní služby.
-Ten určujeme podle počtu úspěšně odbavených incidentů $s$ a ceny plánu $u$.
+Ten určujeme podle počtu úspěšně odbavených incidentů $s_I$ a ceny plánu $u(p)$.
 Z toho důvodu jsme si formálně nadefinovali protředky, které má pohotovostní služba k dispozici a co je plán pohotovostní služby.
 
-V kapitole \ref{kap:optUloha2uc} definujeme cenu plánu (viz definice \ref{df:cenaPlanu}).
-V této kapitole navrhneme způsob, jakým zjistíme $s$ pohotovostního plánu $p$ na množine incidentů $I$.
-Pro zjištění $s$ spustíme simulaci pohotovostního plánu $p$ na dané množině $I$.
+V kapitole \ref{kap:optUloha2uc} definujeme cenu plánu $u(p)$ (viz definice \ref{df:cenaPlanu}).
+V této kapitole navrhneme způsob, jakým zjistíme $s_I$ pohotovostního plánu $p$ na množine incidentů $I$.
+Pro zjištění $s_I$ spustíme simulaci $s$ pohotovostního plánu $p$ na dané množině $I$.
 Následně formálně popíšeme simulaci a jaká pravidla chodu simulace se rozhodneme použít.
 Proč zrovna použijeme přístupu simulace je popsáno v nadcházející kapitole.
 
@@ -132,8 +133,8 @@ Simulace skončí jakmile nejsou žádné další události k odbavení.
 Dále dělíme simulace na \textit{deterministcké} a \textit{stochastické}.
 V \textit{deterministické simulaci} jsme schopni z aktuálního stavu systému a údalosti deterministicky určit nadcházející stav systému.
 V \textit{stochastické simulaci} nejsme schopni z aktuálního stavu systému a údalosti deterministicky určit nadcházející stav systému.
-Většinou proto, že při výběru nadhcázejícího stavu figuruje element náhody.
-\cite{SimulaceBook}
+Většinou proto, že při výběru nadhcázejícího stavu figuruje element náhody
+\cite{SimulaceBook}.
 
 \subsection{Popis deterministické diskrétní simulace plánu pohotovostní služby}\label{kap:definiceSimulace}
 
@@ -161,7 +162,7 @@ Pro odbavení $i$ musíme vybrat nějaký konkrétní $z_i \in Z_i$.
 
 Je mnoho různých způsobu, jak $z_i$ vybrat.
 V naší simulaci jsou použitá pravidla vybraná na základě konzultace se společností, která se danou problematikou zabývá přes 25 let
-a sami podobná pravidla používají pro plánovaní u několika jejich klientů ve Spojených státech.
+a sami podobná pravidla používají pro plánovaní u několika jejich klientů ve Spojených státech \footnote{Logis Solutions, s.r.o. (https://logissolutions.net)}.
 
 Simulace je navržena dostatečně genericky, aby bylo možné naimplementovat i libovolná jiná pravidla, například jednodušší, komplikovanější nebo klidně i stochastická.
 Jak bylo zmíněno v kapitole \ref{kap:procSimulace}, možnost volby libovolných pravidel je výhoda přístupu použití simulace.
@@ -176,29 +177,31 @@ Jak bylo zmíněno v kapitole \ref{kap:procSimulace}, možnost volby libovolnýc
 \end{definice}
 Pravidla výběru \textit{nejvhodnějšího týmu záchranářů} jsou navrhnuta tak,
 aby práce obsluhování incidentů byla rozmístěna rovnoměrně přes všechny týmy, ale aby zároveň byly incidenty obslouženy nejrychleji jak je možné.
-Například, třetí pravidlo pro výběr nejvhodnějšího týmu zaručuje rovnoměrnost práce a druhé co nejrychlejší obsloužení incidentu.
 
 Pravidla také počítají s možným zpožděním a raději upřednostní tým, který je aktuálně k dispozici, než tým, který ještě dokončuje jiný incident, ale mohl by i na místě incidentu
 být dříve, pokud by neměl zpoždění. Příkladem je první pravidlo pro výběr nejvhodnějšího týmu.
 
 Jakmile je $z_i$ vybrán, naplánujeme mu incident $i$ a $z_i$ \textit{odbavuje incident $i$}.
+
+\clearpage
+
 \begin{definice}[Záchranný tým odbavuje incident]\label{df:odbavujeIncident}
-  Řekneme, že záchranný tým $z \in Z$ odbavuje incident $i \in I$, pokud vykonává následující činnosti:
+  Řekneme, že záchranný tým odbavuje incident, pokud vykonává následující činnosti:
   \begin{enumerate}
     \item
-      Tým $z$ přijíží na místo odehrání incidentu $i$.
+      Tým přijíží na místo odehrání incidentu.
 
     \item
-      Tým $z$ odbavuje incident na místě odehrání incidentu $i$.
+      Tým odbavuje incident na místě odehrání incidentu.
 
     \item
-      Tým $z$ pacienty z incidentu $i$ převáží do nejbližší nemocnice.
+      Tým pacienty z incidentu převáží do nejbližší nemocnice.
 
     \item
-      Tým $z$ pacienty odbavuje v nemocnici.
+      Tým pacienty odbavuje v nemocnici.
 
     \item
-      Tým $z$ přijíždí zpět na výjezdovou stanici.
+      Tým přijíždí zpět na výjezdovou stanici.
   \end{enumerate}
 \end{definice}
 Definujme si funkce, které budou v simulaci používány a pomocí výše uvedených pravidel naleznou nejvhodnější tým záchranářů $z_i$
@@ -211,11 +214,11 @@ Funkce \textit{GetBestTeam} vrací tým záchranářu $z_i$ z týmů záchraná�
 Funkce \textit{GetBestAmbulance}\label{df:getBestAmbulance} vybere záchranné vozidlo, které je na stejné výjezdové stanici jako $z_i$ a časově je nejdříve k dispozici.
 \end{definice}
 
-Nyní jsme připraveni definovat \textit{simulaci pohotovostního plánu} $p \in P_C$ na množině incidentů $I$, a to jako deterministickou diskrétní simulaci
+Nyní jsme připraveni definovat \textit{simulaci pohotovostního plánu} $p \in P_C$ na množině incidentů $I$, a to jako deterministickou diskrétní simulaci $s$:
 \begin{align*}
-  s = s(p, I).
+  s_I = s(p, I).
 \end{align*}
-Simulace vrátí počet úspěšně odbavených incidentů $s$ na množině $I$ plánem $p$. 
+Simulace $s$ vrátí počet úspěšně odbavených incidentů $s_I$ na množině $I$ plánem $p$. 
 
 \textit{Událost} je nastání incidentu 
 \begin{align*}
@@ -232,24 +235,22 @@ Stav $S_Z$ je informace, kdy bude záchranný tým k dispozici a pokud tým odba
 
 \begin{algorithm}[H]
   \begin{algorithmic}[1]
-  \Function{Simulation}{$p, I$}
-    \State $s \gets 0$
+  \Function{Simulation}{$p, I$ \mbox{setřízené podle času nastání $T_I$}}
+    \State $s_I \gets 0$
     \State $T$ \gets 0
-    \State $I' \gets \mbox{Setřídí $I$ podle času nastání, pomocí $T_I$}$
     \State $S_Z \gets \mbox{Inicializuje podle $p$}$
     \State $S_A \gets \mbox{Inicializuje podle $p$}$
-    \For{$i_k \in I',~ k \in \{1, 2, \dots , |I|\}$}
+    \For{$i_k \in I,~ k \in \{1, 2, \dots , |I|\}$}
       \State $T \gets \mbox{Čas nastání $i_k$, $T_I(i_k)$}$
       \State $z_k \gets \mbox{GetBestTeam($i_k, S_Z, S_A, T$)}$
       \If{$z_k \neq \emptyset$}
-        \State $s \gets s + 1$
+        \State $s_I \gets s_I + 1$
         \State $a_k \gets \mbox{GetBestAmbulance($z_k, T$)}$
-        \State Plan($z_k, a_k, i_k$)
+        \State Plan($S_Z, z_k, i_k$)
+        \State UpdateWhenFree($S_A, z_k, i_k, a_k$)
       \EndIf
-      \State $S_Z \gets \mbox{UpdateState($S_Z, i_k, z_k$)}$
-      \State $S_A \gets \mbox{UpdateState($S_A, i_k, a_k$)}$
     \EndFor
-    \State \Return $s$
+    \State \Return $s_I$
   \EndFunction
   \end{algorithmic}
   \caption{Simulace plánu pohotovostní služby $p$ na množině incidentů $I$}
@@ -259,32 +260,35 @@ Stav $S_Z$ je informace, kdy bude záchranný tým k dispozici a pokud tým odba
 \vspace*{10px}
 
 Průběh simulace je následovný. 
-V krocích 2 až 6 simulace (viz algoritmus \ref{simulaceAlgo}) položí $s$ a $T$ rovno nule, setřídí si sadu incidentů podle časů nastání
+V krocích 2 až 5 simulace (viz algoritmus \ref{simulaceAlgo}) položí $s_I$ a $T$ rovno nule
 a incicializuje si stavy $S_A$ a $S_Z$ podle plánu $p$.
 
-V krocích 7 až 17 odbavuje události, takže se pohybuje po krocích v časech nastání incidentů od nejdřívějšího po nejpozdější.
+V krocích 6 až 15 odbavuje události, takže se pohybuje po krocích v časech nastání incidentů od nejdřívějšího po nejpozdější.
 V každém kroku simulace $k \in \{ 1, 2, \dots , |I|\}$ se simulace první pokusí deterministicky nalézt nejvhodnější $z_k \in Z$, který obslouží $i_k$,
-pomocí funkce $\textit{GetBestTeam}$ (viz definice \ref{df:getBestTeam}), v kroku 9. 
+pomocí funkce $\textit{GetBestTeam}$ (viz definice \ref{df:getBestTeam}), v kroku 8.
 Pokud takový $z_k$ neexistuje, tak pokračuje v odbavování dalších incidentů.
 
-Pokud existuje, v krocích 8 až 13 zvýší počet odbavených incidentů $s$ o jedna,
+Pokud existuje, v krocích 7 až 12 zvýší počet odbavených incidentů $s_I$ o jedna,
 deterministicky nalezne pro $z_k$ nejvhodnější $a_k$, pomocí funkce \textit{GetBestAmbulance} (viz definice \ref{df:getBestAmbulance}) a
 aktuální incident $i_k$ naplánuje na $z_k$ spolu s $a_k$ funkcí \textit{Plan}.
 Záchranný tým $z_k$ tak \textit{odbavuje} incident $i_k$ (viz definice \ref{df:odbavujeIncident}), a čas, kdy bude opět tým $z_k$ k dispozici je nastaven na čas, kdy incident úspěšně odbaví. 
+Tím se aktualizuje stav záchranných týmů $S_Z$.
 
-V krocích 15 a 16 aktualizuje stav systému $S_A$ a $S_Z$.
+V kroku 13 je funkcí \textit{UpdateWhenFree} aktualizován stav záchranných vozidel $S_A$,
+konkrétně vozidlu $a_k$ se přiřadí čas, kdy bude opět k dispozici -- kdy má $z_k$ přijet zpět na výjezdovou stanici.
+
 Simulace doběhne jakmile nejsou žádné další události k odbavení, takže jakmile projde všechny incidenty, to je po $|I|$ krocích.
-Simulace vrátí $s$, počet úspěšně odbavených incidentů.
+Simulace vrátí $s_I$, počet úspěšně odbavených incidentů.
 
 \section{Převedení problému na optimalizační úlohu s více účelovými funkcemi}\label{kap:optUloha2uc}
 
 V této kapitole si ukážeme, jak konkrétně budeme modelovat optimalizační úlohu nalezení optimálního pohotovostního plánu na množině incidentů $I$,
-pomocí počtu úspěšně odbavených incidentů $s$ a ceny plánu $u$.
+pomocí počtu úspěšně odbavených incidentů $s_I$ a ceny plánu $u(p)$.
 Dále si nadefinujeme potřebné pojmy, jako \textit{optimalizační úlohu s více nebo s jednou účelovou funkcí}.
 Ukážeme si, že problém nalezení optimálního plánu je vhodné modelovat jako optimalizační úlohu s více účelovými funkcemi,
 protože chceme maximalizovat počet úspěšně odbavených incidentů a zároveň minimalizovat cenu plánu.
 
-\begin{definice}[Optimalizační úloha s jednou účelovou funkcí (\cite{AlgOptBook}, str. 5)]\label{df:optUloha1ucObecne}
+\begin{definice}[Optimalizační úloha s jednou účelovou funkcí \cite{AlgOptBook}]\label{df:optUloha1ucObecne}
   Optimalizační úloha s jednou účelovou funkcí je definována jako úloha nalezení $x^*$,
   \begin{align}
     x^* = \max_{x \in \mathcal{X}} \{ q(x) \},
@@ -312,7 +316,7 @@ Optimální řešení nemusí být jenom jedno, může jich být více. Zárove�
   Víceúčelovou funkci $\mathbf{q}(x)$ maximalizujeme po složkách.
 \end{definice}
 Z definice \ref{df:optUloha2ucObecne} je \textit{optimálním řešením optimalizační úlohy s více učelovými funkcemi}
-$x^* \in \mathcal{X}$ takzvaný \textit{utopia point} $y^{utopia}$ (\cite{AlgOptBook}, str. 219).
+$x^* \in \mathcal{X}$ takzvaný \textit{utopia point} $y^{utopia}$ \cite{AlgOptBook}.
 To je konfigurace, která nabývá optima pro každou jednotlivou účelovou funkci.
 Zřejmě $y^{utopia}$ nemusí existovat, protože často maximalizování $q_i \in \mathcal{Q}$ může minimalizovat $q_j \in \mathcal{Q}, i \neq j$.
 V nadcházející kapitole si ukážeme jak se optimalizace takového typu řeší.
@@ -327,7 +331,7 @@ Abychom mohli problém nalezení optimálního plánu modelovat jako optimaliza�
   Cena plánu je součet všech dob trvání směn přiřazených záchranným týmům a počtu naalokovaných záchranných vozidel.
 \end{definice}
 
-Všimněme si, že $p_{D_l}(z) = 0$, pro nenaalokované týmy, čili nijak nepřispějí do výsledku sumy.
+Všimněme si, že $p_{D_l}(z) = 0$, pro nenaalokované týmy (viz kapitola \ref{kap:formalizaceProblemu}), čili nijak nepřispějí do výsledku sumy.
 
 Nyní již máme všechny prostředky potřebné k tomu, abychom modelovali problém nalezení optimálního plánu jako optimalizační úlohu s více účelovýmí funkcemi. 
 \begin{definice}[Optimalizační úloha nalezení optimálního plánu pohotovostní služby jako optimalizační úloha s více účelovými funkcemi]\label{df:optUloha2uc}
@@ -382,7 +386,7 @@ Obecně není vhodná, protože neumí nalézt kompromis mezi jednotlivými úč
 
 Jedná se o způsob převedení víceúčelové funkce pouze na jednu účelovou funkci pomocí sumy účelových funkcí pronásobené váhami.
 
-\begin{definice}[Vážená suma účelových funkcí (\cite{AlgOptBook}, str. 218)]\label{df:vazenaSumaUcelF}
+\begin{definice}[Vážená suma účelových funkcí \cite{AlgOptBook}]\label{df:vazenaSumaUcelF}
   Vážená suma účelových funkcí $q'$ je definovaná jako
   \begin{align*}
     q'(x) = w^T \mathbf{q}(x),
@@ -397,13 +401,13 @@ Stejně ale jako u lexigrafického porovnání nemusí být obecně jasné, jak�
 
 Jedná se o způsob převedení víceúčelové funkce pouze na jednu účelovou funkci minimalizováním vzdálenosti od nějaké ideální hodnoty -- cíle. 
 
-\begin{definice}[Účelová funkce měřící vzdálenost od cíle (\cite{AlgOptBook}, str. 219)]\label{df:goalP}
+\begin{definice}[Účelová funkce měřící vzdálenost od cíle \cite{AlgOptBook}]\label{df:goalP}
   \begin{align*}
     \min_{x \in \mathcal{X}} \{ \| \mathbf{q}(x) - y^{goal} \| \}, \hspace{50pt} y^{goal} \in \mathbb{R}.
   \end{align*}
 \end{definice}
 
-Standardně $y^{goal} = \mathbf{q}(y^{utopia})$ (\cite{AlgOptBook}, str. 219).
+Standardně $y^{goal} = \mathbf{q}(y^{utopia})$.
 Zvolením vhodné normy můžeme preferovat námi vybrané účelové funkce, ale obodně jako u předchozích metod, obecně nemusí být jasné, jaké účelové funkce preferovat.
 Zvolením normy jako nějaké $p$-normy (například standardní euklidovské normy), budou účelové funkce implicitně preferovány podle toho,
 v jakých jednotkách se měří. Tudiž při maximalizaci budou preferovány účelové funkce s oborem hodnot ve větším rozsahu.
@@ -413,7 +417,7 @@ v jakých jednotkách se měří. Tudiž při maximalizaci budou preferovány ú
 Jedná se o kombinaci goal programming a vážené sumy účelových funkcí.
 Váhami $w$ jsme schopni určit, kterou účelovou funkci je pro nás důležitější optimalizovat a parametrem $\varphi$ jakou $\varphi$-normu chceme použít.
 
-\begin{definice}[Vážená exponenciální suma účelových funkcí (\cite{AlgOptBook}, str. 219)]\label{df:vazenaSumUcF}
+\begin{definice}[Vážená exponenciální suma účelových funkcí \cite{AlgOptBook}]\label{df:vazenaSumUcF}
   \begin{align*}
     q(x) = \sum_{i=1}^{m} w_i (q_i(x) - y_i^{goal})^\varphi,
   \end{align*}
@@ -428,7 +432,6 @@ Nadefinovali jsme účelové funkce $s$ a $u$ a problém nalezení optimálního
 Pro optimalizační úlohy s více účelovými funkcemi obecně nemusí existovat optimum.
 Proto jsme si v předchozí kapitole ukázali několik přístupů,
 které vhodně převedou optimalizační úlohu s více účelovými funkcemi na optimalizační úlohu s jednou účelovou funkcí.
-Pro optimalizační úlohu s jednou účelovou funkcí již alespoň jedno optimum vždy existuje.
 
 V této kapitole si ukážeme, jak optimalizační úlohu nalezení optimálního plánu pohotovostní služby s více účelovými funkcemi (viz definice \ref{df:optUloha2uc}) převést na
 optimalizační úlohu nalezení optimálního plánu pohotovostní služby s jednou účelovou funkcí, pomocí metod zmíněných v předchozí kapitole.
@@ -516,7 +519,7 @@ Stejně jako u vážené sumy účelových funkcí jsme díky parametru $\alpha$
 Nyní máme prostředky pro definování problému nalezení optimálního pohotovostního plánu jako optimalizační úlohy s jednou účelovou funkcí.
 
 Označme si $Q_I = \{ q^{\text{Lex}}, q^{\text{Goal}}, q_{\alpha}, q_{\alpha}^{\varphi}\}$ jako množinu účelových funkcí na dané množině incidentů $I$.
-\begin{definice}[problém nalezení optimálního plánu jako optimalizační úloha s jednou účelovou funkcí]\label{df:optUloha1uc}
+\begin{definice}[Problém nalezení optimálního plánu jako optimalizační úloha s jednou účelovou funkcí]\label{df:optUloha1uc}
   Optimalizační úloha nalezení optimálního plánu pohotovostní služby s jednou účelovou funkcí je definována jako úloha nalezení $p^*$,
   \begin{align}
     p^* = \max_{p \in P_C} \{ q(p) \},
