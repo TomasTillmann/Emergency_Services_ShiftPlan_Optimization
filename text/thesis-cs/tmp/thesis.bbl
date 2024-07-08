@@ -401,6 +401,84 @@
       \field{title}{Hybrid Metaheuristics}
       \field{year}{2016}
     \endentry
+    \entry{tabu}{book}{}
+      \name{author}{2}{}{%
+        {{hash=4a01b592dd662a4d7731bcbebbbd8c0a}{%
+           family={Glover},
+           familyi={G\bibinitperiod},
+           given={Fred\bibnamedelima W},
+           giveni={F\bibinitperiod\bibinitdelim W\bibinitperiod}}}%
+        {{hash=c12e2e0c624a02cec0a327a3d097ed38}{%
+           family={Laguna},
+           familyi={L\bibinitperiod},
+           given={Manuel},
+           giveni={M\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {Springer Science \& Business Media}%
+      }
+      \strng{namehash}{d1faa45849c4ba1eabce0f361802a7fb}
+      \strng{fullhash}{d1faa45849c4ba1eabce0f361802a7fb}
+      \strng{bibnamehash}{d1faa45849c4ba1eabce0f361802a7fb}
+      \strng{authorbibnamehash}{d1faa45849c4ba1eabce0f361802a7fb}
+      \strng{authornamehash}{d1faa45849c4ba1eabce0f361802a7fb}
+      \strng{authorfullhash}{d1faa45849c4ba1eabce0f361802a7fb}
+      \field{sortinit}{3}
+      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Tabu search}
+      \field{year}{1997}
+      \verb{doi}
+      \verb 10.1007/978-1-4615-6089-0
+      \endverb
+      \verb{urlraw}
+      \verb https://link.springer.com/book/10.1007/978-1-4615-6089-0
+      \endverb
+      \verb{url}
+      \verb https://link.springer.com/book/10.1007/978-1-4615-6089-0
+      \endverb
+    \endentry
+    \entry{siman}{book}{}
+      \name{author}{2}{}{%
+        {{hash=d1119df0bd4c38937089a2f8d56a1ee7}{%
+           family={Laarhoven},
+           familyi={L\bibinitperiod},
+           given={Peter\bibnamedelima J.M.},
+           giveni={P\bibinitperiod\bibinitdelim J\bibinitperiod}}}%
+        {{hash=5b38b801addca4a6325f2d846600b40f}{%
+           family={Aarts},
+           familyi={A\bibinitperiod},
+           given={Emile\bibnamedelima H.L.},
+           giveni={E\bibinitperiod\bibinitdelim H\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {Springer Netherlands}%
+      }
+      \strng{namehash}{bd079d8b7e35638e264b97ecc257c129}
+      \strng{fullhash}{bd079d8b7e35638e264b97ecc257c129}
+      \strng{bibnamehash}{bd079d8b7e35638e264b97ecc257c129}
+      \strng{authorbibnamehash}{bd079d8b7e35638e264b97ecc257c129}
+      \strng{authornamehash}{bd079d8b7e35638e264b97ecc257c129}
+      \strng{authorfullhash}{bd079d8b7e35638e264b97ecc257c129}
+      \field{sortinit}{4}
+      \field{sortinithash}{9381316451d1b9788675a07e972a12a7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{series}{Mathematics and Its Applications}
+      \field{title}{Simulated Annealing: Theory and Applications}
+      \field{volume}{37}
+      \field{year}{1987}
+      \verb{doi}
+      \verb 10.1007/978-94-015-7744-1
+      \endverb
+      \verb{urlraw}
+      \verb https://link.springer.com/book/10.1007/978-94-015-7744-1
+      \endverb
+      \verb{url}
+      \verb https://link.springer.com/book/10.1007/978-94-015-7744-1
+      \endverb
+    \endentry
     \entry{Metropolis}{article}{}
       \name{author}{5}{}{%
         {{hash=8a5a1433b01fc9b9495db8f7f03c99cb}{%

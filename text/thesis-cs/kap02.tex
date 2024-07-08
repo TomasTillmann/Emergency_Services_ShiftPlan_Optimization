@@ -584,7 +584,7 @@ Sice neběží v polynomiálním čase, ale stále se jedná o dramatické zlep�
 
 Strom také nemusíme prohledávat deterministicky, ale stochasticky tak, že v každé hladině rekurze budeme optimální tahy náhodně permutovat. Nemusíme ani zkoušet všechny optimální tahy,
 ale pouze nějakou část. Hlavní výhodou algoritmu tak je schopnost plány prohledávat strukturovaně a navíc kvalita nalezeného řešení bude úměrná s délkou trvání algoritmu
--- čím déle bude běžet, tím více navštíví optimálních plánů v ceně a s větší šancí tak nalezna globální optimum.
+-- čím déle bude běžet, tím více navštíví optimálních plánů v ceně a s větší šancí tak nalezne globální optimum.
 
 \section{Metaheuristické metody}\label{kap:heuristiky}
 
@@ -651,9 +651,8 @@ generování dovolených plánů, což není efektivní způsob prohledávání.
 Pro představu, jedna z možných definic sousedství by mohla vypadat následovně.
 Jelikož sousední plány definujeme pomocí tahů, stačí nadefinovat tahy:
   \begin{enumerate}
-    \item alokování záchranného týmu,
+    \item alokování záchranného týmu a záchranného vozidla,
     \item dealokování záchranného týmu,
-    \item alokování záchranného vozidla,
     \item dealokování záchranného vozidla,
     \item nejkratší prodloužení směny záchranného týmu,
     \item nejkratší zkrácení směny záchranného týmu,
@@ -725,16 +724,14 @@ přičemž nalezené lokální optimum je v drtivé většině suboptimální (\
 Tabu prohledávání stejně jako lokální prohledávání prohledává plány lokálně pomocí sousedů.
 Tabu prohledávání však narozdíl od lokálního prohledávání po nalezení lokálního optima v něm nezůstane,
 ale umožní i navštívit souseda s horším hodnocením.
-
 Aby se následně prohledávání nevrátilo zpět do stejného optima,
 drží si seznam inverzních tahů posledních provedených tahů. Tomuto seznamu se říká \textit{tabu} a jedná se o tahy, které 
 jsou při prohledávání zakázany.
 Velikost seznamu tabu je takzvaná \textit{tabu tenura}, a jelikož se vždy ze seznamu odstraní nejposledněji provedený tah,
 tak tabu tenura určuje po jaký počet kroků tabu prohledávání se tah uvažuje, že je zakázan. 
-
 Ovšem vždy zakázat tahy z tabu může být příliš omezující, a výsledná nalezená řešení by mohla být suboptimální.
 Z toho důvodu ještě tabu metoda využívá konceptu \textit{aspiračního kritéria}, které pokud je pro nějaký tah splěno,
-tak je soused po provedení tohoto tahu uvažován i pokud je tah zakázan, čili i když se tah nachází v tabu.
+tak je soused po provedení tohoto tahu uvažován i pokud je tah zakázan, čili i když se tah nachází v tabu \cite{tabu}.
 
 Tabu prohledávání lze ukončit několika způsoby. Nejčastěji se prohledávání ukončuje, jakmile v iteraci už neexistují žádní zlepšující sousedé,
 které získáme tahem, jenž není v tabu.~(\citet{GlovKoch03}, str. 41--49). 
@@ -744,12 +741,12 @@ které získáme tahem, jenž není v tabu.~(\citet{GlovKoch03}, str. 41--49).
     \Function{TabuSearch}{$p_{start}$, $I$, $t$}
     \State $p_{current}$ \gets $p_{start}$
     \State $p_{best}$ \gets $p_{start}$
-    \State $tabu\_list$ \gets \{\}
+    \State $tabu$ \gets \{\}
     \While {true}
       \State $p^*$ \gets $p_{\emptyset}$ 
       \For {$T \in \text{neighbours\_moves($p_{current}$)}$}
         \State $p$ \gets T($p_{current}$)
-        \If {$q(p, I) > q(p^*, I)$ \textbf{and} ($T \notin tabu\_list$ \textbf{or} $q(p, I) > q(p_{best}, I)$)}
+        \If {$q(p, I) > q(p^*, I)$ \textbf{and} ($T \notin tabu$ \textbf{or} $q(p, I) > q(p_{best}, I)$)}
           \State $p^*$ \gets $p$
         \EndIf
       \EndFor
@@ -760,9 +757,9 @@ které získáme tahem, jenž není v tabu.~(\citet{GlovKoch03}, str. 41--49).
       \If {$q(p_{current}, I) > q(p_{best}, I)$}
         \State $p_{best}$ \gets $p_{current}$
       \EndIf
-      \State \text{AddFirst(tabu\_list, $T^{-1}$)}
-      \If {$|\text{tabu\_list}| > t$}
-        \State \text{RemoveLast($tabu\_list$)} 
+      \State \text{AddFirst($tabu$, $T^{-1}$)}
+      \If {$|tabu| > t$}
+        \State \text{RemoveLast($tabu$)} 
       \EndIf
     \EndWhile
     \State \Return $p_{best}$
@@ -772,7 +769,7 @@ které získáme tahem, jenž není v tabu.~(\citet{GlovKoch03}, str. 41--49).
   \label{alg:tabusearch}
 \end{algorithm}
 
-Algoritmus tabu prohledávání \ref{alg:tabusearch} si v krocích 1--5 inicializuje stav algoritmu. Tabu je ze začátku prázdné.
+Algoritmus tabu prohledávání \ref{alg:tabusearch} si v krocích 1-5 inicializuje stav algoritmu. Tabu je ze začátku prázdné.
 Podobně jako v lokálním prohledávání se prohledává prostor v krocích 5 až 24, dokud není splněna podmínka na řádku 13.
 V krocích 7--12 se prohledávájí pomocí sousedních tahů sousedé aktuálně prohledávaného plánu $p_{current}$. 
 
@@ -790,13 +787,13 @@ Do taba přidáváme inverzní tah, protože se ze souseda nechceme vrátit do p
 Pokud je tabu větší než dovoluje hyperparametr tabu tenura $t$, odebereme nejdříve přidaný tah.
 
 Tabu prohledávání již narozdíl od lokálního prohledávání nezůstane uvězněné v lokálním optimu a díky tabu se do něj nevrátí a nezacyklí se.
-Prohledá tak více plánů a bude vracet lepší řešení, než lokální prohledávání.
+Prohledá tak více plánů a bude vracet lepší řešení, než lokální prohledávání \cite{tabu}.
 
 \subsection{Simulované žíhání}
 
 Další variantou lokálního prohledávání je \textit{simulované žíhání}.
 Podobně jako tabu prohledávání dovoluje navštěvovat lokálně neoptimální konfigurace, se snahou nalézt globální optimum.
-Je to jedna z nejpopulárnějších technik na řešení těžkých optimalizačních úloh, především kombinatorických úloh.
+Je to jedna z nejpopulárnějších technik na řešení těžkých optimalizačních úloh, především kombinatorických úloh \cite{siman}.
 
 Simulované žíhání je inspirováno metalurgickým procesem žíhání, kdy je kov zahřán na vysokou teplotu
 a následně ochlazován, za účelem odstranění vnitřních defektů.
