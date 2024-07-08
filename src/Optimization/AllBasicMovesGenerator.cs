@@ -16,8 +16,24 @@ public class AllBasicMovesGenerator : MoveGeneratorBase
       for (int teamIndex = 0; teamIndex < plan.Assignments[depotIndex].MedicTeams.Count; ++teamIndex)
       {
         MedicTeamId teamId = new(depotIndex, teamIndex);
+        Interval oldShift = plan.Team(teamId).Shift;
 
-        foreach (var move in GetShiftChanges(plan, teamId))
+        foreach (var move in GetLongerShift(plan, teamId, oldShift))
+        {
+          yield return move;
+        }
+
+        foreach (var move in GetShorterShift(plan, teamId, oldShift))
+        {
+          yield return move;
+        }
+
+        foreach (var move in GetEarlierShift(plan, teamId, oldShift))
+        {
+          yield return move;
+        }
+
+        foreach (var move in GetLaterShift(plan, teamId, oldShift))
         {
           yield return move;
         }
@@ -40,27 +56,35 @@ public class AllBasicMovesGenerator : MoveGeneratorBase
     }
   }
 
-  private IEnumerable<MoveSequenceDuo> GetShiftChanges(EmergencyServicePlan plan, MedicTeamId teamId)
+  protected IEnumerable<MoveSequenceDuo> GetLongerShift(EmergencyServicePlan plan, MedicTeamId teamId, Interval shift)
   {
-    Interval shift = plan.Team(teamId).Shift;
     if (plan.CanLonger(teamId, ShiftTimes))
     {
       ChangeShift(teamId, shift, Interval.GetByStartAndDuration(shift.StartSec, ShiftTimes.GetLonger(shift.DurationSec)));
       yield return Moves;
     }
+  }
 
+  protected IEnumerable<MoveSequenceDuo> GetShorterShift(EmergencyServicePlan plan, MedicTeamId teamId, Interval shift)
+  {
     if (plan.CanShorten(teamId, ShiftTimes))
     {
       ChangeShift(teamId, shift, Interval.GetByStartAndDuration(shift.StartSec, ShiftTimes.GetShorter(shift.DurationSec)));
       yield return Moves;
     }
+  }
 
+  protected IEnumerable<MoveSequenceDuo> GetEarlierShift(EmergencyServicePlan plan, MedicTeamId teamId, Interval shift)
+  {
     if (plan.CanEarlier(teamId, ShiftTimes))
     {
       ChangeShift(teamId, shift, Interval.GetByStartAndDuration(ShiftTimes.GetEarlier(shift.StartSec), shift.DurationSec));
       yield return Moves;
     }
+  }
 
+  protected IEnumerable<MoveSequenceDuo> GetLaterShift(EmergencyServicePlan plan, MedicTeamId teamId, Interval shift)
+  {
     if (plan.CanLater(teamId, ShiftTimes))
     {
       ChangeShift(teamId, shift, Interval.GetByStartAndDuration(ShiftTimes.GetLater(shift.StartSec), shift.DurationSec));
@@ -68,7 +92,7 @@ public class AllBasicMovesGenerator : MoveGeneratorBase
     }
   }
 
-  private IEnumerable<MoveSequenceDuo> GetTeamAllocations(EmergencyServicePlan plan, int depotIndex)
+  protected IEnumerable<MoveSequenceDuo> GetTeamAllocations(EmergencyServicePlan plan, int depotIndex)
   {
     if (plan.CanAllocateTeam(depotIndex, Constraints) && plan.CanAllocateAmbulance(depotIndex, Constraints))
     {
@@ -80,7 +104,7 @@ public class AllBasicMovesGenerator : MoveGeneratorBase
     }
   }
 
-  private IEnumerable<MoveSequenceDuo> GetTeamDeallocations(EmergencyServicePlan plan, MedicTeamId teamId)
+  protected IEnumerable<MoveSequenceDuo> GetTeamDeallocations(EmergencyServicePlan plan, MedicTeamId teamId)
   {
     if (plan.CanDeallocateTeam(teamId, ShiftTimes))
     {
@@ -89,7 +113,7 @@ public class AllBasicMovesGenerator : MoveGeneratorBase
     }
   }
 
-  private IEnumerable<MoveSequenceDuo> GetAmbMoves(EmergencyServicePlan plan, int depotIndex)
+  protected IEnumerable<MoveSequenceDuo> GetAmbMoves(EmergencyServicePlan plan, int depotIndex)
   {
     if (plan.CanDeallocateAmbulance(depotIndex))
     {
