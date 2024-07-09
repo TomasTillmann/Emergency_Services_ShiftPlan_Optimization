@@ -2,10 +2,13 @@
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
+    <RootNamespace>DataGeneration</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Mapsui" Version="4.1.7" />
     <PackageReference Include="MathNet.Numerics" Version="5.0.0" />
+    <PackageReference Include="NetTopologySuite.Core" Version="1.15.3" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
 

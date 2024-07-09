@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DataGeneration\DataGeneration.csproj" />
+    <ProjectReference Include="..\WorldModel\WorldModel.csproj" />
     <ProjectReference Include="..\DataModel\DataModel.csproj" />
     <ProjectReference Include="..\Simulating\Simulating.csproj" />
     <ProjectReference Include="..\Optimization\Optimization.csproj" />

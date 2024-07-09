@@ -13,13 +13,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		text-todo.md = text-todo.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataGeneration", "DataGeneration\DataGeneration.csproj", "{A5445353-87D5-4D4E-9614-7BF74542AE20}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorldModel", "WorldModel\WorldModel.csproj", "{A5445353-87D5-4D4E-9614-7BF74542AE20}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Optimization", "Optimization\Optimization.csproj", "{261F6B0D-8765-4EF4-A517-1DB312C8F7D3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Simulating", "Simulating\Simulating.csproj", "{FBD93F92-2658-469A-8B60-2C2680F3A4AC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{8101F4F3-8F99-4E5B-89CE-A0E692D34EF8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorldMap", "WorldMap\WorldMap.csproj", "{4821368E-1012-48E3-AD22-4505A9C4BCD5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,6 +53,10 @@ Global
 		{8101F4F3-8F99-4E5B-89CE-A0E692D34EF8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8101F4F3-8F99-4E5B-89CE-A0E692D34EF8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8101F4F3-8F99-4E5B-89CE-A0E692D34EF8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4821368E-1012-48E3-AD22-4505A9C4BCD5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4821368E-1012-48E3-AD22-4505A9C4BCD5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4821368E-1012-48E3-AD22-4505A9C4BCD5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4821368E-1012-48E3-AD22-4505A9C4BCD5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

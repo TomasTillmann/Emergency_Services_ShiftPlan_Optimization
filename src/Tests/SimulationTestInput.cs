@@ -38,7 +38,7 @@ public class SimulationTestInput(Random random = null) : IInputParametrization
         ImmutableArray<Incident> incidents = _dataGenerator.GenerateIncidentModels(
           worldSize: new CoordinateModel { Longitude = 50_000, Latitude = 50_000 },
           incidentsCount: count,
-          duration: 21.ToHours().ToSeconds(),
+          totalDuration: 21.ToHours().ToSeconds(),
           onSceneDurationNormalExpected: 20.ToMinutes().ToSeconds(),
           onSceneDurationNormalStddev: 10.ToMinutes().ToSeconds(),
           inHospitalDeliveryNormalExpected: 15.ToMinutes().ToSeconds(),

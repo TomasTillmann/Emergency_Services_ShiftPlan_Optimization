@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.IO;
 using System.Linq;
 using DistanceAPI;
 using ESSP.DataModel;
+using NetTopologySuite.Geometries;
 
 public class Input1 : IInputParametrization
 {
@@ -78,16 +80,16 @@ public class Input1 : IInputParametrization
   public ImmutableArray<Incident> GetIncidents(int count = 330)
   {
     // Incidents init
-    ImmutableArray<Incident> incidents = _dataGenerator.GenerateIncidentModels(
-      worldSize: new CoordinateModel { Longitude = 50_000, Latitude = 50_000 },
-      incidentsCount: count,
-      duration: 21.ToHours().ToSeconds(),
+    List<CoordinateModel> locations = _dataGenerator.GetRandomIncidentsLocationsInPolygon(GetPraguePolygon(), count, _random);
+    ImmutableArray<Incident> incidents = _dataGenerator.GenerateIncidentModelsFromCoordinates(
+      coordinates: locations,
+      totalDuration: 21.ToHours().ToSeconds(),
       onSceneDurationNormalExpected: 20.ToMinutes().ToSeconds(),
       onSceneDurationNormalStddev: 15.ToMinutes().ToSeconds(),
       inHospitalDeliveryNormalExpected: 15.ToMinutes().ToSeconds(),
       inHospitalDeliveryNormalStddev: 5.ToMinutes().ToSeconds(),
       random: _random
-    ).Select(inc => IncidentMapper.MapBack(inc)).ToImmutableArray();
+    ).Select(IncidentMapper.MapBack).ToImmutableArray();
 
     return incidents;
   }
@@ -109,7 +111,7 @@ public class Input1 : IInputParametrization
         //14.ToHours().ToMinutes().ToSeconds().Value,
         16.ToHours().ToMinutes().ToSeconds().Value,
         //18.ToHours().ToMinutes().ToSeconds().Value,
-        //20.ToHours().ToMinutes().ToSeconds().Value,
+        20.ToHours().ToMinutes().ToSeconds().Value,
       },
 
       AllowedShiftDurationsSec = new HashSet<int>()
@@ -126,7 +128,8 @@ public class Input1 : IInputParametrization
     return shiftTimes;
   }
    
-  private IPolygon GetPraguePolygon()
+  private Polygon GetPraguePolygon()
   {
+    return PolygonParser.ParsePolygon(File.ReadAllText("/home/tom/School/Bakalarka/Emergency_Services_ShiftPlan_Optimization/src/WorldModel/Data/PraguePolygon"));
   }
 }
