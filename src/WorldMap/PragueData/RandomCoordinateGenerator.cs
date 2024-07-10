@@ -1,21 +1,21 @@
 using System;
+using MathNet.Numerics.Distributions;
 using NetTopologySuite.Geometries;
 
 namespace ESSP.DataModel;
 
-public class RandomCoordinateGenerator(Random random = null)
+public class RandomCoordinateGenerator(Normal distributionLatitude, Normal distributionLongitude)
 {
-    private readonly Random _random = random ?? new Random();
+    private readonly Normal _distributionLatitude = distributionLatitude; 
+    private readonly Normal _distributionLongitude = distributionLongitude; 
 
     public CoordinateModel GenerateRandomCoordinateIn(Polygon polygon)
     {
-        Envelope envelope = polygon.EnvelopeInternal;
-
         NetTopologySuite.Geometries.Coordinate randomCoordinate;
         do
         {
-            double randomX = envelope.MinX + (_random.NextDouble() * (envelope.MaxX - envelope.MinX));
-            double randomY = envelope.MinY + (_random.NextDouble() * (envelope.MaxY - envelope.MinY));
+            double randomX = _distributionLatitude.Sample();
+            double randomY = _distributionLongitude.Sample();
             randomCoordinate = new NetTopologySuite.Geometries.Coordinate(randomX, randomY);
         }
         while (!polygon.Contains(new Point(randomCoordinate)));

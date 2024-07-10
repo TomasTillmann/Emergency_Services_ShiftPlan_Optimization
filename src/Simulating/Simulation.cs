@@ -43,10 +43,10 @@ public sealed class Simulation
   private readonly MedicTeamsEvaluator _medicTeamsEvaluator;
   private readonly PlannableIncident.Factory _plannableIncidentFactory;
 
-  public Simulation(World world, Constraints constraints)
+  public Simulation(World world, Constraints constraints, IDistanceCalculator distanceCalculator)
   {
-    _plannableIncidentFactory = new PlannableIncident.Factory(world);
-    _medicTeamsEvaluator = new MedicTeamsEvaluator(world);
+    _plannableIncidentFactory = new PlannableIncident.Factory(world, distanceCalculator);
+    _medicTeamsEvaluator = new MedicTeamsEvaluator(world, distanceCalculator);
     State = new SimulationState(world.Depots.Length, constraints);
   }
 

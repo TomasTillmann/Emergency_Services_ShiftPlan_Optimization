@@ -1,3 +1,4 @@
+using DataModel.Interfaces;
 using ESSP.DataModel;
 using Simulating;
 
@@ -8,9 +9,9 @@ public class GaantView
   private readonly Simulation _simulation;
   private readonly SimulationStateVerbose _state;
 
-  public GaantView(World world, Constraints constraints)
+  public GaantView(World world, Constraints constraints, IDistanceCalculator distanceCalculator)
   {
-    _simulation = new Simulation(world, constraints);
+    _simulation = new Simulation(world, constraints, distanceCalculator);
     _state = new SimulationStateVerbose(world.Depots.Length, constraints);
     _simulation.State = _state;
   }

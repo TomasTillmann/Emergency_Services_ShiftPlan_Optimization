@@ -71,11 +71,18 @@ public class DataModelGenerator
   public List<CoordinateModel> GetRandomIncidentsLocationsInPolygon(
     Polygon polygon,
     int incidentsCount,
-    Random random = null
+    double stddev,
+    Random? random = null
   )
   {
     random ??= new();
-    RandomCoordinateGenerator generator = new(random);
+    Normal latitudeDistribution = new Normal(
+     50.0842500, stddev, random);
+    
+    Normal longitudeDistribution = new Normal(
+     14.4580667, stddev, random);
+      
+    RandomCoordinateGenerator generator = new(latitudeDistribution, longitudeDistribution);
     return Enumerable.Range(0, incidentsCount).Select(_ => generator.GenerateRandomCoordinateIn(polygon)).ToList();
   }
 
@@ -86,7 +93,7 @@ public class DataModelGenerator
       Seconds onSceneDurationNormalStddev,
       Seconds inHospitalDeliveryNormalExpected,
       Seconds inHospitalDeliveryNormalStddev,
-      Random random = null
+      Random? random = null
   )
   {
     random ??= new Random();
@@ -109,6 +116,56 @@ public class DataModelGenerator
     incidents.Sort((x, y) => x.OccurenceSec.CompareTo(y.OccurenceSec));
     return incidents.ToArray();
   }
+  
+  public IncidentModel[] GenerateIncidentModelsFromCoordinatesNormal(
+      List<CoordinateModel> coordinates,
+      Seconds totalDuration,
+      Seconds onSceneDurationNormalExpected,
+      Seconds onSceneDurationNormalStddev,
+      Seconds inHospitalDeliveryNormalExpected,
+      Seconds inHospitalDeliveryNormalStddev,
+      int start,
+      int end,
+      double percentage,
+      Random? random = null
+  )
+  {
+    random ??= new Random();
+    Normal onSceneDurationDistribution = new(onSceneDurationNormalExpected.Value, onSceneDurationNormalStddev.Value, random);
+    Normal inHospitalDeliveryDistribution = new(inHospitalDeliveryNormalExpected.Value, inHospitalDeliveryNormalStddev.Value, random);
+
+    List<IncidentModel> incidents = new();
+    for (int i = 0; i < percentage * coordinates.Count(); ++i)
+    {
+      incidents.Add(GetIncidentModelOnLocation(
+        coordinates[i],
+        end.ToHours().ToMinutes().ToSeconds(),
+        onSceneDurationDistribution,
+        inHospitalDeliveryDistribution,
+        random,
+        startTime: start.ToHours().ToMinutes().ToSeconds().Value
+        )
+      );
+    }
+    
+    incidents.Sort((x, y) => x.OccurenceSec.CompareTo(y.OccurenceSec));
+    
+
+    for (int i = (int)(percentage * coordinates.Count); i < coordinates.Count; ++i)
+    {
+      incidents.Add(GetIncidentModelOnLocation(
+        coordinates[i],
+        totalDuration,
+        onSceneDurationDistribution,
+        inHospitalDeliveryDistribution,
+        random
+        )
+      );
+    }
+
+    incidents.Sort((x, y) => x.OccurenceSec.CompareTo(y.OccurenceSec));
+    return incidents.ToArray();
+  }
 
   public IncidentModel[] GenerateIncidentModels(
       CoordinateModel worldSize,
@@ -118,7 +175,7 @@ public class DataModelGenerator
       Seconds onSceneDurationNormalStddev,
       Seconds inHospitalDeliveryNormalExpected,
       Seconds inHospitalDeliveryNormalStddev,
-      Random random = null
+      Random? random = null
   )
   {
     random ??= new Random();
@@ -153,13 +210,15 @@ public class DataModelGenerator
     Seconds totalDuration,
     Normal onSceneDurationDistribution,
     Normal inHospitalDeliveryDistribution,
-    Random random = null
+    Random? random = null,
+    int startTime = 0
   )
   {
+      random ??= new Random();
       return new IncidentModel
       {
         Location = location,
-        OccurenceSec = random.Next(totalDuration.Value),
+        OccurenceSec = random.Next(startTime, totalDuration.Value),
         OnSceneDurationSec = Math.Min(Math.Max(10.ToMinutes().ToSeconds().Value, (int)onSceneDurationDistribution.Sample()), 30.ToMinutes().ToSeconds().Value),
         InHospitalDeliverySec = Math.Min(Math.Max(10.ToMinutes().ToSeconds().Value, (int)inHospitalDeliveryDistribution.Sample()), 30.ToMinutes().ToSeconds().Value),
         GoldTimeSec = 40.ToMinutes().ToSeconds().Value

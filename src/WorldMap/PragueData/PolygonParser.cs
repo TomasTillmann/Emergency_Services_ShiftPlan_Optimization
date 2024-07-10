@@ -16,7 +16,7 @@ public class PolygonParser
             var parts = line.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
             if (parts.Length == 2)
             {
-                if (double.TryParse(parts[0].Trim(), out double longitude) && double.TryParse(parts[1].Trim(), out double latitude))
+                if (double.TryParse(parts[0].Trim(), out double latitude) && double.TryParse(parts[1].Trim(), out double longitude))
                 {
                     coordinates.Add(new NetTopologySuite.Geometries.Coordinate(longitude, latitude));
                 }

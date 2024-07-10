@@ -543,6 +543,9 @@ INPUT /home/tom/.texlive2022/texmf-var/luatex-cache/generic/fonts/otl/lmroman10-
 OUTPUT tmp/kap03.aux
 INPUT ./kap03.tex
 INPUT ./kap03.tex
+INPUT ./img/prague_monday_420.png
+INPUT ./img/prague_monday_420.png
+INPUT ./img/prague_monday_420.png
 OUTPUT tmp/kap04.aux
 INPUT ./kap04.tex
 INPUT ./kap04.tex

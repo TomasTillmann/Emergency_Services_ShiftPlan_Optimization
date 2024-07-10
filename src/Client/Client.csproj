@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\WorldMap\WorldMap.csproj" />
     <ProjectReference Include="..\WorldModel\WorldModel.csproj" />
     <ProjectReference Include="..\DataModel\DataModel.csproj" />
     <ProjectReference Include="..\Simulating\Simulating.csproj" />

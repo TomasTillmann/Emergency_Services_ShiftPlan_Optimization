@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using DataModel.Interfaces;
 using ESSP.DataModel;
 using Simulating;
 
@@ -8,9 +9,9 @@ public class LexComparer
 {
   private readonly Simulation _simulation;
 
-  public LexComparer(World world, Constraints constraints)
+  public LexComparer(World world, Constraints constraints, IDistanceCalculator distanceCalculator)
   {
-    _simulation = new Simulation(world, constraints);
+    _simulation = new Simulation(world, constraints, distanceCalculator);
   }
 
   public int Compare(EmergencyServicePlan p1, EmergencyServicePlan p2, ImmutableArray<Incident> incidents)

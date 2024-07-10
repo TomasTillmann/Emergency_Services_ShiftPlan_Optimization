@@ -34,7 +34,6 @@ public static class WorldMapper
       Hospitals = hospitals,
       AvailableMedicTeams = model.AvailableMedicTeams.Select(team => _medicTeamMapper.MapBack(team)).ToImmutableArray(),
       AvailableAmbulances = model.AvailableAmbulances.Select(amb => _ambMapper.MapBack(amb)).ToImmutableArray(),
-      DistanceCalculator = new RealDistanceCalculator(hospitals)
     };
   }
 }

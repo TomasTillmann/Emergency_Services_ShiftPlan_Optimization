@@ -64,12 +64,11 @@ public partial class PlannableIncident
     private readonly ImmutableArray<Hospital> _hospitals;
     private readonly ImmutableArray<Depot> _depots;
 
-    public Factory(World world)
+    public Factory(World world, IDistanceCalculator distanceCalculator)
     {
-      _distanceCalculator = world.DistanceCalculator;
       _hospitals = world.Hospitals;
       _depots = world.Depots;
-
+      _distanceCalculator = distanceCalculator; 
       WorkingInstance = new PlannableIncident();
     }
 
@@ -119,7 +118,6 @@ public partial class PlannableIncident
       CalculateStartTimeAndAmbulanceStartingLocation(teamId, incidentOccurenceTimeSec, out int startTimeSec, out Coordinate ambStartLoc, out ambIndex);
 
       int toIncidentTravelDurationSec = _distanceCalculator.GetTravelDurationSec(ambStartLoc, incidentLocation);
-
       return Interval.GetByStartAndDuration(startTimeSec, toIncidentTravelDurationSec);
     }
 

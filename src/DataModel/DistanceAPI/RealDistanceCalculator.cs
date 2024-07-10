@@ -1,22 +1,26 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
 using DataModel.Interfaces;
 using ESSP.DataModel;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace DistanceAPI;
 
-public class RealDistanceCalculator(ImmutableArray<Hospital> hospitals) : IDistanceCalculator
+public class RealDistanceCalculator : IDistanceCalculator
 {
     private readonly string _apiKey = ApiKeyParser.ApiKey;
-    private readonly ImmutableArray<Hospital> _hospitals = hospitals = hospitals;
     private readonly Dictionary<Coordinate, Hospital> _nearestHospital = new();
-    private readonly Dictionary<(Coordinate, Coordinate), int> _travelDuration = new();
+    private readonly Dictionary<(Coordinate, Coordinate), int> _travelDurations = new();
     private readonly Dictionary<(Coordinate, Coordinate, int), Coordinate> _newLocation
         = new(new NewLocationComparer(5.ToMinutes().ToSeconds().Value, 0.001 /*about 100m*/));
+
+    private readonly CacheDeserializer _cacheDeserializer;
+    private readonly ImmutableArray<Hospital> _hospitals;
     
     public int NearestHospitalHits { get; private set; }
     public int NearestHospitalTotal { get; private set; }
@@ -27,8 +31,50 @@ public class RealDistanceCalculator(ImmutableArray<Hospital> hospitals) : IDista
     public int IntermediateLocationsHits { get; private set; }
     public int IntermediateLocationsTotal { get; private set; }
 
+    
+    /// <summary>
+    /// Constructs RealDistanceCalculator without cache
+    /// </summary>
+    /// <param name="world"></param>
+    public RealDistanceCalculator(
+        ImmutableArray<Hospital> hospitals
+    )
+    {
+        _hospitals = hospitals;
+    }
+
+    /// <summary>
+    /// Constructs RealDistanceCalculator with precalculated cache for specific incident set.
+    /// The cached data has to match.
+    /// </summary>
+    /// <param name="world"></param>
+    /// <param name="incidents"></param>
+    /// <param name="incidentsToHospitalsCachePath"></param>
+    /// <param name="depotToIncidentsCachePath"></param>
+    /// <param name="hospitalsToDepotsCachePath"></param>
+    public RealDistanceCalculator(
+        World world,
+        ImmutableArray<Incident> incidents,
+        string incidentsToHospitalsCachePath,
+        string depotToIncidentsCachePath,
+        string hospitalsToDepotsCachePath
+    )
+    {
+        _hospitals = world.Hospitals;
+        _cacheDeserializer = new CacheDeserializer(
+            world, 
+            incidents,
+            incidentsToHospitalsCachePath,
+            depotToIncidentsCachePath,
+            hospitalsToDepotsCachePath
+        );
+        _cacheDeserializer.InitNearestHospitalCache(_nearestHospital);
+        _cacheDeserializer.InitTravelDurationsCache(_travelDurations);
+    }
+
     public Hospital GetNearestHospital(Coordinate location)
     {
+        if (NearestHospitalTotal % 50 == 0) Console.WriteLine($"NearestHospitalRequest: {NearestHospitalHits}/{NearestHospitalTotal}");
         ++NearestHospitalTotal;
         if (_nearestHospital.TryGetValue(location, out var nearestHospital))
         {
@@ -54,20 +100,22 @@ public class RealDistanceCalculator(ImmutableArray<Hospital> hospitals) : IDista
 
     public int GetTravelDurationSec(Coordinate from, Coordinate to)
     {
+        if (TravelDurationTotal % 50 == 0) Console.WriteLine($"TravelDurationsRequest: {TravelDurationHits}/{TravelDurationTotal}");
         ++TravelDurationTotal;
-        if (_travelDuration.TryGetValue((from, to), out var duration))
+        if (_travelDurations.TryGetValue((from, to), out var duration))
         {
             ++TravelDurationHits;
             return duration;
         }
         
         var res = GetTravelDurationSecAsync(from, to).Result;
-        _travelDuration[(from, to)] = res;
+        _travelDurations[(from, to)] = res;
         return res;
     }
 
     public Coordinate GetIntermediateLocation(Coordinate from, Coordinate to, int durationDrivingSec)
     {
+        if (IntermediateLocationsTotal % 50 == 0) Console.WriteLine($"Intermediate location requests: {IntermediateLocationsHits}/{IntermediateLocationsTotal}");
         ++IntermediateLocationsTotal;
         if (_newLocation.TryGetValue((from, to, durationDrivingSec), out var newLocation))
         {
@@ -81,6 +129,7 @@ public class RealDistanceCalculator(ImmutableArray<Hospital> hospitals) : IDista
 
     private async Task<int> GetTravelDurationSecAsync(Coordinate from, Coordinate to)
     {
+        //Console.WriteLine($"TRAVEL DURATION API CALL: from: {from}, to: {to}");
         string url = $"https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=" +
                      $"{from.Latitude},{from.Longitude}&destinations={to.Latitude},{to.Longitude}&key={_apiKey}";
 

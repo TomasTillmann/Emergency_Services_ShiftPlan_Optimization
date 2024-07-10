@@ -8,7 +8,6 @@ public class World
 {
   public ImmutableArray<Depot> Depots { get; init; }
   public ImmutableArray<Hospital> Hospitals { get; init; }
-  public IDistanceCalculator DistanceCalculator { get; init; }
   public ImmutableArray<MedicTeam> AvailableMedicTeams { get; init; }
   public ImmutableArray<Ambulance> AvailableAmbulances { get; init; }
 }

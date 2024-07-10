@@ -7,13 +7,13 @@ using DistanceAPI;
 using ESSP.DataModel;
 using NetTopologySuite.Geometries;
 
-public class Input1 : IInputParametrization
+public class PragueInput : IInputParametrization
 {
   private readonly Random _random;
   private readonly DataModelGenerator _dataGenerator = new();
   private readonly int _depotsCount = 20;
 
-  public Input1(Random random = null)
+  public PragueInput(Random? random = null)
   {
     _random = random ?? new Random();
   }
@@ -22,8 +22,8 @@ public class Input1 : IInputParametrization
   {
     return new Constraints
     {
-      MaxTeamsPerDepotCount = Enumerable.Repeat(10, _depotsCount).ToImmutableArray(),
-      MaxAmbulancesPerDepotCount = Enumerable.Repeat(10, _depotsCount).ToImmutableArray(),
+      MaxTeamsPerDepotCount = Enumerable.Repeat(30, _depotsCount).ToImmutableArray(),
+      MaxAmbulancesPerDepotCount = Enumerable.Repeat(30, _depotsCount).ToImmutableArray(),
     };
   }
 
@@ -80,14 +80,42 @@ public class Input1 : IInputParametrization
   public ImmutableArray<Incident> GetIncidents(int count = 330)
   {
     // Incidents init
-    List<CoordinateModel> locations = _dataGenerator.GetRandomIncidentsLocationsInPolygon(GetPraguePolygon(), count, _random);
+    Polygon polygon = GetPraguePolygon();
+    // Prague has area of 500km^2, and its symmetric, meaning its about 25 * 25 km.
+    // The stddev is hence chosen as ~10km, in order to concentrate most of the incidents in the center of Prague.
+    List<CoordinateModel> locations = _dataGenerator.GetRandomIncidentsLocationsInPolygon(polygon, count, 0.1 /* ~11km */, _random);
+    
     ImmutableArray<Incident> incidents = _dataGenerator.GenerateIncidentModelsFromCoordinates(
+      coordinates: locations,
+      totalDuration: 21.ToHours().ToSeconds(),
+      onSceneDurationNormalExpected: 20.ToMinutes().ToSeconds(),
+      onSceneDurationNormalStddev: 5.ToMinutes().ToSeconds(),
+      inHospitalDeliveryNormalExpected: 15.ToMinutes().ToSeconds(),
+      inHospitalDeliveryNormalStddev: 5.ToMinutes().ToSeconds(),
+      random: _random
+    ).Select(IncidentMapper.MapBack).ToImmutableArray();
+
+    return incidents;
+  }
+
+  public ImmutableArray<Incident> GetMondayIncidents(int count = 400)
+  {
+    // #average incidents count / hours in a day * 9h-12h * dvakrat, protoze od 9 do 12 se deje dvakrat tolik incidentu oproti prumeru
+    // 330 / 24 * 3 * 2 ~ 82
+    var percentage = 82 / (double)count;
+    
+    List<CoordinateModel> locations = _dataGenerator.GetRandomIncidentsLocationsInPolygon(GetPraguePolygon(), count, 0.08, _random);
+    
+    ImmutableArray<Incident> incidents = _dataGenerator.GenerateIncidentModelsFromCoordinatesNormal(
       coordinates: locations,
       totalDuration: 21.ToHours().ToSeconds(),
       onSceneDurationNormalExpected: 20.ToMinutes().ToSeconds(),
       onSceneDurationNormalStddev: 15.ToMinutes().ToSeconds(),
       inHospitalDeliveryNormalExpected: 15.ToMinutes().ToSeconds(),
       inHospitalDeliveryNormalStddev: 5.ToMinutes().ToSeconds(),
+      9,
+      12,
+      percentage,
       random: _random
     ).Select(IncidentMapper.MapBack).ToImmutableArray();
 
@@ -128,7 +156,7 @@ public class Input1 : IInputParametrization
     return shiftTimes;
   }
    
-  private Polygon GetPraguePolygon()
+  public Polygon GetPraguePolygon()
   {
     return PolygonParser.ParsePolygon(File.ReadAllText("/home/tom/School/Bakalarka/Emergency_Services_ShiftPlan_Optimization/src/WorldModel/Data/PraguePolygon"));
   }

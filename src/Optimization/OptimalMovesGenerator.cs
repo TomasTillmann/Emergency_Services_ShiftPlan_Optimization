@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using DataModel.Interfaces;
 using ESSP.DataModel;
 using MyExtensions;
 using Simulating;
@@ -9,6 +10,7 @@ public class OptimalMovesGenerator(
   World world,
   ShiftTimes shiftTimes,
   Constraints constraints,
+  IDistanceCalculator distanceCalculator,
   int movesBufferSize,
   Random random = null)
   : MoveGeneratorBase(shiftTimes, constraints, movesBufferSize)
@@ -18,7 +20,7 @@ public class OptimalMovesGenerator(
 
   public ImmutableArray<Incident> Incidents { get; set; }
 
-  private readonly Simulation _simulation = new(world, constraints);
+  private readonly Simulation _simulation = new(world, constraints, distanceCalculator);
   private readonly MoveMaker _moveMaker = new();
   private readonly Random _random = random ?? new Random();
 

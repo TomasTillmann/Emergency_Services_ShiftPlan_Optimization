@@ -7,6 +7,6 @@ public interface IOptimizer
 {
   IUtilityFunction UtilityFunction { get; set; }
 
-  List<EmergencyServicePlan> GetBest(ReadOnlySpan<Incident> incidents);
+  List<EmergencyServicePlan> GetBest(ImmutableArray<Incident> incidents);
 }
 

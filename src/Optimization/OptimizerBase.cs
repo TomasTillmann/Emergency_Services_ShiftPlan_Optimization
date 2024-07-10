@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using ESSP.DataModel;
 
 namespace Optimizing;
@@ -22,6 +23,6 @@ public abstract class OptimizerBase : IOptimizer
     EmptyPlan = EmergencyServicePlan.GetNewEmpty(world);
   }
 
-  public abstract List<EmergencyServicePlan> GetBest(ReadOnlySpan<Incident> incidents);
+  public abstract List<EmergencyServicePlan> GetBest(ImmutableArray<Incident> incidents);
 }
 

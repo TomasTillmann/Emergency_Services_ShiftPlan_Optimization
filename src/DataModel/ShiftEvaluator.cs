@@ -32,9 +32,9 @@ public class MedicTeamsEvaluator
     }
   }
 
-  public MedicTeamsEvaluator(World world)
+  public MedicTeamsEvaluator(World world, IDistanceCalculator distanceCalculator)
   {
-    this._plannableIncidentFactory = new PlannableIncident.Factory(world);
+    this._plannableIncidentFactory = new PlannableIncident.Factory(world, distanceCalculator);
   }
 
   public bool IsHandling(MedicTeamId teamId, in Incident incident)
