@@ -13,7 +13,8 @@ První vygenerujeme data reprezentující výjezdové stanice a nemocnice a tím
 Ty můžeme v podstatě vygenerovat libovolně, ale v rámci praktičtějšího využití
 si v této prácí vybereme jako pohotovostní službu Pražskou záchrannou službu.
 Pražská záchranná služba disponuje 20 výjezdovými stanicemi a 140 vozidly.
-Údaje o počtu záchranných týmu se zdají, že nejsou veřejně dostupné.
+Údaje o počtu záchranných týmu se zdají, že nejsou veřejně dostupné. Jedinou dostupnou informací je celkový počet zaměstanců, který činí přes 500 lidí.
+Tam ale spadají i nezáchranáři.
 V Praze se nachází 12 nemocnic.
 
 Nyní namodelujeme incidenty. Podle statistik zveřejněných Pražskou záchrannou službou se v roce 2017 v Praze denně uskutečnilo na 330 výjezdů.
@@ -34,11 +35,11 @@ V jakých časech se incidenty odehrávají je vygenerováno uniformě náhodně
   \label{img:prague}
 \end{figure}
 
-Na obrázku \ref{img:prague} je znázorněno na mapě Prahy rozmístění výjezdových stanic (kolečka černé barvy), nemocnic (puntíky zelené barvy) a incidenty (puntíky červené barvy).
+Na obrázku \ref{img:prague} je znázorněno na mapě Prahy rozmístění 20 výjezdových stanic (body černé barvy), 12 nemocnic (body zelené barvy) a 300 incidentů (body červené barvy).
 Tmavě červené puntíky reprezentují incidenty, které se odehrají mezi 9 a 12 hodinou.
 
-S výše popsanou reprezentací pohotovostní služby a sady incidentů je třeba zajistit, aby simulace uměla věrohodně zjistit, za jak dlouho se záchranný tým dopraví z aktuální pozice
-na místo incidentu, do nemocnice a nebo zpět na výjezdovou stanici. Připomeňme si, že simulaci používáme právě z toho důvodu, aby počet úspěšně odbavených incidentů plánem byl co nejvěrohodnější.
+S výše popsanou reprezentací pohotovostní služby a sady incidentů je třeba zajistit, aby simulace uměla věrohodně zjistit doby trvání příjezdů.
+Připomeňme si, že simulaci používáme právě z toho důvodu, aby počet úspěšně odbavených incidentů plánem byl co nejvěrohodnější.
 Věrohodnost zajistíme použitím Google API pro zjišťování těchto dob příjezdu. Konkrétně pomocí Distance Matrix API a Routes API.
 
 V průběhu simulace je potřeba především znát následující doby příjezdů:
@@ -53,12 +54,12 @@ tak je povoleno, aby mohlo z aktuální lokace vyrazit na odbavování incidentu
 
 Doby příjezdů mezi výjezdovými stanicemi, incidenty a nemocnicemi si můžeme předpočítat, ale \textit{reroute} předpočítat nelze.
 Můžeme si alespoň v průběhu simulování všechny spočítané doby příjezdů mezi lokacemi udržovat s přesností na desítky metrů,
-abychom se v budoucnu nemuselo volat Google API, což je samozřejmě pomalá operace, trvající až stovky milisekund. 
+aby se v budoucnu nemuselo volat Google API, což je samozřejmě pomalá operace, trvající až desítky až stovky milisekund. 
 
 TravelDurationsRequest: 97619020/97626400
 
 
-\section{Aplikace prohledávání plánů optimálními tahy}
+\section{Aplikace prohledávání plánů optimálními \linebreak tahy}
 
 \section{Aplikace lokálního prohledávání}
 

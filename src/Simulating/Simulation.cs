@@ -135,7 +135,7 @@ public sealed class Simulation
 
   private void ResetState()
   {
-    State.Clear(Plan);
+    State.Clear();
   }
 
   private void ResetStats()

@@ -56,19 +56,16 @@ public class SimulationState : ISimulationState
     }
   }
 
-  /// <summary>
-  /// Clears state of only plan's dimensions.
-  /// </summary>
-  public virtual void Clear(EmergencyServicePlan plan)
+  public virtual void Clear()
   {
-    for (int i = 0; i < plan.Assignments.Length; ++i)
+    for (int i = 0; i < _teamStates.Length; ++i)
     {
-      for (int j = 0; j < plan.Assignments[i].MedicTeams.Count; ++j)
+      for (int j = 0; j < _teamStates[i].Length; ++j)
       {
         _teamStates[i][j].Clear();
       }
 
-      for (int j = 0; j < plan.Assignments[i].Ambulances.Count; ++j)
+      for (int j = 0; j < _ambulanceStates[i].Length; ++j)
       {
         _ambulanceStates[i][j].Clear();
       }

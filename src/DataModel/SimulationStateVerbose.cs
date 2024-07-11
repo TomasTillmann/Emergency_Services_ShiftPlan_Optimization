@@ -22,9 +22,9 @@ public class SimulationStateVerbose : SimulationState
         }
     }
 
-    public override void Clear(EmergencyServicePlan plan)
+    public override void Clear()
     {
-        base.Clear(plan);
+        base.Clear();
         _plannedIncidentsForTeam.Clear();
     }
 

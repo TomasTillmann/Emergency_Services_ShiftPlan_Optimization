@@ -184,7 +184,7 @@ class Program
       Random random = new Random(420);
       PragueInput input = new PragueInput(random);
       var world = input.GetWorld();
-      var incidents = input.GetMondayIncidents(300);
+      var incidents = input.GetMondayIncidents(10);
       Constraints constraints = input.GetConstraints();
       ShiftTimes shiftTimes = input.GetShiftTimes();
 

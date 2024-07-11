@@ -6,6 +6,6 @@ public interface ISimulationState
   AmbulanceState AmbulanceState(AmbulanceId ambId);
   void PlanIncident(MedicTeamId teamId, PlannableIncident incident);
   void FillFrom(ISimulationState other);
-  void Clear(EmergencyServicePlan plan);
+  void Clear();
 }
 

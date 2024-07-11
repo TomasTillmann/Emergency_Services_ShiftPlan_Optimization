@@ -81,7 +81,7 @@ public class OptimalMovesGenerator(
   {
     int[] permutated = new int[plan.Assignments.Length];
     for (int i = 0; i < permutated.Length; ++i) permutated[i] = i;
-    permutated.Shuffle(_random);
+    //permutated.Shuffle(_random);
 
     int new_r;
     for (int depotIndex = 0; depotIndex < plan.Assignments.Length; ++depotIndex)
@@ -144,7 +144,7 @@ public class OptimalMovesGenerator(
   {
     int[] permutated = new int[plan.Assignments.Length];
     for (int i = 0; i < permutated.Length; ++i) permutated[i] = i;
-    permutated.Shuffle(_random);
+    // permutated.Shuffle(_random);
 
     for (int depotIndex = 0; depotIndex < plan.Assignments.Length; ++depotIndex)
     {

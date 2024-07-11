@@ -102,7 +102,7 @@ public class PragueInput : IInputParametrization
   {
     // #average incidents count / hours in a day * 9h-12h * dvakrat, protoze od 9 do 12 se deje dvakrat tolik incidentu oproti prumeru
     // 330 / 24 * 3 * 2 ~ 82
-    var percentage = 82 / (double)count;
+    var percentage = (count / 24 * 3 * 2) / (double)count;
     
     List<CoordinateModel> locations = _dataGenerator.GetRandomIncidentsLocationsInPolygon(GetPraguePolygon(), count, 0.08, _random);
     
