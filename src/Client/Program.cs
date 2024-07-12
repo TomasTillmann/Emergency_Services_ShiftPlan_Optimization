@@ -181,10 +181,11 @@ class Program
     
     var t1 = Task.Run(() =>
     {
+      return;
       Random random = new Random(420);
       PragueInput input = new PragueInput(random);
       var world = input.GetWorld();
-      var incidents = input.GetMondayIncidents(10);
+      var incidents = input.GetMondayIncidents(300);
       Constraints constraints = input.GetConstraints();
       ShiftTimes shiftTimes = input.GetShiftTimes();
 
@@ -201,7 +202,7 @@ class Program
       
       using var writer = new StreamWriter(Path.Join(logDir, log));
       using var bestPlansWriter = new StreamWriter(Path.Join(logDir, bestPlansLog));
-      var optimizer = new OptimalMovesSearchOptimizer(world, shiftTimes, distanceCalculator, constraints, 500, random);
+      var optimizer = new OptimalMovesSearchOptimizer(world, shiftTimes, distanceCalculator, constraints, 500, new Random(69));
       optimizer.Writer = writer;
       optimizer.BestPlansWriter = bestPlansWriter;
       optimizer.GetBest(incidents).First();
@@ -210,8 +211,8 @@ class Program
     var t2 = Task.Run(() =>
     {
       return;
-      string log = "LocalSearch.log";
-      string bestPlansLog = "LocalSearchBestPlans.log";
+      string log = "HybridLocalSearch.log";
+      string bestPlansLog = "HybridLocalSearchBestPlans.log";
       
       Random random = new Random(420);
       PragueInput input = new PragueInput(random);
@@ -231,20 +232,28 @@ class Program
       using var writer = new StreamWriter(Path.Join(logDir, log));
       using var bestPlansWriter = new StreamWriter(Path.Join(logDir, bestPlansLog));
       
+      using var writerLocal = new StreamWriter(Path.Join(logDir, "Local" + log));
+      using var bestPlansWriterLocal = new StreamWriter(Path.Join(logDir, "Local" + bestPlansLog));
+      
+      var optimalOptimizer = new OptimalMovesSearchOptimizer(world, shiftTimes, distanceCalculator, constraints, 1, new Random(1));
+      optimalOptimizer.Writer = writer;
+      optimalOptimizer.BestPlansWriter = bestPlansWriter;
+      var optimalInCost = optimalOptimizer.GetBest(incidents).First();
+      
       IUtilityFunction utilityFunction = new WeightedSum(new Simulation(world, constraints, distanceCalculator), EmergencyServicePlan.GetMaxCost(world, shiftTimes));
       IMoveGenerator moveGenerator = new AllBasicMovesGenerator(shiftTimes, constraints);
       var optimizer = new LocalSearchOptimizer(int.MaxValue, world, constraints, distanceCalculator, utilityFunction, moveGenerator);
-
-      optimizer.Writer = writer;
-      optimizer.BestPlansWriter = bestPlansWriter;
+      optimizer.StartPlan = optimalInCost;
+      optimizer.Writer = writerLocal;
+      optimizer.BestPlansWriter = bestPlansWriterLocal;
       optimizer.GetBest(incidents).First();
     });
     
     var t3 = Task.Run(() =>
     {
       return;
-      string log = "TabuSearch_3000.log";
-      string bestPlansLog = "TabuSearchBestPlans_3000.log";
+      string log = "HybridTabuSearch.log";
+      string bestPlansLog = "HybridTabuSearchBestPlans.log";
       
       Random random = new Random(420);
       PragueInput input = new PragueInput(random);
@@ -264,10 +273,15 @@ class Program
       using var writer = new StreamWriter(Path.Join(logDir, log));
       using var bestPlansWriter = new StreamWriter(Path.Join(logDir, bestPlansLog));
       
+      var optimalOptimizer = new OptimalMovesSearchOptimizer(world, shiftTimes, distanceCalculator, constraints, 1, new Random(1));
+      optimalOptimizer.Writer = writer;
+      optimalOptimizer.BestPlansWriter = bestPlansWriter;
+      var optimalInCost = optimalOptimizer.GetBest(incidents).First();
+      
       IUtilityFunction utilityFunction = new WeightedSum(new Simulation(world, constraints, distanceCalculator), EmergencyServicePlan.GetMaxCost(world, shiftTimes));
       IMoveGenerator moveGenerator = new AllBasicMovesGenerator(shiftTimes, constraints);
-      var optimizer = new TabuSearchOptimizer(world, constraints, distanceCalculator, utilityFunction, moveGenerator,  3000);
-
+      var optimizer = new TabuSearchOptimizer(world, constraints, distanceCalculator, utilityFunction, moveGenerator, 100000);
+      optimizer.StartPlan = optimalInCost;
       optimizer.Writer = writer;
       optimizer.BestPlansWriter = bestPlansWriter;
       optimizer.GetBest(incidents).First();
@@ -275,9 +289,8 @@ class Program
     
     var t4 = Task.Run(() =>
     {
-      return;
-      string log = "SimulatedAnnealing_100_1_30_exp99.log";
-      string bestPlansLog = "SimulatedAnnealingBestPlans_100_1_30_exp99.log";
+      string log = "SimulatedAnnealing_100_1_10_exp99_fromEmpty.log";
+      string bestPlansLog = "SimulatedAnnealingBestPlans_100_1_10_exp99_fromEmpty.log";
       
       Random random = new Random(420);
       PragueInput input = new PragueInput(random);
@@ -299,16 +312,83 @@ class Program
       
       IUtilityFunction utilityFunction = new WeightedSum(new Simulation(world, constraints, distanceCalculator), EmergencyServicePlan.GetMaxCost(world, shiftTimes));
       IMoveGenerator moveGenerator = new AllBasicMovesGenerator(shiftTimes, constraints);
-      RandomBasicMoveSampler sampler = new(shiftTimes, constraints, random);
       ICoolingSchedule coolingSchedule = new ExponentialCoolingSchedule(0.99);
-      var optimizer = new SimulatedAnnealingOptimizer(world, constraints, distanceCalculator, utilityFunction, sampler, 100, 1, 30, coolingSchedule, random);
+      var optimizer = new SimulatedAnnealingOptimizer(world, constraints, distanceCalculator, utilityFunction, moveGenerator, 100, 1, 10, coolingSchedule, random);
 
       optimizer.Writer = writer;
       optimizer.BestPlansWriter = bestPlansWriter;
       optimizer.GetBest(incidents).First();
     });
+    
+    var t5 = Task.Run(() =>
+    {
+      string log = "SimulatedAnnealing_100_1_10_exp99_fromRandom.log";
+      string bestPlansLog = "SimulatedAnnealingBestPlans_100_1_10_exp99_fromRandom.log";
+      
+      Random random = new Random(420);
+      PragueInput input = new PragueInput(random);
+      var world = input.GetWorld();
+      var incidents = input.GetMondayIncidents(300);
+      Constraints constraints = input.GetConstraints();
+      ShiftTimes shiftTimes = input.GetShiftTimes();
 
-    Task.WaitAll([t1, t2, t3, t4]);
+      IDistanceCalculator distanceCalculator = new RealDistanceCalculator(
+        world,
+        incidents,
+        "prague_monday_111_300_IncidentsToHospitals",
+        "prague_monday_111_300_DepotsToIncidents",
+        "prague_HospitalsToDepots"
+      );
+      
+      using var writer = new StreamWriter(Path.Join(logDir, log));
+      using var bestPlansWriter = new StreamWriter(Path.Join(logDir, bestPlansLog));
+      
+      IUtilityFunction utilityFunction = new WeightedSum(new Simulation(world, constraints, distanceCalculator), EmergencyServicePlan.GetMaxCost(world, shiftTimes));
+      IMoveGenerator moveGenerator = new AllBasicMovesGenerator(shiftTimes, constraints);
+      ICoolingSchedule coolingSchedule = new ExponentialCoolingSchedule(0.99);
+      var optimizer = new SimulatedAnnealingOptimizer(world, constraints, distanceCalculator, utilityFunction, moveGenerator, 100, 1, 10, coolingSchedule, random);
+
+      optimizer.Writer = writer;
+      optimizer.BestPlansWriter = bestPlansWriter;
+      optimizer.StartPlan = new PlanSamplerUniform(world, shiftTimes, constraints, 0.5, new Random(42)).Sample();
+      optimizer.GetBest(incidents).First();
+    });
+    
+    var t6 = Task.Run(() =>
+    {
+      string log = "SimulatedAnnealing_100_1_30_exp97_fromRandom.log";
+      string bestPlansLog = "SimulatedAnnealingBestPlans_100_1_30_exp97_fromRandom.log";
+      
+      Random random = new Random(420);
+      PragueInput input = new PragueInput(random);
+      var world = input.GetWorld();
+      var incidents = input.GetMondayIncidents(300);
+      Constraints constraints = input.GetConstraints();
+      ShiftTimes shiftTimes = input.GetShiftTimes();
+
+      IDistanceCalculator distanceCalculator = new RealDistanceCalculator(
+        world,
+        incidents,
+        "prague_monday_111_300_IncidentsToHospitals",
+        "prague_monday_111_300_DepotsToIncidents",
+        "prague_HospitalsToDepots"
+      );
+      
+      using var writer = new StreamWriter(Path.Join(logDir, log));
+      using var bestPlansWriter = new StreamWriter(Path.Join(logDir, bestPlansLog));
+      
+      IUtilityFunction utilityFunction = new WeightedSum(new Simulation(world, constraints, distanceCalculator), EmergencyServicePlan.GetMaxCost(world, shiftTimes));
+      IMoveGenerator moveGenerator = new AllBasicMovesGenerator(shiftTimes, constraints);
+      ICoolingSchedule coolingSchedule = new ExponentialCoolingSchedule(0.97);
+      var optimizer = new SimulatedAnnealingOptimizer(world, constraints, distanceCalculator, utilityFunction, moveGenerator, 100, 1, 30, coolingSchedule, random);
+
+      optimizer.Writer = writer;
+      optimizer.BestPlansWriter = bestPlansWriter;
+      optimizer.StartPlan = new PlanSamplerUniform(world, shiftTimes, constraints, 0.5, new Random(42)).Sample();
+      optimizer.GetBest(incidents).First();
+    });
+
+    Task.WaitAll([t1, t2, t3, t4, t5, t6]);
   }
   #endif
 }

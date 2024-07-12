@@ -17,7 +17,7 @@ public class TabuSearchTest
     World world = input.GetWorld();
     ShiftTimes shiftTimes = input.GetShiftTimes();
     Constraints constraints = input.GetConstraints();
-    PlanSampler sampler = new PlanSamperUniform(world, shiftTimes, constraints, 0.5, random);
+    PlanSampler sampler = new PlanSamplerUniform(world, shiftTimes, constraints, 0.5, random);
 
     var movesGenerator = new AllBasicMovesGenerator(shiftTimes, constraints);
     for (int i = 0; i < count; ++i)

@@ -41,25 +41,30 @@ public class LocalSearchOptimizer : NeighbourOptimizer
     MoveSequence bestMove = MoveSequence.GetNewEmpty(MoveGenerator.MovesBufferSize);
     for (PlateuIteration = 0; PlateuIteration < MaxIterations; ++PlateuIteration)
     {
-      Writer.WriteLine($"elapsed: {_sw.Elapsed.TotalSeconds}, PlateuIteration: {PlateuIteration}, PlansVisited: {PlansVisited}");
-      Writer.Flush();
       bestMove.Count = 0;
       double bestEval = UtilityFunction.Evaluate(current, incidents.AsSpan());
+      Writer.WriteLine($"elapsed: {_sw.Elapsed.TotalSeconds}, Iteration: {PlateuIteration}, PlansVisited: {PlansVisited}, bestEval: {bestEval}");
+      Writer.Flush();
 
       foreach (MoveSequenceDuo moves in MoveGenerator.GetMoves(current))
       {
         ++PlansVisited;
+        Console.WriteLine($"PlansVisited: {PlansVisited}");
         ModifyMakeMove(current, moves.Normal);
 
         double neighbourEval = UtilityFunction.Evaluate(current, incidents.AsSpan());
         if (neighbourEval >= bestEval)
         {
           Simulation simulation = new(World, Constraints, _distanceCalculator);
-          Writer.WriteLine($"UPDATE: elapsed: {_sw.Elapsed.TotalSeconds}, cost: {current.Cost}, allocatedTeams: {current.MedicTeamsCount}, allocatedAmbulances: {current.AmbulancesCount}, handled: {simulation.HandledIncidentsCount}, eval: {neighbourEval}");
-          BestPlansWriter.WriteLine(JsonSerializer.Serialize(current));
-          BestPlansWriter.WriteLine("GANT");
-          new GaantView(World, Constraints, _distanceCalculator).Show(current, incidents.AsSpan(), BestPlansWriter);
-          BestPlansWriter.WriteLine("-----------");
+          simulation.Run(current, incidents.AsSpan());
+          if (PlansVisited % 10 == 0)
+          {
+            Writer.WriteLine($"UPDATE: elapsed: {_sw.Elapsed.TotalSeconds}, cost: {current.Cost}, allocatedTeams: {current.MedicTeamsCount}, allocatedAmbulances: {current.AmbulancesCount}, handled: {simulation.HandledIncidentsCount}, eval: {neighbourEval}");
+            BestPlansWriter.WriteLine(JsonSerializer.Serialize(current));
+          }
+          //BestPlansWriter.WriteLine("GANT");
+          //new GaantView(World, Constraints, _distanceCalculator).Show(current, incidents.AsSpan(), BestPlansWriter);
+          //BestPlansWriter.WriteLine("-----------");
           BestPlansWriter.Flush();
           Writer.Flush();
           bestMove.FillFrom(moves.Normal);

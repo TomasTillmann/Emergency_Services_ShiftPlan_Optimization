@@ -1,0 +1,13 @@
+UPDATE: elapsed: 458.6331705, cost: 2520055, allocatedTeams: 101, allocatedAmbulances: 55, handled: 295
+elapsed: 635.9802923, cost: 2325655, allocatedTeams: 89, allocatedAmbulances: 55, handled: 292
+elapsed: 802.909923, cost: 2412060, allocatedTeams: 101, allocatedAmbulances: 60, handled: 294
+UPDATE: elapsed: 934.7650236, cost: 2455258, allocatedTeams: 101, allocatedAmbulances: 58, handled: 295
+elapsed: 1057.6484564, cost: 2325654, allocatedTeams: 96, allocatedAmbulances: 54, handled: 288
+elapsed: 1167.325766, cost: 2505663, allocatedTeams: 98, allocatedAmbulances: 63, handled: 295
+elapsed: 1280.0806583, cost: 2340053, allocatedTeams: 97, allocatedAmbulances: 53, handled: 288
+elapsed: 1385.2753851, cost: 2390458, allocatedTeams: 97, allocatedAmbulances: 58, handled: 292
+elapsed: 1491.2216149, cost: 2556061, allocatedTeams: 101, allocatedAmbulances: 61, handled: 295
+elapsed: 1587.6098005, cost: 2325655, allocatedTeams: 89, allocatedAmbulances: 55, handled: 290
+elapsed: 1690.4004763, cost: 2325653, allocatedTeams: 89, allocatedAmbulances: 53, handled: 286
+
+requests: 133179688/133189050

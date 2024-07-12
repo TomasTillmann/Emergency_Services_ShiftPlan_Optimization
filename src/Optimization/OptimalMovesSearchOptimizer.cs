@@ -98,7 +98,7 @@ public class OptimalMovesSearchOptimizer
     Writer.WriteLine($"elapsed: {_sw.Elapsed.TotalSeconds}, k: {k}, before enumeration");
     Writer.Flush();
     var moves = movesGenerators[k].GetMoves(current).Enumerate(2);
-    Writer.WriteLine(string.Join("\n", moves));
+    //Writer.WriteLine(string.Join("\n", moves));
     var index = _random.Next(moves.Count);
     Writer.WriteLine($"elapsed: {_sw.Elapsed.TotalSeconds}, k: {k}, move: {moves[index]}, after enumeration");
     Writer.WriteLine($"{index}/{moves.Count}");

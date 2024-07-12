@@ -58,7 +58,7 @@ public class TabuSearchOptimizer : NeighbourOptimizer
       int neighbor = 0;
       foreach (var move in MoveGenerator.GetMoves(current))
       {
-        Writer.WriteLine($"elapsed: {_sw.Elapsed.TotalSeconds}, PlateuIteration: {PlateuIteration}, neighbor: {neighbor++}, PlansVisited: {PlansVisited}, TabuHit: {TabuHit}");
+        //Writer.WriteLine($"elopsed: {_sw.Elapsed.TotalSeconds}, PlateuIteration: {PlateuIteration}, neighbor: {neighbor++}, PlansVisited: {PlansVisited}, TabuHit: {TabuHit}");
         Writer.Flush();
         ++PlansVisited;
         _moveMaker.ModifyMakeMove(current, move.Normal);
@@ -72,25 +72,11 @@ public class TabuSearchOptimizer : NeighbourOptimizer
 
         if (neighbourEval > bestNeighborEval && !tabu.Contains(move.Normal))
         {
-          Simulation simulation = new(World, Constraints, _distanceCalculator);
-          Writer.WriteLine($"UPDATE: elapsed: {_sw.Elapsed.TotalSeconds}, cost: {current.Cost}, allocatedTeams: {current.MedicTeamsCount}, allocatedAmbulances: {current.AmbulancesCount}, handled: {simulation.HandledIncidentsCount}, eval: {neighbourEval}");
-          BestPlansWriter.WriteLine(JsonSerializer.Serialize(current));
-          BestPlansWriter.WriteLine("GANT");
-          new GaantView(World, Constraints, _distanceCalculator).Show(current, incidents.AsSpan(), BestPlansWriter);
-          BestPlansWriter.WriteLine("-----------");
-          BestPlansWriter.Flush();
           bestNeighborEval = neighbourEval;
           bestMove.FillFrom(move);
         }
         else if (neighbourEval > bestPlanEval)
         {
-          Simulation simulation = new(World, Constraints, _distanceCalculator);
-          Writer.WriteLine($"UPDATE: elapsed: {_sw.Elapsed.TotalSeconds}, cost: {current.Cost}, allocatedTeams: {current.MedicTeamsCount}, allocatedAmbulances: {current.AmbulancesCount}, handled: {simulation.HandledIncidentsCount}, eval: {neighbourEval}");
-          BestPlansWriter.WriteLine(JsonSerializer.Serialize(current));
-          BestPlansWriter.WriteLine("GANT");
-          new GaantView(World, Constraints, _distanceCalculator).Show(current, incidents.AsSpan(), BestPlansWriter);
-          BestPlansWriter.WriteLine("-----------");
-          BestPlansWriter.Flush();
           bestNeighborEval = neighbourEval;
           bestMove.FillFrom(move);
         }
@@ -108,6 +94,14 @@ public class TabuSearchOptimizer : NeighbourOptimizer
 
       if (bestNeighborEval > bestPlanEval)
       {
+        Simulation simulation = new(World, Constraints, _distanceCalculator);
+        simulation.Run(current, incidents.AsSpan());
+        Writer.WriteLine($"UPDATE: elapsed: {_sw.Elapsed.TotalSeconds}, cost: {current.Cost}, allocatedTeams: {current.MedicTeamsCount}, allocatedAmbulances: {current.AmbulancesCount}, handled: {simulation.HandledIncidentsCount}, TabuHit: {TabuHit}, eval: {bestNeighborEval}");
+        BestPlansWriter.WriteLine(JsonSerializer.Serialize(current));
+        BestPlansWriter.WriteLine("GANT");
+        new GaantView(World, Constraints, _distanceCalculator).Show(current, incidents.AsSpan(), BestPlansWriter);
+        BestPlansWriter.WriteLine("-----------");
+        BestPlansWriter.Flush();
         bestPlan.FillFrom(current);
         bestPlanEval = bestNeighborEval;
       }

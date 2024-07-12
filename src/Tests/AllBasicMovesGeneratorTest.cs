@@ -34,7 +34,7 @@ public class AllBasicMovesGeneratorTest
     World world = input.GetWorld();
     Constraints constraints = input.GetConstraints();
     ShiftTimes shiftTimes = input.GetShiftTimes();
-    IPlanSampler sampler = new PlanSamperUniform(world, shiftTimes, constraints, 1.0, random);
+    IPlanSampler sampler = new PlanSamplerUniform(world, shiftTimes, constraints, 1.0, random);
     EmergencyServicePlan plan = sampler.Sample();
 
     AllBasicMovesGenerator moveGenerator = new(shiftTimes, constraints);
@@ -51,7 +51,7 @@ public class AllBasicMovesGeneratorTest
     World world = input.GetWorld();
     Constraints constraints = input.GetConstraints();
     ShiftTimes shiftTimes = input.GetShiftTimes();
-    IPlanSampler sampler = new PlanSamperUniform(world, shiftTimes, constraints, 0.8, random);
+    IPlanSampler sampler = new PlanSamplerUniform(world, shiftTimes, constraints, 0.8, random);
     EmergencyServicePlan plan = sampler.Sample();
 
     AllBasicMovesGenerator moveGenerator = new(shiftTimes, constraints);

@@ -4,11 +4,12 @@ using System.Text.Json;
 using DataModel.Interfaces;
 using DistanceAPI;
 using ESSP.DataModel;
+using MyExtensions;
 using Simulating;
 
 namespace Optimizing;
 
-public class SimulatedAnnealingOptimizer : NeighbourSamplerOptimizer
+public class SimulatedAnnealingOptimizer : NeighbourOptimizer
 {
   public EmergencyServicePlan StartPlan { get; set; }
   public double StartTemp { get; set; }
@@ -26,10 +27,11 @@ public class SimulatedAnnealingOptimizer : NeighbourSamplerOptimizer
   private readonly MoveMaker _moveMaker = new();
   private readonly IDistanceCalculator _distanceCalculator;
   private readonly Stopwatch _sw = new();
+  private readonly IMoveGenerator _moveGenerator;
 
-  public SimulatedAnnealingOptimizer(World world, Constraints constraints, IDistanceCalculator distanceCalculator, IUtilityFunction utilityFunction, IRandomMoveSampler randomMoveSampler,
+  public SimulatedAnnealingOptimizer(World world, Constraints constraints, IDistanceCalculator distanceCalculator, IUtilityFunction utilityFunction, IMoveGenerator moveGenerator,
       double startTemp, double finalTemp, int M_k, ICoolingSchedule coolingSchedule, Random random = null)
-  : base(world, constraints, utilityFunction, randomMoveSampler)
+  : base(world, constraints, utilityFunction, moveGenerator)
   {
     StartPlan = EmergencyServicePlan.GetNewEmpty(world);
     StartTemp = startTemp;
@@ -37,6 +39,7 @@ public class SimulatedAnnealingOptimizer : NeighbourSamplerOptimizer
     this.M_k = M_k;
     CoolingSchedule = coolingSchedule;
     _distanceCalculator = distanceCalculator;
+    _moveGenerator = moveGenerator;
     Random = random ?? new Random();
   }
 
@@ -59,18 +62,28 @@ public class SimulatedAnnealingOptimizer : NeighbourSamplerOptimizer
       for (int m = 0; m < M_k; ++m)
       {
         ++PlansVisited;
-        Writer.WriteLine($"elapsed: {_sw.Elapsed.TotalSeconds}, temp: {temp}, Iteration: {Iteration}, neighbor: {neighbor++}, PlansVisited: {PlansVisited}");
-        Writer.Flush();
-        MoveSequenceDuo move = RandomMoveSampler.Sample(current);
+        //Writer.WriteLine($"elapsed: {_sw.Elapsed.TotalSeconds}, temp: {temp}, Iteration: {Iteration}, neighbor: {neighbor++}, PlansVisited: {PlansVisited}");
+        //Writer.Flush();
+        //MoveSequenceDuo move = RandomMoveSampler.Sample(current);
+        var moves = _moveGenerator.GetMoves(current).Enumerate(2).ToList();
+        int index = Random.Next(moves.Count);
+        var move = moves[index];
+        
         _moveMaker.ModifyMakeMove(current, move.Normal);
 
         double neighbourEval = UtilityFunction.Evaluate(current, incidents.AsSpan());
         double delta = currentEval - neighbourEval;
+        
+        Writer.WriteLine($"X: elapsed: {_sw.Elapsed.TotalSeconds}, cost: {current.Cost}, allocatedTeams: {current.MedicTeamsCount}, allocatedAmbulances: {current.AmbulancesCount}, handled: {UtilityFunction.HandledIncidentsCount}, eval: {currentEval}, m: {m}, temp: {temp}");
+        //Writer.WriteLine(move);
+        Writer.Flush();
+        
         if (delta > 0)
         {
           double probabilityToNotAccept = 1 - Math.Exp(-delta / temp);
           if (Random.NextDouble() < probabilityToNotAccept)
           {
+            Console.WriteLine("NOT ACCEPTED");
             _moveMaker.ModifyMakeInverseMove(current, move.Inverse);
             --PlansVisited;
             continue;
@@ -81,11 +94,12 @@ public class SimulatedAnnealingOptimizer : NeighbourSamplerOptimizer
         if (currentEval > bestEval)
         {
           Simulation simulation = new(World, Constraints, _distanceCalculator);
-          Writer.WriteLine($"UPDATE: elapsed: {_sw.Elapsed.TotalSeconds}, cost: {current.Cost}, allocatedTeams: {current.MedicTeamsCount}, allocatedAmbulances: {current.AmbulancesCount}, handled: {simulation.HandledIncidentsCount}, eval: {currentEval}, m: {m}");
+          simulation.Run(current, incidents.AsSpan());
+          Writer.WriteLine($"UPDATE: elapsed: {_sw.Elapsed.TotalSeconds}, cost: {current.Cost}, allocatedTeams: {current.MedicTeamsCount}, allocatedAmbulances: {current.AmbulancesCount}, handled: {simulation.HandledIncidentsCount}, eval: {currentEval}, m: {m}, temp: {temp}");
           BestPlansWriter.WriteLine(JsonSerializer.Serialize(current));
-          BestPlansWriter.WriteLine("GANT");
-          new GaantView(World, Constraints, _distanceCalculator).Show(current, incidents.AsSpan(), BestPlansWriter);
-          BestPlansWriter.WriteLine("-----------");
+          //BestPlansWriter.WriteLine("GANT");
+          //new GaantView(World, Constraints, _distanceCalculator).Show(current, incidents.AsSpan(), BestPlansWriter);
+          //BestPlansWriter.WriteLine("-----------");
           BestPlansWriter.Flush();
           Writer.Flush();
           best.FillFrom(current);

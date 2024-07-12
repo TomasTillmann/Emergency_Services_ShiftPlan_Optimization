@@ -56,14 +56,130 @@ Doby příjezdů mezi výjezdovými stanicemi, incidenty a nemocnicemi si může
 Můžeme si alespoň v průběhu simulování všechny spočítané doby příjezdů mezi lokacemi udržovat s přesností na desítky metrů,
 aby se v budoucnu nemuselo volat Google API, což je samozřejmě pomalá operace, trvající až desítky až stovky milisekund. 
 
-TravelDurationsRequest: 97619020/97626400
-
-
 \section{Aplikace prohledávání plánů optimálními \linebreak tahy}
+
+První metodu, kterou aplikujeme na namodelovanou záchrannou službu a incidenty podle předchozí kapitoly je algoritmus prohledávání plánů optimálními tahy \ref{alg:rekProhPlanu}.
+Konkrétně použijeme jeho upravenou verzi, kde strom tahů budeme prohledávat vždy od prázdného plánu, a na každé hladině rekurze zvolíme pouze jeden náhodný optimální tah.
+Oproti postupnému prohledávání všech tahů na každé úrovni má výhodu ve vyzkoušení více odlišných konfigurací a nalezené optimální plány v ceně budou s menší pravděpodobností sdílet
+podobně naalokované týmy, vozidla a směny, což povede k diversifikovanějšímu prohledání množiny povolených plánů.
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{|c|c|c|}
+\hline
+\textbf{Čas běhu v minutách} & \textbf{Cena plánu} & \textbf{Odbavené incidenty} \\
+\hline
+7:38  & 2520055 & 295 \\
+\hline
+10:36 & 2325655 & 292 \\
+\hline
+13:23 & 2412060 & 294 \\
+\hline
+15:34 & 2455258 & 295 \\
+\hline
+17:37 & 2325654 & 288 \\
+\hline
+19:27 & 2505663 & 295 \\
+\hline
+21:20 & 2340053 & 288 \\
+\hline
+23:05 & 2390458 & 292 \\
+\hline
+24:51 & 2556061 & 295 \\
+\hline
+26:27 & 2325655 & 290 \\
+\hline
+28:10 & 2325653 & 286 \\
+\hline
+\end{tabular}
+\caption{Spuštění prohledávání optimálními tahy na modelu Prahy.}
+\label{table:optimalMovesTabulka}
+\end{table}
+
+Po spuštění metody na modelu Prahy po dobu téměř 30 minut metoda celkem navštívila 11 plánů optimálních v ceně.
+Nalezený optimální plán odbavuje 295 incidentů a stojí 2455258 (viz tabulka \ref{table:optimalMovesTabulka}).
+
+\begin{figure}[H]
+  \caption{Nalezené plány metodou prohledávání plánů optimálními tahy.}
+  \includegraphics[width=\textwidth]{img/optimalMovesRes.png}
+  \centering
+  \label{img:optimalMovesRes}
+\end{figure}
+
+Na obrázku \ref{img:optimalMovesRes} vidíme vizualizovaná data z tabulky \ref{table:optimalMovesTabulka}. 
+První plán trvá nalézt nejdelé, něco přes 7 minut. Důvodem je, že \textit{cache} dob příjezdů obsahuje pouze předpočítané hodnoty a musí se vykonávat větší množství
+dotazů na Google API.
+Při prohledávání dalších plánů už se dotazuje na Google API mnohem méně často.
+
+Metoda navštívila pro každý plán optimální v ceně při jeho budování jeden plán pro každý incident, čili celkové navštívila $11 \cdot 300 = 3300$ plánů.
+Celkový počet dotazů na dobu trvání příjezdu je 133189050, kde pro 133179688 případu, tedy $99.99\%$, byla doba příjezdu předpočítaná a vrácena z \textit{cache}.
 
 \section{Aplikace lokálního prohledávání}
 
+V této kapitole aplikujeme na model Prahy lokální prohledávání (viz kapitola \ref{kap:localSearch}).
+Použijeme ho přesně jak je popsaný algoritmem \ref{alg:hillclimb}.
+Prohledávání začneme z prázdného plánu a jako účelovou funkci použijeme váženou sumu ceny plánu a počtu odbavených incidentů (viz definice \ref{df:vazenaSumaUcelF}), s $\alpha = 0.99$, abychom
+upřednostňovali plány s vyšším počtem odbavených incidentů.
+
+\begin{figure}[H]
+  \caption{Nalezené plány metodou lokálního prohledávání plánů.}
+  \includegraphics[width=\textwidth]{img/local_search_empty_plan_plot.png}
+  \centering
+  \label{img:localSearchRes}
+\end{figure}
+
+Na obrázku \ref{img:localSearchRes} vidíme jak se aktuální plán mění v čase.
+Lokální prohledávání bylo spuštěné po dobu 50 minut, a pak bylo přeřušeno. 
+Nejlepší nalezený plán po 50 minutách úspěšně odbaví 223 incidentů z 300 incidentů a stojí 137673.
+To je v porovnání s předchozí metodou, která za pouhých 7 minut nalezla plán odbavující 295 incidentů nedostačující výsledek.
+I když by se podle růstu křivky dalo usoudit, že by metoda lokálního prohledávání také byla schopná nalézt dost dobrý plán, trvalo by to příliš dlouho.
+
+Lokální prohledávání celkem navštívilo 22997 plánů. To je až 7 krát tolik, kolik plánů navštívila metoda prohledávání optimálními tahy.
+Lokální prohledávání tedy není vhodné na budování optimálního plánu z prázdného plánu, protože zbytečně navštíví velké množství plánů a trvá tak zbytečně dlouho.
+
+Můžeme si polepšit, sice že začneme prohledávát ne z prázdného plánu, ale z plánu zvoleného nějak chytře. Z plánu, který už je skoro optimální a lokální Prohledávání
+už jej jenom doladí.
+
+Jednou z možností jak takový startovní plán zvolit je použít první nalezený optimální plán v ceně předchozí metodou a na něj spustit lokální prohledávání.
+
+\begin{figure}[H]
+  \caption{Nalezené plány metodou lokálního prohledávání plánů z plánu optimálního v ceně.}
+  \includegraphics[width=\textwidth]{img/hybrid_prague.png}
+  \centering
+  \label{img:hybrid}
+\end{figure}
+
+Na obrázku \ref{img:hybrid} vidíme graf, kde lokální prohledávání začíná ne z prázdného plánu, ale z plánu optimálního v ceně.
+Můžeme vidět, že lokální prohledávání upravuje plán tak, že postupně odbavuje více incidentů, až nakonec všech 300. Poté už jen postupně snižuje cenu plánu.
+Po 20 minutách nalezne plán odbavující všechny incidenty a zhruba po hodině lokální prohledávání stagnuje a nalezne lokální optimum.
+
+
 \section{Aplikace tabu prohledávání}
+
+V této kapitole aplikujeme na model Prahy tabu prohledávání (viz kapitola \ref{kap:tabuSearch}).
+Tabu prohledávání je v podstatě lokální prohledávání s pamětí, podle které umí sofistikovaněji vybrat sousední plán,
+pokud se ocitne v lokálním optimu.
+Z toho důvodu bude podobně jako u lokálního prohledávání trvat příliš dlouho, než nalezne nějaký dost dobrý plán, pokud bychom tabu prohledávání pustili z prázdného plánu.
+Nemá proto smysl pouštět tabu prohledávání z prázdného plánu a pustíme tabu prohledávání rovnou z nějakého už dost dobrého plánu.
+Tím bude stejně jako u lokálního prohledávání plán optimální v ceně.
+
+\begin{figure}[H]
+  \caption{Nalezené plány tabu metodou z plánu optimálního v ceně.}
+  \includegraphics[width=\textwidth]{img/prague_hybrid_tabu.png}
+  \centering
+  \label{img:hybrid_tabu}
+\end{figure}
+
+Na obrázku \ref{img:hybrid_tabu} vidíme doposud nejlepší plány nalezené tabu metodou v čase.
+Nalézt plán odbavující všech 300 incidentů trvá kolem 30 minut, což je o 10 minut déle, než trvalo lokálnímu prohledávání. 
+To je pochopitelné, protože při navštívení každého souseda, kterých bude obdobně jako u lokálního prohledávání, se musí kontrolovat,
+zda není obsažen v tabu. Proto vyhodnocení souseda bude trvat o něco déle, což se při tak velkém množství navštívených plánů poměrně rychle nasčítá.
+
+Tabu prohledávání bylo puštěno něco kolem hodiny, a obdobně jako u lokálního prohledávání, s roustoucí délkou běhu programu se i snižuje cena plánu.
+Výhoda tabu prohledávání je hlavně v schopnosti nezůstat v lokálním optimu a umět robustněji prohledávat prostor konfigurací.
+Tato výhoda v našem případě ale není využita, protože tabu prohledávání ani za hodinu běhu na lokální optimum nenarazilo.
+Spíše naopak, prohledávání tabu je nevýhodou, a lokální prohledávání jako rychlejší metodu je v tomto případě lepší volbou.
+
 
 \section{Aplikace simulovaného žíhání}
 

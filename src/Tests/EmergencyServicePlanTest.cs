@@ -26,7 +26,7 @@ public class EmergencyServicePlanTest
     World world = input.GetWorld();
     ShiftTimes shiftTimes = input.GetShiftTimes();
     Constraints constraints = input.GetConstraints();
-    PlanSampler sampler = new PlanSamperUniform(world, shiftTimes, constraints, 0.5, random);
+    PlanSampler sampler = new PlanSamplerUniform(world, shiftTimes, constraints, 0.5, random);
 
     EmergencyServicePlan plan = EmergencyServicePlan.GetNewEmpty(world);
 
@@ -62,7 +62,7 @@ public class EmergencyServicePlanTest
     World world = input.GetWorld();
     ShiftTimes shiftTimes = input.GetShiftTimes();
     Constraints constraints = input.GetConstraints();
-    PlanSampler sampler = new PlanSamperUniform(world, shiftTimes, constraints, 0.5, random);
+    PlanSampler sampler = new PlanSamplerUniform(world, shiftTimes, constraints, 0.5, random);
     EmergencyServicePlan plan = EmergencyServicePlan.GetNewEmpty(world);
     Interval expectedInterval = Interval.GetByStartAndDuration(10, 80);
     plan.AllocateTeam(0, expectedInterval);
@@ -97,7 +97,7 @@ public class EmergencyServicePlanTest
     World world = input.GetWorld();
     ShiftTimes shiftTimes = input.GetShiftTimes();
     Constraints constraints = input.GetConstraints();
-    PlanSampler sampler = new PlanSamperUniform(world, shiftTimes, constraints, 0.5, random);
+    PlanSampler sampler = new PlanSamplerUniform(world, shiftTimes, constraints, 0.5, random);
     EmergencyServicePlan plan = EmergencyServicePlan.GetNewEmpty(world);
     
     plan.AllocateAmbulance(0);
@@ -130,7 +130,7 @@ public class EmergencyServicePlanTest
     World world = input.GetWorld();
     ShiftTimes shiftTimes = input.GetShiftTimes();
     Constraints constraints = input.GetConstraints();
-    PlanSampler sampler = new PlanSamperUniform(world, shiftTimes, constraints, 0.5, random);
+    PlanSampler sampler = new PlanSamplerUniform(world, shiftTimes, constraints, 0.5, random);
     EmergencyServicePlan plan = EmergencyServicePlan.GetNewEmpty(world);
     
     plan.AllocateAmbulance(0);
@@ -165,7 +165,7 @@ public class EmergencyServicePlanTest
     World world = input.GetWorld();
     ShiftTimes shiftTimes = input.GetShiftTimes();
     Constraints constraints = input.GetConstraints();
-    PlanSampler sampler = new PlanSamperUniform(world, shiftTimes, constraints, 0.5, random);
+    PlanSampler sampler = new PlanSamplerUniform(world, shiftTimes, constraints, 0.5, random);
     EmergencyServicePlan plan = sampler.Sample();
     
     plan.DeallocateAll();
@@ -184,7 +184,7 @@ public class EmergencyServicePlanTest
     World world = input.GetWorld();
     ShiftTimes shiftTimes = input.GetShiftTimes();
     Constraints constraints = input.GetConstraints();
-    PlanSampler sampler = new PlanSamperUniform(world, shiftTimes, constraints, 0.5, random);
+    PlanSampler sampler = new PlanSamplerUniform(world, shiftTimes, constraints, 0.5, random);
     EmergencyServicePlan filledPlan = type == "fromEmpty" ? EmergencyServicePlan.GetNewEmpty(world) : sampler.Sample();
     EmergencyServicePlan randomPlan = sampler.Sample();
     

@@ -622,7 +622,7 @@ Existuje spoustu dalších různých metod, jako v poslední době populární \
 které propojují více metaheuristických metod dohromady, s myšlenkou použít každou metaheuristiku co nejvhodněji,
 případně i měnit různé metaheuristiky za běhu~\cite{HybridMeta}.
 
-\subsection{Lokální prohledávání}
+\subsection{Lokální prohledávání}\label{kap:localSearch}
 
 Asi nejjednodušší metoda na prohledávání prostoru konfigurací je \textit{lokální prohledávání}.
 Lokální prohledávání pouze lokálně prohledává prostor konfigurací od nějaké startovní konfigurace $x \in \mathcal{X}$. 
@@ -719,10 +719,10 @@ Jak konkrétně už záleží na konkrétní definici $N(p)$.
 Velkou nevýhodou lokálního prohledávání je neschopnost umět nalézt kompromis mezi lokálním optimem a globálním optimem,
 přičemž nalezené lokální optimum je v drtivé většině suboptimální (\citet{GlovKoch03}, str. 43).
 
-\subsection{Tabu prohledávání}
+\subsection{Tabu prohledávání}\label{kap:tabuSearch}
 
 Tabu prohledávání stejně jako lokální prohledávání prohledává plány lokálně pomocí sousedů.
-Tabu prohledávání však narozdíl od lokálního prohledávání po nalezení lokálního optima v něm nezůstane,
+Tabu prohledávání se chová stejně jako lokální prohledávání, avšak narozdíl od lokálního prohledávání po nalezení lokálního optima v něm nezůstane,
 ale umožní i navštívit souseda s horším hodnocením.
 Aby se následně prohledávání nevrátilo zpět do stejného optima,
 drží si seznam inverzních tahů posledních provedených tahů. Tomuto seznamu se říká \textit{tabu} a jedná se o tahy, které 

@@ -25,7 +25,7 @@ public class SimulationTest
         Constraints constraints = input.GetConstraints();
         ShiftTimes shiftTimes = input.GetShiftTimes();
         ImmutableArray<Incident> incidents = input.GetIncidents(incidentsCount);
-        IPlanSampler sampler = new PlanSamperUniform(world, shiftTimes, constraints, 0.8, random);
+        IPlanSampler sampler = new PlanSamplerUniform(world, shiftTimes, constraints, 0.8, random);
         EmergencyServicePlan plan = sampler.Sample();
         IDistanceCalculator distanceCalculator = new RealDistanceCalculator(world.Hospitals);
 

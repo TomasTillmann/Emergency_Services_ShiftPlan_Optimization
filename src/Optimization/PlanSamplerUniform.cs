@@ -4,11 +4,11 @@ using MyExtensions;
 
 namespace Optimizing;
 
-public class PlanSamperUniform : PlanSampler
+public class PlanSamplerUniform : PlanSampler
 {
   public double Percentage { get; set; }
 
-  public PlanSamperUniform(World world, ShiftTimes shiftTimes, Constraints constraints, double percentage = 1.0,
+  public PlanSamplerUniform(World world, ShiftTimes shiftTimes, Constraints constraints, double percentage = 1.0,
     Random? random = null)
     : base(world, shiftTimes, constraints, random)
   {
