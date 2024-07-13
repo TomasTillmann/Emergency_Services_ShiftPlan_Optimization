@@ -1,3 +1,6 @@
+\theoremstyle{definition}
+\newtheorem{exmp}{Příklad}[section]
+
 \chapter{Řešení optimalizační úlohy}\label{chap:reseniOptUloh}
 
 V této kapitole vyzkoušíme různé metody, které můžeme pro nalezení optimálního plánu pohotovostní služby použít.
@@ -632,7 +635,7 @@ Sousedy $N(p)$ zkonstruujeme implicitně pomocí tahů, což je standardní způ
 Sousední plány $N(p)$ plánu $p \in P_C$ lze definovat různě. 
 
 My budeme od $p' \in N(p)$ vyžadovat alespoň následující:
-\begin{enumerate}
+\begin{enumerate}\label{enum:sousediNutnost}
   \item $\forall p \in P_C \colon N(p) \subseteq P_C$ \label{en:f}.
   \item $\forall p \in P_C, \exists(T_1, \dots, T_n) \colon (T_1 \circ \cdots \circ T_n)(p) = p^*$, kde $p^*$ je globálně optimální plán. \label{en:s}
   \item Pro všechny $p' \in N(p)$ pro dané $p$ platí, že jsou si plány $p$ a $p'$ podobné, čili z větší části mají naalokovaná stejná vozidla a týmy, se stejnými směnami. \label{en:t}
@@ -648,6 +651,7 @@ Podmínka \ref{en:t} vyžaduje, aby sousední plány sdíleli s původním plán
 Kdyby sousední plány nesplňovali tuto podmínku, prohledávání pomocí sousedů by se o moc nelišilo od náhodného
 generování dovolených plánů, což není efektivní způsob prohledávání.
 
+\begin{exmp}\label{pr:sousedi}
 Pro představu, jedna z možných definic sousedství by mohla vypadat následovně.
 Jelikož sousední plány definujeme pomocí tahů, stačí nadefinovat tahy:
   \begin{enumerate}
@@ -658,6 +662,7 @@ Jelikož sousední plány definujeme pomocí tahů, stačí nadefinovat tahy:
     \item nejkratší zkrácení směny záchranného týmu,
     \item posun začátku směny záchranného týmu o nejkratší možnou dobu.
   \end{enumerate}
+\end{exmp}
 
 Je snadné ověřit, že sousedství definována implicitně těmito tahy splňují všechny podmínky.
 

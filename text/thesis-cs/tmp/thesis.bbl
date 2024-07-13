@@ -528,6 +528,81 @@
       \verb 10.1063/1.1699114
       \endverb
     \endentry
+    \entry{sa_theory}{incollection}{}
+      \name{author}{3}{}{%
+        {{hash=724f19394ff905be4ed7b245765f1656}{%
+           family={Delahaye},
+           familyi={D\bibinitperiod},
+           given={Daniel},
+           giveni={D\bibinitperiod}}}%
+        {{hash=e6d1900f733514d5c9b670410ae08c3f}{%
+           family={Chaimatanan},
+           familyi={C\bibinitperiod},
+           given={Supatcha},
+           giveni={S\bibinitperiod}}}%
+        {{hash=0aa4f8579303710b71430ead48cc5909}{%
+           family={Mongeau},
+           familyi={M\bibinitperiod},
+           given={Marcel},
+           giveni={M\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {Springer, Cham}%
+      }
+      \strng{namehash}{ec4b7538e78ed914384001d2de007530}
+      \strng{fullhash}{d0d6c52cffbe38f91adb7894454bf665}
+      \strng{bibnamehash}{d0d6c52cffbe38f91adb7894454bf665}
+      \strng{authorbibnamehash}{d0d6c52cffbe38f91adb7894454bf665}
+      \strng{authornamehash}{ec4b7538e78ed914384001d2de007530}
+      \strng{authorfullhash}{d0d6c52cffbe38f91adb7894454bf665}
+      \field{sortinit}{4}
+      \field{sortinithash}{9381316451d1b9788675a07e972a12a7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{Handbook of Metaheuristics}
+      \field{title}{Simulated Annealing: From Basics to Applications}
+      \field{year}{2018}
+      \field{pages}{1\bibrangedash 35}
+      \range{pages}{35}
+    \endentry
+    \entry{sa_schedules}{inbook}{}
+      \name{author}{3}{}{%
+        {{hash=f72f1bf19bb1b96499fb71be3e3822d4}{%
+           family={Green},
+           familyi={G\bibinitperiod},
+           given={David},
+           giveni={D\bibinitperiod}}}%
+        {{hash=87f5eb7e9817c24a580fa797fe148e98}{%
+           family={Aleti},
+           familyi={A\bibinitperiod},
+           given={Aldeida},
+           giveni={A\bibinitperiod}}}%
+        {{hash=f0aa7105808885fe4286079ee70c38f8}{%
+           family={García},
+           familyi={G\bibinitperiod},
+           given={Julián},
+           giveni={J\bibinitperiod}}}%
+      }
+      \strng{namehash}{5a3fba314c0477c11e97634e389f53b2}
+      \strng{fullhash}{36e838e9f2ec780645294651b8bca051}
+      \strng{bibnamehash}{36e838e9f2ec780645294651b8bca051}
+      \strng{authorbibnamehash}{36e838e9f2ec780645294651b8bca051}
+      \strng{authornamehash}{5a3fba314c0477c11e97634e389f53b2}
+      \strng{authorfullhash}{36e838e9f2ec780645294651b8bca051}
+      \field{sortinit}{4}
+      \field{sortinithash}{9381316451d1b9788675a07e972a12a7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{isbn}{978-3-319-50919-8}
+      \field{month}{03}
+      \field{title}{The Nature of Nature: Why Nature-Inspired Algorithms Work}
+      \field{year}{2017}
+      \field{pages}{1\bibrangedash 27}
+      \range{pages}{27}
+      \verb{doi}
+      \verb 10.1007/978-3-319-50920-4_1
+      \endverb
+    \endentry
   \enddatalist
 \endrefsection
 \endinput

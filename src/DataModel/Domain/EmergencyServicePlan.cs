@@ -30,6 +30,8 @@ public class EmergencyServicePlan
     plan.FillFrom(other);
     return plan;
   }
+  
+  public EmergencyServicePlan() { }
 
   // creates an empty plan
   private EmergencyServicePlan(int depotCount, ImmutableArray<MedicTeam> allAvailableTeams, ImmutableArray<Ambulance> allAvailableAmbulances)

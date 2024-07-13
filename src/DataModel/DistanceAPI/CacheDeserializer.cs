@@ -64,7 +64,13 @@ public class CacheDeserializer
         {
             for (int j = 0; j < _incidents.Length; ++j)
             {
-                travelDurations[(_world.Depots[i].Location, _incidents[j].Location)] = cache1[(i,j)];
+                try
+                {
+                    travelDurations[(_world.Depots[i].Location, _incidents[j].Location)] = cache1[(i,j)];
+                }
+                catch {
+                    Console.WriteLine($"{i} depot and {j} incident not present");
+                }
             }
         }
 
@@ -72,7 +78,14 @@ public class CacheDeserializer
         {
             for (int j = 0; j < _world.Hospitals.Length; ++j)
             {
-                travelDurations[(_incidents[i].Location, _world.Hospitals[j].Location)] = cache2[(i, j)];
+                try
+                {
+                    travelDurations[(_incidents[i].Location, _world.Hospitals[j].Location)] = cache2[(i, j)];
+                }
+                catch
+                {
+                    Console.WriteLine($"{i} incident and {j} hospital not present");
+                }
             }
         }
         
@@ -81,7 +94,14 @@ public class CacheDeserializer
         {
             for (int j = 0; j < _world.Depots.Length; ++j)
             {
-                travelDurations[(_world.Hospitals[i].Location, _world.Depots[j].Location)] = cache3[(i,j)];
+                try
+                {
+                    travelDurations[(_world.Hospitals[i].Location, _world.Depots[j].Location)] = cache3[(i, j)];
+                }
+                catch
+                {
+                    Console.WriteLine($"{i} hospital and {j} depot not present");
+                }
             }
         }
     }

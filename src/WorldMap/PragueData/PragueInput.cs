@@ -7,16 +7,10 @@ using DistanceAPI;
 using ESSP.DataModel;
 using NetTopologySuite.Geometries;
 
-public class PragueInput : IInputParametrization
+public class PragueInput
 {
-  private readonly Random _random;
   private readonly DataModelGenerator _dataGenerator = new();
   private readonly int _depotsCount = 20;
-
-  public PragueInput(Random? random = null)
-  {
-    _random = random ?? new Random();
-  }
 
   public Constraints GetConstraints()
   {
@@ -77,13 +71,14 @@ public class PragueInput : IInputParametrization
     return WorldMapper.MapBack(worldModel);
   }
 
-  public ImmutableArray<Incident> GetIncidents(int count = 330)
+  public ImmutableArray<Incident> GetIncidents(int count = 330, Random? random = null)
   {
+    random ??= new();
     // Incidents init
     Polygon polygon = GetPraguePolygon();
     // Prague has area of 500km^2, and its symmetric, meaning its about 25 * 25 km.
     // The stddev is hence chosen as ~10km, in order to concentrate most of the incidents in the center of Prague.
-    List<CoordinateModel> locations = _dataGenerator.GetRandomIncidentsLocationsInPolygon(polygon, count, 0.1 /* ~11km */, _random);
+    List<CoordinateModel> locations = _dataGenerator.GetRandomIncidentsLocationsInPolygon(polygon, count, 0.1 /* ~11km */, random);
     
     ImmutableArray<Incident> incidents = _dataGenerator.GenerateIncidentModelsFromCoordinates(
       coordinates: locations,
@@ -92,19 +87,20 @@ public class PragueInput : IInputParametrization
       onSceneDurationNormalStddev: 5.ToMinutes().ToSeconds(),
       inHospitalDeliveryNormalExpected: 15.ToMinutes().ToSeconds(),
       inHospitalDeliveryNormalStddev: 5.ToMinutes().ToSeconds(),
-      random: _random
+      random: random
     ).Select(IncidentMapper.MapBack).ToImmutableArray();
 
     return incidents;
   }
 
-  public ImmutableArray<Incident> GetMondayIncidents(int count = 400)
+  public ImmutableArray<Incident> GetMondayIncidents(int count = 400, Random? random = null)
   {
+    random ??= new();
     // #average incidents count / hours in a day * 9h-12h * dvakrat, protoze od 9 do 12 se deje dvakrat tolik incidentu oproti prumeru
     // 330 / 24 * 3 * 2 ~ 82
     var percentage = (count / 24 * 3 * 2) / (double)count;
     
-    List<CoordinateModel> locations = _dataGenerator.GetRandomIncidentsLocationsInPolygon(GetPraguePolygon(), count, 0.08, _random);
+    List<CoordinateModel> locations = _dataGenerator.GetRandomIncidentsLocationsInPolygon(GetPraguePolygon(), count, 0.08, random);
     
     ImmutableArray<Incident> incidents = _dataGenerator.GenerateIncidentModelsFromCoordinatesNormal(
       coordinates: locations,
@@ -116,7 +112,7 @@ public class PragueInput : IInputParametrization
       9,
       12,
       percentage,
-      random: _random
+      random: random
     ).Select(IncidentMapper.MapBack).ToImmutableArray();
 
     return incidents;
@@ -127,8 +123,8 @@ public class PragueInput : IInputParametrization
     // shift times init
     ShiftTimes shiftTimes = new()
     {
-      AllowedShiftStartingTimesSec = new HashSet<int>()
-      {
+      AllowedShiftStartingTimesSec =
+      [
         0.ToHours().ToMinutes().ToSeconds().Value,
         //2.ToHours().ToMinutes().ToSeconds().Value,
         4.ToHours().ToMinutes().ToSeconds().Value,
@@ -139,17 +135,17 @@ public class PragueInput : IInputParametrization
         //14.ToHours().ToMinutes().ToSeconds().Value,
         16.ToHours().ToMinutes().ToSeconds().Value,
         //18.ToHours().ToMinutes().ToSeconds().Value,
-        20.ToHours().ToMinutes().ToSeconds().Value,
-      },
+        20.ToHours().ToMinutes().ToSeconds().Value
+      ],
 
-      AllowedShiftDurationsSec = new HashSet<int>()
-      {
+      AllowedShiftDurationsSec =
+      [
         4.ToHours().ToMinutes().ToSeconds().Value,
         6.ToHours().ToMinutes().ToSeconds().Value,
         8.ToHours().ToMinutes().ToSeconds().Value,
         10.ToHours().ToMinutes().ToSeconds().Value,
-        12.ToHours().ToMinutes().ToSeconds().Value,
-      }
+        12.ToHours().ToMinutes().ToSeconds().Value
+      ]
     };
     //
 

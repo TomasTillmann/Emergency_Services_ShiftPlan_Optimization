@@ -35,10 +35,9 @@ public partial class MainWindow : Window
         var map = new Map();
         map.Layers.Add(OpenStreetMapPositron.CreateTileLayer());
         
-        Random random = new(420);
-        PragueInput input = new PragueInput(random);
+        PragueInput input = new PragueInput();
         var world = input.GetWorld();
-        var incidents = input.GetMondayIncidents(300);
+        var incidents = input.GetMondayIncidents(300, new Random(420));
         
         SymbolStyle.DefaultHeight = 1;
         SymbolStyle.DefaultWidth = 1;

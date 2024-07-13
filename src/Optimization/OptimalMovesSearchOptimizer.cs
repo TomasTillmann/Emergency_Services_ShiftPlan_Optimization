@@ -80,29 +80,21 @@ public class OptimalMovesSearchOptimizer
       {
         Writer.WriteLine($"UPDATE: elapsed: {_sw.Elapsed.TotalSeconds}, cost: {current.Cost}, allocatedTeams: {current.MedicTeamsCount}, allocatedAmbulances: {current.AmbulancesCount}, handled: {simulation.HandledIncidentsCount}");
         Writer.Flush();
+        BestPlansWriter.WriteLine(JsonSerializer.Serialize(current));
+        BestPlansWriter.Flush();
         best.FillFrom(current);
       }
       
       Writer.WriteLine($"elapsed: {_sw.Elapsed.TotalSeconds}, cost: {current.Cost}, allocatedTeams: {current.MedicTeamsCount}, allocatedAmbulances: {current.AmbulancesCount}, handled: {simulation.HandledIncidentsCount}");
       Writer.Flush();
-      BestPlansWriter.WriteLine("GANT");
-      _gaantView.Show(current, incidents.AsSpan(), BestPlansWriter);
-      BestPlansWriter.WriteLine(JsonSerializer.Serialize(current));
-      BestPlansWriter.WriteLine("-----------");
-      BestPlansWriter.Flush();
-      BestPlansWriter.Flush();
+      //BestPlansWriter.WriteLine("GANT");
+      //_gaantView.Show(current, incidents.AsSpan(), BestPlansWriter);
 
       return;
     }
 
-    Writer.WriteLine($"elapsed: {_sw.Elapsed.TotalSeconds}, k: {k}, before enumeration");
-    Writer.Flush();
     var moves = movesGenerators[k].GetMoves(current).Enumerate(2);
-    //Writer.WriteLine(string.Join("\n", moves));
     var index = _random.Next(moves.Count);
-    Writer.WriteLine($"elapsed: {_sw.Elapsed.TotalSeconds}, k: {k}, move: {moves[index]}, after enumeration");
-    Writer.WriteLine($"{index}/{moves.Count}");
-    Writer.Flush();
     
     _moveMaker.ModifyMakeMove(current, moves[index].Normal);
     if (!_cache.Contains((k, current)))

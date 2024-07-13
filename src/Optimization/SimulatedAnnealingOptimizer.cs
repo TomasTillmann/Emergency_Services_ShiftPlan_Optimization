@@ -81,9 +81,13 @@ public class SimulatedAnnealingOptimizer : NeighbourOptimizer
         if (delta > 0)
         {
           double probabilityToNotAccept = 1 - Math.Exp(-delta / temp);
+          Writer.WriteLine($"delta: {delta}");
+          Writer.WriteLine("to accepts: " + Math.Exp(-delta / temp));
+          Writer.WriteLine($"probToNot: {probabilityToNotAccept}");
+          Writer.WriteLine($"temp: {temp}");
           if (Random.NextDouble() < probabilityToNotAccept)
           {
-            Console.WriteLine("NOT ACCEPTED");
+            Writer.WriteLine("NOT ACCEPTED");
             _moveMaker.ModifyMakeInverseMove(current, move.Inverse);
             --PlansVisited;
             continue;
