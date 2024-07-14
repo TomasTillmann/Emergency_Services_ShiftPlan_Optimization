@@ -19,7 +19,7 @@ namespace ESSP.DataModel
       return Math.Abs(x.Value - y.Value).ToMeters();
     }
 
-    public static int DistanceMet(int x, int y)
+    public static double DistanceMet(double x, double y)
     {
       return Math.Abs(x - y);
     }
