@@ -28,3 +28,6 @@ plan: BestPlan_HybridTabu, incidents: 15-370, handled: 349
 plan: BestPlan_HybridTabu, incidents: 15-380, handled: 356
 plan: BestPlan_HybridTabu, incidents: 15-390, handled: 363
 plan: BestPlan_HybridTabu, incidents: 15-400, handled: 364
+plan: BestPlan_HybridLocal, incidents: 12-300_extra30, handled: 290
+plan: BestPlan_HybridLocal, incidents: 12-300_extra20, handled: 290
+plan: BestPlan_HybridLocal, incidents: 12-300_extra30, handled: 290

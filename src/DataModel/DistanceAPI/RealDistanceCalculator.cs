@@ -115,7 +115,7 @@ public class RealDistanceCalculator : IDistanceCalculator
 
     public Coordinate GetIntermediateLocation(Coordinate from, Coordinate to, int durationDrivingSec)
     {
-        /if (IntermediateLocationsTotal % 10000 == 0) Console.WriteLine($"Intermediate location requests: {IntermediateLocationsHits}/{IntermediateLocationsTotal}");
+        //if (IntermediateLocationsTotal % 10000 == 0) Console.WriteLine($"Intermediate location requests: {IntermediateLocationsHits}/{IntermediateLocationsTotal}");
         ++IntermediateLocationsTotal;
         if (_newLocation.TryGetValue((from, to, durationDrivingSec), out var newLocation))
         {

@@ -328,8 +328,9 @@ class Program
       Constraints constraints = input.GetConstraints();
 
       const string plansDir = "/home/tom/School/Bakalarka/Emergency_Services_ShiftPlan_Optimization/src/StatsLog/prague_420_300_results/";
-      //string[] bestPlans = ["BestPlan_Optimal", "BestPlan_HybridLocal", "BestPlan_HybridTabu"];
-      string[] bestPlans = ["BestPlan_HybridLocal", "BestPlan_HybridTabu"];
+      //string[] bestPlans = ["BestPlan_Optimal", "BestPlan_HybridLocal", "BestPlan_HybridTabu", "sa"];
+      //string[] bestPlans = ["BestPlan_HybridLocal", "BestPlan_HybridTabu"];
+      string[] bestPlans = ["BestPlan_HybridTabu", "BestPlan_SA_fromRandom90", "BestPlan_SA_fromEmpty", "BestPlan_SA_fromOptimal"];
 
       foreach (var planString in bestPlans)
       {
@@ -564,6 +565,7 @@ class Program
     
     var sa_empty = Task.Run(() =>
     {
+      return;
       string log = "SimulatedAnnealing_5_0000001_1_exp99_fromEmpty.log";
       string bestPlansLog = "Plans_" + log;
       
@@ -596,6 +598,7 @@ class Program
     
     var sa_fromOptimal = Task.Run(() =>
     {
+      return;
       string log = "SimulatedAnnealing_5_0000001_1_exp99_fromOptimal.log";
       string bestPlansLog = "Plans_" + log; 
       
@@ -634,6 +637,7 @@ class Program
     
     var sa_fromRandom_85 = Task.Run(() =>
     {
+      return;
       string log = "SimulatedAnnealing_5_0000001_10_exp85_fromRandom.log";
       string bestPlansLog = "Plans_" + log;
       
@@ -668,6 +672,7 @@ class Program
     
     var sa_fromRandom_90 = Task.Run(() =>
     {
+      return;
       string log = "SimulatedAnnealing_3_000000001_30_exp90_fromRandom.log";
       string bestPlansLog = "Plan_" + log; 
       

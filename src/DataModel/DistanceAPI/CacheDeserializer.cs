@@ -42,14 +42,21 @@ public class CacheDeserializer
             int duration = int.MaxValue;
             for (int j = 0; j < _world.Hospitals.Length; ++j)
             {
-                var time = cache[(i, j)];
-                if (time < duration)
+                try
                 {
-                    nearest = _world.Hospitals[j];
-                    duration = time;
+                    var time = cache[(i, j)];
+                    if (time < duration)
+                    {
+                        nearest = _world.Hospitals[j];
+                        duration = time;
+                    }
+                }
+                catch
+                {
+                    Console.WriteLine($"{i} incident and {j} hospital not present");
                 }
             }
-            
+
             nearestHospital[_incidents[i].Location] = nearest;
         }
     }
