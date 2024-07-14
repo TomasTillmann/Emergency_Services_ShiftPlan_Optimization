@@ -1,20 +1,9 @@
-﻿//#define LocalSearch 
-//#define DynamicProgramming 
-//#define TabuSearch
-//#define SimulatedAnnealing
-//#define Cache
-#define All
-
-using System.Collections.Immutable;
-using System.Diagnostics;
-using System.Text.Json;
+﻿using System.Collections.Immutable;
 using DataModel.Interfaces;
 using DistanceAPI;
 using ESSP.DataModel;
-using Newtonsoft.Json;
 using Optimizing;
 using Simulating;
-using Coordinate = GeoAPI.Geometries.Coordinate;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 using Random = System.Random;
 
@@ -22,177 +11,20 @@ namespace Client;
 
 class Program
 {
-#if LocalSearch
   public static void Main()
   {
-    Random random = new Random(420);
-    PragueInput input = new PragueInput(random);
-    var world = input.GetWorld();
-    Constraints constraints = input.GetConstraints();
-    ShiftTimes shiftTimes = input.GetShiftTimes();
-    PlanSampler planSampler = new PlanSamperUniform(world, shiftTimes, constraints, 0.5, random);
-    var incidents = input.GetMondayIncidents(300);
-      
-    IDistanceCalculator distanceCalculator = new RealDistanceCalculator(
-        world,
-        incidents,
-        "FromIncidentToHospitals_420_200_Prague",
-        "FromDepotToIncidents_420_200_Prague",
-        "FromDepotsToHospitals_420_200_Prague"
-     );
-
-    Simulation simulation = new(world, constraints, distanceCalculator);
-    IUtilityFunction utilityFunction = new WeightedSum(simulation, EmergencyServicePlan.GetMaxCost(world, shiftTimes));
-    IMoveGenerator moveGenerator = new AllBasicMovesGenerator(shiftTimes, constraints);
-    var optimizer = new LocalSearchOptimizer(int.MaxValue, world, constraints, distanceCalculator, utilityFunction, moveGenerator);
-    //optimizer.StartPlan = planSampler.Sample();
-
-    Console.WriteLine($"Start time: {DateTime.Now}");
-    var optimal = optimizer.GetBest(incidents.AsSpan()).ToList().First();
-    double eval = utilityFunction.Evaluate(optimal, incidents.AsSpan());
-
-    Console.WriteLine($"Iteration: {optimizer.PlateuIteration} " +
-                      $"eval: {eval}," +
-                      $"handled: {utilityFunction.HandledIncidentsCount} / {incidents.Length} " +
-                      $"cost: {optimal.Cost}");
-  }
-#endif
-
-#if TabuSearch
-  public static void Main()
-  {
-    Random random = new Random(420);
-    IInputParametrization input = new Input1(random);
-    World world = input.GetWorld();
-    Constraints constraints = input.GetConstraints();
-    ShiftTimes shiftTimes = input.GetShiftTimes();
-    PlanSampler planSampler = new PlanSamperUniform(world, shiftTimes, constraints, 0.5, random);
-    ImmutableArray<Incident> incidents = input.GetIncidents(100);
-
-    Simulation simulation = new(world, constraints);
-    IUtilityFunction utilityFunction = new WeightedSum(simulation, EmergencyServicePlan.GetMaxCost(world, shiftTimes));
-    IMoveGenerator moveGenerator = new AllBasicMovesGenerator(shiftTimes, constraints);
-    var optimizer = new TabuSearchOptimizer(world, constraints, utilityFunction, moveGenerator, tabuTenure: 1000);
-    //optimizer.StartPlan = planSampler.Sample();
-
-    Stopwatch sw = Stopwatch.StartNew();
-    var optimal = optimizer.GetBest(incidents.AsSpan()).ToList().First();
-    double eval = utilityFunction.Evaluate(optimal, incidents.AsSpan());
-
-    Console.WriteLine($"Iteration: {optimizer.PlateuIteration} " +
-                      $"eval: {eval}," +
-                      $"handled: {utilityFunction.HandledIncidentsCount} / {incidents.Length} " +
-                      $"cost: {optimal.Cost}");
-
-    using StreamWriter writer = new("/home/tom/School/Bakalarka/Emergency_Services_ShiftPlan_Optimization/src/log.txt");
-    GaantView gaant = new GaantView(world, constraints);
-    gaant.Show(optimal, incidents.AsSpan(), writer);
-  }
-#endif
-
-#if SimulatedAnnealing
-  public static void Main()
-  {
-    Random random = new Random(420);
-    IInputParametrization input = new Input1(random);
-    World world = input.GetWorld();
-    Constraints constraints = input.GetConstraints();
-    ShiftTimes shiftTimes = input.GetShiftTimes();
-    PlanSampler planSampler = new PlanSamperUniform(world, shiftTimes, constraints, 0.5, random);
-    ImmutableArray<Incident> incidents = input.GetIncidents(100);
-
-    Simulation simulation = new(world, constraints);
-    IUtilityFunction utilityFunction = new WeightedSum(simulation, EmergencyServicePlan.GetMaxCost(world, shiftTimes));
-    IMoveGenerator moveGenerator = new RandomBasicMoveSampler(shiftTimes, constraints);
-    var optimizer = new SimulatedAnnealingOptimizer(
-      world,
-      constraints,
-      utilityFunction,
-      new RandomBasicMoveSampler(shiftTimes, constraints, random),
-      100,
-      10,
-      200,
-      new ExponentialCoolingSchedule(0.99),
-      random
-    );
-    //optimizer.StartPlan = planSampler.Sample();
-
-    Stopwatch sw = Stopwatch.StartNew();
-    var optimal = optimizer.GetBest(incidents.AsSpan()).ToList().First();
-    double eval = utilityFunction.Evaluate(optimal, incidents.AsSpan());
-
-    Console.WriteLine($"Iteration: {optimizer.Iteration} " +
-                      $"eval: {eval}," +
-                      $"handled: {utilityFunction.HandledIncidentsCount} / {incidents.Length} " +
-                      $"cost: {optimal.Cost}");
-  }
-#endif
-
-#if DynamicProgramming
-  public static void Main()
-  {
-    Random random = new(420);
-    Input1 input = new Input1(random);
-    var world = input.GetWorld();
-    Constraints constraints = input.GetConstraints();
-    ShiftTimes shiftTimes = input.GetShiftTimes();
-    var incidents = input.GetIncidents(200);
-
-    IDistanceCalculator distanceCalculator = new RealDistanceCalculator(
-      world,
-      incidents,
-      "FromIncidentToHospitals_420_200_Prague",
-      "FromDepotToIncidents_420_200_Prague",
-      "FromDepotsToHospitals_420_200_Prague"
-    );
-    
-    Simulation simulation = new(world, constraints, distanceCalculator);
-    var optimizer = new OptimalMovesSearchOptimizer(world, shiftTimes, distanceCalculator, constraints, random);
-    var optimal = optimizer.GetBest(incidents).First();
-
-    simulation.Run(optimal, incidents.AsSpan());
-    Console.WriteLine($"handled: {simulation.HandledIncidentsCount} / {incidents.Length} " +
-                      $"cost: {optimal.Cost}");
-  }
-#endif
-  
-  #if Cache
-  public static void Main()
-  {
-    const int seed = 15;
-    PragueInput input = new PragueInput();
-    var world = input.GetWorld();
-    int count = 300;
-    var incidents = input.GetStandardIncidents(count, new Random(seed));
-    
-    var t1 = Task.Run(() => new CacheSerializer(world, incidents, new RealDistanceCalculator(world.Hospitals)).SerializeFromDepotsToIncidents($"prague_monday_{seed}_{count}_DepotsToIncidents"));
-    var t2 = Task.Run(() => new CacheSerializer(world, incidents, new RealDistanceCalculator(world.Hospitals)).SerializeFromIncidentsToHospitals($"prague_monday_{seed}_{count}_IncidentsToHospitals"));
-    //var t3 = Task.Run(() => new CacheSerializer(world, incidents, new RealDistanceCalculator(world.Hospitals)).SerializeFromHospitalsToDepots("prague_HospitalsToDepots"));
-
-    //Task[] tasks = [t1, t2, t3];
-    
-    Task[] tasks = [t1, t2];
-    Task.WaitAll(tasks);
-  }
-  #endif
-  
-  #if All
-  public static void Main()
-  {
-    const string logDir = "/home/tom/School/Bakalarka/Emergency_Services_ShiftPlan_Optimization/src/StatsLog/prague_420_300/";
+    const string logDir = "StatsLog"; // Choose logdir
 
     List<Task> tasks = new();
     var incidentsInference = Task.Run(() =>
     {
-      return;
       PragueInput input = new PragueInput();
       var world = input.GetWorld();
       Constraints constraints = input.GetConstraints();
 
       
-      const string plansDir = "/home/tom/School/Bakalarka/Emergency_Services_ShiftPlan_Optimization/src/StatsLog/prague_420_300_results/";
-      //string[] bestPlans = ["BestPlan_Optimal", "BestPlan_HybridLocal", "BestPlan_HybridTabu"];
-      string[] bestPlans = ["BestPlan_HybridLocal", "BestPlan_HybridTabu"];
+      const string plansDir = "/StatsLog/prague_420_300_results/"; // Choose plans dir
+      string[] bestPlans = ["BestPlan_Optimal", "BestPlan_HybridLocal", "BestPlan_HybridTabu", "BestPlan_SA_fromEmpty", "BestPlan_SA_fromOptimal", "BestPlan_SA_fromRandom85", "bestPlan_SA_fromRandom90" ];
 
       foreach (var planString in bestPlans)
       {
@@ -327,10 +159,8 @@ class Program
       var world = input.GetWorld();
       Constraints constraints = input.GetConstraints();
 
-      const string plansDir = "/home/tom/School/Bakalarka/Emergency_Services_ShiftPlan_Optimization/src/StatsLog/prague_420_300_results/";
-      //string[] bestPlans = ["BestPlan_Optimal", "BestPlan_HybridLocal", "BestPlan_HybridTabu", "sa"];
-      //string[] bestPlans = ["BestPlan_HybridLocal", "BestPlan_HybridTabu"];
-      string[] bestPlans = ["BestPlan_HybridTabu", "BestPlan_SA_fromRandom90", "BestPlan_SA_fromEmpty", "BestPlan_SA_fromOptimal"];
+      const string plansDir = "StatsLog/prague_420_300_results/";
+      string[] bestPlans = ["BestPlan_Optimal", "BestPlan_HybridLocal", "BestPlan_HybridTabu", "BestPlan_SA_fromEmpty", "BestPlan_SA_fromOptimal", "BestPlan_SA_fromRandom85", "bestPlan_SA_fromRandom90" ];
 
       foreach (var planString in bestPlans)
       {
@@ -396,7 +226,6 @@ class Program
     
     var optimalMovesSearch = Task.Run(() =>
     {
-      return;
       string log = "OptimalMovesSearch.log";
       string bestPlansLog = "Plans_OptimalMovesSearch.log";
       
@@ -425,7 +254,6 @@ class Program
     
     var localSearchEmpty = Task.Run(() =>
     {
-      return;
       string log = "LocalSearch.log";
       string bestPlansLog = "Plans_LocalSearch.log";
       
@@ -457,7 +285,6 @@ class Program
     
     var localSearchHybrid = Task.Run(() =>
     {
-      return;
       string log = "HybridLocalSearch.log";
       string bestPlansLog = "Plans_HybridLocalSearch.log";
       
@@ -495,7 +322,6 @@ class Program
     
     var tabuSearchEmpty = Task.Run(() =>
     {
-      return;
       string log = "TabuSearch_empty.log";
       string bestPlansLog = "Plans_TabuSearch_empty.log";
       
@@ -527,7 +353,6 @@ class Program
     
     var tabuSearchFromOptimal = Task.Run(() =>
     {
-      return;
       string log = "HybridTabuSearch.log";
       string bestPlansLog = "Plans_HybridTabuSearch.log";
       
@@ -565,7 +390,6 @@ class Program
     
     var sa_empty = Task.Run(() =>
     {
-      return;
       string log = "SimulatedAnnealing_5_0000001_1_exp99_fromEmpty.log";
       string bestPlansLog = "Plans_" + log;
       
@@ -598,7 +422,6 @@ class Program
     
     var sa_fromOptimal = Task.Run(() =>
     {
-      return;
       string log = "SimulatedAnnealing_5_0000001_1_exp99_fromOptimal.log";
       string bestPlansLog = "Plans_" + log; 
       
@@ -637,7 +460,6 @@ class Program
     
     var sa_fromRandom_85 = Task.Run(() =>
     {
-      return;
       string log = "SimulatedAnnealing_5_0000001_10_exp85_fromRandom.log";
       string bestPlansLog = "Plans_" + log;
       
@@ -672,7 +494,6 @@ class Program
     
     var sa_fromRandom_90 = Task.Run(() =>
     {
-      return;
       string log = "SimulatedAnnealing_3_000000001_30_exp90_fromRandom.log";
       string bestPlansLog = "Plan_" + log; 
       
@@ -707,5 +528,4 @@ class Program
 
     Task.WaitAll(tasks.ToArray());
   }
-  #endif
 }
