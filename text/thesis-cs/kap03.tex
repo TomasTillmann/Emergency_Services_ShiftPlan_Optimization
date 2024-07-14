@@ -11,9 +11,9 @@ Chování nalezených optimálních plánů budeme následně zkoumat na různý
 
 První vygenerujeme data reprezentující výjezdové stanice a nemocnice a tím namodelujeme pohotovostní službu.
 Ty můžeme v podstatě vygenerovat libovolně, ale v rámci praktičtějšího využití
-si v této prácí vybereme jako pohotovostní službu Pražskou záchrannou službu.
+si v této práci vybereme jako pohotovostní službu Pražskou záchrannou službu.
 Pražská záchranná služba disponuje 20 výjezdovými stanicemi a 140 vozidly.
-Údaje o počtu záchranných týmu se zdají, že nejsou veřejně dostupné. Jedinou dostupnou informací je celkový počet zaměstanců, který činí přes 500 lidí.
+Údaje o počtu záchranných týmu se zdají, že nejsou veřejně dostupné. Jedinou dostupnou informací je celkový počet zaměstnanců, který činí přes 500 lidí.
 Tam ale spadají i nezáchranáři.
 V Praze se nachází 12 nemocnic.
 
@@ -22,8 +22,8 @@ Nejrušnější část všedního dne je mezi 9 a 12 hodinou, kdy se odehrává 
 Incidenty se odehrávají mnohem častěji v centru a ve středu Prahy, než na jeho okolí. 
 
 Podle těchto informací namodelujeme sadu incidentů.
-První si území Prahy reprezentujeme jako mnohoúhleník a pomocí normálního rozdělení vygenerujeme souřadnice v něm obsažené.
-Normálnímu rozdělení nastavíme střední hodnotu na střed mnohoúhelníka a směrodatnou odchylku nastavíme tak, aby se incidenty na okrajích Prahy odehrávali méně než v centru. 
+První si území Prahy reprezentujeme jako mnohoúhelník a pomocí normálního rozdělení vygenerujeme souřadnice v něm obsažené.
+Normálnímu rozdělení nastavíme střední hodnotu na střed mnohoúhelníku a směrodatnou odchylku nastavíme tak, aby se incidenty na okrajích Prahy odehrávali méně než v centru. 
 Kde a v kolik hodin se incidenty odehrávají přesně záchranná služba Prahy vypadá, že nezveřejňuje, pravděpodobně proto, že by se mohlo jednat o zneužitelné nebo citlivé údaje.
 Rozloha Prahy činí 496 kilometrů čtverečních a je poměrně symetrického tvaru. Pro naše účely tak bude stačit nastavit směrodatnou odchylku na 10 kilometrů.
 V jakých časech se incidenty odehrávají je vygenerováno uniformě náhodně tak, aby se skutečně odehrávali incidenty častěji mezi 9 a 12 hodinou.
@@ -100,10 +100,10 @@ Po spuštění metody na modelu Prahy po dobu téměř 30 minut metoda celkem na
 Nalezený optimální plán odbavuje 295 incidentů a stojí 2455258 (viz tabulka \ref{table:optimalMovesTabulka}).
 Dále má naalokovaných 101 týmů a 58 záchranných vozidel.
 
-První plán trvá nalézt nejdelé, něco přes 7 minut. Důvodem je, že \textit{cache} dob příjezdů obsahuje pouze předpočítané hodnoty a musí se vykonávat větší množství
+První plán trvá nalézt nejdéle, něco přes 7 minut. Důvodem je, že \textit{cache} dob příjezdů obsahuje pouze předpočítané hodnoty a musí se vykonávat větší množství
 dotazů na Google API.
 Při prohledávání dalších plánů už se dotazuje na Google API mnohem méně často.
-Obodbně bude vyhodnocování prvních navštívených plánů trvat i u ostatních metod.
+Obdobně bude vyhodnocování prvních navštívených plánů trvat i u ostatních metod.
 
 Metoda navštívila pro každý plán optimální v ceně při jeho budování jeden plán pro každý incident, čili celkově navštívila $11 \cdot 300 = 3300$ plánů.
 Celkový počet dotazů na dobu trvání příjezdu je 133189050, kde pro 133179688 případu, tedy $99.99\%$, byla doba příjezdu předpočítaná a vrácena z \textit{cache}.
@@ -116,11 +116,11 @@ Prohledávání začneme z prázdného plánu a jako účelovou funkci použijem
 abychom upřednostňovali plány s vyšším počtem odbavených incidentů.
 Jakou přesně účelovou funkci si zvolíme uvážíme podle toho, co pro nás konkrétně znamená optimální plán. My budeme chtít zkoumat především plány odbavující co nejvíce incidentů a až poté minimalizovat cenu.
 
-Potřebujeme ještě nadefinovat jak budou vypadat sousedi nějakého plánu.
+Potřebujeme ještě nadefinovat, jak budou vypadat sousedi nějakého plánu.
 Ty standardně nadefinujeme implicitně pomocí tahů a vyžadujeme, aby splňovali alespoň nutné podmínky.
 Takové tahy můžeme vybrat různě, my si vybereme tahy uvedené jako příklad tahů, které splňují nutné podmínky (viz příklad \ref{pr:sousedi}).
 
-Záměrně alokování týmu a vozidla zvolíme jako jeden tah a nikoliv jako dva samostatné tahy. Vyhneme se tak situaci, kdy by se lokální prohledávání zastavilo v lokálním optimu, 
+Záměrně alokování týmu a vozidla zvolíme jako jeden tah, a nikoliv jako dva samostatné tahy. Vyhneme se tak situaci, kdy by se lokální prohledávání zastavilo v lokálním optimu, 
 kde už nelze odbavit žádný incident naalokování týmu a vozidla odděleně, ale pouze zároveň. Takové lokální optimum by pak bylo suboptimální, protože by odbavovalo méně incidentů, než by mohlo být možné.
 Takto definované sousedství budeme používat i u dalších metod.
 
@@ -131,19 +131,19 @@ Takto definované sousedství budeme používat i u dalších metod.
   \label{img:localSearchRes}
 \end{figure}
 
-Na obrázku \ref{img:localSearchRes} vidíme jak se aktuální plán mění v čase.
-Lokální prohledávání bylo spuštěné po dobu 50 minut, a pak bylo přeřušeno. 
+Na obrázku \ref{img:localSearchRes} vidíme, jak se aktuální plán mění v čase.
+Lokální prohledávání bylo spuštěné po dobu 50 minut, a pak bylo přerušeno. 
 Nejlepší nalezený plán po 50 minutách úspěšně odbaví 223 incidentů z 300 incidentů a stojí 137673.
 To je v porovnání s předchozí metodou, která za pouhých 7 minut nalezla plán odbavující 295 incidentů nedostačující výsledek.
 I když by se podle růstu křivky dalo usoudit, že by metoda lokálního prohledávání také byla schopná nalézt dost dobrý plán, trvalo by to příliš dlouho.
 
-Lokální prohledávání celkem navštívilo 22997 plánů. To je až 7 krát tolik, kolik plánů navštívila metoda prohledávání optimálními tahy.
+Lokální prohledávání celkem navštívilo 22997 plánů. To je až sedm krát tolik, kolik plánů navštívila metoda prohledávání optimálními tahy.
 Lokální prohledávání tedy není vhodné na budování optimálního plánu z prázdného plánu, protože zbytečně navštíví velké množství plánů a trvá tak zbytečně dlouho.
 
-Můžeme si polepšit, sice že začneme prohledávát ne z prázdného plánu, ale z plánu zvoleného nějak chytře. Z plánu, který už je skoro optimální a lokální Prohledávání
+Můžeme si polepšit, sice že začneme prohledávat ne z prázdného plánu, ale z plánu zvoleného nějak chytře. Z plánu, který už je skoro optimální a lokální Prohledávání
 už jej jenom doladí.
 
-Jednou z možností jak takový startovní plán zvolit je použít první nalezený optimální plán v ceně předchozí metodou a na něj spustit lokální prohledávání.
+Jednou z možností, jak takový startovní plán zvolit je použít první nalezený optimální plán v ceně předchozí metodou a na něj spustit lokální prohledávání.
 
 \begin{figure}[H]
   \caption{Nalezené plány metodou lokálního prohledávání plánů z plánu optimálního v ceně.}
@@ -178,7 +178,7 @@ Nalézt plán odbavující všech 300 incidentů trvá kolem 30 minut, což je o
 To je pochopitelné, protože při navštívení každého souseda, kterých bude obdobně jako u lokálního prohledávání, se musí kontrolovat,
 zda není obsažen v tabu. Proto vyhodnocení souseda bude trvat o něco déle, což se při tak velkém množství navštívených plánů poměrně rychle nasčítá.
 
-Tabu prohledávání bylo puštěno něco kolem hodiny, a obdobně jako u lokálního prohledávání, s roustoucí délkou běhu programu se i snižuje cena plánu.
+Tabu prohledávání bylo puštěno něco kolem hodiny, a obdobně jako u lokálního prohledávání, s rostoucí délkou běhu programu se i snižuje cena plánu.
 Výhoda tabu prohledávání je hlavně v schopnosti nezůstat v lokálním optimu a umět robustněji prohledávat prostor konfigurací.
 Tato výhoda v našem případě ale není využita, protože tabu prohledávání ani za hodinu běhu na lokální optimum nenarazilo.
 Spíše naopak, prohledávání tabu je nevýhodou, a lokální prohledávání je v tomto případě lepší volbou.
@@ -244,7 +244,7 @@ Vybrat ochlazovací rozvrh lze různě, nejčastěji používané jsou \cite{sa_
     Náročnější na implementaci než předchozí ochlazující rozvrhy. Hodí se uvažovat o jeho použití především, pokud jednodušší ochlazující rozvrhy nalézají pouze suboptimální řešení.
 \end{enumerate}
 
-My si jako ochlazovací rozvrh zvolíme exponenciální ochlazovací rozvrh, především pro jeho jedhoduchou implementaci a pěkné vlastnosti.
+My si jako ochlazovací rozvrh zvolíme exponenciální ochlazovací rozvrh, především pro jeho jednoduchou implementaci a pěkné vlastnosti.
 Jako první spustíme simulované žíhání z prázdného plánu.
 
 \begin{figure}[H]

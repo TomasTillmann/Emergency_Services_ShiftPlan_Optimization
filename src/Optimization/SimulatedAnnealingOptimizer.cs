@@ -77,12 +77,12 @@ public class SimulatedAnnealingOptimizer : NeighbourOptimizer
         Writer.WriteLine($"X: elapsed: {_sw.Elapsed.TotalSeconds}, cost: {current.Cost}, allocatedTeams: {current.MedicTeamsCount}, allocatedAmbulances: {current.AmbulancesCount}, handled: {UtilityFunction.HandledIncidentsCount}, eval: {currentEval}, m: {m}, temp: {temp}");
         //Writer.WriteLine(move);
         Writer.Flush();
-        
+
         if (delta > 0)
         {
           double probabilityToNotAccept = 1 - Math.Exp(-delta / temp);
           Writer.WriteLine($"delta: {delta}");
-          Writer.WriteLine("to accepts: " + Math.Exp(-delta / temp));
+          Writer.WriteLine("probToAccept: " + Math.Exp(-delta / temp));
           Writer.WriteLine($"probToNot: {probabilityToNotAccept}");
           Writer.WriteLine($"temp: {temp}");
           if (Random.NextDouble() < probabilityToNotAccept)
@@ -92,6 +92,14 @@ public class SimulatedAnnealingOptimizer : NeighbourOptimizer
             --PlansVisited;
             continue;
           }
+          else
+          {
+            Writer.WriteLine($"MOVED TO: elapsed: {_sw.Elapsed.TotalSeconds}, cost: {current.Cost}, allocatedTeams: {current.MedicTeamsCount}, allocatedAmbulances: {current.AmbulancesCount}, handled: {UtilityFunction.HandledIncidentsCount}, eval: {currentEval}, m: {m}, temp: {temp}");
+          }
+        }
+        else
+        {
+            Writer.WriteLine($"MOVED TO: elapsed: {_sw.Elapsed.TotalSeconds}, cost: {current.Cost}, allocatedTeams: {current.MedicTeamsCount}, allocatedAmbulances: {current.AmbulancesCount}, handled: {UtilityFunction.HandledIncidentsCount}, eval: {currentEval}, m: {m}, temp: {temp}");
         }
 
         currentEval = neighbourEval;

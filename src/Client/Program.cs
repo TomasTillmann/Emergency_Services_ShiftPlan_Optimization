@@ -180,11 +180,11 @@ class Program
   public static void Main()
   {
     const string logDir = "/home/tom/School/Bakalarka/Emergency_Services_ShiftPlan_Optimization/src/StatsLog/prague_420_300/";
-  
 
     List<Task> tasks = new();
     var incidentsInference = Task.Run(() =>
     {
+      return;
       PragueInput input = new PragueInput();
       var world = input.GetWorld();
       Constraints constraints = input.GetConstraints();
@@ -323,29 +323,73 @@ class Program
     
     var extraIncidentsInference = Task.Run(() =>
     {
-      return;
       PragueInput input = new PragueInput();
       var world = input.GetWorld();
       Constraints constraints = input.GetConstraints();
 
-      var incidents = input.GetIncidents(300, new Random(12));
-      IDistanceCalculator distanceCalculator = new RealDistanceCalculator(
-        world,
-        incidents,
-        "prague_monday_12_300_IncidentsToHospitals",
-        "prague_monday_12_300_DepotsToIncidents",
-        "prague_HospitalsToDepots"
-      );
+      const string plansDir = "/home/tom/School/Bakalarka/Emergency_Services_ShiftPlan_Optimization/src/StatsLog/prague_420_300_results/";
+      //string[] bestPlans = ["BestPlan_Optimal", "BestPlan_HybridLocal", "BestPlan_HybridTabu"];
+      string[] bestPlans = ["BestPlan_HybridLocal", "BestPlan_HybridTabu"];
 
-      string bestPlansLog = "OptimalMovesSearchBestPlans.log";
-      var planJson =
-        "{\"Assignments\":[{\"MedicTeams\":[{\"Shift\":{\"StartSec\":14400,\"EndSec\":43200,\"DurationSec\":28800}},{\"Shift\":{\"StartSec\":14400,\"EndSec\":50400,\"DurationSec\":36000}},{\"Shift\":{\"StartSec\":28800,\"EndSec\":50400,\"DurationSec\":21600}},{\"Shift\":{\"StartSec\":28800,\"EndSec\":64800,\"DurationSec\":36000}},{\"Shift\":{\"StartSec\":28800,\"EndSec\":43200,\"DurationSec\":14400}},{\"Shift\":{\"StartSec\":28800,\"EndSec\":72000,\"DurationSec\":43200}},{\"Shift\":{\"StartSec\":72000,\"EndSec\":86400,\"DurationSec\":14400}}],\"Ambulances\":[{},{},{},{},{}]},{\"MedicTeams\":[{\"Shift\":{\"StartSec\":0,\"EndSec\":36000,\"DurationSec\":36000}},{\"Shift\":{\"StartSec\":14400,\"EndSec\":43200,\"DurationSec\":28800}},{\"Shift\":{\"StartSec\":28800,\"EndSec\":57600,\"DurationSec\":28800}},{\"Shift\":{\"StartSec\":57600,\"EndSec\":79200,\"DurationSec\":21600}}],\"Ambulances\":[{},{}]},{\"MedicTeams\":[{\"Shift\":{\"StartSec\":0,\"EndSec\":43200,\"DurationSec\":43200}},{\"Shift\":{\"StartSec\":0,\"EndSec\":28800,\"DurationSec\":28800}},{\"Shift\":{\"StartSec\":0,\"EndSec\":43200,\"DurationSec\":43200}},{\"Shift\":{\"StartSec\":0,\"EndSec\":43200,\"DurationSec\":43200}},{\"Shift\":{\"StartSec\":14400,\"EndSec\":28800,\"DurationSec\":14400}},{\"Shift\":{\"StartSec\":28800,\"EndSec\":50400,\"DurationSec\":21600}},{\"Shift\":{\"StartSec\":28800,\"EndSec\":64800,\"DurationSec\":36000}},{\"Shift\":{\"StartSec\":28800,\"EndSec\":50400,\"DurationSec\":21600}}],\"Ambulances\":[{},{},{},{},{},{}]},{\"MedicTeams\":[{\"Shift\":{\"StartSec\":0,\"EndSec\":14400,\"DurationSec\":14400}},{\"Shift\":{\"StartSec\":28800,\"EndSec\":57600,\"DurationSec\":28800}},{\"Shift\":{\"StartSec\":28800,\"EndSec\":72000,\"DurationSec\":43200}},{\"Shift\":{\"StartSec\":28800,\"EndSec\":50400,\"DurationSec\":21600}},{\"Shift\":{\"StartSec\":28800,\"EndSec\":57600,\"DurationSec\":28800}},{\"Shift\":{\"StartSec\":57600,\"EndSec\":72000,\"DurationSec\":14400}},{\"Shift\":{\"StartSec\":57600,\"EndSec\":79200,\"DurationSec\":21600}}],\"Ambulances\":[{},{},{},{}]},{\"MedicTeams\":[{\"Shift\":{\"StartSec\":14400,\"EndSec\":57600,\"DurationSec\":43200}},{\"Shift\":{\"StartSec\":28800,\"EndSec\":50400,\"DurationSec\":21600}}],\"Ambulances\":[{}]},{\"MedicTeams\":[{\"Shift\":{\"StartSec\":0,\"EndSec\":43200,\"DurationSec\":43200}},{\"Shift\":{\"StartSec\":0,\"EndSec\":43200,\"DurationSec\":43200}},{\"Shift\":{\"StartSec\":28800,\"EndSec\":50400,\"DurationSec\":21600}},{\"Shift\":{\"StartSec\":28800,\"EndSec\":43200,\"DurationSec\":14400}},{\"Shift\":{\"StartSec\":28800,\"EndSec\":64800,\"DurationSec\":36000}},{\"Shift\":{\"StartSec\":28800,\"EndSec\":50400,\"DurationSec\":21600}}],\"Ambulances\":[{},{},{},{}]},{\"MedicTeams\":[{\"Shift\":{\"StartSec\":28800,\"EndSec\":43200,\"DurationSec\":14400}},{\"Shift\":{\"StartSec\":57600,\"EndSec\":79200,\"DurationSec\":21600}},{\"Shift\":{\"StartSec\":72000,\"EndSec\":86400,\"DurationSec\":14400}}],\"Ambulances\":[{},{}]},{\"MedicTeams\":[{\"Shift\":{\"StartSec\":14400,\"EndSec\":28800,\"DurationSec\":14400}},{\"Shift\":{\"StartSec\":28800,\"EndSec\":43200,\"DurationSec\":14400}},{\"Shift\":{\"StartSec\":28800,\"EndSec\":50400,\"DurationSec\":21600}},{\"Shift\":{\"StartSec\":43200,\"EndSec\":57600,\"DurationSec\":14400}},{\"Shift\":{\"StartSec\":72000,\"EndSec\":86400,\"DurationSec\":14400}}],\"Ambulances\":[{},{}]},{\"MedicTeams\":[{\"Shift\":{\"StartSec\":0,\"EndSec\":43200,\"DurationSec\":43200}},{\"Shift\":{\"StartSec\":0,\"EndSec\":43200,\"DurationSec\":43200}},{\"Shift\":{\"StartSec\":28800,\"EndSec\":50400,\"DurationSec\":21600}}],\"Ambulances\":[{},{},{}]},{\"MedicTeams\":[{\"Shift\":{\"StartSec\":0,\"EndSec\":14400,\"DurationSec\":14400}},{\"Shift\":{\"StartSec\":28800,\"EndSec\":50400,\"DurationSec\":21600}},{\"Shift\":{\"StartSec\":57600,\"EndSec\":79200,\"DurationSec\":21600}}],\"Ambulances\":[{}]},{\"MedicTeams\":[{\"Shift\":{\"StartSec\":0,\"EndSec\":28800,\"DurationSec\":28800}},{\"Shift\":{\"StartSec\":28800,\"EndSec\":43200,\"DurationSec\":14400}},{\"Shift\":{\"StartSec\":28800,\"EndSec\":50400,\"DurationSec\":21600}},{\"Shift\":{\"StartSec\":28800,\"EndSec\":50400,\"DurationSec\":21600}}],\"Ambulances\":[{},{},{}]},{\"MedicTeams\":[{\"Shift\":{\"StartSec\":0,\"EndSec\":43200,\"DurationSec\":43200}},{\"Shift\":{\"StartSec\":28800,\"EndSec\":64800,\"DurationSec\":36000}},{\"Shift\":{\"StartSec\":28800,\"EndSec\":50400,\"DurationSec\":21600}},{\"Shift\":{\"StartSec\":28800,\"EndSec\":50400,\"DurationSec\":21600}}],\"Ambulances\":[{},{},{},{}]},{\"MedicTeams\":[{\"Shift\":{\"StartSec\":0,\"EndSec\":43200,\"DurationSec\":43200}},{\"Shift\":{\"StartSec\":14400,\"EndSec\":57600,\"DurationSec\":43200}},{\"Shift\":{\"StartSec\":28800,\"EndSec\":43200,\"DurationSec\":14400}},{\"Shift\":{\"StartSec\":57600,\"EndSec\":72000,\"DurationSec\":14400}},{\"Shift\":{\"StartSec\":57600,\"EndSec\":79200,\"DurationSec\":21600}},{\"Shift\":{\"StartSec\":57600,\"EndSec\":79200,\"DurationSec\":21600}}],\"Ambulances\":[{},{}]},{\"MedicTeams\":[{\"Shift\":{\"StartSec\":0,\"EndSec\":21600,\"DurationSec\":21600}},{\"Shift\":{\"StartSec\":28800,\"EndSec\":50400,\"DurationSec\":21600}},{\"Shift\":{\"StartSec\":43200,\"EndSec\":64800,\"DurationSec\":21600}},{\"Shift\":{\"StartSec\":72000,\"EndSec\":86400,\"DurationSec\":14400}}],\"Ambulances\":[{}]},{\"MedicTeams\":[{\"Shift\":{\"StartSec\":0,\"EndSec\":36000,\"DurationSec\":36000}},{\"Shift\":{\"StartSec\":28800,\"EndSec\":72000,\"DurationSec\":43200}},{\"Shift\":{\"StartSec\":43200,\"EndSec\":64800,\"DurationSec\":21600}},{\"Shift\":{\"StartSec\":43200,\"EndSec\":64800,\"DurationSec\":21600}},{\"Shift\":{\"StartSec\":57600,\"EndSec\":79200,\"DurationSec\":21600}},{\"Shift\":{\"StartSec\":57600,\"EndSec\":79200,\"DurationSec\":21600}},{\"Shift\":{\"StartSec\":72000,\"EndSec\":86400,\"DurationSec\":14400}}],\"Ambulances\":[{},{},{}]},{\"MedicTeams\":[{\"Shift\":{\"StartSec\":14400,\"EndSec\":43200,\"DurationSec\":28800}},{\"Shift\":{\"StartSec\":14400,\"EndSec\":43200,\"DurationSec\":28800}},{\"Shift\":{\"StartSec\":14400,\"EndSec\":50400,\"DurationSec\":36000}},{\"Shift\":{\"StartSec\":28800,\"EndSec\":43200,\"DurationSec\":14400}},{\"Shift\":{\"StartSec\":43200,\"EndSec\":79200,\"DurationSec\":36000}}],\"Ambulances\":[{},{},{}]},{\"MedicTeams\":[{\"Shift\":{\"StartSec\":0,\"EndSec\":43200,\"DurationSec\":43200}},{\"Shift\":{\"StartSec\":0,\"EndSec\":43200,\"DurationSec\":43200}},{\"Shift\":{\"StartSec\":28800,\"EndSec\":43200,\"DurationSec\":14400}},{\"Shift\":{\"StartSec\":28800,\"EndSec\":43200,\"DurationSec\":14400}},{\"Shift\":{\"StartSec\":57600,\"EndSec\":72000,\"DurationSec\":14400}}],\"Ambulances\":[{},{},{},{}]},{\"MedicTeams\":[{\"Shift\":{\"StartSec\":0,\"EndSec\":43200,\"DurationSec\":43200}},{\"Shift\":{\"StartSec\":28800,\"EndSec\":43200,\"DurationSec\":14400}},{\"Shift\":{\"StartSec\":28800,\"EndSec\":50400,\"DurationSec\":21600}},{\"Shift\":{\"StartSec\":28800,\"EndSec\":50400,\"DurationSec\":21600}},{\"Shift\":{\"StartSec\":28800,\"EndSec\":50400,\"DurationSec\":21600}}],\"Ambulances\":[{},{},{},{},{}]},{\"MedicTeams\":[{\"Shift\":{\"StartSec\":14400,\"EndSec\":43200,\"DurationSec\":28800}},{\"Shift\":{\"StartSec\":14400,\"EndSec\":36000,\"DurationSec\":21600}},{\"Shift\":{\"StartSec\":28800,\"EndSec\":72000,\"DurationSec\":43200}}],\"Ambulances\":[{},{}]},{\"MedicTeams\":[{\"Shift\":{\"StartSec\":0,\"EndSec\":43200,\"DurationSec\":43200}},{\"Shift\":{\"StartSec\":14400,\"EndSec\":50400,\"DurationSec\":36000}},{\"Shift\":{\"StartSec\":28800,\"EndSec\":64800,\"DurationSec\":36000}}],\"Ambulances\":[{},{},{}]}],\"AmbulancesCount\":60,\"MedicTeamsCount\":94,\"TotalShiftDuration\":2505600,\"AvailableMedicTeams\":[{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}},{\"Shift\":{\"StartSec\":0,\"EndSec\":0,\"DurationSec\":0}}],\"AvailableAmbulances\":[{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}],\"Cost\":2505660}";
-      var plan = JsonSerializer.Deserialize<EmergencyServicePlan>(planJson);
+      foreach (var planString in bestPlans)
+      {
+        var plan = JsonSerializer.Deserialize<EmergencyServicePlan>(File.ReadAllText(Path.Join(plansDir, planString)));
 
-      Simulation simulation = new(world, constraints, distanceCalculator);
-      
-      var handled = simulation.Run(plan, incidents.AsSpan());
-      Console.WriteLine($"handled: {handled}");
+        var incidentsTemp = input.GetIncidents(300, new Random(12)).ToList();
+        var extraIncidents = input.GetExtraKlanoviceIncidents(10, new Random(12)).ToList();
+        incidentsTemp.AddRange(extraIncidents);
+        incidentsTemp.Sort((x, y) => x.OccurenceSec.CompareTo(y.OccurenceSec));
+        var incidents = incidentsTemp.ToImmutableArray();
+          
+        var distanceCalculator = new RealDistanceCalculator(
+          world.Hospitals
+        );
+        Simulation simulation = new(world, constraints, distanceCalculator);
+        var handled = simulation.Run(plan, incidents.AsSpan());
+        Console.WriteLine($"plan: {planString}, incidents: 12-300_extra30, handled: {handled}");
+        
+        
+        incidentsTemp = input.GetIncidents(300, new Random(12)).ToList();
+        extraIncidents = input.GetExtraKlanoviceIncidents(10, new Random(12)).ToList();
+        incidentsTemp.AddRange(extraIncidents);
+        incidentsTemp.Sort((x, y) => x.OccurenceSec.CompareTo(y.OccurenceSec));
+        incidents = incidentsTemp.ToImmutableArray();
+          
+        distanceCalculator = new RealDistanceCalculator(
+          world.Hospitals
+        );
+        simulation = new(world, constraints, distanceCalculator);
+        handled = simulation.Run(plan, incidents.AsSpan());
+        Console.WriteLine($"plan: {planString}, incidents: 12-300_extra20, handled: {handled}");
+        
+        
+        incidentsTemp = input.GetIncidents(300, new Random(12)).ToList();
+        extraIncidents = input.GetExtraKlanoviceIncidents(10, new Random(12)).ToList();
+        incidentsTemp.AddRange(extraIncidents);
+        incidentsTemp.Sort((x, y) => x.OccurenceSec.CompareTo(y.OccurenceSec));
+        incidents = incidentsTemp.ToImmutableArray();
+        
+        distanceCalculator = new RealDistanceCalculator(
+          world.Hospitals
+        );
+        simulation = new(world, constraints, distanceCalculator);
+        handled = simulation.Run(plan, incidents.AsSpan());
+        Console.WriteLine($"plan: {planString}, incidents: 12-300_extra30, handled: {handled}");
+        
+        
+        incidentsTemp = input.GetIncidents(300, new Random(12)).ToList();
+        extraIncidents = input.GetExtraKlanoviceIncidents(10, new Random(12)).ToList();
+        incidentsTemp.AddRange(extraIncidents);
+        incidentsTemp.Sort((x, y) => x.OccurenceSec.CompareTo(y.OccurenceSec));
+        incidents = incidentsTemp.ToImmutableArray();
+
+        distanceCalculator = new RealDistanceCalculator(
+          world.Hospitals
+        );
+        simulation = new(world, constraints, distanceCalculator);
+        handled = simulation.Run(plan, incidents.AsSpan());
+        Console.WriteLine($"plan: {planString}, incidents: 12-300_extra40, handled: {handled}");
+      }
     });
     tasks.Add(extraIncidentsInference);
     
@@ -520,7 +564,6 @@ class Program
     
     var sa_empty = Task.Run(() =>
     {
-      return;
       string log = "SimulatedAnnealing_5_0000001_1_exp99_fromEmpty.log";
       string bestPlansLog = "Plans_" + log;
       
@@ -553,7 +596,6 @@ class Program
     
     var sa_fromOptimal = Task.Run(() =>
     {
-      return;
       string log = "SimulatedAnnealing_5_0000001_1_exp99_fromOptimal.log";
       string bestPlansLog = "Plans_" + log; 
       
@@ -592,7 +634,6 @@ class Program
     
     var sa_fromRandom_85 = Task.Run(() =>
     {
-      return;
       string log = "SimulatedAnnealing_5_0000001_10_exp85_fromRandom.log";
       string bestPlansLog = "Plans_" + log;
       
@@ -627,7 +668,6 @@ class Program
     
     var sa_fromRandom_90 = Task.Run(() =>
     {
-      return;
       string log = "SimulatedAnnealing_3_000000001_30_exp90_fromRandom.log";
       string bestPlansLog = "Plan_" + log; 
       

@@ -32,7 +32,7 @@ Pro nás zajímavějším příkladem využití dynamického programování je �
 
 Existuje $2^n$ možností, které předměty vložíme do batohu. Naivní řešení prohledání všech možností tak běží v čase $\mathcal{O} (2^n)$.
 Avšak pomocí dynamického programování lze vyřešit problém batohu v \textit{pseudopolynomiálním} čase $\mathcal{O}(nc)$,
-což pro velká $n$ a konstatní $c$ je až exponenciálním zlepšením.
+což pro velká $n$ a konstantní $c$ je až exponenciálním zlepšením.
 
 Rekurzivní vztahy vypadají následovně,
 
@@ -45,8 +45,8 @@ Rekurzivní vztahy vypadají následovně,
   pro $0 \leq c' \leq c$ aktuální uvažovaná kapacita batohu.
 \end{definice}
 
-Rekurzivní vztah (viz rovnice \ref{rov:KPrekurz}) nám pouze říká, že ze znalostí optimálního výběru předmětů podpbroblému $m_{i-1, c' - w_i}$ a podproblému $m_{i - 1, c'}$,
-umíme v konstantím čase zjistit optimální výběr předmětů pro aktuální problém $c'$, tedy $m_{i, c'}$.
+Rekurzivní vztah (viz rovnice \ref{rov:KPrekurz}) nám pouze říká, že ze znalostí optimálního výběru předmětů podproblému $m_{i-1, c' - w_i}$ a podproblému $m_{i - 1, c'}$,
+umíme v konstantním čase zjistit optimální výběr předmětů pro aktuální problém $c'$, tedy $m_{i, c'}$.
 Buď předmět $i$ použijeme při výběru, a tak aktuální optimální výběr je roven $m_{i - 1, c' - w_i} + p_i$,
 nebo předmět při výběru nepoužijeme, takže aktuální optimální výběr je optimální výběr podproblému, $m_{i - 1, c'}$. 
 
@@ -71,7 +71,7 @@ nebo předmět při výběru nepoužijeme, takže aktuální optimální výběr
 \end{algorithm}
 
 Algoritmus \ref{KP} vrací sumu hodnot optimálních předmětů přidaných do batohu.
-Jaké konkrétní předměty přispěly do sumy lze snado zjistit zpětným následováním rekurzivního vztahu.
+Jaké konkrétní předměty přispěly do sumy lze snadno zjistit zpětným následováním rekurzivního vztahu.
 
 Rádi bychom našli nějaký podobný rekurzivní vztah v problému hledání optimálního plánu.
 Nalezením rekurzivních vztahů by pak simulace $s$ nebyla černou skříňkou a byla by splněna nutná podmínka (viz věta \ref{veta:simulaceJakoCernaSkrinka}) pro šanci na polynomiální řešení.
@@ -363,7 +363,7 @@ Následující věta vše spojí dohromady a poskytne základ pro postup, jak š
   Zároveň $p_k$ je optimální v ceně na $I_k$ a jelikož $p_k$ odbavuje stejné incidenty na $I_{k-1}$, tak je optimální v ceně i na $I_{k-1}$.
 
   V druhém případě, je poslední incident $i_k = i'_r$ plánem $p_k$ odbaven.
-  Z toho důvodu $p_k$ na množině inidentů $I_{k-1}$ odbavuje incidenty $i'_1, \dots, i'_{r-1}$, o jeden méně -- opět, simulace incidenty prochází postupně.
+  Z toho důvodu $p_k$ na množině incidentů $I_{k-1}$ odbavuje incidenty $i'_1, \dots, i'_{r-1}$, o jeden méně -- opět, simulace incidenty prochází postupně.
   Platí tak,
   \begin{align*}
     s(p_k, I_{k-1}) = r - 1.
@@ -376,12 +376,12 @@ Následující věta vše spojí dohromady a poskytne základ pro postup, jak š
   Pro tým $z$ pak pro spuštění simulace na plánu $p_k$ na množině incidentů $I_{k-1}$ platí:
   \begin{enumerate}
     \item
-      Tým $z$ odbavuje jenom $i_k$, pak je v plánu $p_k$ naalokován zbytečně. O odbavení všech ostatních $r-1$ incidentů se postarájí ostatní týmy.
+      Tým $z$ odbavuje jenom $i_k$, pak je v plánu $p_k$ naalokován zbytečně. O odbavení všech ostatních $r-1$ incidentů se postarají ostatní týmy.
 
     \item
       Tým $z$ odbavuje i jiné incidenty $I_z$, ale jelikož každý $z_i \in I_z$ nastal dříve,
       tak $z$ odbavuje $i_k$ až po odbavení všech incidentů $I_z$.
-      Zde využíváme předpokladu, že incidenty se odehrávájí v různých časech (viz definice $I$ v kapitole \ref{kap:formalizaceProblemu}).
+      Zde využíváme předpokladu, že incidenty se odehrávají v různých časech (viz definice $I$ v kapitole \ref{kap:formalizaceProblemu}).
       Aby $z$ úspěšně odbavil $i_k$ , může mít delší směnu, než by potřeboval pro odbavení všech incidentů $I_z$.
   \end{enumerate}
   V obou případech ještě může být zbytečně naalokováno vozidlo, které $z$ používal pro odbavení $i_k$.
@@ -442,7 +442,7 @@ V následující větě je její tvrzení využito pro dokázání dosažitelnos
   Takovou konstrukcí sestrojíme $p_{k}, T_{k}, \forall k \in \{ 0, \dots, n-1 \}$. 
   Plán $p_0$ je z věty \ref{veta:optimalniTahy} plán na prázdné množině odbavující buď jeden nebo nula incidentů, optimální v ceně.
   Pro prázdnou množinu incidentů jakýkoliv jiný plán než prázdný plán $p_{\emptyset}$ není optimální v ceně.
-  Tudiž plán $p_0$ je prázdný plán.
+  Tudíž plán $p_0$ je prázdný plán.
   Tahy $T_k$ jsou optimální tahy, takže se jedná o hledanou posloupnost takovou, že
   \begin{equation*}
     p^* = (T_0 \circ T_1 \circ \dots \circ T_{n-1})(p_{\emptyset}).
@@ -483,7 +483,7 @@ Pro zjištění všech optimálních plánu $P^*$ na množině incidentů $I$ al
 
 Pokud je v kroku 2 dosaženo hloubky $h$, algoritmus \ref{alg:rekProhPlanu} zkontroluje, zda je aktuální plán $p$ lepší než dosud nejlepší plán $p^* \in P^*$ podle účelové funkce $q^{\text{Lex}}$:
 \begin{enumerate}
-  \item Pokud je aktuální plán $p$ lepší, v kroku 7 se $P^*$ nahrádí množinou obsahující pouze aktuální plán $p$. 
+  \item Pokud je aktuální plán $p$ lepší, v kroku 7 se $P^*$ nahradí množinou obsahující pouze aktuální plán $p$. 
   \item Pokud je stejně kvalitní, plán $p$ se v kroku 5 přidá do množiny $P^*$.
   \item Pokud je horší, plán $p$ není zajímavý a ignoruje se.
 \end{enumerate}
@@ -503,13 +503,13 @@ Zároveň díky \textit{Visited} se zbytečně neprohledává podstrom ve stejn�
   Z věty \ref{veta:dosazitelnostOptimalnimiTahy} víme, že $p^* \in P^*$ je dosažitelný nějakou posloupností optimálních tahů z prázdného plánu $p_{\emptyset}$. 
   V algoritmu v kroku 11 množina $T^*_k$ obsahuje všechny optimální tahy, které lze provést na plánu $p$ na množině $I_k$, počínaje prázdným plánem a prvním incidentem.
   V kroku 14 se rekurzivně zavoláme na každý $T^*(p), T^* \in T^*_k$, pokud již nebyl navštíven.
-  Není důvod vícekrát prohledávát stejný podstrom, protože vrácená $P^*$ by byla stejná.
-  Algoritmus tudiž prohledá každou posloupnost optimálních tahů, takže určitě i všechny takové, kterými se získá libovolný optimální plán $p \in P^*$ (plyne z věty \ref{veta:dosazitelnostOptimalnimiTahy}).
+  Není důvod vícekrát prohledávat stejný podstrom, protože vrácená $P^*$ by byla stejná.
+  Algoritmus tudíž prohledá každou posloupnost optimálních tahů, takže určitě i všechny takové, kterými se získá libovolný optimální plán $p \in P^*$ (plyne z věty \ref{veta:dosazitelnostOptimalnimiTahy}).
   Algoritmus je úplný.
 
   V krocích 3-8 vybíráme pouze plány optimální vůči $q^{\text{Lex}}$.
   Vybíráme tak ze všech plánů, které jsou dosažitelné nějakou posloupností optimálních tahů, ty optimální při $q^{\text{Lex}}$.
-  Zároveň i \textit{cache} je korektně používaná, tudiž algoritmus je i korektní.
+  Zároveň i \textit{cache} je korektně používaná, takže algoritmus je i korektní.
 \end{dukaz}
 
 Omezili jsme se na použití účelové funkce $q^{\text{Lex}}$, protože potřebujeme, aby optimální plán podle účelové funkce $q$ byl zároveň optimální v ceně.
@@ -629,7 +629,7 @@ případně i měnit různé metaheuristiky za běhu~\cite{HybridMeta}.
 
 Asi nejjednodušší metoda na prohledávání prostoru konfigurací je \textit{lokální prohledávání}.
 Lokální prohledávání pouze lokálně prohledává prostor konfigurací od nějaké startovní konfigurace $x \in \mathcal{X}$. 
-Prostor porhledává prostřednictvním sousedů $N(x)$, kde vždy vybere souseda s nejlepší hodnotou účelové funkce.~(\citet{HybridMeta}, str. 3).
+Prostor prohledává prostřednictvím sousedů $N(x)$, kde vždy vybere souseda s nejlepší hodnotou účelové funkce.~(\citet{HybridMeta}, str. 3).
 
 Sousedy $N(p)$ zkonstruujeme implicitně pomocí tahů, což je standardní způsob konstrukce sousedů nějaké konfigurace (\citet{HybridMeta}, str. 3).
 Sousední plány $N(p)$ plánu $p \in P_C$ lze definovat různě. 
@@ -709,10 +709,10 @@ Zřejmě lokální prohledávání nalezne nějaké lokální maximum, jaké kon
   kde $k$ je počet iterací, než lokální prohledávání nalezne nějaké lokální maximum.
 \end{veta}
 \begin{dukaz}
-  Prohledáváme v každé iteraci všechny sousedy. Celkem je tudiž prohledáno $k \cdot |N(p)|$ plánů.
+  Prohledáváme v každé iteraci všechny sousedy. Celkem je tudíž prohledáno $k \cdot |N(p)|$ plánů.
   Každý plán vyhodnocujeme při účelové funkci $q \in Q_I$. Vyhodnocení $q(p, I)$ je konstantní až na spuštění simulace. 
   Složitost simulace je $|I| \cdot |Z|$, protože pro každý incident je třeba nalézt nejvhodnější plán.
-  Aktualizace stavů a spočítání doby odbdavování považujeme za konstantní.
+  Aktualizace stavů a spočítání doby odbavování považujeme za konstantní.
 \end{dukaz}
 
 Pokud by $k$ i $|N(p)$| byli \uv{malé}, tak jsme získali velmi rychlý způsob, jak upravit libovolný plán, abychom dostali jeho \uv{nejlepší verzi}. 
@@ -731,12 +731,12 @@ Tabu prohledávání se chová stejně jako lokální prohledávání, avšak na
 ale umožní i navštívit souseda s horším hodnocením.
 Aby se následně prohledávání nevrátilo zpět do stejného optima,
 drží si seznam inverzních tahů posledních provedených tahů. Tomuto seznamu se říká \textit{tabu} a jedná se o tahy, které 
-jsou při prohledávání zakázany.
-Velikost seznamu tabu je takzvaná \textit{tabu tenura}, a jelikož se vždy ze seznamu odstraní nejposledněji provedený tah,
-tak tabu tenura určuje po jaký počet kroků tabu prohledávání se tah uvažuje, že je zakázan. 
+jsou při prohledávání zakázány.
+Velikost seznamu tabu je takzvaná \textit{tabu tenura}, a jelikož se vždy ze seznamu odstraní poslední provedený tah,
+tak tabu tenura určuje po jaký počet kroků tabu prohledávání se tah uvažuje, že je zakázán.
 Ovšem vždy zakázat tahy z tabu může být příliš omezující, a výsledná nalezená řešení by mohla být suboptimální.
-Z toho důvodu ještě tabu metoda využívá konceptu \textit{aspiračního kritéria}, které pokud je pro nějaký tah splěno,
-tak je soused po provedení tohoto tahu uvažován i pokud je tah zakázan, čili i když se tah nachází v tabu \cite{tabu}.
+Z toho důvodu ještě tabu metoda využívá konceptu \textit{aspiračního kritéria}, které pokud je pro nějaký tah splněno,
+tak je soused po provedení tohoto tahu uvažován i pokud je tah zakázán, čili i když se tah nachází v tabu \cite{tabu}.
 
 Tabu prohledávání lze ukončit několika způsoby. Nejčastěji se prohledávání ukončuje, jakmile v iteraci už neexistují žádní zlepšující sousedé,
 které získáme tahem, jenž není v tabu.~(\citet{GlovKoch03}, str. 41--49). 
@@ -776,12 +776,12 @@ které získáme tahem, jenž není v tabu.~(\citet{GlovKoch03}, str. 41--49).
 
 Algoritmus tabu prohledávání \ref{alg:tabusearch} si v krocích 1-5 inicializuje stav algoritmu. Tabu je ze začátku prázdné.
 Podobně jako v lokálním prohledávání se prohledává prostor v krocích 5 až 24, dokud není splněna podmínka na řádku 13.
-V krocích 7--12 se prohledávájí pomocí sousedních tahů sousedé aktuálně prohledávaného plánu $p_{current}$. 
+V krocích 7--12 se prohledávají pomocí sousedních tahů sousedé aktuálně prohledávaného plánu $p_{current}$. 
 
-Nejzajímavější je krok 9. Zde se prvně kontroluje stejně jako v lokálním prohledávání, zda je splěna nutná podmínka, jestli je vůbec třeba souseda $p$ uvažovat.
+Nejzajímavější je krok 9. Zde se prvně kontroluje stejně jako v lokálním prohledávání, zda je splněna nutná podmínka, jestli je vůbec třeba souseda $p$ uvažovat.
 Druhá podmínka kontroluje, zda $p$ buď není v tabu, nebo je splněné aspirační kritérium.
 Tah $T$, který je v tabu uvažujeme pouze pokud soused $T(p_{current})$ je doposavad nejoptimálnějším nalezeným plánem.
-Takové aspirační kritérium je nejčastěji používané a obecně nejefektivněšjí aspirační kritérium~(\citet{GlovKoch03}, str. 47).
+Takové aspirační kritérium je nejčastěji používané a obecně nejefektivnější aspirační kritérium~(\citet{GlovKoch03}, str. 47).
 
 Podmínka v kroku 13 je totožná s podmínkou u lokálního prohledávání.
 Pokud již neexistuje žádný zlepšující soused, který není v tabu nebo nesplňuje aspirační kritérium, tak vrátíme nejlepší nalezený plán $p_{best}$.
@@ -800,9 +800,9 @@ Další variantou lokálního prohledávání je \textit{simulované žíhání}
 Podobně jako tabu prohledávání dovoluje navštěvovat lokálně neoptimální konfigurace, se snahou nalézt globální optimum.
 Je to jedna z nejpopulárnějších technik na řešení těžkých optimalizačních úloh, především kombinatorických úloh \cite{siman}.
 
-Simulované žíhání je inspirováno metalurgickým procesem žíhání, kdy je kov zahřán na vysokou teplotu
+Simulované žíhání je inspirováno metalurgickým procesem žíhání, kdy je kov zahříván na vysokou teplotu
 a následně ochlazován, za účelem odstranění vnitřních defektů.
-Stejně jako ve fyzickém procesu žíhání, simulované žíhání si dřží teplotu.
+Stejně jako ve fyzickém procesu žíhání, simulované žíhání si drží teplotu.
 Při vyšší teplotě je větší šance na navštěvování horších konfigurací a při nižší se pravděpodobnost snižuje, takže se navštěvují především lokálně optimální konfigurace.
 
 Při postupném chlazení, tedy snižování teploty, se v průběhu běhu simulovaného žíhání postupně navštěvují horší konfigurace méně a optimální konfigurace více častěji.
@@ -836,7 +836,7 @@ Tento proces má zajistit ze začátku dostatečnou exploraci prostoru konfigura
   \label{alg:siman}
 \end{algorithm}
 
-Algoritmus simulovaného žíhání \ref{alg:siman} si v krocích 2 až 4 inicializuje aktuálně prohledávaný plán $p_{\text{current}}$, nejlepší nalezený plán $p_{\text{best}}$ a akutální teplotu $t$.
+Algoritmus simulovaného žíhání \ref{alg:siman} si v krocích 2 až 4 inicializuje aktuálně prohledávaný plán $p_{\text{current}}$, nejlepší nalezený plán $p_{\text{best}}$ a aktuální teplotu $t$.
 Hlavní smyčka algoritmu v krocích 5--19 běží, dokud $t$ nepoklesne pod nejnižší dovolenou teplotu $t_{\text{final}}$.
 V každé iteraci se provádí $M_k$ iterací, přičemž každá iterace se snaží najít lepší plán ze sousedních plánů $p$.
 V kroku 8 se vypočítá rozdíl kvality $\Delta q$ aktuálně nejlepšího plánu a sousedního plánu.
@@ -846,9 +846,9 @@ V kroku 12 je $p$ přijato s pravděpodobností definovanou jako
 \begin{align}\label{df:metropolis}
   \exp\left(-\frac{\Delta q}{t}\right).
 \end{align}
-Pravděpodobností funkce \ref{df:metropolis} je takzvané \textit{metropolis akceptační kritérium} \cite{Metropolis}, které modeluje
+Pravděpodobností funkce \ref{df:metropolis} je takzvané \textit{metropolis akceptační kritérium} \cite{Metropolis}, které modeluje,
 jak přechází termodynamický systém z aktuální konfigurace.
-Určuje s jakou pravděpodobností v závislosti na aktuální teplotě $t$ je suboptimální soused uvažován.
+Určuje, s jakou pravděpodobností v závislosti na aktuální teplotě $t$ je suboptimální soused uvažován.
 
 V krocích 14--16 se standardně aktualizuje $p_{\text{best}}$, pokud $p$ má vyšší kvalitu než dosud nejlepší plán.
 Po provedení $M_k$ iterací se v kroku 18 snižuje teplota $t$ pomocí ochlazovacího rozvrhu $t_{\text{cooling}}(t)$.

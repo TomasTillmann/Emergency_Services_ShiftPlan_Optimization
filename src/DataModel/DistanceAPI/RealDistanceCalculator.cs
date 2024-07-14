@@ -74,7 +74,7 @@ public class RealDistanceCalculator : IDistanceCalculator
 
     public Hospital GetNearestHospital(Coordinate location)
     {
-        if (NearestHospitalTotal % 10000 == 0) Console.WriteLine($"NearestHospitalRequest: {NearestHospitalHits}/{NearestHospitalTotal}");
+        //if (NearestHospitalTotal % 10000 == 0) Console.WriteLine($"NearestHospitalRequest: {NearestHospitalHits}/{NearestHospitalTotal}");
         ++NearestHospitalTotal;
         if (_nearestHospital.TryGetValue(location, out var nearestHospital))
         {
@@ -100,7 +100,7 @@ public class RealDistanceCalculator : IDistanceCalculator
 
     public int GetTravelDurationSec(Coordinate from, Coordinate to)
     {
-        if (TravelDurationTotal % 10000 == 0) Console.WriteLine($"TravelDurationsRequest: {TravelDurationHits}/{TravelDurationTotal}");
+        //if (TravelDurationTotal % 10000 == 0) Console.WriteLine($"TravelDurationsRequest: {TravelDurationHits}/{TravelDurationTotal}");
         ++TravelDurationTotal;
         if (_travelDurations.TryGetValue((from, to), out var duration))
         {
@@ -115,7 +115,7 @@ public class RealDistanceCalculator : IDistanceCalculator
 
     public Coordinate GetIntermediateLocation(Coordinate from, Coordinate to, int durationDrivingSec)
     {
-        if (IntermediateLocationsTotal % 10000 == 0) Console.WriteLine($"Intermediate location requests: {IntermediateLocationsHits}/{IntermediateLocationsTotal}");
+        /if (IntermediateLocationsTotal % 10000 == 0) Console.WriteLine($"Intermediate location requests: {IntermediateLocationsHits}/{IntermediateLocationsTotal}");
         ++IntermediateLocationsTotal;
         if (_newLocation.TryGetValue((from, to, durationDrivingSec), out var newLocation))
         {
