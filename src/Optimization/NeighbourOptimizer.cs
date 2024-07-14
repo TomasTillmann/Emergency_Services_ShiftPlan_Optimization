@@ -3,6 +3,9 @@ using Optimizing;
 
 namespace Optimizing;
 
+/// <summary>
+/// Adds functionality for move making using <see cref="IMoveGenerator" />.
+/// </summary>
 public abstract class NeighbourOptimizer : OptimizerBase
 {
   public IMoveGenerator MoveGenerator { get; set; }

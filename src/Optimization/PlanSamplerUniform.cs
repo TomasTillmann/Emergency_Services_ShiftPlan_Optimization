@@ -4,10 +4,14 @@ using MyExtensions;
 
 namespace Optimizing;
 
+/// <summary>
+/// Samples random plan satisfying constraints in uniform fashion, allcoating teams and vehicles given by a percentage.
+/// </summary>
 public class PlanSamplerUniform : PlanSampler
 {
   public double Percentage { get; set; }
 
+  /// <param name="percentage">Ratio of how many teams and vehicles to allocate from available.</param>
   public PlanSamplerUniform(World world, ShiftTimes shiftTimes, Constraints constraints, double percentage = 1.0,
     Random? random = null)
     : base(world, shiftTimes, constraints, random)
@@ -16,6 +20,7 @@ public class PlanSamplerUniform : PlanSampler
     Percentage = percentage;
   }
 
+  /// <inheritdoc /> 
   public override EmergencyServicePlan Sample()
   {
     EmergencyServicePlan plan = EmergencyServicePlan.GetNewEmpty(World);

@@ -3,6 +3,9 @@ using ESSP.DataModel;
 
 namespace Optimizing;
 
+/// <summary>
+/// Base class for optimizers. 
+/// </summary>
 public abstract class OptimizerBase : IOptimizer
 {
   public IUtilityFunction UtilityFunction { get; set; }

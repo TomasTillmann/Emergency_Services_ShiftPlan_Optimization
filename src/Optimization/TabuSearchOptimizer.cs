@@ -8,38 +8,46 @@ using Simulating;
 
 namespace Optimizing;
 
+/// <summary>
+/// Implementation of tabu search optimizer.
+/// </summary>
 public class TabuSearchOptimizer : NeighbourOptimizer
 {
+  /// <summary>
+  /// Plan from which to start the local search.
+  /// By default is set to empty plan.
+  /// </summary>
   public EmergencyServicePlan StartPlan { get; set; }
-  public int TabuTenure { get; set; }
-  public int PlateuIteration { get; set; }
-  public int MaxIterations { get; set; }
-  public int PlansVisited { get; private set; }
-  public int TabuHit { get; private set; }
   
-  public TextWriter Writer { get; set; }
-  public TextWriter BestPlansWriter { get; set; }
+  /// <summary>
+  /// Size of tabu.
+  /// </summary>
+  public int TabuTenure { get; set; }
+  
+  /// <summary>
+  /// The iteration at which the local search plateud, meaning, it found the local optima.
+  /// </summary>
+  public int PlateuIteration { get; set; }
+  
+  
+  /// <summary>
+  /// Maximum number of iterations allowed to make.
+  /// </summary>
+  public int MaxIterations { get; set; }
 
   private readonly MoveMaker _moveMaker = new();
-  private readonly IDistanceCalculator _distanceCalculator;
-  private readonly Stopwatch _sw = new();
 
-  public TabuSearchOptimizer(World world, Constraints constraints, IDistanceCalculator distanceCalculator, IUtilityFunction utilityFunction, IMoveGenerator moveGenerator, int tabuTenure, int maxIterations = int.MaxValue)
+  public TabuSearchOptimizer(World world, Constraints constraints, IUtilityFunction utilityFunction, IMoveGenerator moveGenerator, int tabuTenure, int maxIterations = int.MaxValue)
   : base(world, constraints, utilityFunction, moveGenerator)
   {
     MaxIterations = maxIterations;
     TabuTenure = tabuTenure;
     StartPlan = EmergencyServicePlan.GetNewEmpty(world);
-    _distanceCalculator = distanceCalculator;
   }
 
+  /// <inheritdoc />
   public override List<EmergencyServicePlan> GetBest(ImmutableArray<Incident> incidents)
   {
-    _sw.Restart();
-    _sw.Start();
-    PlansVisited = 0;
-    TabuHit = 0;
-    
     HashSet<MoveSequence> tabu = new(TabuTenure, new MoveSequenceComparer());
     MoveSequence[] tabuQueue = new MoveSequence[TabuTenure];
     int tabuQueueIndex = -1;
@@ -58,18 +66,9 @@ public class TabuSearchOptimizer : NeighbourOptimizer
       int neighbor = 0;
       foreach (var move in MoveGenerator.GetMoves(current))
       {
-        //Writer.WriteLine($"elopsed: {_sw.Elapsed.TotalSeconds}, PlateuIteration: {PlateuIteration}, neighbor: {neighbor++}, PlansVisited: {PlansVisited}, TabuHit: {TabuHit}");
-        Writer.Flush();
-        ++PlansVisited;
         _moveMaker.ModifyMakeMove(current, move.Normal);
 
         double neighbourEval = UtilityFunction.Evaluate(current, incidents.AsSpan());
-
-        if (tabu.Contains(move.Normal))
-        {
-          ++TabuHit;
-        }
-
         if (neighbourEval > bestNeighborEval && !tabu.Contains(move.Normal))
         {
           bestNeighborEval = neighbourEval;
@@ -94,20 +93,12 @@ public class TabuSearchOptimizer : NeighbourOptimizer
 
       if (bestNeighborEval > bestPlanEval)
       {
-        Simulation simulation = new(World, Constraints, _distanceCalculator);
-        simulation.Run(current, incidents.AsSpan());
-        Writer.WriteLine($"UPDATE: elapsed: {_sw.Elapsed.TotalSeconds}, cost: {current.Cost}, allocatedTeams: {current.MedicTeamsCount}, allocatedAmbulances: {current.AmbulancesCount}, handled: {simulation.HandledIncidentsCount}, TabuHit: {TabuHit}, eval: {bestNeighborEval}");
-        BestPlansWriter.WriteLine(JsonSerializer.Serialize(current));
-        BestPlansWriter.WriteLine("GANT");
-        new GaantView(World, Constraints, _distanceCalculator).Show(current, incidents.AsSpan(), BestPlansWriter);
-        BestPlansWriter.WriteLine("-----------");
-        BestPlansWriter.Flush();
         bestPlan.FillFrom(current);
         bestPlanEval = bestNeighborEval;
       }
 
       int position = (tabuQueueIndex + 1) % TabuTenure;
-      //tabu.Remove(tabuQueue[position]);
+      tabu.Remove(tabuQueue[position]);
       MoveSequence bestMoveCopy = MoveSequence.GetNewFrom(bestMove.Inverse);
       tabu.Add(bestMoveCopy);
       tabuQueueIndex = position;

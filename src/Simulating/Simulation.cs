@@ -4,9 +4,16 @@ using ESSP.DataModel;
 
 namespace Simulating;
 
-public sealed class Simulation
+/// <summary>
+/// Discrete event simulation of emergency service plan on given incidents set.
+/// </summary>
+public class Simulation
 {
   private ISimulationState _state;
+  
+  /// <summary>
+  /// Simulation state. You can freely change the state.
+  /// </summary>
   public ISimulationState State
   {
     get => _state;
@@ -27,14 +34,15 @@ public sealed class Simulation
   /// </summary>
   public int TotalIncidentsCount { get; private set; }
 
+  /// <summary>
+  /// Total count of unhandled incidents.
+  /// </summary>
   public int UnhandledIncidentsCount { get; private set; }
 
-  public int HandledIncidentsCount => TotalIncidentsCount - UnhandledIncidentsCount;
-
   /// <summary>
-  /// Success rate of last run simulation.
+  /// Total count of handled incidents.
   /// </summary>
-  public double SuccessRate => (TotalIncidentsCount - UnhandledIncidentsCount) / (double)TotalIncidentsCount;
+  public int HandledIncidentsCount => TotalIncidentsCount - UnhandledIncidentsCount;
 
   #endregion
 
@@ -90,7 +98,7 @@ public sealed class Simulation
 
       if (depotIndex != Plan.Assignments.Length)
       {
-        for (teamIndex = teamIndex + 1; teamIndex < Plan.Assignments[depotIndex].MedicTeams.Count; ++teamIndex)
+        for (teamIndex += 1; teamIndex < Plan.Assignments[depotIndex].MedicTeams.Count; ++teamIndex)
         {
           if (_medicTeamsEvaluator.IsHandling(new MedicTeamId(depotIndex, teamIndex), in currentIncident))
           {
@@ -99,7 +107,7 @@ public sealed class Simulation
         }
       }
 
-      for (depotIndex = depotIndex + 1; depotIndex < Plan.Assignments.Length; ++depotIndex)
+      for (depotIndex += 1; depotIndex < Plan.Assignments.Length; ++depotIndex)
       {
         for (teamIndex = 0; teamIndex < Plan.Assignments[depotIndex].MedicTeams.Count; ++teamIndex)
         {

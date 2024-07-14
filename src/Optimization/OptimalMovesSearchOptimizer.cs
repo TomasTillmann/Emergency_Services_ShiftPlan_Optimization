@@ -9,25 +9,24 @@ using Simulating;
 
 namespace Optimizing;
 
+/// <summary>
+/// Implementation of optimal moves search optimizer.
+/// </summary>
 public class OptimalMovesSearchOptimizer
 {
-  private readonly GaantView _gaantView;
   private readonly LexComparer _lexComparer;
   private readonly MoveMaker _moveMaker;
   private readonly ShiftTimes _shiftTimes;
   private readonly Random _random;
   private readonly HashSet<(int K, EmergencyServicePlan Plan)> _cache;
-  private readonly Stopwatch _sw = new();
 
   private EmergencyServicePlan best;
   private OptimalMovesGenerator[] movesGenerators;
 
-  public TextWriter Writer { get; set; } = Console.Out;
-  public TextWriter BestPlansWriter { get; set; } = Console.Out;
   public World World { get; set; }
-  public Constraints Constraints { get; set; }
-  public int PlansVisited { get; set; }
+  public int PlansVisited { get; private set; }
   public int VisitPlans { get; set; }
+  public Constraints Constraints { get; set; }
 
   private readonly IDistanceCalculator _distanceCalculator;
   
@@ -35,33 +34,26 @@ public class OptimalMovesSearchOptimizer
   {
     World = world;
     Constraints = constraints;
-    VisitPlans = visitPlans;
     _lexComparer = new(world, constraints, distanceCalculator);
     _moveMaker = new();
     _shiftTimes = shiftTimes;
     _cache = new(new OptimalMovesPlanComparer());
     _random = random ?? new Random();
     _distanceCalculator = distanceCalculator;
-
-    _gaantView = new(world, constraints, distanceCalculator);
   }
 
+  /// <inheritdoc />
   public List<EmergencyServicePlan> GetBest(ImmutableArray<Incident> incidents)
   {
-    PlansVisited = 0;
-
     movesGenerators = new OptimalMovesGenerator[incidents.Length];
     for (int k = 0; k < movesGenerators.Length; ++k)
     {
       movesGenerators[k] = new(World, _shiftTimes, Constraints, _distanceCalculator, 2, _random);
       movesGenerators[k].Incidents = incidents;
-      movesGenerators[k].writer = Writer;
       movesGenerators[k].K = k;
     }
 
     best = EmergencyServicePlan.GetNewEmpty(World);
-    _sw.Restart();
-    _sw.Start();
     for (PlansVisited = 0; PlansVisited < VisitPlans; ++PlansVisited)
     {
       OptimalMovesSearch(EmergencyServicePlan.GetNewEmpty(World), incidents, 1, incidents.Length);
@@ -74,21 +66,11 @@ public class OptimalMovesSearchOptimizer
     if (k == h)
     {
       int res = _lexComparer.Compare(best, current, incidents);
-      Simulation simulation = new(World, Constraints, _distanceCalculator);
       // current is better than best
       if (res == 1)
       {
-        Writer.WriteLine($"UPDATE: elapsed: {_sw.Elapsed.TotalSeconds}, cost: {current.Cost}, allocatedTeams: {current.MedicTeamsCount}, allocatedAmbulances: {current.AmbulancesCount}, handled: {simulation.HandledIncidentsCount}");
-        Writer.Flush();
-        BestPlansWriter.WriteLine(JsonSerializer.Serialize(current));
-        BestPlansWriter.Flush();
         best.FillFrom(current);
       }
-      
-      Writer.WriteLine($"elapsed: {_sw.Elapsed.TotalSeconds}, cost: {current.Cost}, allocatedTeams: {current.MedicTeamsCount}, allocatedAmbulances: {current.AmbulancesCount}, handled: {simulation.HandledIncidentsCount}");
-      Writer.Flush();
-      //BestPlansWriter.WriteLine("GANT");
-      //_gaantView.Show(current, incidents.AsSpan(), BestPlansWriter);
 
       return;
     }

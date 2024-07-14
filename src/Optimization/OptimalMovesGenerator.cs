@@ -6,6 +6,9 @@ using Simulating;
 
 namespace Optimizing;
 
+/// <summary>
+/// Implementation of optimal moves generator.
+/// </summary>
 public class OptimalMovesGenerator(
   World world,
   ShiftTimes shiftTimes,
@@ -16,14 +19,13 @@ public class OptimalMovesGenerator(
   : MoveGeneratorBase(shiftTimes, constraints, movesBufferSize)
 {
   public int K { get; set; }
-  public TextWriter writer;
-
   public ImmutableArray<Incident> Incidents { get; set; }
 
   private readonly Simulation _simulation = new(world, constraints, distanceCalculator);
   private readonly MoveMaker _moveMaker = new();
   private readonly Random _random = random ?? new Random();
 
+  /// <inheritdoc />
   public override IEnumerable<MoveSequenceDuo> GetMoves(EmergencyServicePlan plan)
   {
     Incident lastIncident = Incidents[K];
@@ -33,7 +35,6 @@ public class OptimalMovesGenerator(
       // incident happens before any shift could possible be allocated, therefore it cannot be handled. 
       // Identity move is returned, so this incident is ignored.
       // There is no branch, where this incident could possibly be handled.
-      //writer.WriteLine("No way");
       Identity();
       yield return Moves;
       yield break;
@@ -50,7 +51,6 @@ public class OptimalMovesGenerator(
     if (new_r == 1)
     {
       // incident is handled already. No shift needs to be prolonged or new team / ambulance need to be allocated.
-      //writer.WriteLine("Identity -> r = r + 1");
       Identity();
       yield return Moves;
     }
@@ -79,10 +79,6 @@ public class OptimalMovesGenerator(
 
   private IEnumerable<MoveSequenceDuo> OptimalMovesTeamAllocations(EmergencyServicePlan plan, ImmutableArray<Incident> incidents, int startTimeIndex, ISimulationState simulationState)
   {
-    int[] permutated = new int[plan.Assignments.Length];
-    for (int i = 0; i < permutated.Length; ++i) permutated[i] = i;
-    //permutated.Shuffle(_random);
-
     int new_r;
     for (int depotIndex = 0; depotIndex < plan.Assignments.Length; ++depotIndex)
     {
@@ -95,12 +91,12 @@ public class OptimalMovesGenerator(
             ShiftTimes.AllowedDurationsSecSorted[durationIndex]
           );
 
-          if (plan.CanAllocateTeam(permutated[depotIndex], Constraints))
+          if (plan.CanAllocateTeam(depotIndex, Constraints))
           {
             AllocateTeam(
-              permutated[depotIndex],
+              depotIndex,
               shift,
-              plan.Assignments[permutated[depotIndex]].MedicTeams.Count
+              plan.Assignments[depotIndex].MedicTeams.Count
             );
 
             _simulation.State.FillFrom(simulationState);
@@ -114,12 +110,12 @@ public class OptimalMovesGenerator(
               goto next;
             }
 
-            if (plan.CanAllocateAmbulance(permutated[depotIndex], Constraints))
+            if (plan.CanAllocateAmbulance(depotIndex, Constraints))
             {
               AllocateTeamAndAmbulance(
-                permutated[depotIndex],
+                depotIndex,
                 shift,
-                plan.Assignments[permutated[depotIndex]].MedicTeams.Count
+                plan.Assignments[depotIndex].MedicTeams.Count
               );
 
               _simulation.State.FillFrom(simulationState);
@@ -142,19 +138,15 @@ public class OptimalMovesGenerator(
 
   private IEnumerable<MoveSequenceDuo> OptimalMovesShiftProlonging(EmergencyServicePlan plan, ImmutableArray<Incident> incidents, ISimulationState simulationState)
   {
-    int[] permutated = new int[plan.Assignments.Length];
-    for (int i = 0; i < permutated.Length; ++i) permutated[i] = i;
-    // permutated.Shuffle(_random);
-
     for (int depotIndex = 0; depotIndex < plan.Assignments.Length; ++depotIndex)
     {
-      for (int teamIndex = 0; teamIndex < plan.Assignments[permutated[depotIndex]].MedicTeams.Count; ++teamIndex)
+      for (int teamIndex = 0; teamIndex < plan.Assignments[depotIndex].MedicTeams.Count; ++teamIndex)
       {
-        MedicTeamId teamId = new(permutated[depotIndex], teamIndex);
+        MedicTeamId teamId = new(depotIndex, teamIndex);
         int durationIndex = Array.BinarySearch(ShiftTimes.AllowedDurationsSecSorted, plan.Team(teamId).Shift.DurationSec) + 1;
         for (; durationIndex < ShiftTimes.AllowedDurationsSecSorted.Length; ++durationIndex)
         {
-          Interval oldShift = plan.Assignments[permutated[depotIndex]].MedicTeams[teamIndex].Shift;
+          Interval oldShift = plan.Assignments[depotIndex].MedicTeams[teamIndex].Shift;
           if (plan.CanLonger(teamId, ShiftTimes))
           {
             ChangeShift(teamId, oldShift, Interval.GetByStartAndDuration(oldShift.StartSec, ShiftTimes.AllowedDurationsSecSorted[durationIndex]));

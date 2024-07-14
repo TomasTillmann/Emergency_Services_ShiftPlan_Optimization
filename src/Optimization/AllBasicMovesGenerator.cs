@@ -2,6 +2,14 @@ using ESSP.DataModel;
 
 namespace Optimizing;
 
+/// <summary>
+/// Generates basic moves:
+/// 1. Allocate team and ambulance
+/// 2. Deallocate ambulance
+/// 3. Deallocate team
+/// 4. Change shift time by the shortest possible amount
+/// 5. Move start of the shift by the shortest possible duration
+/// </summary>
 public class AllBasicMovesGenerator : MoveGeneratorBase
 {
   public AllBasicMovesGenerator(ShiftTimes shiftTimes, Constraints constraints)
@@ -9,6 +17,7 @@ public class AllBasicMovesGenerator : MoveGeneratorBase
   {
   }
 
+  /// <inheritdoc />
   public override IEnumerable<MoveSequenceDuo> GetMoves(EmergencyServicePlan plan)
   {
     for (int depotIndex = 0; depotIndex < plan.Assignments.Length; ++depotIndex)

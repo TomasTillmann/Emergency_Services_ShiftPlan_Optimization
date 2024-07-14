@@ -2,11 +2,9 @@ using ESSP.DataModel;
 
 namespace Optimizing;
 
-public interface IPlanSampler
-{
-  EmergencyServicePlan Sample();
-}
-
+/// <summary>
+/// Samples random plan satisfying constraints.
+/// </summary>
 public abstract class PlanSampler : IPlanSampler
 {
   public World World { get; set; }
@@ -22,5 +20,6 @@ public abstract class PlanSampler : IPlanSampler
     Constraints = constraints;
   }
 
+  /// <inheritdoc />
   public abstract EmergencyServicePlan Sample();
 }

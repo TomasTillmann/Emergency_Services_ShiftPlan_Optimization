@@ -2,6 +2,9 @@ using ESSP.DataModel;
 
 namespace Optimizing;
 
+/// <summary>
+/// Utility function, evaluating plans against given incidents set
+/// </summary>
 public interface IUtilityFunction
 {
   public int HandledIncidentsCount { get; }

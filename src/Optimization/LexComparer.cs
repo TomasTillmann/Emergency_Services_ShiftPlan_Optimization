@@ -5,6 +5,9 @@ using Simulating;
 
 namespace Optimizing;
 
+/// <summary>
+/// Lex comparer implementation.
+/// </summary>
 public class LexComparer
 {
   private readonly Simulation _simulation;

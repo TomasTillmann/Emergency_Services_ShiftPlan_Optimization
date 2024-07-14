@@ -2,11 +2,30 @@ using ESSP.DataModel;
 
 namespace Optimizing;
 
+/// <summary>
+/// Provides moves like ambulance allocations, team allocation, shift change ... which are very useful for every specific move generator.
+/// </summary>
 public abstract class MoveGeneratorBase : IMoveGenerator
 {
+  /// <summary>
+  /// The size of the moves buffer.
+  /// Maximum length of allowed moves sequence.
+  /// </summary>
   public int MovesBufferSize { get; }
+  
+  /// <summary>
+  /// Allowed shift times.
+  /// </summary>
   protected ShiftTimes ShiftTimes { get; set; }
+  
+  /// <summary>
+  /// Constraints.
+  /// </summary>
   protected Constraints Constraints { get; set; }
+  
+  /// <summary>
+  /// The shared moves instance. Shared, to minimize heap allocations.
+  /// </summary>
   protected MoveSequenceDuo Moves { get; set; }
 
   public MoveGeneratorBase(ShiftTimes shiftTimes, Constraints constraints, int movesBufferSize)
@@ -21,6 +40,7 @@ public abstract class MoveGeneratorBase : IMoveGenerator
     };
   }
 
+  /// <inheritdoc />
   public abstract IEnumerable<MoveSequenceDuo> GetMoves(EmergencyServicePlan plan);
 
   protected void Identity()

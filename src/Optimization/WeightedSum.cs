@@ -2,6 +2,9 @@ using Simulating;
 
 namespace Optimizing;
 
+/// <summary>
+/// Implementation of weighted sum utility function.
+/// </summary>
 public class WeightedSum : UtilityFunctionBase
 {
   public double Alpha { get; set; }

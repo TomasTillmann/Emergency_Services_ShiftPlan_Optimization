@@ -4,18 +4,26 @@ using Simulating;
 
 namespace Optimizing;
 
-public class GaantView
+/// <summary>
+/// Helpful for visualization of emergency service plan's behaviour on some set of incidents.
+/// https://en.wikipedia.org/wiki/Gantt_chart
+/// </summary>
+public class GanttView
 {
   private readonly Simulation _simulation;
   private readonly SimulationStateVerbose _state;
 
-  public GaantView(World world, Constraints constraints, IDistanceCalculator distanceCalculator)
+  public GanttView(World world, Constraints constraints, IDistanceCalculator distanceCalculator)
   {
     _simulation = new Simulation(world, constraints, distanceCalculator);
     _state = new SimulationStateVerbose(world.Depots.Length, constraints);
     _simulation.State = _state;
   }
 
+  /// <summary>
+  /// Show gantt view (chart) of <see cref="plan"/> behaviour on given set of <see cref="incidents"/>.
+  /// </summary>
+  /// <param name="writer">Defaults to <see cref="Console.Out"/>. Gannt chart is written to this writer.</param>
   public void Show(EmergencyServicePlan plan, ReadOnlySpan<Incident> incidents, TextWriter writer = null)
   {
     writer = writer ?? Console.Out;

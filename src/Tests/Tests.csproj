@@ -26,7 +26,6 @@
 
     <ItemGroup>
       <ProjectReference Include="..\WorldMap\WorldMap.csproj" />
-      <ProjectReference Include="..\WorldModel\WorldModel.csproj" />
       <ProjectReference Include="..\Optimization\Optimization.csproj" />
     </ItemGroup>
 
