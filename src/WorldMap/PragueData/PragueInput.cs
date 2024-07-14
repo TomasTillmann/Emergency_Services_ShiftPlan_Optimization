@@ -5,7 +5,9 @@ using System.IO;
 using System.Linq;
 using DistanceAPI;
 using ESSP.DataModel;
+using MathNet.Numerics.Distributions;
 using NetTopologySuite.Geometries;
+using Coordinate = NetTopologySuite.Geometries.Coordinate;
 
 public class PragueInput
 {
@@ -71,14 +73,14 @@ public class PragueInput
     return WorldMapper.MapBack(worldModel);
   }
 
-  public ImmutableArray<Incident> GetIncidents(int count = 330, Random? random = null)
+  public ImmutableArray<Incident> GetUniformIncidents(int count = 330, Random? random = null)
   {
     random ??= new();
     // Incidents init
     Polygon polygon = GetPraguePolygon();
     // Prague has area of 500km^2, and its symmetric, meaning its about 25 * 25 km.
     // The stddev is hence chosen as ~10km, in order to concentrate most of the incidents in the center of Prague.
-    List<CoordinateModel> locations = _dataGenerator.GetRandomIncidentsLocationsInPolygon(polygon, count, 0.1 /* ~11km */, random);
+    List<CoordinateModel> locations = _dataGenerator.GetRandomIncidentsLocationsInPolygon(polygon, count, 0.1 /* ~11km */, random: random);
     
     ImmutableArray<Incident> incidents = _dataGenerator.GenerateIncidentModelsFromCoordinates(
       coordinates: locations,
@@ -93,15 +95,37 @@ public class PragueInput
     return incidents;
   }
 
-  public ImmutableArray<Incident> GetMondayIncidents(int count = 400, Random? random = null)
+  public ImmutableArray<Incident> GetExtraKlanoviceIncidents(int count = 20, Random? random = null)
   {
     random ??= new();
+    List<CoordinateModel> extraLocationsKlanovice = _dataGenerator.GetRandomIncidentsLocationsInPolygon(GetPraguePolygon(),
+      count, meanX: 50.0819664, meanY: 14.6487131, stddev: 0.06, random: random);
+    
+    var percentage = (count / 24 * 3 * 2) / (double)count;
+    ImmutableArray<Incident> incidents = _dataGenerator.GenerateIncidentModelsFromCoordinatesNormal(
+      coordinates: extraLocationsKlanovice,
+      totalDuration: 21.ToHours().ToSeconds(),
+      onSceneDurationNormalExpected: 20.ToMinutes().ToSeconds(),
+      onSceneDurationNormalStddev: 15.ToMinutes().ToSeconds(),
+      inHospitalDeliveryNormalExpected: 15.ToMinutes().ToSeconds(),
+      inHospitalDeliveryNormalStddev: 5.ToMinutes().ToSeconds(),
+      0,
+      21.ToHours().ToMinutes().ToSeconds().Value,
+      percentage,
+      random: random
+    ).Select(IncidentMapper.MapBack).ToImmutableArray();
+
+    return incidents;
+  }
+  
+  public ImmutableArray<Incident> GetIncidents(int count = 400, Random? random = null)
+  {
+    random ??= new();
+    List<CoordinateModel> locations = _dataGenerator.GetRandomIncidentsLocationsInPolygon(GetPraguePolygon(), count, random: random);
+    
     // #average incidents count / hours in a day * 9h-12h * dvakrat, protoze od 9 do 12 se deje dvakrat tolik incidentu oproti prumeru
     // 330 / 24 * 3 * 2 ~ 82
     var percentage = (count / 24 * 3 * 2) / (double)count;
-    
-    List<CoordinateModel> locations = _dataGenerator.GetRandomIncidentsLocationsInPolygon(GetPraguePolygon(), count, 0.08, random);
-    
     ImmutableArray<Incident> incidents = _dataGenerator.GenerateIncidentModelsFromCoordinatesNormal(
       coordinates: locations,
       totalDuration: 21.ToHours().ToSeconds(),

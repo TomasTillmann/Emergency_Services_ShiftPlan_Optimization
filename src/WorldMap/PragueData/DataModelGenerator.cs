@@ -71,16 +71,15 @@ public class DataModelGenerator
   public List<CoordinateModel> GetRandomIncidentsLocationsInPolygon(
     Polygon polygon,
     int incidentsCount,
-    double stddev,
+    double meanX = 50.0842500,
+    double meanY = 14.4580667,
+    double stddev = 0.08,
     Random? random = null
   )
   {
     random ??= new();
-    Normal latitudeDistribution = new Normal(
-     50.0842500, stddev, random);
-    
-    Normal longitudeDistribution = new Normal(
-     14.4580667, stddev, random);
+    Normal latitudeDistribution = new Normal(meanX, stddev, random);
+    Normal longitudeDistribution = new Normal(meanY, stddev, random);
       
     RandomCoordinateGenerator generator = new(latitudeDistribution, longitudeDistribution);
     return Enumerable.Range(0, incidentsCount).Select(_ => generator.GenerateRandomCoordinateIn(polygon)).ToList();

@@ -37,7 +37,7 @@ public partial class MainWindow : Window
         
         PragueInput input = new PragueInput();
         var world = input.GetWorld();
-        var incidents = input.GetMondayIncidents(300, new Random(420));
+        var incidents = input.GetExtraKlanoviceIncidents(100, new Random(420));
         
         SymbolStyle.DefaultHeight = 1;
         SymbolStyle.DefaultWidth = 1;

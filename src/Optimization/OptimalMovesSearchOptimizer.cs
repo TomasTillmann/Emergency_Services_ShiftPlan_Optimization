@@ -75,20 +75,19 @@ public class OptimalMovesSearchOptimizer
     {
       int res = _lexComparer.Compare(best, current, incidents);
       Simulation simulation = new(World, Constraints, _distanceCalculator);
+      simulation.Run(current, incidents.AsSpan());
       // current is better than best
       if (res == 1)
       {
         Writer.WriteLine($"UPDATE: elapsed: {_sw.Elapsed.TotalSeconds}, cost: {current.Cost}, allocatedTeams: {current.MedicTeamsCount}, allocatedAmbulances: {current.AmbulancesCount}, handled: {simulation.HandledIncidentsCount}");
         Writer.Flush();
-        BestPlansWriter.WriteLine(JsonSerializer.Serialize(current));
-        BestPlansWriter.Flush();
         best.FillFrom(current);
       }
       
+      BestPlansWriter.WriteLine(JsonSerializer.Serialize(current));
+      BestPlansWriter.Flush();
       Writer.WriteLine($"elapsed: {_sw.Elapsed.TotalSeconds}, cost: {current.Cost}, allocatedTeams: {current.MedicTeamsCount}, allocatedAmbulances: {current.AmbulancesCount}, handled: {simulation.HandledIncidentsCount}");
       Writer.Flush();
-      //BestPlansWriter.WriteLine("GANT");
-      //_gaantView.Show(current, incidents.AsSpan(), BestPlansWriter);
 
       return;
     }
@@ -96,6 +95,7 @@ public class OptimalMovesSearchOptimizer
     var moves = movesGenerators[k].GetMoves(current).Enumerate(2);
     var index = _random.Next(moves.Count);
     
+    Writer.WriteLine($"k: {k}");
     _moveMaker.ModifyMakeMove(current, moves[index].Normal);
     if (!_cache.Contains((k, current)))
     {
