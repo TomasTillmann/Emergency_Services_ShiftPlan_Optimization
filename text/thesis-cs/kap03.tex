@@ -1,25 +1,27 @@
 \chapter{Aplikace metod}
 
-V této kapitole se budeme zabývat aplikováním a porovnáváním metod, kterým jsme se věnovali v kapitole \ref{chap:reseniOptUloh}.
-Synteticky vygenerujeme data, která budou reprezentovat prostředky pohotovostní služby a sady incidentů. 
-V rámci této práce budeme modelovat Pražskou záchranou službu pro rok 2017, podle veřejně dostupných dat
+V této kapitole se zabýváme aplikováním a porovnáváním metod, kterým jsme se věnovali v kapitole \ref{chap:reseniOptUloh}.
+Namodelujeme pohotovostní službu a synteticky vytvoříme sadu incidentů, pro kterou budeme hledat optimální pohotovostní plán.
+V rámci této práce namodelujeme Pražskou záchranou službu pro rok 2017, podle veřejně dostupných dat
 poskytnutých přímo ze zdravotnické záchranné služby hlavního města Prahy.
 \footnote{https://www.zzshmp.cz/wp-content/uploads/2017/12/Statistiky-160let-ZZSHMP.pdf}.
-Chování nalezených optimálních plánů budeme následně zkoumat na různých sadách incidentů.
+
+Především nás bude zajímat kvalita nalezených optimálních plánů a rychlost jejich nalezení.
+Také nás bude zajímat, jak dobře se nalezené optimální plány chovají na jiných sadách incidentů, tedy jak dobře umí generalizovat.
 
 \section{Generování dat}
 
 První vygenerujeme data reprezentující výjezdové stanice a nemocnice a tím namodelujeme pohotovostní službu.
 Ty můžeme v podstatě vygenerovat libovolně, ale v rámci praktičtějšího využití
-si v této prácí vybereme jako pohotovostní službu Pražskou záchrannou službu.
+si v této prácí vybereme jako pohotovostní službu pražskou záchrannou službu.
 Pražská záchranná služba disponuje 20 výjezdovými stanicemi a 140 vozidly.
 Údaje o počtu záchranných týmu se zdají, že nejsou veřejně dostupné. Jedinou dostupnou informací je celkový počet zaměstanců, který činí přes 500 lidí.
 Tam ale spadají i nezáchranáři.
 V Praze se nachází 12 nemocnic.
 
-Nyní namodelujeme incidenty. Podle statistik zveřejněných Pražskou záchrannou službou se v roce 2017 v Praze denně uskutečnilo na 330 výjezdů.
+Nyní namodelujeme incidenty. Podle statistik zveřejněných pražskou záchrannou službou se v roce 2017 v Praze denně uskutečnilo průměrně na 330 výjezdů.
 Nejrušnější část všedního dne je mezi 9 a 12 hodinou, kdy se odehrává až dvojnásobně incidentů než je průměr.
-Incidenty se odehrávají mnohem častěji v centru a ve středu Prahy, než na jeho okolí. 
+Incidenty se odehrávají mnohem častěji v centru a ve středu Prahy, než na jeho okolí.
 
 Podle těchto informací namodelujeme sadu incidentů.
 První si území Prahy reprezentujeme jako mnohoúhleník a pomocí normálního rozdělení vygenerujeme souřadnice v něm obsažené.
@@ -27,6 +29,8 @@ Normálnímu rozdělení nastavíme střední hodnotu na střed mnohoúhelníka 
 Kde a v kolik hodin se incidenty odehrávají přesně záchranná služba Prahy vypadá, že nezveřejňuje, pravděpodobně proto, že by se mohlo jednat o zneužitelné nebo citlivé údaje.
 Rozloha Prahy činí 496 kilometrů čtverečních a je poměrně symetrického tvaru. Pro naše účely tak bude stačit nastavit směrodatnou odchylku na 10 kilometrů.
 V jakých časech se incidenty odehrávají je vygenerováno uniformě náhodně tak, aby se skutečně odehrávali incidenty častěji mezi 9 a 12 hodinou.
+
+Takto vygenerované incidenty tak reprezentují, jak se běžně incidenty v Praze v průběhu dne odehrávají.
 
 \begin{figure}[H]
   \caption{Záchranná pohotovostní služba a nemocnice spolu s incidenty na mapě Prahy.}
@@ -69,56 +73,53 @@ podobně naalokované týmy, vozidla a směny, což povede k diversifikovanějš
 \hline
 \textbf{Čas běhu v minutách} & \textbf{Cena plánu} & \textbf{Odbavené incidenty} \\
 \hline
-7:38  & 2520055 & 295 \\
+7:11 & 2455260 & 292 \\
 \hline
-10:36 & 2325655 & 292 \\
+10:53 & 2469661 & 296 \\
 \hline
-13:23 & 2412060 & 294 \\
+13:38 & 2433659 & 294 \\
 \hline
-15:34 & 2455258 & 295 \\
+16:28 & 2347256 & 294 \\
 \hline
-17:37 & 2325654 & 288 \\
+19:23 & 2376058 & 293 \\
 \hline
-19:27 & 2505663 & 295 \\
+22:06 & 2340053 & 290 \\
 \hline
-21:20 & 2340053 & 288 \\
+25:14 & 2433661 & 292 \\
 \hline
-23:05 & 2390458 & 292 \\
+28:13 & 2368858 & 293 \\
 \hline
-24:51 & 2556061 & 295 \\
+30:46 & 2404856 & 294 \\
 \hline
-26:27 & 2325655 & 290 \\
-\hline
-28:10 & 2325653 & 286 \\
+33:08 & 2448061 & 291 \\
 \hline
 \end{tabular}
 \caption{Spuštění prohledávání optimálními tahy na modelu Prahy.}
 \label{table:optimalMovesTabulka}
 \end{table}
 
-Po spuštění metody na modelu Prahy po dobu téměř 30 minut metoda celkem navštívila 11 plánů optimálních v ceně.
-Nalezený optimální plán odbavuje 295 incidentů a stojí 2455258 (viz tabulka \ref{table:optimalMovesTabulka}).
-Dále má naalokovaných 101 týmů a 58 záchranných vozidel.
+Po spuštění metody na modelu Prahy po dobu kolem 30 minut metoda celkem navštívila 10 plánů optimálních v ceně.
+Nalezený optimální plán odbavuje 296 incidentů a stojí 2469661 (viz tabulka \ref{table:optimalMovesTabulka}).
+Dále má naalokovaných 100 týmů a 61 záchranných vozidel.
 
-První plán trvá nalézt nejdelé, něco přes 7 minut. Důvodem je, že \textit{cache} dob příjezdů obsahuje pouze předpočítané hodnoty a musí se vykonávat větší množství
+První plán trvá nalézt nejdéle, něco přes 7 minut. Důvodem je, že \textit{cache} dob příjezdů obsahuje pouze předpočítané hodnoty a musí se vykonávat větší množství
 dotazů na Google API.
 Při prohledávání dalších plánů už se dotazuje na Google API mnohem méně často.
-Obodbně bude vyhodnocování prvních navštívených plánů trvat i u ostatních metod.
-
-Metoda navštívila pro každý plán optimální v ceně při jeho budování jeden plán pro každý incident, čili celkově navštívila $11 \cdot 300 = 3300$ plánů.
-Celkový počet dotazů na dobu trvání příjezdu je 133189050, kde pro 133179688 případu, tedy $99.99\%$, byla doba příjezdu předpočítaná a vrácena z \textit{cache}.
+Pro zajímavost, celkový počet dotazů na dobu trvání příjezdu je 133189050, kde pro 133179688 případu, tedy $99.99\%$, byla doba příjezdu předpočítaná a vrácena z \textit{cache}.
+Podobně se \textit{cache} chová i u ostatních metod.
 
 \section{Aplikace lokálního prohledávání}
 
 V této kapitole aplikujeme na model Prahy lokální prohledávání (viz kapitola \ref{kap:localSearch}).
-Použijeme ho přesně jak je popsaný algoritmem \ref{alg:hillclimb}.
+Metodu použijeme přesně jak je popsaná algoritmem \ref{alg:hillclimb}.
 Prohledávání začneme z prázdného plánu a jako účelovou funkci použijeme váženou sumu ceny plánu a počtu odbavených incidentů, s parametrem $\alpha = 0.99$ (viz definice \ref{df:vazenaSumaUcelF}),
 abychom upřednostňovali plány s vyšším počtem odbavených incidentů.
-Jakou přesně účelovou funkci si zvolíme uvážíme podle toho, co pro nás konkrétně znamená optimální plán. My budeme chtít zkoumat především plány odbavující co nejvíce incidentů a až poté minimalizovat cenu.
+Jakou přesně účelovou funkci si zvolíme uvážíme podle toho, co pro nás konkrétně znamená optimální plán.
+My budeme chtít zkoumat především plány odbavující co nejvíce incidentů a až poté minimalizovat cenu.
 
 Potřebujeme ještě nadefinovat jak budou vypadat sousedi nějakého plánu.
 Ty standardně nadefinujeme implicitně pomocí tahů a vyžadujeme, aby splňovali alespoň nutné podmínky.
-Takové tahy můžeme vybrat různě, my si vybereme tahy uvedené jako příklad tahů, které splňují nutné podmínky (viz příklad \ref{pr:sousedi}).
+Takové tahy můžeme vybrat různě, my si vybereme tahy uvedené jako příklad tahů, které nutné podmínky splňují (viz příklad \ref{pr:sousedi}).
 
 Záměrně alokování týmu a vozidla zvolíme jako jeden tah a nikoliv jako dva samostatné tahy. Vyhneme se tak situaci, kdy by se lokální prohledávání zastavilo v lokálním optimu, 
 kde už nelze odbavit žádný incident naalokování týmu a vozidla odděleně, ale pouze zároveň. Takové lokální optimum by pak bylo suboptimální, protože by odbavovalo méně incidentů, než by mohlo být možné.
@@ -126,59 +127,66 @@ Takto definované sousedství budeme používat i u dalších metod.
 
 \begin{figure}[H]
   \caption{Nalezené plány metodou lokálního prohledávání plánů.}
-  \includegraphics[width=\textwidth]{img/local_search_empty_plan_plot.png}
+  \includegraphics[width=\textwidth]{img/plots/localSearch_empty.png}
   \centering
   \label{img:localSearchRes}
 \end{figure}
 
-Na obrázku \ref{img:localSearchRes} vidíme jak se aktuální plán mění v čase.
+V grafu \ref{img:localSearchRes} vidíme jak se aktuální plán mění v čase.
 Lokální prohledávání bylo spuštěné po dobu 50 minut, a pak bylo přeřušeno. 
-Nejlepší nalezený plán po 50 minutách úspěšně odbaví 223 incidentů z 300 incidentů a stojí 137673.
+Nejlepší nalezený plán po hodině a půl úspěšně odbaví 229 incidentů z 300 incidentů a stojí 1224080.
 To je v porovnání s předchozí metodou, která za pouhých 7 minut nalezla plán odbavující 295 incidentů nedostačující výsledek.
 I když by se podle růstu křivky dalo usoudit, že by metoda lokálního prohledávání také byla schopná nalézt dost dobrý plán, trvalo by to příliš dlouho.
 
-Lokální prohledávání celkem navštívilo 22997 plánů. To je až 7 krát tolik, kolik plánů navštívila metoda prohledávání optimálními tahy.
+Lokální prohledávání celkem navštívilo 29248 plánů. To je až 7 krát tolik, kolik plánů navštívila metoda prohledávání optimálními tahy.
 Lokální prohledávání tedy není vhodné na budování optimálního plánu z prázdného plánu, protože zbytečně navštíví velké množství plánů a trvá tak zbytečně dlouho.
 
-Můžeme si polepšit, sice že začneme prohledávát ne z prázdného plánu, ale z plánu zvoleného nějak chytře. Z plánu, který už je skoro optimální a lokální Prohledávání
+Můžeme si polepšit, sice že začneme prohledávát ne z prázdného plánu, ale z plánu zvoleného nějak chytře. Z plánu, který už je skoro optimální a lokální prohledávání
 už jej jenom doladí.
 
 Jednou z možností jak takový startovní plán zvolit je použít první nalezený optimální plán v ceně předchozí metodou a na něj spustit lokální prohledávání.
 
 \begin{figure}[H]
   \caption{Nalezené plány metodou lokálního prohledávání plánů z plánu optimálního v ceně.}
-  \includegraphics[width=\textwidth]{img/hybrid_prague.png}
+  \includegraphics[width=\textwidth]{img/plots/localSearch_fromOptimal.png}
   \centering
   \label{img:hybrid}
 \end{figure}
 
 Na obrázku \ref{img:hybrid} vidíme graf, kde lokální prohledávání začíná ne z prázdného plánu, ale z plánu optimálního v ceně.
 Můžeme vidět, že lokální prohledávání upravuje plán tak, že postupně odbavuje více incidentů, až nakonec všech 300. Poté už jen postupně snižuje cenu plánu.
-Po 20 minutách nalezne plán odbavující všechny incidenty a zhruba po hodině lokální prohledávání stagnuje a nalezne lokální optimum.
-Optimální nalezený plán odbavuje všech 300 incidentů, stojí 2073655 a má naalokovaných pouze 87 týmů a 55 vozidel.
+Po zhruba 30 minutách nalezne plán odbavující všechny incidenty a do hodiny a půl lokální prohledávání stagnuje a nalezne lokální optimum.
+Optimální nalezený plán odbavuje všech 300 incidentů, stojí 2188863 a má naalokovaných pouze 88 týmů a 63 vozidel.
 
 \section{Aplikace tabu prohledávání}
 
 V této kapitole aplikujeme na model Prahy tabu prohledávání (viz kapitola \ref{kap:tabuSearch}).
 Tabu prohledávání je v podstatě lokální prohledávání s pamětí, podle které umí sofistikovaněji vybrat sousední plán,
 pokud se ocitne v lokálním optimu.
-Z toho důvodu bude podobně jako u lokálního prohledávání trvat příliš dlouho, než nalezne nějaký dost dobrý plán, pokud bychom tabu prohledávání pustili z prázdného plánu.
-Nemá proto smysl pouštět tabu prohledávání z prázdného plánu a pustíme tabu prohledávání rovnou z nějakého už dost dobrého plánu.
-Tím bude stejně jako u lokálního prohledávání plán optimální v ceně.
 
 \begin{figure}[H]
   \caption{Nalezené plány tabu metodou z plánu optimálního v ceně.}
-  \includegraphics[width=\textwidth]{img/prague_hybrid_tabu.png}
+  \includegraphics[width=\textwidth]{img/plots/tabuSearch_empty.png}
+  \centering
+  \label{img:empty_tabu}
+\end{figure}
+
+Z toho důvodu bude podobně jako u lokálního prohledávání (viz obrázek \ref{img:empty_tabu}) trvat příliš dlouho, než nalezne nějaký dost dobrý plán.
+Obdobně jako u lokálního prohledávání nemá smysl pouštět tabu prohledávání z prázdného plánu.
+
+\begin{figure}[H]
+  \caption{Nalezené plány tabu metodou z plánu optimálního v ceně.}
+  \includegraphics[width=\textwidth]{img/plots/tabuSearch_fromOptimal.png}
   \centering
   \label{img:hybrid_tabu}
 \end{figure}
 
-Na obrázku \ref{img:hybrid_tabu} vidíme doposud nejlepší plány nalezené tabu metodou v čase.
-Nalézt plán odbavující všech 300 incidentů trvá kolem 30 minut, což je o 10 minut déle, než trvalo lokálnímu prohledávání. 
+Na obrázku \ref{img:hybrid_tabu} vidíme doposud nejlepší plány nalezené tabu metodou v čase z plánu optimálního v ceně.
+Nalézt plán odbavující všech 300 incidentů trvá kolem 40 minut, což je o 10 minut déle, než trvalo lokálnímu prohledávání. 
 To je pochopitelné, protože při navštívení každého souseda, kterých bude obdobně jako u lokálního prohledávání, se musí kontrolovat,
 zda není obsažen v tabu. Proto vyhodnocení souseda bude trvat o něco déle, což se při tak velkém množství navštívených plánů poměrně rychle nasčítá.
 
-Tabu prohledávání bylo puštěno něco kolem hodiny, a obdobně jako u lokálního prohledávání, s roustoucí délkou běhu programu se i snižuje cena plánu.
+Tabu prohledávání bylo puštěno něco kolem hodiny a půl, a obdobně jako u lokálního prohledávání, s roustoucí délkou běhu programu se i snižuje cena plánu.
 Výhoda tabu prohledávání je hlavně v schopnosti nezůstat v lokálním optimu a umět robustněji prohledávat prostor konfigurací.
 Tato výhoda v našem případě ale není využita, protože tabu prohledávání ani za hodinu běhu na lokální optimum nenarazilo.
 Spíše naopak, prohledávání tabu je nevýhodou, a lokální prohledávání je v tomto případě lepší volbou.
@@ -190,7 +198,8 @@ Simulovanému žíhání je potřeba nastavit následující hyperparametry:
 \begin{enumerate}
   \item počáteční teplota,
   \item koncová teplota,
-  \item chladící rozvrh.
+  \item chladící rozvrh,
+  \item počet iterací v rámci stejné teploty.
 \end{enumerate}
 
 Počáteční teplota je vhodné nastavit tak, aby pravděpodobnost přijetí horší konfigurace byla ze začátku kolem 0.8--0.9 procent \cite{sa_theory}.
@@ -215,7 +224,7 @@ kde na ose x je hodnota delta, a na ose y pravděpodobnost přijetí sousedního
 \end{figure}
 
 Finální teplota se často volí velmi blízko nule, aby bylo možné dostatečně důkladně prohledat konfigurace lokálně, podobně jak dělá například lokální prohledávání \cite{sa_theory}.
-Vyberme finální teplotu jako $10^{-6}$.
+Zatím vyberme finální teplotu jako $10^{-6}$.
 
 Vybrat ochlazovací rozvrh lze různě, nejčastěji používané jsou \cite{sa_theory}:
 \begin{enumerate}
@@ -245,18 +254,28 @@ Vybrat ochlazovací rozvrh lze různě, nejčastěji používané jsou \cite{sa_
 \end{enumerate}
 
 My si jako ochlazovací rozvrh zvolíme exponenciální ochlazovací rozvrh, především pro jeho jedhoduchou implementaci a pěkné vlastnosti.
+Parametr $\alpha$ určující rychlost snižování teploty zatím zvolíme jako $0.99$.
+
+Nelze obecně říct, kolik iterací $M_k$ provést v rámci stejné teploty. Menší počet iterací může vést k předčasné kovergenci, ale na druhou stranu je výpočet méně náročný. \cite{sa_theory}. 
+Zvolme zatím pouze jednu iteraci, čili $M_k = 1$.
+Je vhodné balancovat $M_k$ spolu s $\alpha$, pro zajištění rozumné výpočetní náročnosti.
+Samozřejmě, že ideální je použít $\alpha$ rovno $O.99$ a $M_k$ velmi vysoké, například v rámci stovek až tisíců, 
+ovšem simulované žíhání s takto zvolenými parametry je velmi výpočetně náročné a běh by trval příliš dlouho.
+
 Jako první spustíme simulované žíhání z prázdného plánu.
 
 \begin{figure}[H]
   \caption{Simulované žíhání z prázdného plánu.}
-  \includegraphics[width=\textwidth]{img/sa_empty_elapsed.png}
+  \includegraphics[width=\textwidth]{img/plots/sa_empty.png}
   \centering
   \label{img:sa_empty}
 \end{figure}
 
-Na obrázku \ref{img:sa_empty} vidíme, jaké plány simulované žíhání v průběhu z prázdného plánu navštěvovalo.
-Celkově běželo simulované žíhání 20 minut a navštívilo celkem 1779 plánů.
-Nejlepší nalezený plán odbavuje 292 incidentů, stojí 2217732 a má naalokovaných 89 týmů a 132 záchranných vozidel.
+V grafu \ref{img:sa_empty} vidíme, jaké plány simulované žíhání
+s počáteční teplotou 5 stupňů, finální teplotou $10^{-6}$, exponenciálním chladícím rozvrhem s $\alpha = 0.99$ a s $M_k = 1$,
+v průběhu z prázdného plánu navštěvovalo.
+Celkově běželo simulované žíhání 25 minut a navštívilo celkem 1779 plánů.
+Nejlepší nalezený plán odbavuje 288 incidentů, stojí 2059332 a má naalokovaných 93 týmů a 132 záchranných vozidel.
 V porovnání s lokálním nebo tabu prohledáváním z prázdného plánu se jedná o dramaticky lepší výsledek.
 
 Podobně jako u předchozích metod můžeme zkusit spustit simulované žíhání z jiného než prázdného plánu.
@@ -264,28 +283,45 @@ Zkusme spustit z uniformě náhodně vygenerovaného plánu, který má naalokov
 
 \begin{figure}[H]
   \caption{Simulované žíhání z náhodného plánu.}
-  \includegraphics[width=\textwidth]{img/sa_random_elapsed.png}
+  \includegraphics[width=\textwidth]{img/plots/sa_random_85.png}
   \centering
   \label{img:sa_random}
 \end{figure}
 
-Na obrázku \ref{img:sa_random} vidíme chování simulovaného žíhání spuštěného z náhodně vygenerovaného plánu.
-Přibližně do 15 minuty (1000 sekund) lze vidět explorační fázi, kdy následně už je plán pouze lokálně vylepšován. 
+V grafu \ref{img:sa_random} vidíme chování simulovaného žíhání
+s počáteční teplotou 5 stupňů, finální teplotou $10^{-6}$, exponenciálním chladícím rozvrhem s $\alpha = 0.85$ a s $M_k = 10$,
+Přibližně do 12 minuty (800 sekund) lze vidět explorační fázi, kdy následně už je plán pouze lokálně vylepšován. 
 Spustit simulované žíhání z náhodného plánu přináší lepší výsledky než z plánu prázdného.
-Nejlepší nalezený plán odbavuje všech 300 incidentů, stojí 3456121 a má naalokovaných 139 týmů a 121 vozidel.
+Nejlepší nalezený plán odbavuje všech 300 incidentů, stojí 3182531 a má naalokovaných 139 týmů a 126 vozidel.
+
+Z grafu podle klesající ceny můžeme usoudit, že by simulované žíhání bylo schopné najít ještě lepší plán, pokud by mohlo běžet déle.
+Spusťmě proto simulované žíhání znovu ze stejného náhodného plánu, tentorkát ale s jinými parametry.
+
+\begin{figure}[H]
+  \caption{Simulované žíhání z náhodného plánu.}
+  \includegraphics[width=\textwidth]{img/plots/sa_random_90.png}
+  \centering
+  \label{img:sa_random}
+\end{figure}
+
+V grafu \ref{img:sa_random} vidíme chování simulovaného žíhání
+s počáteční teplotou 3 stupňů, finální teplotou $10^{-8}$, exponenciálním chladícím rozvrhem s $\alpha = 0.90$ a s $M_k = 30$,
+Finální teplota je snížena, aby se prodloužila ladící fáze.
+Zároveň je snížena rychlost klesání teploty a zvýšen počet iterací v rámci stejné teploty, takže sice bude výpočet trvat déle, ale zato by měl být nalezený optimální plán lepší.
+Skutečně, optimální nalezený plán odbavuje všech 300 incidentů, stojí 2124103 a má naalokovaných 94 týmů a 104 vozidel.
 
 Zkusme ještě spustit simulované žíhání z plánu optimálního v ceně, podobně jako u lokálního a tabu prohledávání.
 
 \begin{figure}[H]
   \caption{Simulované žíhání z plánu optimálního v ceně.}
-  \includegraphics[width=\textwidth]{img/sa_optimal.png}
+  \includegraphics[width=\textwidth]{img/plots/sa_optimal.png}
   \centering
   \label{img:sa_optimal}
 \end{figure}
 
-Na obrázku \ref{img:sa_optimal} vidíme průběh výpočtu.
+V grafu \ref{img:sa_optimal} vidíme průběh výpočtu.
 Podobně jako v případě procházení z náhodného plánu jsou při vyšší teplotě navštěvovány horší plány v rámci explorace a od přibližně 
 10 minuty (700 sekund) se postupně přechází do ladící fáze, která se chová podobně jako lokální prohledávání.
 Program celkově běžel něco pod 30 minut i spolu s nalezením plánu optimálního v ceně.
-Nejlepší nalezený plán odbavuje 300 incidentů, stojí 3009734 a má naalokovaných 110 týmu a 134 vozidel.
+Nejlepší nalezený plán odbavuje 300 incidentů, stojí 2736133 a má naalokovaných 108 týmu a 133 vozidel.
 

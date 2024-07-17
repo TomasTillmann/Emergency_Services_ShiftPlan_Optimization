@@ -58,6 +58,6 @@ def plot_data(elapsed, costs, handled_cases, evals):
 
 # Main script
 if __name__ == "__main__":
-    filename = 'SimulatedAnnealing_5_0000001_1_exp99_fromOptimal.log'
+    filename = 'SimulatedAnnealing_3_000000001_30_exp90_fromRandom.log'
     elapsed, costs, handled_cases, evals = parse_file(filename)
     plot_data(elapsed, costs, handled_cases, evals)

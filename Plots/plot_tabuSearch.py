@@ -1,32 +1,31 @@
 import matplotlib.pyplot as plt
 
-# Function to parse the file
-
 
 def parse_file(filename):
     elapsed_times = []
     costs = []
     handled_cases = []
-    evals = []
 
     with open(filename, 'r') as file:
         for line in file:
             if 'UPDATE' in line:
+                print(line)
                 parts = line.split(',')
                 elapsed = float(parts[0].split('elapsed: ')[1])
-                cost = int(parts[1].split('cost: ')[1])
-                handled = int(parts[4].split('handled: ')[1])
+                cost = int(parts[3].split('cost: ')[1])
+                handled = int(parts[6].split('handled: ')[1])
 
                 elapsed_times.append(elapsed)
                 costs.append(cost)
                 handled_cases.append(handled)
 
-    return elapsed_times, costs, handled_cases, evals
-
-# Plotting function
+    return elapsed_times, costs, handled_cases
 
 
-def plot_data(elapsed_times, costs, handled_cases, evals):
+if __name__ == "__main__":
+    filename = 'TabuSearch_empty.log'
+    elapsed_times, costs, handled_cases = parse_file(filename)
+
     fig, ax1 = plt.subplots()
 
     color = 'tab:blue'
@@ -44,10 +43,3 @@ def plot_data(elapsed_times, costs, handled_cases, evals):
     fig.tight_layout()
     plt.title('Cost and Handled Incidents Count Over Time')
     plt.show()
-
-
-# Main script
-if __name__ == "__main__":
-    filename = 'hybrid_tabu.log'
-    elapsed_times, costs, handled_cases, evals = parse_file(filename)
-    plot_data(elapsed_times, costs, handled_cases, evals)
