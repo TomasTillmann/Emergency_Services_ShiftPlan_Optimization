@@ -80,7 +80,7 @@ Budeme vždy uvažovat pouze incidenty, které se odehrávájí v rámci jednoho
 
 Zároveň neexistují dva incidenty, které se odehrají v přesně stejný čas.
 Tento předpoklad je bez újmy na obecnosti, protože kdyby bylo žádoucí, aby se dva incidenty odehráli v přesně stejný čas,
-tak jednomu z nich stačí čas nastání posunout o vteřinu.
+tak jednomu z nich stačí čas nastání posunout o vteřinu, což je pro naše účely zanedbatelná změna.
 
 Problém, který v této práci řešíme, je nalézt \textit{optimální plán} $p_C \in P_C \subseteq P$,
 tedy plán,
@@ -164,7 +164,7 @@ Pro odbavení $i$ musíme vybrat nějaký konkrétní $z_i \in Z_i$.
 
 Je mnoho různých způsobu, jak $z_i$ vybrat.
 V naší simulaci jsou použitá pravidla vybraná na základě konzultace se společností, která se danou problematikou zabývá přes 25 let
-a sama podobná pravidla používá pro plánovaní u několika jejích klientů ve Spojených státech amerických \footnote{Logis Solutions, s.r.o. (https://logissolutions.net)}.
+a sama podobná pravidla používá pro plánovaní u několika jejích klientů ve Spojených státech amerických \cite{logisSolutions}.
 
 Simulace je navržena dostatečně genericky tak, aby bylo možné naimplementovat i libovolná jiná pravidla, například jednodušší, komplikovanější nebo klidně i stochastická.
 Jak bylo zmíněno v kapitole \ref{kap:procSimulace}, možnost volby libovolných pravidel je jedna z několika výhod přístupu použití simulace.
@@ -438,7 +438,7 @@ které vhodně převedou optimalizační úlohu s více účelovými funkcemi na
 V této kapitole si ukážeme, jak optimalizační úlohu nalezení optimálního plánu pohotovostní služby s více účelovými funkcemi (viz definice \ref{df:optUloha2uc}) převést na
 optimalizační úlohu nalezení optimálního plánu pohotovostní služby s jednou účelovou funkcí, pomocí metod zmíněných v předchozí kapitole.
 
-K tomu si je ještě potřeba první dodefinovat přeškálované účelové funkce do intervalu $\langle 0, 1 \rangle$, aby
+K tomu si je ještě potřeba prvně dodefinovat přeškálované účelové funkce do intervalu $\langle 0, 1 \rangle$, aby
 bylo možné výsledné účelové funkce definovat přehledněji.
 \begin{definice}[Přeškálování $s$ do intervalu $\langle 0, 1 \rangle$ ] \label{df:simulaceSkal}
   Definujme $s'$ jako přeškálování $s$ do intervalu $\langle 0, 1 \rangle$,
@@ -501,7 +501,7 @@ Metodu goal programming (viz definice \ref{df:goalP}) aplikujeme následovně.
   pro danou množinu incidentů $I$ a libovolnou normu.
 \end{definice}
 
-Pro pohotovostní plány nechť $p^{goal} \colon q(p^{utopia}) = [1, 0]$, úspěšné odbavení všech incidentů za nulovou cenu.
+Pro pohotovostní plány nechť $p^{goal} = q(p^{utopia}) = [1, 0]$, úspěšné odbavení všech incidentů za nulovou cenu.
 Samozřejmě $p^{utopia} \not \in P_C$, ledaže $|I| = 0$.
 
 Nulovou cenu má pouze plán, kde není naalokován žádný tým záchranářů ani záchranné vozidlo a takový plán nemůže úspěšně obsloužit žádný incident. 
@@ -534,8 +534,8 @@ Označme si $Q_I = \{ q^{\text{Lex}}, q^{\text{Goal}}, q_{\alpha}, q_{\alpha}^{\
 V předchozí kapitole se nám podařilo problém nalezení optimálního plánu namodelovat jako optimalizační úlohu s jednou účelovou funkcí,
 pomocí metod diskutovaných v kapitole \ref{kap:metodyProReseniOptSViceUcel}.
 V této kapitole klasifikujeme, o jakou optimalizační úlohu se jedná, a to zkoumáním účelové funkce a množiny plánů.
-Zklasifikováním optimalizační úlohy budeme moct použít metodiky, které se standardně pro řešení takových úloh využívají. 
-Podrobněji jsou diskutovány v kapitole \ref{chap:reseniOptUloh}.
+Zjištěním přesně o jaký typ optimalizační úlohy se jedná, budeme schopni použít metody, které jsou vhodné pro řešení úloh takového typu.
+Podrobněji jsou tyto metody diskutovány v kapitole \ref{chap:reseniOptUloh}.
 
 \subsection{Analýza množiny plánů pohotovostních služeb}\label{kap:analP}
 
@@ -800,7 +800,7 @@ Nejdříve si ukažme, do jaké třídy složitosti náleží optimalizační ú
   Problém \textit{SAT} je NP-úplný. Převodem tak dokážeme, že problém $R$ je alespoň tak těžký, jako problém \textit{SAT}, takže je alespoň NP-úplný.
 
   Nechť klauzule v konjuktivním normálním tvaru $\phi$ problému \textit{SAT} o $n$ literálech.
-  Nechť $\mathcal{X} = \text{množina všech možných ohodnocení \phi}$.
+  Nechť $\mathcal{X} \text{ je množina všech možných ohodnocení \phi}$.
 
   Funkci $q$ definujme $q(x) = \phi(x)$.
   Hledané $k$ tak bude 1, splění formule.

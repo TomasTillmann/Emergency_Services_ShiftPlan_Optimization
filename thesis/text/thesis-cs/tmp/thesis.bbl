@@ -75,6 +75,18 @@
       \field{title}{Discrete Event Simulation: A Practical Approach}
       \field{year}{1992}
     \endentry
+    \entry{logisSolutions}{misc}{}
+      \field{sortinit}{3}
+      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{labeltitlesource}{title}
+      \field{title}{Logis Solutions}
+      \verb{urlraw}
+      \verb https://logissolutions.net
+      \endverb
+      \verb{url}
+      \verb https://logissolutions.net
+      \endverb
+    \endentry
     \entry{AlgOptBook}{book}{}
       \name{author}{1}{}{%
         {{hash=0075e2f83a4ed7076eb6fc0bffbd96d6}{%
@@ -95,8 +107,8 @@
       \strng{authorbibnamehash}{0075e2f83a4ed7076eb6fc0bffbd96d6}
       \strng{authornamehash}{0075e2f83a4ed7076eb6fc0bffbd96d6}
       \strng{authorfullhash}{0075e2f83a4ed7076eb6fc0bffbd96d6}
-      \field{sortinit}{3}
-      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{sortinit}{4}
+      \field{sortinithash}{9381316451d1b9788675a07e972a12a7}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{isbn}{9780262351409}
@@ -123,8 +135,8 @@
       \strng{authorbibnamehash}{5681fb99526e3b7309d7ae9ba517a854}
       \strng{authornamehash}{5681fb99526e3b7309d7ae9ba517a854}
       \strng{authorfullhash}{5681fb99526e3b7309d7ae9ba517a854}
-      \field{sortinit}{8}
-      \field{sortinithash}{a231b008ebf0ecbe0b4d96dcc159445f}
+      \field{sortinit}{9}
+      \field{sortinithash}{0a5ebc79d83c96b6579069544c73c7d4}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{isbn}{80-246-0084-6}
@@ -251,8 +263,8 @@
       \strng{authorbibnamehash}{7bb51e859e70aaedef4ed1f3bb67779b}
       \strng{authornamehash}{7bb51e859e70aaedef4ed1f3bb67779b}
       \strng{authorfullhash}{7bb51e859e70aaedef4ed1f3bb67779b}
-      \field{sortinit}{1}
-      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{isbn}{978-0691079516}

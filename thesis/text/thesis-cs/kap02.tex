@@ -7,8 +7,6 @@ V této kapitole vyzkoušíme různé metody, které můžeme pro nalezení opti
 
 \section{Dynamické programování}\label{kap:dynamicProgram}
 
-\subsection{Popis}
-
 \textit{Dynamické programování} je technika řešení problému, která si průběžně ukládá řešení menších podúloh a pomocí rekurzivního vztahu menších podúloh s většími,
 definovaného \textit{rekurzivním vztahem}, řeší větší podúlohy efektivněji, až po vyřešení původní úlohy. 
 Průběžnému ukládání výsledků podúloh se říká \textit{memoizace}.
@@ -449,7 +447,7 @@ V následující větě je její tvrzení využito pro dokázání dosažitelnos
   \end{equation*}
 \end{dukaz}
 
-\subsection{Rekurzivní prohledávání stromu optimálních tahů}
+\subsection{Rekurzivní prohledávání stromu optimálních tahů}\label{kap:rekurzivniProhledavaniStromu}
 
 Věta \ref{veta:dosazitelnostOptimalnimiTahy} nám dává návod, jak plány $P_C$ z $p_{\emptyset}$ prohledávat optimálními tahy $T_1 \in T^*_1, \dots , T_{|I| - 1} \in T^*_{|I|-1}$.
 
@@ -496,7 +494,7 @@ rekurzivně se na něj algoritmus zavolá a aktualizuje se \textit{cache} navšt
 Tímto způsobem se systematicky prohledává celý prostor možných plánů a ukládají se všechny doposud nejlepší nalezené plány $P^*$.
 Zároveň díky \textit{Visited} se zbytečně neprohledává podstrom ve stejné hloubce se stejným plánem vícekrát.
 
-\begin{veta}[Korektnost a úplnost algoritmu]\label{}
+\begin{veta}[Korektnost a úplnost algoritmu]
   Algoritmus rekurzivního prohledávání prostoru plánů optimálními tahy (viz algoritmus \ref{alg:rekProhPlanu}) nalezne všechny optimální plány $P^* \subseteq P_C$ při účelové funkci $q^{\text{Lex}}$.
 \end{veta}
 \begin{dukaz}
@@ -571,7 +569,7 @@ Nyní máme všechny prostředky pro spočítání složitosti algoritmu.
 \begin{veta}[Složitost algoritmu rekurzivního prohledávání optimálních tahů]\label{veta:slozitostRek}
   Algoritmus rekurzivního prohledávání optimálních plánů běží v čase
   \begin{equation*}
-    \mathcal{O}((Z_n + 1)^{|I| + 1}).
+    \mathcal{O}(Z_n^{|I|}).
   \end{equation*}
 \end{veta}
 \begin{dukaz}
@@ -585,9 +583,13 @@ Nyní máme všechny prostředky pro spočítání složitosti algoritmu.
 Nalezli jsme korektní algoritmus při účelové funkci $q^{\text{Lex}}$, který běží v exponenciálním čase podle počtu incidentů. 
 Algoritmus sice neběží v polynomiálním čase, ale stále se jedná o dramatické zlepšení oproti naivnímu řešením, jehož složitost je rovna velikosti množiny plánů (viz věta \ref{veta:PCvelikost}).
 
-Strom také nemusíme prohledávat deterministicky, ale stochasticky tak, že v každé hladině rekurze budeme optimální tahy náhodně permutovat. Nemusíme ani zkoušet všechny optimální tahy,
-ale pouze nějakou část. Hlavní výhodou algoritmu tak je schopnost plány prohledávat strukturovaně. Navíc kvalita nalezeného řešení bude úměrná s délkou trvání algoritmu
--- čím déle bude běžet, tím více navštíví optimálních plánů v ceně, a s větší šancí tak nalezne globální optimum.
+Hlavní výhodou algoritmu je schopnost plány prohledávat strukturovaně.
+Díky tomu můžeme uvažovat i různé jiné varianty algoritmu, kdy například nemusíme strom rekurze prohledávat deterministicky,
+ale stochasticky tak, že v každé hladině rekurze budeme optimální tahy náhodně permutovat.
+Nemusíme ani na každé hladině zkoušet všechny optimální tahy, ale například pouze jeden náhodný, nebo nějakou část.
+Oproti postupnému prohledávání všech tahů na každé úrovni má tento přístup výhodu ve vyzkoušení více odlišných konfigurací
+a nalezené plány budou s menší pravděpodobností sdílet podobně naalokované týmy, vozidla a směny, což povede k diversifikovanějšímu prohledání množiny povolených plánů.
+Při aplikování metod budeme uvažovat tuto lehce pozměněnou verzi algoritmu (viz kapitola \ref{kap:aplikaceTabu}).
 
 \section{Metaheuristické metody}\label{kap:heuristiky}
 
@@ -629,7 +631,7 @@ případně i měnit různé metaheuristiky za běhu~\cite{HybridMeta}.
 
 Asi nejjednodušší metoda na prohledávání prostoru konfigurací je \textit{lokální prohledávání}.
 Lokální prohledávání pouze lokálně prohledává prostor konfigurací od dané startovní konfigurace $x \in \mathcal{X}$. 
-Prostor porhledává prostřednictvním sousedů $N(x)$, kde vždy vybere souseda s nejlepší hodnotou účelové funkce.~(\citet{HybridMeta}, str. 3).
+Prostor prohledává prostřednictvním sousedů $N(x)$, kde vždy vybere souseda s nejlepší hodnotou účelové funkce.~(\citet{HybridMeta}, str. 3).
 
 Sousedy $N(p)$ zkonstruujeme implicitně pomocí tahů, což je standardní způsob konstrukce sousedů nějaké konfigurace (\citet{HybridMeta}, str. 3).
 Sousední plány $N(p)$ plánu $p \in P_C$ lze definovat různě. 
