@@ -62,9 +62,11 @@ aby se v budoucnu nemuselo volat Google API, což je samozřejmě pomalá operac
 
 \section{Aplikace naivního řešení}
 
+První metodu, kterou aplikujeme na namodelovanou záchrannou službu a incidenty podle předchozí kapitoly je naivní řešení.
+
 \section{Aplikace prohledávání plánů optimálními \linebreak tahy}
 
-První metodu, kterou aplikujeme na namodelovanou záchrannou službu a incidenty podle předchozí kapitoly je algoritmus prohledávání plánů optimálními tahy \ref{alg:rekProhPlanu}.
+V této kapitole aplikujeme algoritmus prohledávání plánů optimálními tahy \ref{alg:rekProhPlanu}.
 Konkrétně použijeme jeho upravenou verzi, kde strom tahů budeme prohledávat vždy od prázdného plánu, a na každé hladině rekurze zvolíme pouze jeden náhodný optimální tah.
 Oproti postupnému prohledávání všech tahů na každé úrovni má výhodu ve vyzkoušení více odlišných konfigurací a nalezené optimální plány v ceně budou s menší pravděpodobností sdílet
 podobně naalokované týmy, vozidla a směny, což povede k diversifikovanějšímu prohledání množiny povolených plánů.
@@ -219,9 +221,9 @@ Počáteční teplota splňující takový požadavek činí například 5 stup�
 kde na ose x je hodnota delta, a na ose y pravděpodobnost přijetí sousedního plánu metropolisním kritériem, který se od aktuálního liší o danou deltu.
 
 \begin{figure}[H]
-  \caption{Metropolis kritérium pro teplotu 5 stupňů.}
-  \includegraphics[width=\textwidth]{img/metropolis_5.png}
   \centering
+\includegraphics[width=0.5\textwidth,height=0.5\textwidth]{img/metropolis_5.png}
+  \caption{Metropolis kritérium pro teplotu 5 stupňů.}
   \label{img:metropolis_5}
 \end{figure}
 
