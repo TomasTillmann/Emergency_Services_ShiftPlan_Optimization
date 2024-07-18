@@ -1,4 +1,4 @@
-PWD /home/tom/School/Bakalarka/thesis/text/thesis-cs
+PWD /home/tom/School/Bakalarka/Emergency_Services_ShiftPlan_Optimization/thesis/text/thesis-cs
 INPUT /var/lib/texmf/web2c/luahbtex/lualatex.fmt
 INPUT ./abstract-cs.tex
 OUTPUT tmp/abstract-cs.log

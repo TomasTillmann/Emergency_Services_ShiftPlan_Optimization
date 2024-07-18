@@ -71,7 +71,7 @@ Na grafu \ref{img:naive} vidíme naivní řešení spuštěné po dobu 20 minut.
 Naivní řešení pouze náhodně generuje pohotovostní plány a vyhodnocuje je při účelové funkci. Můžeme vidět, že nalezené plány velmi kolísají jak v ceně tak v počtu odbavených incidentů. 
 Naivní řešení není nijak více zajímavé a nebudeme jej dále zkoumat. Slouží spíše jako základ, se kterými můžeme porovnávat lepší metody, diskutované níže. 
 
-\section{Aplikace prohledávání plánů optimálními \linebreak tahy} \label{kap:aplikaceTabu}
+\section{Aplikace prohledávání plánů optimálními tahy} \label{kap:aplikaceTabu}
 
 V této kapitole aplikujeme algoritmus prohledávání plánů optimálními tahy \ref{alg:rekProhPlanu}.
 Konkrétně použijeme jeho mírně upravenou verzi, diskutovanou na závěru kapitoly \ref{kap:rekurzivniProhledavaniStromu},
@@ -157,7 +157,7 @@ Jednou z možností jak takový startovní plán zvolit je použít první nalez
 
 \begin{figure}[H]
   \caption{Nalezené plány metodou lokálního prohledávání plánů z plánu nalezeného optimálními tahy.}
-  \includegraphics[width=\textwidth]{img/plots/localSearch_fromOptimal.png}
+  \includegraphics[width=0.7\textwidth,height=0.9\textwidth]{img/plots/localSearch_fromOptimal.png}
   \centering
   \label{img:hybrid}
 \end{figure}

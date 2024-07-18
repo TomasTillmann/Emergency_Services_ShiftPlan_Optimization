@@ -1,23 +1,39 @@
 \chapter*{Závěr}
 \addcontentsline{toc}{chapter}{Závěr}
 
-Tato práce se zabývala problémem nalezení optimálního plánu pohotovostní služby. 
+Tato práce se zabývá problémem nalezení optimálního plánu pohotovostní služby. 
 V první kapitole jsme problém zformalizovali a důkladně zanalyzovali, abychom zvolili vhodné metody řešení.
 Ukázalo se, že nejvhodnější je problém modelovat jako optimalizační úlohu s jednou účelovou funkcí.
-Účelová funkce je vhodným složením ceny plánu a počtu úspěšně odbavených incidentů plánu na dané sadě incidentů.
-Abychom věrohodně zjistili počet úspěšně odbavených incidentů, spustili jsme diskrétní simulaci, která pro danou sadu incidentů simuluje chování plánu v průběhu jednoho dne.
-Použití simulace omezilo možné techniky, které se běžně používají pro řešení těžkých optimalizačních problému, jako například lineární programování,
-na druhou stranu, umožňuje věrohodně získat počet úspěšně odbavených incidentů, jako kdyby plán již skutečně incidenty odbavoval v terénu.
+Účelová funkce je vhodným složením ceny plánu a počtu úspěšně odbavených incidentů.
+Abychom věrohodně zjistili počet úspěšně odbavených incidentů, spustili jsme diskrétní simulaci, která pro danou sadu incidentů napodobuje chování plánu v průběhu jednoho dne.
+Použití simulace omezilo možné techniky, které se běžně používají pro řešení těžkých optimalizačních problému, jako například lineární programování.
+Na druhou stranu, umožňuje věrohodně získat počet úspěšně odbavených incidentů, stejně jako by plán již skutečně odbavoval incidenty v terénu.
  
-V druhé kapitole jsme diskutovali několik metod, od využití dynamického programování, až po použití metaheuristických přístupů.
-Nalezli jsme rekurzivní vztah mezi plány odbavující o jedna méně incidentů,
-a využili jej pro vyřešení úlohy pomocí dynamického programování. Přestože výpočetní složitost je exponenciální vůči počtu incidentů, 
-tak se jedná o dramatické zlepšení, oproti naivnímu řešení, které jenom náhodně vytváří plány.
+V druhé kapitole jsme diskutovali několik různých metod, od využití dynamického programování, až po použití metaheuristických přístupů.
+Nalezli jsme rekurzivní vztah mezi plány odbavující o jedna méně incidentů
+a využili jej pro řešení úlohy pomocí dynamického programování. Přestože výpočetní složitost je exponenciální vůči počtu incidentů, 
+jedná se o dramatické zlepšení oproti naivnímu řešení, které jenom náhodně vytváří plány.
 
 Ve třetí kapitole jsme nalezené metody aplikovali na konkrétní pohotovostní službu, a to sice na pohotovostní službu hlavního města Prahy.
-Synteticky jsme vygenerovali sadu incidentů, která vhodně reprezentuje, jak skutečně by se incidenty v průběhu dne mohli odehrávat, podle volně dostupných dat přímo od pražské pohotovostní služby.
+Synteticky jsme vygenerovali sadu incidentů, která vhodně reprezentuje možnou skutečnou situaci.
+Na základě volně dostupných dat pražské pohotovostní služby představuje, jak by se mohly incidenty v průběhu dne skutečně odehrát.
+
 Při aplikaci metod jsme zjistili, že některé metody jsou vhodnější než jiné. Například se ukázalo, že nemá smysl používat tabu prohledávání, jelikož je obtížné nalézt i jedno lokální optimum.
-Na druhou stranu, kombinace lokálního prohledávání nebo simulovaného žíhání spolu s dynamickým programováním se ukázali jako nejlepší metody pro praktické využití,
-kdy nalezené plány uměly úspěšně odbavit všechny incidenty jen s polovinou vozidel a do stovky týmů záchranářů.
-Nalezené plány jsou kvalitní, a jistě by se uplatnili pro praktické využití.
+Na druhou stranu, kombinace lokálního prohledávání nebo simulovaného žíhání spolu s dynamickým programováním se ukázaly jako nejlepší metody pro praktické využití.
+Nalezené plány uměly úspěšně odbavit všechny incidenty jen s polovinou vozidel a do stovky týmů záchranářů.
+Nalezené plány jsou kvalitní, a jistě by se uplatnily pro praktické využití.
+
+Přestože umíme nalézt velmi kvalitní plány pohotovostní služby na dané sadě incidentů, lze práci do budoucna rozšířit hned o několik věcí.
+Především by bylo zajímavé více prozkoumat, jak vypadají optimální plány, které by odbavovaly jen o něco méně incidentů, ale byly by výrazně levnější.
+Takové plány by se daly hledat pomocí vhodně zvolené účelové funkce, která by poskytovala dobře nastavený kompromis mezi cenou a počtem odbavených incidentů. 
+
+Dalším zajímavým rozšířením by bylo přidat incidentům typ, který by určoval, jaká záchranná vozidla a týmy by mohly incident odbavit.
+Jednotlivé týmy nebo vozidla by byly různě drahé, právě podle toho, jaké typy incidentů by mohly odbavovat. 
+Implementace takového rozšíření vyžaduje pouze úpravu simulace a přidání nových tahů u metod, které využívají sousedství.
+
+V neposlední řadě by bylo zajímavé zkoumat, jak se nalezené optimální plány chovájí v krajních případech, kdy se například najednou stane velké množství incidentů
+na jedné lokalitě, nebo na velmi odlehlé lokalitě, případně i ve stejný čas. Aby bylo možné takové plány hledat, je potřeba, aby plány uměly dobře generalizovat.
+Metody by tak musely krajní případy uvažovat už v rámci hledání a předem alokovat vozidla a týmy, i když by většinu času nebyly potřeba.
+To nás vede na další rozšíření, kdy by bylo dovoleno, aby týmy naalokované na jedné výjezdové stanici mohly pomáhat v krajních případech týmům na jiných stanicích.
+Tomuto mechanismu se říká \textit{dynamic dispatch} a v krajních případech by se mohlo jednat o nejefektivnější způsob, jak zdroje rozmisťovat.
 
