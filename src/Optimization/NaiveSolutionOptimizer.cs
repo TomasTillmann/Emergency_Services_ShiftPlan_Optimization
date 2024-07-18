@@ -30,6 +30,7 @@ public class NaiveSolutionOptimizer : OptimizerBase
         
         for (int i = 0; i < SamplePlans; ++i)
         {
+            Console.WriteLine($"{i}");
             sampler = new PlanSamplerUniform(World, ShiftTimes, Constraints, _random.NextDouble(), _random);
             var plan = sampler.Sample();
             var eval = UtilityFunction.Evaluate(plan, incidents.AsSpan());
@@ -38,6 +39,10 @@ public class NaiveSolutionOptimizer : OptimizerBase
                 Console.WriteLine($"UPDATE: elapsed: {sw.Elapsed.TotalSeconds}, handled: {UtilityFunction.HandledIncidentsCount}, cost: {plan.Cost}");
                 best = plan;
                 bestEval = eval;
+            }
+            else
+            {
+                Console.WriteLine($"elapsed: {sw.Elapsed.TotalSeconds}, handled: {UtilityFunction.HandledIncidentsCount}, cost: {plan.Cost}");
             }
         }
 

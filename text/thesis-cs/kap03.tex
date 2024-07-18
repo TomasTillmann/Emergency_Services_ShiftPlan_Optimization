@@ -64,36 +64,36 @@ Oproti postupnému prohledávání všech tahů na každé úrovni má výhodu v
 podobně naalokované týmy, vozidla a směny, což povede k diversifikovanějšímu prohledání množiny povolených plánů.
 
 \begin{table}[h!]
-\centering
-\begin{tabular}{|c|c|c|}
-\hline
-\textbf{Čas běhu v minutách} & \textbf{Cena plánu} & \textbf{Odbavené incidenty} \\
-\hline
-7:38  & 2520055 & 295 \\
-\hline
-10:36 & 2325655 & 292 \\
-\hline
-13:23 & 2412060 & 294 \\
-\hline
-15:34 & 2455258 & 295 \\
-\hline
-17:37 & 2325654 & 288 \\
-\hline
-19:27 & 2505663 & 295 \\
-\hline
-21:20 & 2340053 & 288 \\
-\hline
-23:05 & 2390458 & 292 \\
-\hline
-24:51 & 2556061 & 295 \\
-\hline
-26:27 & 2325655 & 290 \\
-\hline
-28:10 & 2325653 & 286 \\
-\hline
-\end{tabular}
-\caption{Spuštění prohledávání optimálními tahy na modelu Prahy.}
-\label{table:optimalMovesTabulka}
+  \centering
+  \begin{tabular}{|c|c|c|}
+    \hline
+    \textbf{Čas běhu v minutách} & \textbf{Cena plánu} & \textbf{Odbavené incidenty} \\
+    \hline
+    7:38  & 2520055 & 295 \\
+    \hline
+    10:36 & 2325655 & 292 \\
+    \hline
+    13:23 & 2412060 & 294 \\
+    \hline
+    \textbf{15:34} & \textbf{2455258} & \textbf{295} \\
+    \hline
+    17:37 & 2325654 & 288 \\
+    \hline
+    19:27 & 2505663 & 295 \\
+    \hline
+    21:20 & 2340053 & 288 \\
+    \hline
+    23:05 & 2390458 & 292 \\
+    \hline
+    24:51 & 2556061 & 295 \\
+    \hline
+    26:27 & 2325655 & 290 \\
+    \hline
+    28:10 & 2325653 & 286 \\
+    \hline
+    \end{tabular}
+  \caption{Spuštění prohledávání optimálními tahy na modelu Prahy.}
+  \label{table:optimalMovesTabulka}
 \end{table}
 
 Po spuštění metody na modelu Prahy po dobu téměř 30 minut metoda celkem navštívila 11 plánů optimálních v ceně.
@@ -133,17 +133,12 @@ Takto definované sousedství budeme používat i u dalších metod.
 
 Na obrázku \ref{img:localSearchRes} vidíme, jak se aktuální plán mění v čase.
 Lokální prohledávání bylo spuštěné po dobu 50 minut, a pak bylo přerušeno. 
+Celkem navštívilo 22997 plánů. To je až sedm krát tolik, kolik plánů navštívila metoda prohledávání optimálními tahy.
 Nejlepší nalezený plán po 50 minutách úspěšně odbaví 223 incidentů z 300 incidentů a stojí 137673.
-To je v porovnání s předchozí metodou, která za pouhých 7 minut nalezla plán odbavující 295 incidentů nedostačující výsledek.
-I když by se podle růstu křivky dalo usoudit, že by metoda lokálního prohledávání také byla schopná nalézt dost dobrý plán, trvalo by to příliš dlouho.
+I když by se podle růstu křivky dalo usoudit, že by metoda lokálního prohledávání byla schopná nalézt o dost lepší plán, trvalo by to zbytečně dlouho.
 
-Lokální prohledávání celkem navštívilo 22997 plánů. To je až sedm krát tolik, kolik plánů navštívila metoda prohledávání optimálními tahy.
-Lokální prohledávání tedy není vhodné na budování optimálního plánu z prázdného plánu, protože zbytečně navštíví velké množství plánů a trvá tak zbytečně dlouho.
-
-Můžeme si polepšit, sice že začneme prohledávat ne z prázdného plánu, ale z plánu zvoleného nějak chytře. Z plánu, který už je skoro optimální a lokální Prohledávání
-už jej jenom doladí.
-
-Jednou z možností, jak takový startovní plán zvolit je použít první nalezený optimální plán v ceně předchozí metodou a na něj spustit lokální prohledávání.
+Můžeme si polepšit, sice že začneme prohledávat ne z prázdného plánu, ale z plánu zvoleného nějak chytře. Z plánu, který už je skoro optimální a lokální prohledávání
+už jej jenom doladí. Jednou z možností, jak takový startovní plán zvolit je použít první nalezený optimální plán v ceně předchozí metodou a na něj spustit lokální prohledávání.
 
 \begin{figure}[H]
   \caption{Nalezené plány metodou lokálního prohledávání plánů z plánu optimálního v ceně.}
@@ -156,6 +151,9 @@ Na obrázku \ref{img:hybrid} vidíme graf, kde lokální prohledávání začín
 Můžeme vidět, že lokální prohledávání upravuje plán tak, že postupně odbavuje více incidentů, až nakonec všech 300. Poté už jen postupně snižuje cenu plánu.
 Po 20 minutách nalezne plán odbavující všechny incidenty a zhruba po hodině lokální prohledávání stagnuje a nalezne lokální optimum.
 Optimální nalezený plán odbavuje všech 300 incidentů, stojí 2073655 a má naalokovaných pouze 87 týmů a 55 vozidel.
+
+Zde je dobré si uvědomit, že pokud je plán optimální v ceně, neznamená to, že neexistuje plán, který odbavuje stejný počet incidentů za nižší cenu,
+ale pouze neexistuje tah snižující cenu (dealokace týmu, vozidla, zkrácení směny), kde by získaný plán tímto tahem odbavoval stejně incidentů.
 
 \section{Aplikace tabu prohledávání}
 
