@@ -1,19 +1,30 @@
 \chapter*{Úvod}
 \addcontentsline{toc}{chapter}{Úvod}
 
-Jedním z hlavních problému, které musí každá pohotovostní služba řešit, je jak v průběhu dne naplánovat týmy záchranařů a vozidla, kterými disponuje tak,
-aby zajišťovala co nejlepší pokrytí území, na kterém působí, a zároveň byli zaměstnanci přiměřeně vytížení a pohotovostní služba neplýtvala zbytečně svými zdroji.
-Nalézt takový optimální plán je poměrně náročný úkol, navíc pro pohotovostní služby vlastnící vyšší stovky záchranářů a vozidel, které jsou velmi častými například ve Spojených státech.
-Přitom nalézt takový optimální plán je velmi žádoucí, protože efektivní využití zdrojů může vést až k několikanásobně úspěšnějšímu počtu odbavených incidentů
-za nižší potřebné vynaložené náklady.
+Zásadním úkol, se kterým se potýkájí všechny pohotovostní služby, je plánování konkrétních směn.
+Hlavním cílem tohoto plánování je rozdělení a rozvržení týmů záchranářů a dostupných záchranných vozidel na výjezdové stanice tak, aby byly jednotlivé incidenty efektivně odbaveny. 
+Pod tím si můžeme představit, že během daného časového úseku, například jednoho dne, chceme úspěšně odbavit co největší počet incidentů, a to při nejnižsích možných vynaložených nákladech.
+Nalézt takový optimální a efektivní plán je poměrně komplexní úkol. Zejména pak pro pohotovostní služby
+vlastnící vyšší stovky záchranářů a vozidel, které jsou velmi časté například ve Spojených státech amerických. 
+Nalézt takový plán je ale velmi žádoucí, protože efektivní využití zdrojů může vést až k několikanásobně úspěšnějšímu
+počtu odbavených incidentů za nižší potřebné vynaložené náklady.
 
-V této prácí se konkrétně budeme zabývat problematikou, jak takový optimální plán najít a zkoumat metody,
-které umí v rozumném čase najít jeden, nebo i více takových optimálních plánu.
-Tyto metody budou studovány nejen z hlediska kvality nalezených plánu, ale i jak rychle je metoda umí nalézt.
-Jak takové optimální plány hledat lze několika způsoby. V této práci budeme především vycházet z historických dat.
-Respektivě budeme zkoumat, kde a kdy se v minulosti na území děly incidenty, a podle toho budeme budovat takové plány, které budou na těchto incidentech fungovat efektivně.
-Tyto metody na závěr práce aplikujeme na pohotovostní službu Prahy. Následně je porovnáma a ukážeme si, jaké metody patří mezi ty nejlepší a které jsou doporučené pro reálné využití. 
+Cílem této práce je představit, aplikovat a porovnat metody, které nám pomohou taková optimální naplánování směn nalézt. 
+Práce je rozdělena do tří částí.
+V první části je důkladně popsán a zformalizován řešený problém jako optimalizační úloha a jakým způsobem namodelujeme pohotovostní službu a sadu incidentů.
+Dále si popíšeme, jak konkrétně vyhodnotíme, kolik incidentů plán úspěšně odbaví.
+Budeme zkoumat chování plánu pohotovostní služby na dané sadě incidentů, pomocí deterministické diskrétní simulace.
+Také si zaanalyzujeme řešený problém, a o nalezené poznatky se budeme opírat při nalézání řešících metod, které jsou diskutovány v druhé části práce.
 
-Data a statistiky potřebné pro zmíněnou analýzu získáme simulováním chodu pohotovostní služby s přiřazeným daným plánem, kde simulaci bude velmi věrohodně odpovídat chování plánu,
-jako by skutečně byl takto vybrán do terénu.
+V druhé části se zabýváme několika možnými řešeními optimalizační úlohy.
+První se pokusíme nalézt rychlá řešení pomocí dynamického programování.
+Ukáže se, že jsme schopni nalézt rekurzivní vztahy mezi většími a menšími podproblémy, avšak v nejhorším případě se stále nebude jednat o řešení v polynomiálním čase.
+Na další metody, které se podíváme budou metaheuristiké přístupy, které se pokusí nalézt alespoň dostatečně dobrá řešení za rozumnou dobu.
+Podíváme se na nejčastěji používané metaheuristiky, které se běžně používají pro řešení náročných kombinatorických úloh.
+
+V třetí části jednotlivé metody aplikujeme na reálnou pohotovostní službu, a to konkrétně na pohotovostní službu hlavního města Prahy.
+Budeme zkoumat nalezené optimální plány jednotlivými metodami a následně je mezi sebou porovnáme.
+Na závěr na základě dat vyhodnotíme, které metody jsou nejlepšími pro nalezení optimálních plánů, a které jsou doporučené pro reálné využití.
+Tím bude naplněn cíl práce, kterým bylo nalézt nejvhodnější metodu, řešící problém nalezení optimálního pohotovostního plánu. 
+
 

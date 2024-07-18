@@ -28,7 +28,7 @@ První si území Prahy reprezentujeme jako mnohoúhleník a pomocí normálníh
 Normálnímu rozdělení nastavíme střední hodnotu na střed mnohoúhelníka a směrodatnou odchylku nastavíme tak, aby se incidenty na okrajích Prahy odehrávali méně než v centru. 
 Kde a v kolik hodin se incidenty odehrávají přesně záchranná služba Prahy vypadá, že nezveřejňuje, pravděpodobně proto, že by se mohlo jednat o zneužitelné nebo citlivé údaje.
 Rozloha Prahy činí 496 kilometrů čtverečních a je poměrně symetrického tvaru. Pro naše účely tak bude stačit nastavit směrodatnou odchylku na 10 kilometrů.
-V jakých časech se incidenty odehrávají je vygenerováno uniformě náhodně tak, aby se skutečně odehrávali incidenty častěji mezi 9 a 12 hodinou.
+Incidenty jsou vygenerovány tak, aby se skutčně děly častěji mezi 9 a 12 hodinou.
 
 Takto vygenerované incidenty tak reprezentují, jak se běžně incidenty v Praze v průběhu dne odehrávají.
 
@@ -59,6 +59,8 @@ tak je povoleno, aby mohlo z aktuální lokace vyrazit na odbavování incidentu
 Doby příjezdů mezi výjezdovými stanicemi, incidenty a nemocnicemi si můžeme předpočítat, ale \textit{reroute} předpočítat nelze.
 Můžeme si alespoň v průběhu simulování všechny spočítané doby příjezdů mezi lokacemi udržovat s přesností na desítky metrů,
 aby se v budoucnu nemuselo volat Google API, což je samozřejmě pomalá operace, trvající desítky až stovky milisekund. 
+
+\section{Aplikace naivního řešení}
 
 \section{Aplikace prohledávání plánů optimálními \linebreak tahy}
 
