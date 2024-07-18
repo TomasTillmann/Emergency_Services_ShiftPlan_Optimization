@@ -546,6 +546,9 @@ INPUT ./kap03.tex
 INPUT ./img/prague_monday_420.png
 INPUT ./img/prague_monday_420.png
 INPUT ./img/prague_monday_420.png
+INPUT ./img/plots/naive.png
+INPUT ./img/plots/naive.png
+INPUT ./img/plots/naive.png
 INPUT ./img/plots/localSearch_empty.png
 INPUT ./img/plots/localSearch_empty.png
 INPUT ./img/plots/localSearch_empty.png

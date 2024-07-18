@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+from matplotlib.ticker import FuncFormatter
 
 # Function to parse the file
 
@@ -45,6 +46,9 @@ def plot_data(elapsed, costs, handled_cases, evals):
     ax1.tick_params(axis='y', labelcolor=color)
     # ax1.set_xlim(max(temps), min(temps))
 
+    # Setting y-axis format to integer
+    ax1.get_yaxis().set_major_formatter(
+        FuncFormatter(lambda x, p: format(int(x), ',')))
     ax2 = ax1.twinx()
     color = 'tab:red'
     ax2.set_ylabel('Handled Incidents Count', color=color)

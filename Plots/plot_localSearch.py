@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+from matplotlib.ticker import FuncFormatter
 
 
 def parse_file(filename):
@@ -33,6 +34,10 @@ if __name__ == "__main__":
     ax1.set_ylabel('Cost', color=color)
     ax1.plot(elapsed_times, costs, color=color)
     ax1.tick_params(axis='y', labelcolor=color)
+
+    # Setting y-axis format to integer
+    ax1.get_yaxis().set_major_formatter(
+        FuncFormatter(lambda x, p: format(int(x), ',')))
 
     ax2 = ax1.twinx()
     color = 'tab:red'

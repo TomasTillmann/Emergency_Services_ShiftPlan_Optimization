@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+from matplotlib.ticker import FuncFormatter
 
 
 def parse_file(filename):
@@ -12,8 +13,8 @@ def parse_file(filename):
                 print(line)
                 parts = line.split(',')
                 elapsed = float(parts[0].split('elapsed: ')[1])
-                cost = int(parts[3].split('cost: ')[1])
-                handled = int(parts[6].split('handled: ')[1])
+                cost = int(parts[1].split('cost: ')[1])
+                handled = int(parts[4].split('handled: ')[1])
 
                 elapsed_times.append(elapsed)
                 costs.append(cost)
@@ -33,6 +34,10 @@ if __name__ == "__main__":
     ax1.set_ylabel('Cost', color=color)
     ax1.plot(elapsed_times, costs, color=color)
     ax1.tick_params(axis='y', labelcolor=color)
+
+    # Setting y-axis format to integer
+    ax1.get_yaxis().set_major_formatter(
+        FuncFormatter(lambda x, p: format(int(x), ',')))
 
     ax2 = ax1.twinx()
     color = 'tab:red'
