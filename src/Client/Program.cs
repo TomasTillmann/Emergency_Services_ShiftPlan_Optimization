@@ -18,15 +18,6 @@ namespace Client;
 
 class Program
 {
-  public static void Main()
-  {
-    PragueInput input = new PragueInput();
-    var world = input.GetWorld();
-    var incidents = input.GetMondayIncidents(300, new Random(420));
-
-    var optimizer = new NaiveSolutionOptimizer();
-  }
-  
   #if Cache
   public static void Main()
   {
