@@ -13,6 +13,10 @@ class Program
 {
   public static void Main()
   {
+  }
+  
+  public static void Main2()
+  {
     const string logDir = "StatsLog"; // Choose logdir
 
     List<Task> tasks = new();
