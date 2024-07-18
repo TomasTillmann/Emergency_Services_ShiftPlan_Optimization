@@ -2,10 +2,8 @@
 
 \section{Formalizace problému}\label{kap:formalizaceProblemu}
 
-Ústředním problémem pohotovostních služeb je umět naplánovat týmy záchranářů a záchranná vozidla na výjezdové stanice tak, aby efektivně odbavili co největší počet incidentů,
-při nejnižších možných, vynaložených nákladech, v rámci jednoho dne.
-Naším cílem je vymyslet metody, jak být schopný taková optimální naplánovaní nalézt.
-Z toho důvodu je v první řadě potřeba si problém zformalizovat a jasně si tak vymezit, jaký konkrétní problém řešíme.
+V první řadě je potřeba si problém plánování směn matematicky vymezit a popsat, abychom byli následně schopni problém systematicky řešit. 
+Právě proto je tato kapitola věnována formalizaci problému a představení klíčových pojmů. 
 
 Pohotovostní služba má k dispozici \textit{týmy záchranářů} $Z = \{ z_1, z_2, \dots, z_{Z_n} \}$, \textit{záchranná vozidla} $A = \{ a_1, a_2, \dots\ a_{A_n} \}$
 a \textit{výjezdové stanice} $V = \{ v_1, v_2, \dots, v_{V_n} \}$. 
@@ -44,6 +42,9 @@ kde P je množina všech plánů pohotovostních služeb.
 Množina $P$ obsahuje všechny plány, ale ne všechny plány jsou pro nás zajímavé.
 Zajímat nás budou pouze plány, které splňují nějaké \textit{omezující podmínky}.
 Pohotovostní služba definuje omezující podmínky, a to konkrétně \textit{maximální počty týmů záchranářů a záchranných vozidel povolených na jednotlivých výjezdových stanicích}.
+
+\clearpage
+
 \begin{definice}[Omezující podmínky pohotovostního plánu]
   Nechť $\mathbf{c^z}, \mathbf{c^a} \in \mathbb{N}^{V_n}$ vektory, 
   kde $i$-tou položku definujeme:
