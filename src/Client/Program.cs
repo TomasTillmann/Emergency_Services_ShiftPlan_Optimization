@@ -13,6 +13,24 @@ class Program
 {
   public static void Main()
   {
+    
+      PragueInput input = new PragueInput();
+      var world = input.GetWorld();
+      var incidents = input.GetIncidents(300, new Random(420));
+      Constraints constraints = input.GetConstraints();
+      ShiftTimes shiftTimes = input.GetShiftTimes();
+
+      IDistanceCalculator distanceCalculator = new RealDistanceCalculator(
+        world,
+        incidents,
+        "prague_monday_420_300_IncidentsToHospitals",
+        "prague_monday_420_300_DepotsToIncidents",
+        "prague_HospitalsToDepots"
+      );
+      
+      IUtilityFunction utilityFunction = new WeightedSum(new Simulation(world, constraints, distanceCalculator), EmergencyServicePlan.GetMaxCost(world, shiftTimes));
+      var optimizer = new NaiveSolutionOptimizer(world, constraints, utilityFunction, shiftTimes, 1000, new Random(1));
+      optimizer.GetBest(incidents);
   }
   
   public static void Main2()
