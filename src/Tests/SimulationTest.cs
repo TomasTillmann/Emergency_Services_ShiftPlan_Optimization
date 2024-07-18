@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using DataModel;
 using DataModel.Interfaces;
 using DistanceAPI;
 using ESSP.DataModel;
@@ -27,7 +28,7 @@ public class SimulationTest
         ImmutableArray<Incident> incidents = input.GetIncidents(incidentsCount);
         IPlanSampler sampler = new PlanSamplerUniform(world, shiftTimes, constraints, 0.8, random);
         EmergencyServicePlan plan = sampler.Sample();
-        IDistanceCalculator distanceCalculator = new RealDistanceCalculator(world.Hospitals);
+        IDistanceCalculator distanceCalculator = new LineDistanceCalculator(world.Hospitals);
 
         Simulation simulation = new(world, constraints, distanceCalculator);
         int expectedHandled = simulation.Run(plan, incidents.AsSpan());

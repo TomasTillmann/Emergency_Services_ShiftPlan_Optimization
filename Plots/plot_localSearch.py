@@ -27,7 +27,8 @@ if __name__ == "__main__":
     filename = 'LocalSearch_empty.log'
     elapsed_times, costs, handled_cases = parse_file(filename)
 
-    fig, ax1 = plt.subplots()
+    # fig, ax1 = plt.subplots()
+    fig, ax1 = plt.subplots(figsize=(16, 9))  # Adjust the width and height
 
     color = 'tab:blue'
     ax1.set_xlabel('Elapsed Time (seconds)')

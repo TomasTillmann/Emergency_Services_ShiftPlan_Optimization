@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Immutable;
+using DataModel.Interfaces;
 using ESSP.DataModel;
 
 namespace DataModel;
 
-public class LineDistanceCalculator
+public class LineDistanceCalculator : IDistanceCalculator
 {
   /// average speed of the ambulance
   public int SpeedMetPerSec { get; set; } = 80.ToKmPerHour().Value;
@@ -37,7 +38,7 @@ public class LineDistanceCalculator
     return _hospitals[index];
   }
 
-  public Coordinate GetNewLocation(Coordinate from, Coordinate to, int durationDrivingSec, int firstPossibleStartTimeSec)
+  public Coordinate GetIntermediateLocation(Coordinate from, Coordinate to, int durationDrivingSec)
   {
     int traveledDistanceMet = SpeedMetPerSec * durationDrivingSec;
     int distanceMet = GetDistanceMet(from, to);
