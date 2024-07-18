@@ -13,7 +13,7 @@ kde $D_{s} \in \mathbb{N}_0$ množina \textit{začátků pracovních směn} a $D
 \textit{Pracovní směna} $d \in D$ je tak dvojice $d = (d_s, d_l)$, kde $d_{s} \in D_{s}$ značí začátek a $d_{l} \in D_{l}$ délku trvání směny.
 Nechť $D_n = |D|$.
 
-Plánem pohotovostní služby chápeme přiřazení týmů záchranářů $z \in Z$ a záchranných vozidel $a \in A$ na konkrétní výjezdové stanice $v \in V$
+Plánem pohotovostní služby rozumíme přiřazení týmů záchranářů $z \in Z$ a záchranných vozidel $a \in A$ na konkrétní výjezdové stanice $v \in V$
 a přiřazení pracovní směny $d \in D$ každému týmu záchranářů $z \in Z$ v rámci jednoho dne.
 Tato přiřazení popíšeme \textit{přiřazovacími funkcemi}:
 \begin{definice}[Přiřazovací funkce]
@@ -39,7 +39,7 @@ Pro pohodlnost zaveďme:
   p = (p_Z, p_A, p_{D_{s}}, p_{D_{l}}) \in P,
 \end{align*}
 kde P je množina všech plánů pohotovostních služeb.
-Množina $P$ obsahuje všechny plány, ale ne všechny plány jsou pro nás zajímavé.
+Množina $P$ obsahuje všechny plány. Ale ne všechny plány jsou pro nás zajímavé.
 Zajímat nás budou pouze plány, které splňují nějaké \textit{omezující podmínky}.
 Pohotovostní služba definuje omezující podmínky, a to konkrétně \textit{maximální počty týmů záchranářů a záchranných vozidel povolených na jednotlivých výjezdových stanicích}.
 
@@ -88,14 +88,14 @@ který bude maximalizovat počet \textit{úspěšně odbavených incidentů $s_I
 
 \section{Simulace plánu pohotovostní služby}\label{SimulaceKap}
 
-Naším cílem je umět nalézt optimální plán pohotovostní služby.
+Naším cílem je nalézt způsob, který nalezne optimální plán pohotovostní služby.
 Ten určujeme podle počtu úspěšně odbavených incidentů $s_I$ a ceny plánu $u(p)$.
 Z toho důvodu jsme si formálně nadefinovali prostředky, které má pohotovostní služba k dispozici a co je plán pohotovostní služby.
 
 V kapitole \ref{kap:optUloha2uc} definujeme cenu plánu $u(p)$ (viz definice \ref{df:cenaPlanu}).
 V této kapitole navrhneme způsob, jakým zjistíme $s_I$ pohotovostního plánu $p$ na množine incidentů $I$.
 Pro zjištění $s_I$ spustíme simulaci $s$ pohotovostního plánu $p$ na dané množině $I$.
-Následně formálně popíšeme simulaci a jaká pravidla chodu simulace se rozhodneme použít.
+Následně formálně popíšeme simulaci a určíme, jaká pravidla chodu simulace se rozhodneme použít.
 Důvod použití přístupu simulace je popsán v nadcházející kapitole.
 
 \subsection{Přístup použití simulace}\label{kap:procSimulace}
@@ -108,10 +108,11 @@ Simulace bude napodobovat chování plánu v průběhu dne tak, jak by se plán 
 počtu úspěšně odbavených incidentů v reálném světě.
 
 Přístup použití simulace má ještě jednu podstatnou výhodu.
-Různé pohotovostní služby mohou používat různé způsoby a pravidla, například pro výběr záchranného týmu či vozidla pro odbavení incidentu, který právě nastal, nebo do jaké nemocnice je incident vhodné odbavit.
+Různé pohotovostní služby mohou používat různé způsoby a pravidla, například pro výběr záchranného týmu či vozidla pro odbavení incidentu, který právě nastal,
+nebo do jaké nemocnice je vhodné incident odbavit.
 Tato pravidla mohou být příliš složitá na to, aby bylo možné je výstižně zachytit jinými způsoby, jako například pouze matematickými rovnostmi a nerovnostmi, jak je zvykem pro lineární programování \cite{LP}.
 
-Na druhou stranu je podstatnou nevýhodou simulace její výpočetní náročnost a značné omezení použitelných technik obecně využívaných pro řešení optimalizač~ních problémů.
+Na druhou stranu je podstatnou nevýhodou simulace její výpočetní náročnost a značné omezení použitelných technik využívaných pro řešení optimalizačních problémů.
 
 \subsection{Popis deterministické diskrétní simulace}
 
@@ -166,7 +167,7 @@ V naší simulaci jsou použitá pravidla vybraná na základě konzultace se sp
 a sama podobná pravidla používá pro plánovaní u několika jejích klientů ve Spojených státech amerických \footnote{Logis Solutions, s.r.o. (https://logissolutions.net)}.
 
 Simulace je navržena dostatečně genericky tak, aby bylo možné naimplementovat i libovolná jiná pravidla, například jednodušší, komplikovanější nebo klidně i stochastická.
-Jak bylo zmíněno v kapitole \ref{kap:procSimulace}, možnost volby libovolných pravidel je jedna z více výhod přístupu použití simulace.
+Jak bylo zmíněno v kapitole \ref{kap:procSimulace}, možnost volby libovolných pravidel je jedna z několika výhod přístupu použití simulace.
 \begin{definice}\label{df:simulacePravidla2}
   Nejvhodnější tým záchranářů $z_i \in Z_i$, kde $Z_i \subseteq Z$ jsou všechny týmy záchranářů schopny úspěšně odbavit incident $i \in I$ je tým,
   který je nejlepší podle následujících kritérií v daném pořadí:
@@ -276,7 +277,7 @@ Záchranný tým $z_k$ tak \textit{odbavuje} incident $i_k$ (viz definice \ref{d
 Tím se aktualizuje stav záchranných týmů $S_Z$.
 
 V kroku 13 je funkcí \textit{UpdateWhenFree} aktualizován stav záchranných vozidel $S_A$.
-konkrétně vozidlu $a_k$ se přiřadí čas, kdy bude opět k dispozici, tedy kdy má $z_k$ přijet zpět na výjezdovou stanici.
+Konkrétně vozidlu $a_k$ se přiřadí čas, kdy bude opět k dispozici, tedy kdy má $z_k$ přijet zpět na výjezdovou stanici.
 
 Simulace doběhne jakmile nejsou žádné další události k odbavení, respektive jakmile projde všechny incidenty, to je po $|I|$ krocích.
 Simulace vrátí $s_I$, počet úspěšně odbavených incidentů.
@@ -538,7 +539,7 @@ Podrobněji jsou diskutovány v kapitole \ref{chap:reseniOptUloh}.
 
 \subsection{Analýza množiny plánů pohotovostních služeb}\label{kap:analP}
 
-Znát velikost množiny plánů pohotovostních služeb $P$ a $P_C$ je klíčové pro navrhování metod pro nalezení optima, proto je v této kapitole spočítáme.
+Znát velikost množiny plánů pohotovostních služeb $P$ a $P_C$ je klíčové pro navrhování metod hledající optima, a proto je v této kapitole spočítáme.
 To platí zejména pro $P_C$, jelikož námi hledané optimum právě $P_C$ náleží.
 Jaké implikace má velikost $P_C$ na zvolené metody řešení je popsáno v kapitole \ref{kap:NP}.
 
@@ -550,7 +551,7 @@ Jaké implikace má velikost $P_C$ na zvolené metody řešení je popsáno v ka
 \end{veta}
 
 \begin{dukaz}
-  Všimněme si, že počet uspořádaných $V_n$-tic nezáporných celých čísel posčítajících se na $k$
+  Všimněme si, že počet uspořádaných $V_n$-tic nezáporných celých čísel posčítajících se na $k$,
   přičemž záleží na pořadí sčítanců, přesně odpovídá počtu naalokování záchranných týmů na výjezdové stanice, kde chceme naalokovat přesně $k$ týmů.
   Například pro $k = 10$ a $V_n = 4$ by
 
@@ -585,7 +586,7 @@ Jaké implikace má velikost $P_C$ na zvolené metody řešení je popsáno v ka
 \end{veta}
 
 \begin{dukaz}
-  Stejný jako v předchozí větě, avšak na místo, abychom vybírali ze všech záchranných týmu a vozidel,
+  Stejný jako v předchozí větě, avšak namísto toho, abychom vybírali ze všech záchranných týmu a vozidel,
   vybíráme ze součtu přes korespondující dostupné kapacity na výjezdových stanicích $Z^c_n$ a $A^c_n$.
 \end{dukaz}
 
@@ -721,7 +722,7 @@ Chtěli bychom nalézt způsob, kterým nalezneme optimum ideálně v polynomiá
 V kapitole \ref{kap:analP} jsme přesně spočítali velikost $P$ a $P_C$ a zároveň jsme je odhadli asymptoticky.
 V kapitole \ref{kap:analVicF} jsme si ukázali základní vlastnosti účelové funkce $q \in Q_I$.
 V předchozí kapitole jsme si ukázali, že nemůžeme úlohu vyřešit jednoduše naivním řešením v polynomiálním čase.
-V této kapitole dáme tyto poznatky dohromady a zklasifikujeme tak řešenou optimalizační úlohu, za účelem nalezení nejvhodnějších metod pro řešení.
+V této kapitole dáme tyto poznatky dohromady, a zklasifikujeme tak řešenou optimalizační úlohu, za účelem nalezení nejvhodnějších metod pro řešení.
 
 Vybíráme optimální konfigurace z konečně mnoho diskrétních objektů, a to sice přiřazení $p_Z$, $p_A$, $p_{D_{s}}$, $p_{D_{l}}$.
 Jedná se tak o \textit{diskrétní} nebo taky o \textit{kombinatorickou} optimalizaci \cite{discrete}.
