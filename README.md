@@ -1,5 +1,5 @@
-# User documentation
 
+# User documentation
 ## Installation guide
 
 This project is a library implemented in C# (.NET 8), which implements optimizers for finding optimal emergency service plans.
@@ -108,14 +108,14 @@ Project `WorldMap` is used for visualization of your emergency service and incid
 It's both windows and linux desktop application, build using Avalonia framework.
 Here is visualized model of Prague and sample incidents: 
 
-![Depots and hospitals in Prague, with incidents](./img/prague.png)
+![Depots and hospitals in Prague, with incidents](./src/img/prague.png)
 
 # Technical documentation
 
 ## Project structure
 The project structure is as following:
 
-![Project diagram](./img/project_diagram.png)
+![Project diagram](./src/img/project_diagram.png)
 
 `DataModel` project contains all data types and model classes.
 Project `Simulating` contains everything related to emergency service plan simulation.
@@ -127,7 +127,7 @@ It provides all optimizers, with utility functions etc ...
 This is the most important library, which is included and where all the logic of finding an optimal plan lies. 
 Below is visualized optimizers hiearchy:
 
-![Optimizers hierarchy](./img/optimizer_hierarchy.png)
+![Optimizers hierarchy](./src/img/optimizer_hierarchy.png)
 
 Everything implements `IOptimizer` which defines method `GetBest`.
 Class `OptimizerBase` represents an optimizer, which finds best emergency plan using only some utility function, defined by `IUtilityFunction` interface.
@@ -135,7 +135,7 @@ Class `NeighbourOptimizer` represents optimizers, which for finding an optimal p
 The optimal moves search optimizer does not implement `OptimizerBase`, because the utility function lex comparer has two arguments - it only works by comparing, not by producing some absolute value.
 It also does not make sense to inherit from `NeighbourOptimizer`, because the move generation is very specific and cannot be parametrized by some `IMoveGenerator` instance.
 
-![Utility function hierarchy](./img/utility_func_diagram.png)
+![Utility function hierarchy](./src/img/utility_func_diagram.png)
 
 This is the utility function hierarchy. Notice the lex comparer does not implement the interface `IUtilityFunction`.
 
@@ -164,7 +164,7 @@ Simulation has to be very efficient. If you use some API to calculate route trav
 For that reason, there is also `LineDistanceCalculator`, which does not call any API's, but instead calculates travel durations and also intermediate locations simply by making all trajectories as lines and using a Pythagorean theorem.
 In this implementation calculating travel durations is very fast, compared to `RealDistanceCalculator` it's in hundreds of orders of magnitude, but the accuracy is not very good. Such an implementation of `IDistanceCalculator` can still be useful, for example as some kind of Surrogate Model.
 
-![Simulation uses](./img/simulation_uses.png)
+![Simulation uses](./src/img/simulation_uses.png)
 
 In the diagram above, we can see what classes is simulation using.
 Class `MedicTeamsEvaluator` is used for evaluating which medic team is the best one to choose to handle current incident.
